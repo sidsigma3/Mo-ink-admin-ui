@@ -1,0 +1,57 @@
+.modal .modal-header .modal-title{
+    font-size: 1rem;
+}
+
+.modal .modal-body h5{
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+
+.modal .modal-body button{
+    font-size: 0.8rem;
+    font-weight: 400;
+    border: 1px solid #B9C0CD;
+    background-color: #EFEFEF;
+    border-radius: 1rem;
+    padding: 0.3rem 0.6rem;
+}
+
+.modal .modal-body .color-picker-ctn{
+    position: absolute;
+    right: -14rem;
+    
+}
+
+.modal .modal-body  .add-color{
+    background-color: #0561FC !important;
+    border-radius: 0.3rem;
+}
+
+.modal .modal-body .size-section img{
+    width: 3rem;
+    cursor: pointer;
+}
+
+.modal .modal-body .size-section .selected{
+    border: 2px solid rgb(74, 74, 255);
+    background-color: white;
+}
+
+.modal .modal-body .color-picker-ctn .color-picker{
+  
+}
+
+
+@media(max-width:1024px){
+
+    .modal .modal-body .color-picker-ctn{
+        position: absolute;
+        right: 0;
+        bottom:-10rem;
+        
+    }
+
+}
+
+

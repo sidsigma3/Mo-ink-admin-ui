@@ -1,0 +1,28 @@
+ .order-id{
+    width: 30%;
+    border-radius: 0.3rem;
+}
+
+.order-id input{
+    border: none;
+    background: none;
+    width: 90%;
+}
+
+ .order-id input:focus{
+    outline: none;
+}
+
+.order-id h5{
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+
+@media(max-width:768px){
+    .order-id{
+        width: 50%;
+        border-radius: 0.3rem;
+    }
+}

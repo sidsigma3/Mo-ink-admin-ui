@@ -1,0 +1,200 @@
+.order-table{
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+
+}
+
+.order-table table {
+    width: 100%;
+    background-color: white;
+    text-align: left;
+   
+    table-layout: fixed;
+}
+
+.order-table table thead{
+    position: sticky;
+    top: 0;
+    z-index: 9999999;
+    background-color: #F9FAFB;
+}
+
+.order-table th,
+.order-table td {
+  
+  border-bottom: 1px solid #ddd
+}
+
+
+.order-table table tr{
+    color: #16181E;
+    
+}
+
+.order-table table tr th{
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+
+.order-table table tbody td{
+    font-size: 0.8rem;
+    font-weight: 400;
+    padding: 0.5rem 1rem;
+}
+
+.order-table table tbody td>div{
+    display: flex;
+    justify-content: center;
+}
+
+.order-table table tbody td .green{
+    background-color: #D1FAE5;
+    border: 1px solid #6EE7B7;
+    color: #41b788;
+    border-radius: 0.3rem;
+}
+
+.order-table table tbody td .grey{
+    background-color: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    color: rgb(63, 60, 60);
+    border-radius: 0.3rem;
+}
+
+.order-table table tbody td .blue{
+    background-color: #DBEAFE;
+    border: 1px solid #5d91cb;
+    color: #5c9de8;
+    border-radius: 0.3rem;
+}
+
+.order-table table tbody td .yellow{
+    background-color: #FEF3C7;
+    border: 1px solid #FCD34D;
+    color: #8e741d;
+    border-radius: 0.3rem;
+}
+
+
+.order-table table tbody td .red{
+    background-color: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #be5757;
+    border-radius: 0.3rem;
+}
+
+.order-table table tbody td button{
+    height: 30%;
+    width: 90%;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+.order-table table tbody .manufacturer .assign-button{
+    height: 25px;
+    padding: 0.2rem 1rem;
+}
+
+.order-table .order-cards{
+    display: none;
+}
+
+@media(max-width:1024px){
+    .order-table{
+        width: 100vw;
+    }
+}
+
+
+
+@media (max-width: 768px) {
+    .order-table table {
+        display: none;
+    }
+
+    .order-table .order-cards{
+        display: block;
+    }
+
+    .order-table .order-cards .order-card{
+        background-color: white;
+        padding: 1rem 2rem;
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+    }
+
+    .order-table .order-cards .order-card h4{
+        font-size: 0.8rem;
+        color: #93A3AB;
+    }
+
+    .order-table .order-cards .order-card h3{
+        font-size: 1.3rem;
+    }
+
+    .order-table .order-cards .order-card h5{
+        padding: 0.2rem 0.6rem;
+        font-size: 0.8rem;
+        width: 6rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .order-table  .order-cards .assign-button{
+        height: 1.8rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .order-table .order-cards .order-card p{
+        font-weight: 500;
+    }
+
+    .order-table .order-cards .order-card .manufacturer-name{
+        border: 1px solid #93A3AB;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+    }
+
+    .order-table .order-cards .order-card .green{
+        background-color: #D1FAE5;
+        border: 1px solid #6EE7B7;
+        color: #41b788;
+        border-radius: 0.3rem;
+    }
+    
+    .order-table .order-cards .order-card .grey{
+        background-color: #F3F4F6;
+        border: 1px solid #D1D5DB;
+        color: rgb(63, 60, 60);
+        border-radius: 0.3rem;
+    }
+    
+    .order-table .order-cards .order-card .blue{
+        background-color: #DBEAFE;
+        border: 1px solid #5d91cb;
+        color: #5c9de8;
+        border-radius: 0.3rem;
+    }
+    
+    .order-table .order-cards .order-card .yellow{
+        background-color: #FEF3C7;
+        border: 1px solid #FCD34D;
+        color: #8e741d;
+        border-radius: 0.3rem;
+    }
+    
+    
+    .order-table .order-cards .order-card .red{
+        background-color: #FEE2E2;
+        border: 1px solid #FCA5A5;
+        color: #be5757;
+        border-radius: 0.3rem;
+    }
+
+
+}

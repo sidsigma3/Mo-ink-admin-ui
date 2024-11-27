@@ -1,0 +1,82 @@
+.create-order .main-sec .payment h4{
+    font-size: 1.25rem;
+}
+.create-order .main-sec .payment h5{
+    font-size: 1rem;
+}
+
+.create-order .main-sec .payment .container h5{
+    margin-bottom: 1rem;
+}
+
+.create-order .main-sec .order-detail .head h4{
+    font-size: 1rem;
+}
+
+.create-order .main-sec .right{
+  
+    position: sticky;
+    right: 0;
+}
+
+.create-order .main-sec .right .ctn{
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.3rem;
+}
+
+.create-order .main-sec .right h4{
+    font-size: 1rem;
+}
+
+.create-order .main-sec .right h5{
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.create-order .main-sec .right .drop-down button{
+    background-color: white;
+    color: black;
+    border-color: #B9C0CD;
+    width: 95%;
+}
+
+.create-order .main-sec .right .drop-down .dropdown-menu{
+    width: 95%;
+}
+
+.create-order .main-sec .right ul{
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.create-order .main-sec .right ul li{
+    border-bottom: 1px solid #B9C0CD;
+    padding: 0.3rem;
+}
+
+
+@media (max-width: 1024px) {
+    .create-order .main-sec{
+        flex-wrap: wrap-reverse;
+    }
+
+    .create-order .main-sec .right{
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    
+    .create-order .main-sec .right .ctn .selected-customer{
+         display: flex;
+         gap: 1rem;
+         justify-content: space-between;
+        
+    }
+}

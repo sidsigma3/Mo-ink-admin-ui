@@ -1,0 +1,87 @@
+.discount-table-ctn {
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+  
+    overflow: auto;
+    margin-top: 1rem;
+  }
+  
+  .discount-table-ctn table {
+    width: 100%;
+    background-color: white;
+    text-align: left;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  .discount-table-ctn table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f9fafb;
+  }
+
+  .discount-table-ctn table thead tr th{
+    background-color: #f9fafb; ;
+  }
+  
+  .discount-table-ctn th,
+  .discount-table-ctn td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .discount-table-ctn th {
+    font-weight: 600
+  }
+  
+  .discount-table-ctn tbody td {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .discount-table-ctn .data-cards {
+    display: none;
+    
+  }
+
+  @media (max-width: 1024px) {
+    .discount-table-ctn{
+     
+      overflow: auto;
+    }
+
+    .discount-table-ctn table{
+      width: 110vw;
+    }
+  }
+
+
+  
+  @media (max-width: 768px) {
+    .discount-table-ctn table {
+      display: none;
+    }
+  
+    .discount-table-ctn .data-cards {
+      display: block;
+      padding: 1rem;
+    }
+  
+    .discount-table-ctn .data-card {
+      background-color: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
+    }
+  
+    .discount-table-ctn .data-card h3 {
+      margin: 0 0 0.5rem;
+    }
+  
+    .discount-table-ctn .data-card p {
+      margin: 0.2rem 0;
+      font-size: 1rem;
+    }
+  }
+  

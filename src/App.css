@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +35,91 @@
   to {
     transform: rotate(360deg);
   }
+} */
+
+*{margin: 0; padding: 0;}
+
+html, body, #root {
+  width: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important; height: 100%;}
+
+
+.main{
+  overflow: hidden;
+  padding-top: 12vh;
+}
+
+.sidebarWrapper{
+  width: 22%;
+  height: calc(100vh - 12vh);
+  position: sticky;
+  top: 0;
+  padding: 0.5rem;
+}
+
+.content{
+  overflow: auto;
+}
+
+
+@media (max-width: 768px) {
+
+.main {
+  flex-wrap: wrap-reverse;
+  height: auto;
+  padding-top: 10vh;
+  padding-bottom: 8vh;
+}
+
+.main .sidebarWrapper{
+  width: 100% !important;
+  height: auto;
+}
+
+.main .content{
+  overflow: auto;
+  height: 100%;
+}
+
+.main .sidebarWrapper .sideBar{
+  height: 10vh;
+  border-radius: 3rem;
+  position: fixed;
+  bottom: 0vh;
+  width: 98%;
+}
+
+}
+
+
+@media (max-width: 1024px) {
+  .main .sidebarWrapper{
+    width: 30%;
+  }
+
+  .main{
+    height: auto;
+    padding-top: 9vh;
+  }
+
+  html, body, #root {
+    width: auto;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+
+}
+
+

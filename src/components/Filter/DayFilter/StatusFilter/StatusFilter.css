@@ -1,0 +1,26 @@
+.status{
+    /* width: 25%; */
+    border-radius: 0.3rem;
+    
+}
+
+.status h5{
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+
+.dropdown button{
+    background-color: white;
+   border: 1px solid #D1D5DB;
+    border-radius: 0.3rem;
+}
+
+@media(max-width:768px){
+    .status{
+        width: 50%;
+        border-radius: 0.3rem;
+    }
+}
+

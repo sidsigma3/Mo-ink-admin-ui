@@ -1,0 +1,82 @@
+.data-table-ctn {
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+    /* height: 70vh; */
+    overflow: auto;
+    margin-top: 1rem;
+  }
+  
+  .data-table table {
+    width: 100%;
+    background-color: white;
+    text-align: left;
+    border-collapse: collapse;
+  }
+  
+  .data-table table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f9fafb;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .data-table th {
+    font-weight: 600
+  }
+  
+  .data-table tbody td {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .data-table .data-cards {
+    display: none;
+    
+  }
+
+  @media (max-width: 1024px) {
+    .data-table{
+     
+      overflow: auto;
+    }
+
+    .data-table table{
+      width: 110vw;
+    }
+  }
+
+
+  
+  @media (max-width: 768px) {
+    .data-table table {
+      display: none;
+    }
+  
+    .data-table .data-cards {
+      display: block;
+      padding: 1rem;
+    }
+  
+    .data-table .data-card {
+      background-color: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
+    }
+  
+    .data-table .data-card h3 {
+      margin: 0 0 0.5rem;
+    }
+  
+    .data-table .data-card p {
+      margin: 0.2rem 0;
+      font-size: 1rem;
+    }
+  }
+  

@@ -1,0 +1,58 @@
+header{
+    background-color: var(--White, #FFF);
+    padding: 0.5rem 0;
+    width: 100%;
+    position: fixed;
+    
+    z-index: 1000;
+}
+
+header .row{
+    margin: 0;
+}
+
+header .logo-ctn img{
+    
+}
+
+header .profile-ctn{
+    text-align: left;
+}
+
+header .profile-ctn h4{
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+header .profile-ctn p{
+    margin: 0;
+    color: #93A3AB;
+}
+
+
+
+header .myAcc button svg{
+    border: none;
+    background: none;
+    color: #93A3AB;
+}
+
+
+header .myAcc button{
+    background:none;
+    border: none;
+}
+
+
+@media (max-width: 768px) {
+    header .myAcc{
+        display: none !important;
+    }
+
+    header{
+        z-index: 1000;
+    }
+
+    header .bell-icon{}
+
+}

@@ -1,0 +1,22 @@
+.dashboardBox{
+    border-radius: 0.8rem;
+    background-color: white;
+    /* height: 12vh; */
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+
+.dashboardBox h4{
+    font-size: 0.8rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.dashboardBox .title svg{
+    vertical-align: top;
+}
+
+.dashboardBox h3{
+    font-size: 1.1rem;
+}

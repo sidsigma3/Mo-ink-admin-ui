@@ -1,0 +1,124 @@
+.sideBar{
+    border-radius: 0.8rem;
+    background-color: var(--White, #FFF);
+    height: 100%;
+    padding: 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sideBar ul{
+    list-style: none;
+    padding: 0;
+}
+
+.sideBar ul li{
+    margin-bottom: 0.1rem;
+    padding: 0.4rem 0 0.4rem 1rem;
+    display: flex;
+    justify-content: left;
+    width: 100%;
+}
+
+.sideBar ul li button{
+    background: none;
+    border: none;
+    
+
+}
+
+.sideBar .icon{
+    color: #222326;
+}
+
+.sideBar ul li span{
+    margin-right: 1rem;
+}
+
+.sideBar ul li button{
+    font-size: 1rem;
+    font-weight: 400;
+    color:#222326;
+    
+}
+
+
+.sideBar ul li button:hover{
+    color: #0561FC;
+}
+
+.sideBar ul li button:hover .icon svg {
+    color: #0561FC;
+}
+
+.sideBar h3{
+    font-size: 1.1rem;
+    padding-left: 1rem;
+}
+
+.sideBar .show-on-mobile{
+    display: none;
+}
+
+
+.sideBar .selected button{
+    color: #0561FC;
+}
+
+.sideBar .selected button span{
+    color: #0561FC;
+}
+
+
+@media (max-width: 768px) {
+    .sideBar .menu .on-mobile{
+       display: flex;
+        margin: 0;
+    }
+
+    .sideBar .menu .show-on-mobile{
+        display: block;
+    }
+
+    .sideBar .hide-on-mobile{
+        display: none;
+    }
+
+    .sideBar ul li a{
+        width: 100%;
+    }
+
+    .sideBar ul li button{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .sideBar ul li a{
+        text-decoration: none;
+    }
+
+    .sideBar ul li  span{
+        margin: 0;
+    } 
+
+}
+
+
+@media (max-width: 1024px) {
+
+    .sideBar{
+
+    }
+
+    .sideBar ul li{
+        padding: 0.4rem 0.5rem;
+    }
+
+    .sideBar button{
+       
+    }
+
+}

@@ -1,0 +1,22 @@
+.searchBox input{
+    background: transparent;
+    border: none;
+    width: 95%;
+}
+
+.searchBox input:focus{
+    outline: none;
+}
+
+.searchBox{
+    background-color: #F7F8FA;
+    padding: 0.5rem 1rem;
+}
+
+
+@media (max-width: 768px) {
+    .searchBox{
+        border-radius: 1rem;
+        /* margin-top: 1rem; */
+    }
+}

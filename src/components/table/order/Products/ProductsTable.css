@@ -1,0 +1,82 @@
+.product-table {
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+    height: 70vh;
+    overflow: auto;
+    margin-top: 1rem;
+  }
+  
+  .product-table table {
+    width: 100%;
+    background-color: white;
+    text-align: left;
+    border-collapse: collapse;
+  }
+  
+  .product-table table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f9fafb;
+  }
+  
+  .product-table th,
+  .product-table td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .product-table th {
+    font-weight: 600
+  }
+  
+  .product-table tbody td {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .product-table .product-cards {
+    display: none;
+    
+  }
+
+  @media (max-width: 1024px) {
+    .product-table{
+     
+      overflow: auto;
+    }
+
+    .product-table table{
+      width: 110vw;
+    }
+  }
+
+
+  
+  @media (max-width: 768px) {
+    .product-table table {
+      display: none;
+    }
+  
+    .product-table .product-cards {
+      display: block;
+      padding: 1rem;
+    }
+  
+    .product-table .product-card {
+      background-color: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
+    }
+  
+    .product-table .product-card h3 {
+      margin: 0 0 0.5rem;
+    }
+  
+    .product-table .product-card p {
+      margin: 0.2rem 0;
+      font-size: 1rem;
+    }
+  }
+  
