@@ -7,53 +7,20 @@ import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/Stat
 import { Table } from 'react-bootstrap'
 import "./CustomersPage.css"
 import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
+import { useCustomerContext } from '../../../components/Context/CustomerContext'
+import { useNavigate } from 'react-router-dom'
+import { BiWallet } from "react-icons/bi";
 
 const CustomersPage = () => {
 
-    const customerData = [
-        {
-          name: "Rahul Sharma",
-          email: "rahul.sharma@example.com",
-          phone: "+91-9876543210",
-          wallet: "₹5,000",
-          location: "Mumbai",
-          lastOrder: "2024-11-15",
-        },
-        {
-          name: "Priya Gupta",
-          email: "priya.gupta@example.com",
-          phone: "+91-8765432109",
-          wallet: "₹2,800",
-          location: "Delhi",
-          lastOrder: "2024-11-10",
-        },
-        {
-          name: "Amit Patel",
-          email: "amit.patel@example.com",
-          phone: "+91-7654321098",
-          wallet: "₹12,450",
-          location: "Ahmedabad",
-          lastOrder: "2024-11-20",
-        },
-        {
-          name: "Sneha Nair",
-          email: "sneha.nair@example.com",
-          phone: "+91-6543210987",
-          wallet: "₹9,600",
-          location: "Kochi",
-          lastOrder: "2024-11-18",
-        },
-        {
-          name: "Karan Singh",
-          email: "karan.singh@example.com",
-          phone: "+91-5432109876",
-          wallet: "₹3,300",
-          location: "Chandigarh",
-          lastOrder: "2024-11-05",
-        },
-      ];
-      
+    const navigate = useNavigate()
 
+    const { customers } = useCustomerContext();
+
+    const handleRowClick = (index) => {
+        navigate('/add-customer', { state: { index } });
+      };
+    
 
   return (
     <div className='customer-page'>
@@ -91,18 +58,51 @@ const CustomersPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-            {customerData.map((customer, index) => (
-              <tr key={index}>
+            {customers.map((customer, index) => (
+              <tr key={index} onClick={() => handleRowClick(index)} style={{ cursor: "pointer" }}>
                 <td>{customer.name}</td>
                 <td>{customer.location}</td>
-                <td>{customer.phone}</td>
-                <td>{customer.wallet}</td>
+                <td style={{color:'#3CAA82'}}>{customer.wallet}</td>
+                <td>{customer.totalOrders}</td>
                 <td>{customer.lastOrder}</td>
               </tr>
             ))}
           </tbody>
 
             </Table>
+
+
+            <div className="data-cards">
+        {customers.map((item,index) => (
+          <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
+
+            <div className='d-flex justify-content-between'>
+                 <h3>{item.name}</h3>
+                 <p> 
+                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:'#D1FAE5',border:'1px solid' ,borderColor:'#6EE7B7',borderRadius:'0.2rem',textAlign:'center',width:'100%' ,color:'#00A65E'}}>
+                      <span><BiWallet /></span>      {item.wallet}
+                    </div>
+                </p>
+            </div>
+
+          
+            
+            <p><strong></strong> {item.phone}</p>
+    
+         
+
+            <p className='fw-medium'><strong></strong> {item.location}</p>
+
+            <p className='text-body-tertiary'>Last Order on {item.lastOrder}</p>
+
+           
+          </div>
+        ))}
+      </div>
+
+
+
+
         </div>
 
 

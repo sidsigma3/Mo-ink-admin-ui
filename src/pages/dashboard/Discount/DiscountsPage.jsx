@@ -73,7 +73,7 @@ const DiscountsPage = () => {
 
           <div className="data-cards">
         {discountData.map((product,index) => (
-          <div className="data-card" key={index}>
+          <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
                  <h3>{product.discountCode}</h3>

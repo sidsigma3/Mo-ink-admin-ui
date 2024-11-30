@@ -1,0 +1,54 @@
+.add-segments-page{
+    .main{
+        padding-top: 0;
+
+        .left{
+            width: 75%;
+
+            
+
+            input[type=text]{
+                border: 1px solid #D1D5DB;
+                border-radius: 0.3rem;
+                padding: 0.2rem 0.2rem;
+                height: 2rem;
+                margin-top: 0.5rem;
+            }
+
+            .media-input{
+                border: 1px dashed gainsboro;
+            
+                h4{
+                    font-size: 0.9rem;
+                    margin-top: 1rem;
+                    margin-left: -5rem;
+                    color: #0561FC;
+                }
+            
+            }
+            
+
+
+        }
+
+        .right{
+            width: 25%;
+        }
+    }
+
+}
+
+@media(max-width:1024px){
+    .add-segments-page .main {
+        flex-wrap: wrap-reverse;
+    }
+
+    .add-segments-page .left{
+        flex-grow: 1;
+    }
+
+    .add-segments-page .right{
+        flex-grow: 1;
+    }
+    
+}

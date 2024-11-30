@@ -15,11 +15,13 @@ import { GrBug } from "react-icons/gr";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { TfiMenuAlt } from "react-icons/tfi";
 import { Link } from 'react-router-dom'
+import { BsArrowReturnRight } from "react-icons/bs";
+import { RiUserSettingsLine } from "react-icons/ri";
 
 const SideBar = () => {
     const [selected,setSelected] = useState('dashboard')
 
-
+    const [hoverSelected , setHoverSelected] = useState('')
 
   return (
     <div className='sideBar'>
@@ -70,18 +72,35 @@ const SideBar = () => {
         <h3 className='hide-on-mobile'>My Team</h3>
 
         <ul className='hide-on-mobile'>
-            <li className={selected === 'customers' ? 'selected' : 'not-selected'}>
+            <div  onMouseEnter={() => setHoverSelected('customers')}  onMouseLeave={() => setHoverSelected(null)}>
+            <li className={selected === 'customers' ? 'selected' : 'not-selected'}  onMouseEnter={() => setHoverSelected('customers')} >
                 <Link to={'/customers'}>
                 <button  onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={25} /></span>Customers</button>
+                </Link>
+                
+            </li>
+
+                 {hoverSelected === 'customers' && (
+                    <div className='mt-2 ps-4 mb-2'>
+                    <Link to={'/segments'}>
+                        <button className='d-flex gap-3' style={{border:'none',background:'none' ,textDecoration:'none'}}> <span><BsArrowReturnRight /></span>Segments</button>
+                    </Link>
+                    </div>
+                   
+                )}
+
+            </div>
+
+            <li className={selected === 'manufactures' ? 'selected' : 'not-selected'}>
+                <Link to={'/spinners-and-dyers'}>
+                <button  onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={25}/></span>Spinners & Dyers</button>
                 </Link>
             </li>
 
             <li>
-                <button  onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={25}/></span>Manufactures</button>
-            </li>
-
-            <li>
-                <button  onClick={()=>setSelected('sales-team')}><span className='icon'><MdOutlineDiscount size={25}/></span>Sales Team</button>
+                <Link to={'/users'}>
+                <button  onClick={()=>setSelected('users')}><span className='icon'><RiUserSettingsLine  size={25}/></span>Users</button>
+                </Link>
             </li>
 
         </ul>

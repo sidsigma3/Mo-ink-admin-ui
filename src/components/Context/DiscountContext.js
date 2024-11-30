@@ -36,7 +36,7 @@ export const DiscountProvider = ({ children }) => {
       return prevDiscounts.map((d, idx) => (idx === discount.index ? discount : d));
     } else {
       // Add new discount
-      return [...prevDiscounts, discount];
+      return [discount,...prevDiscounts];
     }
   });
 };

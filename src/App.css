@@ -60,7 +60,7 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
 }
 
 .sidebarWrapper{
-  width: 22%;
+  width: 25%;
   height: calc(100vh - 12vh);
   position: sticky;
   top: 0;
@@ -104,7 +104,7 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
 
 @media (max-width: 1024px) {
   .main .sidebarWrapper{
-    width: 30%;
+    width: 37%;
   }
 
   .main{

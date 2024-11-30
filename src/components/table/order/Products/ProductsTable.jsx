@@ -70,8 +70,8 @@ const ProductsTable = ({sampleProducts}) => {
       </Table>
 
       <div className="product-cards">
-        {sampleProducts.map((product) => (
-          <div className="product-card" key={product.productId}>
+        {sampleProducts.map((product,index) => (
+          <div className="product-card" key={product.index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
                  <h3>{product.productName}</h3>

@@ -5,7 +5,9 @@
         .left{
             width: 75%;
 
-            
+            .row{
+                margin: 0;
+            }
 
             input[type=text]{
                 border: 1px solid #D1D5DB;
@@ -37,3 +39,105 @@
     }
 
 }
+
+
+.table-ctn {
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+  
+    overflow: auto;
+    margin-top: 1rem;
+  }
+  
+  .table-ctn table {
+    width: 100%;
+    background-color: white;
+    text-align: left;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  .table-ctn table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f9fafb;
+  }
+
+  .table-ctn table thead tr th{
+    background-color: #f9fafb; ;
+  }
+  
+  .table-ctn th,
+  .table-ctn td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .table-ctn th {
+    font-weight: 600
+  }
+  
+  .table-ctn tbody td {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .table-ctn .data-cards {
+    display: none;
+    
+  }
+
+  @media (max-width: 1024px) {
+    .table-ctn{
+     
+      overflow: auto;
+    }
+
+    .table-ctn table{
+      width: 110vw;
+    }
+  
+
+    .add-customer .main {
+        flex-wrap: wrap-reverse;
+    }
+
+    .add-customer .left{
+        flex-grow: 1;
+    }
+
+    .add-customer .right{
+        flex-grow: 1;
+    }
+    
+}
+
+  
+  @media (max-width: 768px) {
+    .table-ctn table {
+      display: none;
+    }
+  
+    .table-ctn .data-cards {
+      display: block;
+      padding: 1rem;
+    }
+  
+    .table-ctn .data-card {
+      background-color: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
+    }
+  
+    .table-ctn .data-card h3 {
+      margin: 0 0 0.5rem;
+    }
+  
+    .table-ctn .data-card p {
+      margin: 0.2rem 0;
+      font-size: 1rem;
+    }
+  }
+  
