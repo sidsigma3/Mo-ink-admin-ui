@@ -1,0 +1,30 @@
+.setting-page{
+
+    .setting-inputs{
+        width: 75%;
+
+        .row{
+            margin: 0;
+        }
+
+        input[type=text]{
+            border: 1px solid #D1D5DB;
+            border-radius: 0.3rem;
+            padding: 0.2rem 0.2rem;
+            height: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .media-input{
+            border: 1px dashed gainsboro;
+        
+            h4{
+                font-size: 0.9rem;
+                margin-top: 1rem;
+                margin-left: -5rem;
+                color: #0561FC;
+            }
+        
+        }
+    }
+}

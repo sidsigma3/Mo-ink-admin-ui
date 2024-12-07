@@ -13,11 +13,6 @@
     font-size: 1rem;
 }
 
-.create-order .main-sec .right{
-  
-    position: sticky;
-    right: 0;
-}
 
 .create-order .main-sec .right .ctn{
     background-color: white;
@@ -38,7 +33,7 @@
     background-color: white;
     color: black;
     border-color: #B9C0CD;
-    width: 95%;
+    width: 100%;
 }
 
 .create-order .main-sec .right .drop-down .dropdown-menu{
@@ -59,6 +54,60 @@
 }
 
 
+
+.create-order .top p{
+    display: flex;
+    justify-content: center;
+}
+
+.create-order .top .green{
+    background-color: #D1FAE5;
+    border: 1px solid #6EE7B7;
+    color: #41b788;
+    border-radius: 0.3rem;
+    width: 6rem;
+}
+
+.create-order .top .grey{
+    background-color: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    color: rgb(63, 60, 60);
+    border-radius: 0.3rem;
+    width: 6rem;
+}
+
+.create-order .top .blue{
+    background-color: #DBEAFE;
+    border: 1px solid #5d91cb;
+    color: #5c9de8;
+    border-radius: 0.3rem;
+    width: 6rem;
+}
+
+.create-order .top .yellow{
+    background-color: #FEF3C7;
+    border: 1px solid #FCD34D;
+    color: #8e741d;
+    border-radius: 0.3rem;
+    width: 6rem;
+}
+
+
+.create-order .top .red{
+    background-color: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #be5757;
+    border-radius: 0.3rem;
+    width: 6rem;
+}
+
+
+
+
+
+
+
+
 @media (max-width: 1024px) {
     .create-order .main-sec{
         flex-wrap: wrap-reverse;
@@ -74,9 +123,14 @@
 
     
     .create-order .main-sec .right .ctn .selected-customer{
-         display: flex;
-         gap: 1rem;
+         /* display: flex; */
+         gap: 0.5rem;
          justify-content: space-between;
         
+        /* .cross-btn{
+            right: -35rem !important;
+            top: -25px !important;
+        } */
+
     }
 }

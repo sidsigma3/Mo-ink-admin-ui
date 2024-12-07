@@ -39,10 +39,14 @@
     font-weight: 500;
   }
   
-  .discount-table-ctn .data-cards {
+  .discount-table-ctn  .data-cards {
     display: none;
     
   }
+
+  .discounts .filter-sec{
+    width: 50% !important;
+}
 
   @media (max-width: 1024px) {
     .discount-table-ctn{
@@ -60,6 +64,10 @@
   @media (max-width: 768px) {
     .discount-table-ctn table {
       display: none;
+    }
+
+    .discount-table-ctn .pagination{
+        display: none;
     }
   
     .discount-table-ctn .data-cards {
@@ -83,5 +91,9 @@
       margin: 0.2rem 0;
       font-size: 1rem;
     }
+
+    .discounts .filter-sec{
+        width: 100% !important;
   }
+}
   

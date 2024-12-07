@@ -44,7 +44,7 @@ const ProductSoldGraph = () => {
   };
 
   return (
-    <div style={{height:'100%',width:'99%' }}>
+    <div style={{height:'80%',width:'99%' }}>
       <Bar data={chartData} options={chartOptions} />
     </div>
   );

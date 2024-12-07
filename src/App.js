@@ -26,6 +26,10 @@ import AddSegmentsPage from './pages/dashboard/Customers/Segments/AddSegmentsPag
 import { SegmentsProvider } from './components/Context/SegmentsContext';
 import UserPage from './pages/dashboard/Users/UserPage';
 import AddUser from './pages/dashboard/Users/AddUser';
+import { OrderProvider } from './components/Context/OrderContext';
+import SettingPage from './pages/dashboard/Settings/SettingPage';
+
+import ProfilePage from './pages/dashboard/Profile/ProfilePage';
 
 function App() {
   return (
@@ -36,6 +40,7 @@ function App() {
           <SideBar></SideBar>
         </div>
         <div className='content w-100 p-3'>
+          <OrderProvider>
         <ProductProvider>
         <DiscountProvider>
         <CustomerProvider>
@@ -60,12 +65,15 @@ function App() {
               <Route path='/add-segments' element={<AddSegmentsPage></AddSegmentsPage>}></Route>
               <Route path='/users' element={<UserPage></UserPage>}></Route>
               <Route path='/add-user' element={<AddUser></AddUser>}></Route>
+              <Route path='/settings' element={<SettingPage></SettingPage>}></Route>
+              <Route path='/profile' element={<ProfilePage></ProfilePage>}></Route>
           </Routes>
           </SegmentsProvider>
           </SpinnerDyersProvider>
         </CustomerProvider>
         </DiscountProvider>
         </ProductProvider>
+        </OrderProvider>
         </div>
         </div>
        

@@ -1,6 +1,4 @@
 import React from 'react'
-import { MdOutlineFileDownload } from "react-icons/md";
-import { MdAdd } from "react-icons/md";
 import "./Orders.css"
 import { IoSearchOutline } from "react-icons/io5";
 import Filter from '../../../components/Filter/DayFilter/Filter';
@@ -10,8 +8,26 @@ import OrderTable from '../../../components/table/order/OrderTable';
 import { Link } from 'react-router-dom'
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn';
 import AddBtn from '../../../components/Buttons/Add/AddBtn';
+import ProductFilter from '../../../components/Filter/DayFilter/ProductFilter/ProductFilter';
+import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/StatusFilter';
+import { Pagination } from 'react-bootstrap';
 
 const Orders = () => {
+
+
+     
+    let active = 2;
+    let items = [];
+    for (let number = 1; number <= 5; number++) {
+      items.push(
+        <Pagination.Item key={number} active={number === active}>
+          {number}
+        </Pagination.Item>,
+      );
+    }
+
+
+
   return (
     <div className='order'>
         <div className='top'>
@@ -65,30 +81,20 @@ const Orders = () => {
             </ul>
         </div>
 
-        <div className='order-filter-ctn d-flex gap-2 '>
-            <div className='d-flex bg-white  p-1 gap-3 border order-id'>
-                <div className='d-flex gap-4 align-items-center w-50'>
-                    <h5>Order ID</h5>
-                    <span><MdKeyboardArrowDown size={18}/></span>
-                </div>
-            
-            
-                <div className='d-flex gap-5 align-items-center justify-content-between flex-grow-1' >
-                    
-                    <input type='text' placeholder='Search'></input>
-                    <span>  <IoSearchOutline /></span>
-                    
-                </div>
-            </div>
-
-            <div className='d-flex bg-white p-1 gap-5 border  align-items-center justify-content-between status'>
-                <h5>Status</h5>
-                <span><MdKeyboardArrowDown size={20}/></span>
-            </div>
+        <div className='order-filter-ctn d-flex gap-2'>
+          
+                <ProductFilter></ProductFilter>
+          
+                <StatusFilter status={"Active"}></StatusFilter>
         </div>
 
         <div className='order-table-ctn'>
             <OrderTable></OrderTable>
+              
+          <div className='d-flex justify-content-end mt-2'>
+          <Pagination>{items}</Pagination>
+          </div>
+
         </div>
 
     </div>

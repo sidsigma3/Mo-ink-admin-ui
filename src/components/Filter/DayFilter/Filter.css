@@ -2,6 +2,7 @@
     background-color: white;
     padding: 0 0.5rem;
     border-radius: 0.5rem;
+    width: 9.5rem;
 }
 
 .filter button{
@@ -14,3 +15,19 @@
 .filter button span{
     margin-right: 1rem;
 }
+
+@media(max-width:768px){
+    .filter button span{
+        margin: 0;
+        margin: 0 0.3rem;
+    }
+
+    .filter button .text{
+       display: none;
+    }
+    .filter{
+       
+        /* width: 9.5rem; */
+    }
+}
+

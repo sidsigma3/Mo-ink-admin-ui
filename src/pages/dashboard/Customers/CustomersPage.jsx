@@ -10,17 +10,40 @@ import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
 import { useCustomerContext } from '../../../components/Context/CustomerContext'
 import { useNavigate } from 'react-router-dom'
 import { BiWallet } from "react-icons/bi";
+import { Pagination } from 'react-bootstrap'
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { Dropdown } from 'react-bootstrap'
 
 const CustomersPage = () => {
 
     const navigate = useNavigate()
 
-    const { customers } = useCustomerContext();
+    const { customers ,setCustomers } = useCustomerContext();
 
     const handleRowClick = (index) => {
         navigate('/add-customer', { state: { index } });
       };
+
+      let active = 2;
+  let items = [];
+  for (let number = 1; number <= 5; number++) {
+    items.push(
+      <Pagination.Item key={number} active={number === active}>
+        {number}
+      </Pagination.Item>,
+    );
+  }
     
+  const handleDelete = (index) => {
+    setCustomers(customers.filter((_, i) => i !== index));
+  };
+
+  const handleDuplicate = (index) => {
+    setCustomers([customers[index],...customers]);
+  };
+
+
+
 
   return (
     <div className='customer-page'>
@@ -55,21 +78,38 @@ const CustomersPage = () => {
                         <th>Wallet</th>
                         <th>Orders</th>
                         <th>Last Order</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
             {customers.map((customer, index) => (
-              <tr key={index} onClick={() => handleRowClick(index)} style={{ cursor: "pointer" }}>
+              <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
                 <td>{customer.name}</td>
                 <td>{customer.location}</td>
                 <td style={{color:'#3CAA82'}}>{customer.wallet}</td>
                 <td>{customer.totalOrders}</td>
                 <td>{customer.lastOrder}</td>
+                <td>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
+                        <BsThreeDotsVertical />
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                    </td>
               </tr>
             ))}
           </tbody>
 
             </Table>
+
+            <div className='d-flex justify-content-end mt-2'>
+            <Pagination>{items}</Pagination>
+            </div>
 
 
             <div className="data-cards">

@@ -3,3 +3,24 @@
     padding: 0.2rem 1rem;
     font-size: 0.8rem;
 }
+
+.lg-add-btn{
+    display: grid;
+}
+
+.sm-add-btn{
+    display: none !important;
+}
+
+
+
+@media(max-width:768px){
+    .sm-add-btn{
+        display: grid !important;
+        padding: 0.2rem 0.5rem !important;
+    }
+
+    .lg-add-btn{
+        display: none !important;
+    }
+}

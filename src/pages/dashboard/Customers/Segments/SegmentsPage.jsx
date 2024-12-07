@@ -7,6 +7,9 @@ import StatusFilter from '../../../../components/Filter/DayFilter/StatusFilter/S
 import { Table } from 'react-bootstrap'
 import { BsThreeDots } from 'react-icons/bs';
 import { useSegments } from '../../../../components/Context/SegmentsContext'
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { Pagination } from 'react-bootstrap'
+import { Dropdown } from 'react-bootstrap'
 
 const SegmentsPage = () => {
 
@@ -47,7 +50,7 @@ const SegmentsPage = () => {
       };
     
       const handleDuplicate = (index) => {
-        setRows([...rows, rows[index]]);
+        setRows([rows[index],...rows]);
       };
 
 
@@ -88,6 +91,16 @@ const SegmentsPage = () => {
       };
       
 
+      let active = 2;
+        let items = [];
+        for (let number = 1; number <= 5; number++) {
+            items.push(
+            <Pagination.Item key={number} active={number === active}>
+                {number}
+            </Pagination.Item>,
+            );
+        }
+
   return (
     <div className='segments-page'>
          <div className='top d-flex justify-content-between'>
@@ -118,39 +131,38 @@ const SegmentsPage = () => {
                         <th>Type</th>
                         <th>Customers</th>
                         <th>Conditions</th>
-                        <th>Settings</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                 {rows.map((row, index) => (
-                    <tr key={index} onClick={() => handleRowClick(index)} style={{ cursor: "pointer" }}>
+                    <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
                     <td>{row.title}</td>
                     <td>{row.type === 'Conditional' ? 'Automated' : 'Label'}</td>
                     <td>{row.customers}</td>
                     <td>{formatConditions(row.conditions, row.customerList)}</td>
                     <td>
-                        <div className="dropdown">
-                        <button className="btn border border-0" data-bs-toggle="dropdown" aria-expanded="false">
-                            <BsThreeDots size={20} />
-                        </button>
-                        <ul className="dropdown-menu">
-                            <li>
-                            <button className="dropdown-item" onClick={() => handleDuplicate(index)}>
-                                Duplicate
-                            </button>
-                            </li>
-                            <li>
-                            <button className="dropdown-item" onClick={() => handleDelete(index)}>
-                                Delete
-                            </button>
-                            </li>
-                        </ul>
-                        </div>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
+                        <BsThreeDotsVertical />
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                     </td>
                     </tr>
                 ))}
                 </tbody>
             </Table>
+
+
+            <div className='d-flex justify-content-end mt-2'>
+            <Pagination>{items}</Pagination>
+            </div>
+
 
             <div className="data-cards">
         {rows.map((seg,index) => (

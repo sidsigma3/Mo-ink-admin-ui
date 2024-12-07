@@ -1,0 +1,119 @@
+.profile-page{
+
+    .avatar{
+        top: 12rem;
+        left: 2rem;
+    }
+
+    .profile-info{
+        padding:2rem 2rem 2rem 15rem
+    }
+
+    input[type=text]{
+        border: 1px solid #D1D5DB;
+        border-radius: 0.3rem;
+        padding: 0.2rem 0.2rem;
+        height: 2rem;
+        margin-top: 0.5rem;
+    }
+
+    input[type=password]{
+        border: 1px solid #D1D5DB;
+        border-radius: 0.3rem;
+        padding: 0.2rem 0.2rem;
+        height: 2rem;
+        margin-top: 0.5rem;
+    }
+}
+
+@media(min-width:1440px){
+    .profile-page{
+
+        .avatar{
+            top: 20rem;
+            left: 2rem;
+        }
+    }
+}
+
+@media(max-width:1440px){
+    .profile-page{
+
+        .avatar{
+            top: 13rem;
+            left: 2rem;
+        }
+    }
+
+    .profile-info{
+        padding-left: 13rem !important;
+    }
+}
+
+
+@media(max-width:1024px){
+    .profile-page{
+
+        .avatar{
+            top: 7rem;
+            left: 2rem;
+        }
+    }
+}
+
+
+@media(max-width:768px){
+    .profile-page{
+
+        .avatar{
+            top: 2rem;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .profile-info{
+            padding:1rem;
+            margin-top: 3rem;
+            justify-content: center !important;
+        }
+
+        .profile-info>div{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 15rem;
+
+            h5,p{
+                display: flex;
+                justify-content: center;
+            }
+        }
+
+        .go-home{
+            display: none !important;
+        }
+    }
+}
+
+
+@media(max-width:500px){
+    .profile-page{
+
+        /* .avatar{
+            top: 7rem;
+            left: 2rem;
+        } */
+
+        .profile-info{
+            padding:1rem;
+            margin-top: 5rem;
+            justify-content: center !important;
+        }
+
+        .profile-cover{
+            height: 10rem;
+        }
+    }
+}

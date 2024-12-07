@@ -7,7 +7,7 @@ import ProductsTable from '../../../components/table/order/Products/ProductsTabl
 import "./Products.css"
 import { Link, useNavigate } from 'react-router-dom'
 import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
-
+import { Pagination } from 'react-bootstrap'
 
 const Products = () => {
 
@@ -107,6 +107,17 @@ const Products = () => {
 
     const navigate =useNavigate()
 
+
+    let active = 2;
+    let items = [];
+    for (let number = 1; number <= 5; number++) {
+      items.push(
+        <Pagination.Item key={number} active={number === active}>
+          {number}
+        </Pagination.Item>,
+      );
+    }
+
   return (
     <div className='products'>
         <div className='top d-flex justify-content-between'>
@@ -130,7 +141,7 @@ const Products = () => {
 
         </div>
 
-        <div className='filter-sec d-flex gap-2 align-items-center'>
+        <div className='filter-sec d-flex gap-2 align-items-center mt-2'>
 
             <div className='w-75'>
                 <ProductFilter></ProductFilter>
@@ -143,6 +154,9 @@ const Products = () => {
 
         <div>
             <ProductsTable sampleProducts={sampleProducts}></ProductsTable>
+            <div className='d-flex justify-content-end mt-2'>
+          <Pagination>{items}</Pagination>
+          </div>
         </div>
 
     </div>

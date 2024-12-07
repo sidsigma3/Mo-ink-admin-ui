@@ -6,3 +6,19 @@
     color: white !important;
 }
 
+.sm-btn{
+    display: none;
+}
+
+
+@media(max-width:768px){
+    .sm-btn{
+        display: grid;
+        padding: 0.2rem 0.5rem !important;
+    }
+
+
+    .lg-btn{
+        display: none;
+    }
+}

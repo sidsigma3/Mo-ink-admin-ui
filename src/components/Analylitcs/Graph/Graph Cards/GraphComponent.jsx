@@ -70,7 +70,9 @@ const centerTextPlugin = {
     <div className="graph-card">
     <h4>{text}</h4>
     <h3>{number}</h3>
+    <div>
     <ChartComponent data={data} options={options}  plugins={type === "doughnut" ? [centerTextPlugin] : []}/>
+    </div>
     </div>
   )
 };

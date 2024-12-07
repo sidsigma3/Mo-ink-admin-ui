@@ -11,11 +11,13 @@ import { Table } from 'react-bootstrap';
 import TotalOrders from '../Analytics/Graphs/TotalOrders';
 import { FaMinus } from "react-icons/fa";
 import { VscCreditCard } from "react-icons/vsc";
+import { useSegments } from '../../../components/Context/SegmentsContext';
 
 
 const AddCustomerPage = () => {
 
   const { state } = useLocation();
+  const { rows, setRows } = useSegments();
   const navigate =useNavigate()
   const { customers ,setCustomers } = useCustomerContext();
 
@@ -42,6 +44,28 @@ const AddCustomerPage = () => {
     pinCode: customer?.pinCode || "",
     
   });
+
+
+  const [selectedSegments, setSelectedSegments] = useState(customer?.segment || []);  // State to track selected segments
+  const [searchTerm, setSearchTerm] = useState('');  // State for input field
+
+  // Filter segments based on the search term
+  const filteredSegments = rows.filter((segment) =>
+    segment.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Add segment to selected chips
+  const addSegmentAsChip = (segment) => {
+    if (!selectedSegments.includes(segment)) {
+      setSelectedSegments([...selectedSegments, segment]);
+    }
+  };
+
+  // Remove segment chip
+  const removeSegmentChip = (index) => {
+    const updatedSelectedSegments = selectedSegments.filter((_, i) => i !== index);
+    setSelectedSegments(updatedSelectedSegments);
+  };
 
   const handleStatusChange = (stat) =>{
      setStatus(stat)
@@ -113,6 +137,7 @@ const AddCustomerPage = () => {
             totalOrders:0,
             wallet:customer.wallet,
             purchaseData:customer.purchaseData,
+            segment:selectedSegments,
             ...formData,
           };
       
@@ -259,8 +284,8 @@ const AddCustomerPage = () => {
                         <div className='d-flex gap-2 mt-2'>
                         <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='₹ INR'></input>
                         <AddBtn clickFunction={handleAddMoney}></AddBtn>
-                       
-                        <button className='btn btn-danger d-flex align-items-cneter' style={{height:'1.8rem'}} onClick={handleSubtractMoney}>
+                        
+                        <button className='btn btn-danger d-flex align-items-cneter px-3' style={{height:'1.8rem'}} onClick={handleSubtractMoney}>
                         <FaMinus size={12}/>
                         </button>
                         </div>
@@ -317,12 +342,12 @@ const AddCustomerPage = () => {
 
 
             <div className='right'>
-            <div className='bg-white p-2 rounded'>
+            <div className='bg-white p-3 rounded'>
                 <h5>Status</h5>
                 <StatusFilter status={status} onStatusChange={handleStatusChange}></StatusFilter>
             </div>
 
-            <div className='bg-white p-2 rounded mt-2'>
+            <div className='bg-white p-3 rounded mt-2'>
                     <div className='d-flex gap-3 border-bottom'>
                     <div className="d-flex gap-3 position-relative" style={{ width: '100px', height: '100px' }}>
                         <svg width="100" height="100" viewBox="0 0 100 100">
@@ -354,6 +379,67 @@ const AddCustomerPage = () => {
                         </div>
                     </div>
             </div>
+
+            <div className="bg-white p-3 rounded mt-2">
+                <h5>Segments</h5>
+                
+                {/* Searchable input to filter segments */}
+                <input
+                    className="border border-secondary-subtle rounded p-1 w-100 mb-2"
+                    type="text"
+                    placeholder="Search Segments"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                
+                {/* Display filtered segments to select from */}
+                <div className="filtered-segments">
+                    {filteredSegments.map((segment, index) => (
+                    <div
+                        key={index}
+                        className="segment-item"
+                        onClick={() => addSegmentAsChip(segment)}  // Add segment as chip when clicked
+                        style={{ cursor: 'pointer', padding: '5px', border: '1px solid #ccc', margin: '5px' }}
+                    >
+                        {segment.title}
+                    </div>
+                    ))}
+                </div>
+
+                {/* Display selected segments as chips */}
+                <div className="chips-container mt-2">
+                    {selectedSegments.map((segment, index) => (
+                    <span
+                        key={index}
+                        className="chip"
+                        style={{
+                        display: 'inline-block',
+                        backgroundColor: '#e0e0e0',
+                        padding: '5px 10px',
+                        margin: '5px',
+                        borderRadius: '20px',
+                        }}
+                    >
+                        {segment.title}
+                        <button
+                        onClick={() => removeSegmentChip(index)}  // Remove chip when clicked
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'red',
+                            marginLeft: '5px',
+                            cursor: 'pointer',
+                        }}
+                        >
+                        x
+                        </button>
+                    </span>
+                    ))}
+                </div>
+                </div>
+
+
+
             </div>
 
         </div>

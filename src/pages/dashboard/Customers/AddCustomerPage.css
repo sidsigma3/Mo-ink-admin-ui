@@ -117,6 +117,10 @@
     .table-ctn table {
       display: none;
     }
+
+    .table-ctn .pagination{
+        display: none;
+    }
   
     .table-ctn .data-cards {
       display: block;

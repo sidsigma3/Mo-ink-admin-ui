@@ -43,7 +43,7 @@ export const DiscountProvider = ({ children }) => {
 
 
   return (
-    <DiscountContext.Provider value={{ discountData, addDiscount }}>
+    <DiscountContext.Provider value={{ discountData, setDiscountData, addDiscount }}>
       {children}
     </DiscountContext.Provider>
   );

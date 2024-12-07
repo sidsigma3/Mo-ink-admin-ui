@@ -23,24 +23,26 @@ const Dashboard = () => {
                     </div>
 
                     <div className="info-ctn row">
-                        <div className="dashboardBox-ctn col-6 col-md-6 col-lg">
+                        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
                         <DashboardBox  heading={'Total Visits'} number={2568}/>
                         </div>
-                        <div className="dashboardBox-ctn col-6 col-md-6 col-lg">
+                        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
                         <DashboardBox heading={'Total Customers'} number={236}/>
                         </div>
-                        <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+                        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
                         <DashboardBox heading={'Total Purchase Order'} number={359}/>
                         </div>
-                        <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+                        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
                         <DashboardBox heading={'Total Revenue'} number={'52.6 Lacs'}/>
                         </div>
-                        <div className="dashboardBox-ctn col-12 col-md-4 col-lg">
+                        <div className="dashboardBox-ctn col-12 col-md-4 col-lg-4 col-xl">
                         <DashboardBox heading={'Total Weight Sold'} number={'2250 Kgs'}/>
                         </div>
                     </div>
 
       <div className="bg-white graph-ctn">
+        <h4 className="fs-5">Product Sold</h4>
+       <h5 className="fs-6 mb-3"> <span className="text-success me-1">+3.4%</span>from last period</h5>
        <ProductSoldGraph></ProductSoldGraph>
       </div>
 

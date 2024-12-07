@@ -72,11 +72,15 @@
 
 }
 
-.order .order-table-ctn{
+/* .order .order-table-ctn{
     height: 48vh;
     overflow: auto;
     margin-top: 1rem;
     border-radius: 8px;
+} */
+
+.order .order-filter-ctn{
+    width: 50%;
 }
 
 
@@ -125,6 +129,10 @@
         display: none;
     } */
 
+    .order .order-filter-ctn{
+        width: 75%;
+    }
+
 
     .order .order-filter-ctn .order-id{
         width: 50%;
@@ -166,7 +174,7 @@
     }
 
     .order .order-filter-ctn .status{
-        width: 30%;
+        width: 50%;
         border-radius: 0.3rem;
     }
 
@@ -174,6 +182,13 @@
         height: 68vh;
     }
 
+    .order .order-filter-ctn{
+        width: 100%;
+    }
+
+    .order .top .btn-ctn{
+        gap: 0.5rem;
+    }
     
 
 }

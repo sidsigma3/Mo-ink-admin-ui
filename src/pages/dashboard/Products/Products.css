@@ -17,12 +17,7 @@
 
 @media(max-width:768px){
     .products .filter-sec{
-        width: 75%;
-    }
-}
-
-@media(max-width:500px){
-    .products .filter-sec{
         width: 100%;
     }
 }
+

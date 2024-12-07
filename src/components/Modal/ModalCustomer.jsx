@@ -1,6 +1,6 @@
 import { Input  } from '@mui/material';
 import React ,{useState} from 'react'
-import { Modal, Button, Dropdown, ModalHeader, ModalTitle, ModalBody, ModalFooter } from "react-bootstrap";
+import { Modal, Button, Dropdown, ModalHeader, ModalTitle, ModalBody, ModalFooter  } from "react-bootstrap";
 import "./ModalCustomer.css"
 
 const ModalCustomer = ({ show, handleClose,onSubmit}) => {

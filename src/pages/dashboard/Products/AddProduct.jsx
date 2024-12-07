@@ -109,9 +109,10 @@ const AddProduct = () => {
 
   const [sizes, setSizes] = useState([{ value: "" }]); 
   const [colors, setColors] = useState([{ color: "white" }]); 
-  const [sizeColorMap, setSizeColorMap] = useState(product?.sizeColorMap || {});
+  const [sizeColorMap, setSizeColorMap] = useState(product?.sizeColorMap || []);
 
- 
+  console.log(sizeColorMap)
+
   const generateSizeColorMap = () => {
     const sizes = variants.find(v => v.name.toLowerCase() === "size")?.values || [];
     const colors = variants.find(v => v.name.toLowerCase() === "color")?.values || [];
@@ -209,6 +210,37 @@ const AddProduct = () => {
     setVariants(updatedVariants);
   };
 
+  const handleVariantValueChangeTable = (sizeIndex, colorIndex, key, value) => {
+    setSizeColorMap((prev) => {
+      const updatedMap = [...prev];
+      // Ensure `colors` exists and `colorIndex` is valid
+      if (updatedMap[sizeIndex]?.colors[colorIndex]) {
+        updatedMap[sizeIndex].colors[colorIndex][key] = value;
+      }
+      return updatedMap;
+    });
+  };
+
+
+// const handleVariantValueChange = (variantIndex, valueIndex, key, value) => {
+//     setVariants((prevVariants) => {
+//       const updatedVariants = [...prevVariants];
+  
+//       // Check if the variant and value index exist to avoid undefined errors
+//       if (
+//         updatedVariants[variantIndex] &&
+//         updatedVariants[variantIndex].values &&
+//         updatedVariants[variantIndex].values[valueIndex]
+//       ) {
+//         updatedVariants[variantIndex].values[valueIndex][key] = value;
+//       }
+  
+//       return updatedVariants;
+//     });
+//   };
+  
+  
+
   const addVariantValue = (index) => {
     const updatedVariants = [...variants];
     updatedVariants[index].values.push({ value: "", color: "", hex: "" });
@@ -270,6 +302,32 @@ const AddProduct = () => {
     setVariants(updatedVariants);
   };
   
+
+  const handleAddColor = (sizeIndex) => {
+  const newColor = {
+    name: "New Color",  // Default name
+    hex: "#FFFFFF",     // Default hex color
+    available: "",      // Default availability
+    price: "",          // Default price per kg
+  };
+
+  setSizeColorMap((prev) => {
+    return prev.map((entry, index) => {
+      if (index === sizeIndex) {
+        return {
+          ...entry,
+          colors: [...(entry.colors || []), newColor], // Add new color without mutating
+        };
+      }
+      return entry; // Return other entries unchanged
+    });
+  });
+};
+
+  
+  
+  
+
   
   return (
 
@@ -281,10 +339,11 @@ const AddProduct = () => {
 
     <div className="add-product d-flex gap-2">
       <div className="left w-75 flex-grow-1">
-        <div className="info-inputs-ctn">
+        <div className="info-inputs-ctn p-3 rounded">
           <div className="title-ctn d-flex flex-column p-2">
             <label>Titile</label>
             <input
+              className="ps-1"
               name="productName"
               value={formData.productName}
               onChange={handleInputChange}
@@ -321,7 +380,7 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <div className="pricing-ctn mt-2 p-2">
+        <div className="pricing-ctn mt-2 p-3 rounded">
           <h3 className="mb-3">Pricing</h3>
           <div className="row">
             <div className="d-flex flex-column col">
@@ -346,7 +405,7 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="row">
+          <div className="row mt-2">
             <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-12">
               <label>Cost Per item/Kg</label>
               <input
@@ -380,7 +439,7 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <div className="variant-ctn mt-2 p-2">
+        <div className="variant-ctn mt-2 p-3 rounded">
             <div className="top d-flex justify-content-between">
                 <h4>Variant</h4>
             <button 
@@ -637,22 +696,22 @@ const AddProduct = () => {
       ))}
 
 
-{variants.length > 0 && (
-    <div className="d-flex justify-content-end">
-    <button
-        style={{
-            backgroundColor:"#EFEFEF",
-            border:"1px solid #CDCDCD",
-            padding:"0.4rem",
-            borderRadius:"0.3rem",
-            fontSize:"0.8rem"
-        }}
-        onClick={generateSizeColorMap}
-    >
-        Submit
-    </button>
-    </div>
-)}
+                    {variants.length > 0 && (
+                        <div className="d-flex justify-content-end">
+                        <button
+                            style={{
+                                backgroundColor:"#EFEFEF",
+                                border:"1px solid #CDCDCD",
+                                padding:"0.4rem",
+                                borderRadius:"0.3rem",
+                                fontSize:"0.8rem"
+                            }}
+                            onClick={generateSizeColorMap}
+                        >
+                            Submit
+                        </button>
+                        </div>
+                    )}
         
 
                 {Object.keys(sizeColorMap).length > 0 && (
@@ -660,7 +719,7 @@ const AddProduct = () => {
                 <table  className="variant-table">
                 <thead>
                 <tr>
-                    <th>Size</th>
+                    <th>Counter</th>
                     <th>Variants</th>
                     <th>Available</th>
                     <th>Price/Kg</th>
@@ -697,7 +756,13 @@ const AddProduct = () => {
                         />
                     </td>
                     <td>
-                        <button style={{ padding: "5px" , background:"none",border:"none" ,color:"#0561FC"}}><IoMdAddCircleOutline size={20}/></button>
+                        <button 
+                         onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddColor(sizeIndex);
+                          }}
+                        style={{ padding: "5px" , background:"none",border:"none" ,color:"#0561FC"}}
+                        ><IoMdAddCircleOutline size={20}/></button>
                     </td>
                     </tr>
 
@@ -706,8 +771,11 @@ const AddProduct = () => {
                     entry.colors.map((color, colorIndex) => (
                         <tr key={colorIndex}>
                         <td >
+                        
                         </td>
-                        <td style={{ alignItems: "center" }}><div
+                        <td style={{ alignItems: "center" }} className="d-flex justify-content-between">
+                            <div >
+                            <div
                             style={{
                                 backgroundColor: color.hex,
                                 width: "20px",
@@ -717,7 +785,23 @@ const AddProduct = () => {
                                 marginRight: "10px",
                             }}
                             ></div>
-                            {color.name}</td>
+
+                                {color.name}
+                            </div>
+                            
+                         
+                            
+                            <input
+                                className="w-50"
+                                type="text"
+                                value={color.hex || ""}
+                                onChange={(e) =>
+                                handleVariantValueChangeTable(sizeIndex, colorIndex, "hex", e.target.value)
+                                }
+                                placeholder="Hex Code (#FFFFFF)"
+                            />
+                            
+                            </td>
                         <td>
                             <input
                             type="number"
@@ -747,7 +831,9 @@ const AddProduct = () => {
                             </button>
                         </td>
                         </tr>
-                    ))}
+                    ))
+                    
+                    }
                 </React.Fragment>
                 ))}
 
@@ -771,8 +857,8 @@ const AddProduct = () => {
       </div>
 
       <div className="right w-25 flex-grow-1">
-        <div className="status-ctn  px-2 py-2 gap-3">
-          <h3>Status</h3>
+        <div className="status-ctn p-3 gap-3 rounded">
+          <h3 className="mb-2">Status</h3>
           <StatusFilter status={status} onStatusChange={handleStatusChange}></StatusFilter>
         </div>
       </div>

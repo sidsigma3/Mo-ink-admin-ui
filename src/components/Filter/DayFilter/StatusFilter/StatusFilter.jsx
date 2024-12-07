@@ -11,14 +11,15 @@ const StatusFilter = ({ status ,onStatusChange }) => {
   };
    
   return (
-    <Dropdown onSelect={handleSelect}  size="sm">
-      <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1">
+    <Dropdown onSelect={handleSelect}  size="sm" className='status'>
+      <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100">
         <p className="m-0">{selectedStatus}</p>
       </Dropdown.Toggle>
 
       <Dropdown.Menu className='w-100'>
         <Dropdown.Item eventKey="Active">Active</Dropdown.Item>
         <Dropdown.Item eventKey="Inactive">Inactive</Dropdown.Item>
+        <Dropdown.Item eventKey="All">View All</Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

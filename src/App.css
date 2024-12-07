@@ -56,12 +56,13 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
 
 .main{
   overflow: hidden;
-  padding-top: 12vh;
+  flex-grow: 1;
+  /* padding-top: 12vh; */
 }
 
 .sidebarWrapper{
   width: 25%;
-  height: calc(100vh - 12vh);
+  /* height: calc(100vh - 12vh); */
   position: sticky;
   top: 0;
   padding: 0.5rem;
@@ -72,35 +73,11 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
 }
 
 
-@media (max-width: 768px) {
-
-.main {
-  flex-wrap: wrap-reverse;
-  height: auto;
-  padding-top: 10vh;
-  padding-bottom: 8vh;
-}
-
-.main .sidebarWrapper{
-  width: 100% !important;
-  height: auto;
-}
-
-.main .content{
-  overflow: auto;
-  height: 100%;
-}
-
-.main .sidebarWrapper .sideBar{
-  height: 10vh;
-  border-radius: 3rem;
-  position: fixed;
-  bottom: 0vh;
-  width: 98%;
-}
-
-}
-
+/* @media (min-width: 1900px) {
+  .main{
+   padding-top: 9vh;
+  }
+ } */
 
 @media (max-width: 1024px) {
   .main .sidebarWrapper{
@@ -109,7 +86,7 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
 
   .main{
     height: auto;
-    padding-top: 9vh;
+    /* padding-top: 7vh; */
   }
 
   html, body, #root {
@@ -123,3 +100,33 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
 }
 
 
+@media (max-width: 768px) {
+
+  .main {
+    flex-wrap: wrap-reverse;
+    height: auto;
+    /* padding-top: 11vh; */
+    padding-bottom: 8vh;
+  }
+  
+  .main .sidebarWrapper{
+    width: 100% !important;
+    height: auto;
+  }
+  
+  .main .content{
+    overflow: auto;
+    height: 100%;
+    padding-top: 1.5rem !important;
+  }
+  
+  .main .sidebarWrapper .sideBar{
+    height: 5rem;
+    border-radius: 3rem;
+    position: fixed;
+    bottom: 0vh;
+    width: 98%;
+  }
+  
+  }
+  

@@ -17,11 +17,14 @@ import { TfiMenuAlt } from "react-icons/tfi";
 import { Link } from 'react-router-dom'
 import { BsArrowReturnRight } from "react-icons/bs";
 import { RiUserSettingsLine } from "react-icons/ri";
+import { IconContext } from "react-icons";
 
 const SideBar = () => {
     const [selected,setSelected] = useState('dashboard')
 
     const [hoverSelected , setHoverSelected] = useState('')
+
+    const [isMoreMenuOpen, setMoreMenuOpen] = useState(false);
 
   return (
     <div className='sideBar'>
@@ -40,7 +43,7 @@ const SideBar = () => {
                 </Link>
             </li>
 
-            <li className={selected === 'orders' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
+            <li className={selected === 'profile' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
                
                 <button  onClick={()=>setSelected('profile')}><span className='icon'><MdOutlinePersonOutline  size={28}/></span>Profile</button>
                 
@@ -53,18 +56,95 @@ const SideBar = () => {
             </li>
 
             <li className='show-on-mobile'>
-                <button  onClick={()=>setSelected('more')}><span className='icon'><TfiMenuAlt  size={28}/></span>More</button>
+                <button onClick={() => setMoreMenuOpen(!isMoreMenuOpen)}><span className='icon'><TfiMenuAlt  size={28}/></span>More</button>
             </li>
+
+
+            {isMoreMenuOpen && (
+        <div className="more-menu">
+            <ul>
+          <li
+            className={`${
+              selected === 'analytics' ? 'selected' : 'not-selected'
+            }`}
+          >
+            <Link to={'/analytics'}>
+              <button onClick={() => setSelected('analytics')}>
+                <span className="icon">
+                  <GoGraph size={25} style={{ strokeWidth: '0.4' }} />
+                </span>
+                Analytics
+              </button>
+            </Link>
+          </li>
+
+          <li
+            className={`${
+              selected === 'discount' ? 'selected' : 'not-selected'
+            }`}
+          > 
+            <Link to={'/discounts'}>
+              <button onClick={() => setSelected('discount')}>
+                <span className="icon">
+                  <TbRosetteDiscount size={27} />
+                </span>
+                Discount
+              </button>
+            </Link>
+          </li>
+
+
+          <div  onMouseEnter={() => setHoverSelected('customers')}  onMouseLeave={() => setHoverSelected(null)}>
+            <li className={selected === 'customers' ? 'selected' : 'not-selected'}  onMouseEnter={() => setHoverSelected('customers')} >
+                <Link to={'/customers'}>
+                <button  onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={25} style={{ strokeWidth: '0.4'}}/></span>Customers</button>
+                </Link>
+                
+            </li>
+
+                 {hoverSelected === 'customers' && (
+                    <div className={selected === 'segments' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
+                    <Link to={'/segments'} >
+                        <button onClick={()=>setSelected('segments')} className='d-flex gap-3' style={{border:'none',background:'none' ,textDecoration:'none'}}> <span><BsArrowReturnRight /></span>Segments</button>
+                    </Link>
+                    </div>
+                   
+                )}
+
+            </div>
+
+            <li className={selected === 'manufactures' ? 'selected' : 'not-selected'}>
+                <Link to={'/spinners-and-dyers'}>
+                <button  onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={25}/></span>Spinners & Dyers</button>
+                </Link>
+            </li>
+
+            <li>
+                <Link to={'/users'}>
+                <button  onClick={()=>setSelected('users')}><span className='icon'><RiUserSettingsLine  size={25}/></span>Users</button>
+                </Link>
+            </li>
+          </ul>
+        </div>
+      )}
+
+
 
             <li className={selected === 'analytics' ? 'selected hide-on-mobile' : 'not-selected hide-on-mobile'}>
                 <Link to={'/analytics'}>
-                <button  onClick={()=>setSelected('analytics')}><span className='icon'><GoGraph  size={25}/></span>Analytics</button>
+                <button  onClick={()=>setSelected('analytics')}>
+              
+                    <span className='icon'>
+                        <GoGraph  size={25} style={{ strokeWidth: '0.4'}}/>
+                    </span>
+             
+                    Analytics</button>
                 </Link>
             </li>
 
             <li className={selected === 'discount' ? 'selected hide-on-mobile' : 'not-selected hide-on-mobile'}> 
                 <Link to={'/discounts'}>
-                <button  onClick={()=>setSelected('discount')}><span className='icon'><TbRosetteDiscount  size={25}/></span>Discount</button>
+                <button  onClick={()=>setSelected('discount')}><span className='icon'><TbRosetteDiscount  size={27}/></span>Discount</button>
                 </Link>
             </li>
         </ul>
@@ -75,7 +155,7 @@ const SideBar = () => {
             <div  onMouseEnter={() => setHoverSelected('customers')}  onMouseLeave={() => setHoverSelected(null)}>
             <li className={selected === 'customers' ? 'selected' : 'not-selected'}  onMouseEnter={() => setHoverSelected('customers')} >
                 <Link to={'/customers'}>
-                <button  onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={25} /></span>Customers</button>
+                <button  onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={25} style={{ strokeWidth: '0.4'}}/></span>Customers</button>
                 </Link>
                 
             </li>
@@ -97,7 +177,7 @@ const SideBar = () => {
                 </Link>
             </li>
 
-            <li>
+            <li className={selected === 'users' ? 'selected' : 'not-selected'}>
                 <Link to={'/users'}>
                 <button  onClick={()=>setSelected('users')}><span className='icon'><RiUserSettingsLine  size={25}/></span>Users</button>
                 </Link>
@@ -109,8 +189,10 @@ const SideBar = () => {
 
         
         <ul className='hide-on-mobile'>
-            <li>
-                <button  onClick={()=>setSelected('settings')}><span className='icon'><LuSettings size={25} /></span>Settings</button>
+            <li className={selected === 'settings' ? 'selected' : 'not-selected'}>
+                <Link to={'/settings'}>
+                <button  onClick={()=>setSelected('settings')}><span className='icon'><LuSettings size={25} /></span>Store settings</button>
+                </Link>
             </li>
 
             <li>

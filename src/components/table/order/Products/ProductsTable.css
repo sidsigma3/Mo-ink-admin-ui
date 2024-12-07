@@ -16,7 +16,7 @@
   .product-table table thead {
     position: sticky;
     top: 0;
-    background-color: #f9fafb;
+   
   }
   
   .product-table th,
@@ -27,6 +27,10 @@
   
   .product-table th {
     font-weight: 600
+  }
+
+  .product-table table thead tr th{
+    background-color: #f9fafb; ;
   }
   
   .product-table tbody td {
@@ -56,10 +60,16 @@
     .product-table table {
       display: none;
     }
+
+    .product-table{
+      border: 0;
+    
+    }
+    
   
     .product-table .product-cards {
       display: block;
-      padding: 1rem;
+      /* padding: 1rem; */
     }
   
     .product-table .product-card {

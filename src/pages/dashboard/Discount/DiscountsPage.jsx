@@ -9,16 +9,37 @@ import { Link } from 'react-router-dom'
 import { useDiscounts } from '../../../components/Context/DiscountContext'
 import { useNavigate } from 'react-router-dom'
 import { LuDot } from "react-icons/lu";
+import { Pagination } from 'react-bootstrap'
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { Dropdown } from 'react-bootstrap'
 
 const DiscountsPage = () => {
 
   const navigate = useNavigate ()
-  const { discountData } = useDiscounts();
+  const { discountData , setDiscountData} = useDiscounts();
 
   const handleRowClick = (index) => {
     navigate('/add-discount', { state: { index } });
   };
 
+  let active = 2;
+  let items = [];
+  for (let number = 1; number <= 5; number++) {
+    items.push(
+      <Pagination.Item key={number} active={number === active}>
+        {number}
+      </Pagination.Item>,
+    );
+  }
+
+
+  const handleDelete = (index) => {
+    setDiscountData(discountData.filter((_, i) => i !== index));
+  };
+
+  const handleDuplicate = (index) => {
+    setDiscountData([discountData[index],...discountData]);
+  };
 
   return (
     <div className='discounts'>
@@ -34,7 +55,7 @@ const DiscountsPage = () => {
             </div>
         </div>
 
-        <div className='w-50 d-flex gap-2'>
+        <div className='d-flex gap-2 filter-sec'>
           <ProductFilter></ProductFilter>
           <StatusFilter status={'Active'}></StatusFilter>
         </div>
@@ -49,12 +70,13 @@ const DiscountsPage = () => {
                 <th>Method</th>
                 <th>Customer</th>
                 <th>Used</th>
+                <th></th>
               </tr>
             </thead>
 
             <tbody>
             {discountData.map((discount, index) => (
-            <tr key={index} onClick={() => handleRowClick(index)} style={{ cursor: "pointer" }}>
+            <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
               <td>{discount.discountCode}</td>
               <td>
                 <div style={{backgroundColor:discount.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'50%'}}>
@@ -64,11 +86,28 @@ const DiscountsPage = () => {
               <td>{discount.method}</td>
               <td style={{textTransform:'capitalize'}}>{discount.selectedOptionCustomer}</td>
               <td>{discount.used}</td>
+              <td>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
+                        <BsThreeDotsVertical />
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                    </td>
             </tr>
           ))}
             </tbody>
 
           </Table>
+
+          <div className='d-flex justify-content-end mt-2 pagination'>
+          <Pagination>{items}</Pagination>
+          </div>
+          
 
 
           <div className="data-cards">

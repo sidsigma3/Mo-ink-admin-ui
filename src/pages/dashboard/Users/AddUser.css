@@ -41,3 +41,17 @@
 
 }
 
+@media(max-width:1024px){
+    .add-user .bottom {
+        flex-wrap: wrap-reverse;
+    }
+
+    .add-user .left{
+        flex-grow: 1;
+    }
+
+    .add-user .right{
+        flex-grow: 1;
+    }
+    
+}

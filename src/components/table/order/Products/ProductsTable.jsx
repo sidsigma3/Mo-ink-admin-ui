@@ -20,7 +20,7 @@ const ProductsTable = ({sampleProducts}) => {
         <thead>
           <tr>
             <th>Product Name</th>
-            <th>Size</th>
+            <th>Counter</th>
             <th>Color Variant</th>
             <th>Color</th>
             <th>Available</th>
@@ -60,7 +60,7 @@ const ProductsTable = ({sampleProducts}) => {
             </td>
               <td>{product.stock} Kgs</td>
               <td>
-                <div style={{backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'50%'}}>
+                <div style={{backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'70%'}}>
                 {product.status}
                 </div>          
               </td>

@@ -1,7 +1,7 @@
 import React , {useState} from 'react'
 import SearchBox from '../../../components/SearchBox/SearchBox'
 import { IoArrowBackOutline } from "react-icons/io5";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,useLocation } from 'react-router-dom';
 import ModalOrder from '../../../components/Modal/ModalOrder';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -11,31 +11,43 @@ import { RxCross2 } from "react-icons/rx";
 import { GoPencil } from "react-icons/go";
 import { Button } from 'react-bootstrap';
 import { IoAddCircleOutline } from "react-icons/io5";
+import ModalAssign from '../../../components/Modal/ModalAssign';
+import ModalInvoice from '../../../components/Modal/ModalInvoice';
+import { useCustomerContext } from '../../../components/Context/CustomerContext';
 
 const CreateOrder = () => {
+    const { customers ,setCustomers} = useCustomerContext();
 
     const navigate = useNavigate();
+
+    const location = useLocation();
+
+    const order = location.state?.order || {};
+   
     const [showModalOrder, setShowModalOrder] = useState(false);
     const [showModalCustomer,setShowModalCustomer] =useState(false)
+    const [showModalAssign,setShowModalAssign] = useState(false)
+    const [showModalInvoice,SetShowModalInvoice] =useState(false)
+
     const [cart, setCart] = useState([]);
     
-    const [orderDetails, setOrderDetails] = useState([]);
+    const [orderDetails, setOrderDetails] = useState(order?.orderDetail || []);
 
     // Callback to receive order details from child
     const handleReceiveOrder = (order) => {
       setOrderDetails(order);
-      console.log(orderDetails)
+   
     };
 
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer, setSelectedCustomer] = useState( customers.find((customer) => customer.name === order?.customer) || null);
 
-    const [customers, setCustomers] = useState([
-        { name: 'Esthar Howard', contact: '+91 4855456781', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
-        { name: 'Michael Johnson', contact: '+91 9833548723', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
-        { name: 'Alice Williams', contact: '+91 7823412345', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
-        { name: 'John Doe', contact: '+91 9988776655', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
-        { name: 'Sarah Parker', contact: '+91 8877665544', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
-      ]);
+    // const [customers, setCustomers] = useState([
+    //     { name: 'Esthar Howard', contact: '+91 4855456781', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
+    //     { name: 'Michael Johnson', contact: '+91 9833548723', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
+    //     { name: 'Alice Williams', contact: '+91 7823412345', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
+    //     { name: 'John Doe', contact: '+91 9988776655', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
+    //     { name: 'Sarah Parker', contact: '+91 8877665544', address:'Suraj poll gate purani kekri 305404 kekri RJ, India' },
+    //   ]);
     
 
     const handleAddCustomer = (newCustomer) => {
@@ -86,12 +98,35 @@ const CreateOrder = () => {
         );
       };
 
+      const statusClassMap = {
+        'New Order': 'blue',
+        Delivered: 'green',
+        Shipped: 'yellow',
+        Rejected: 'red',
+        'In Transit': 'grey',
+      };
+      
+
 
   return (
     <div className='create-order'>
-        <div className='top d-flex gap-3'>
+        <div className='top d-flex gap-3' style={{cursor:'pointer'}}>
             <span onClick={() => navigate('/orders')}><IoArrowBackOutline size={25}/></span>
+           { Object.keys(order).length === 0 ? (
             <h5>Create Order</h5>
+
+           ): (
+                <div className='d-flex gap-2'>
+                <h5>{order.orderId}</h5>
+             
+                    <p className={order.payment==='Paid' ? 'green' : 'grey'}>{order.payment}</p>
+                    <p className={statusClassMap[order.orderStatus]}>{order.orderStatus}</p> 
+              
+                </div>
+            )
+           }
+           
+          
         </div>
 
 
@@ -107,8 +142,8 @@ const CreateOrder = () => {
         </ModalOrder>
 
         <div className='main-sec d-flex gap-2'>
-            <div className='left col-xl-9 col-lg-12 col-md-12 col-sm-12 pe-2'>
-                <div className='products bg-white p-4 mb-3'>
+            <div className='left col-xl-9 col-lg-12 col-md-12 col-sm-12'>
+                <div className='products bg-white p-4 mb-3 rounded'>
                     <h5>Products</h5>
                     
                     <div className='d-flex gap-2 mb-3 mt-3'>
@@ -123,7 +158,7 @@ const CreateOrder = () => {
                             {/* Table header */}
                             <div className='head row border-bottom pb-2 mb-2'>
                                 <div className='col'><h4>Product</h4></div>
-                                <div className='col'><h4>Size</h4></div>
+                                <div className='col'><h4>Counter</h4></div>
                                 <div className='col'><h4>Color</h4></div>
                                 <div className='col'><h4>Weight</h4></div>
                                 <div className='col'><h4>Total</h4></div>
@@ -134,11 +169,11 @@ const CreateOrder = () => {
                             {orderDetails.map((order, index) => (
                                 <div className="row border-bottom py-2" key={index}>
                                 {/* Product ID */}
-                                <div className="col">{order.productId + ' ' + order.productName}</div>
+                                <div className="col">{order.productName}</div>
 
                                 {/* Size */}
                                 <div className="col">
-                                     <div style={{width:'40%',padding:'0.3rem 0.6rem',borderRadius:'1rem',backgroundColor:'#EFEFEF',border:'1px solid #B9C0CD',textAlign:'center'}}>{order.size}</div>
+                                     <div className='badge fw-normal' style={{width:'50%',padding:'0.3rem 0.6rem',borderRadius:'1rem',backgroundColor:'#EFEFEF',border:'1px solid #B9C0CD',textAlign:'center',color:'black'}}>{order.size}</div>
                                 </div>
                                 
                                 {/* Colors Column */}
@@ -184,12 +219,24 @@ const CreateOrder = () => {
                         </div>
                         )}
 
+
+                    <ModalAssign
+                        show={showModalAssign}
+                        handleClose={()=> setShowModalAssign(false)}
+                    >
+                    </ModalAssign>
+                    {orderDetails.length > 0 && (
+
+                    <div className='d-flex justify-content-end w-100 mt-2'>
+                        <button onClick={()=> setShowModalAssign(true)} className='btn btn-primary btn-sm'>Assign</button>
+                    </div>
+                    )}
                                                 
                 </div>
 
 
 
-                <div className='payment bg-white p-4'>
+                <div className='payment bg-white p-4 rounded'>
                     <h4>Payment</h4>
 
                     <div  className='container border p-3 rounded mb-3'>
@@ -225,9 +272,14 @@ const CreateOrder = () => {
                          <h5>Add a Product to calculate total and view payment options</h5>
                     )}
 
+                    <ModalInvoice
+                        show={showModalInvoice}
+                        handleClose={()=>SetShowModalInvoice(false)}
+                    ></ModalInvoice>
+
                     {orderDetails.length > 0 &&(
                         <div className='d-flex justify-content-end w-100'>
-                        <Button>Send Invoice</Button>
+                        <Button onClick={()=>SetShowModalInvoice(true)}>Send Invoice</Button>
                         </div>
                     )}
                    
@@ -278,7 +330,7 @@ const CreateOrder = () => {
                         {customers.map((customer, index) => (
                             <li key={index} onClick={() => handleSelectCustomer(customer)} style={{ cursor: 'pointer' }}>
                             <h5>{customer.name}</h5>
-                            <span>{customer.contact}</span>
+                            <span>{customer.phone}</span>
                             </li>
                         ))}
                         </ul>
@@ -288,7 +340,7 @@ const CreateOrder = () => {
 
                     {selectedCustomer && (
                     <div className='selected-customer mt-2'>
-                        <div className='d-flex justify-content-between align-items-center'>
+                        <div className='d-flex justify-content-between align-items-center position-relative'>
                        
                         <button
                             onClick={handleDeselectCustomer}
@@ -300,8 +352,8 @@ const CreateOrder = () => {
                             position:'absolute',
                             top:-3,
                             right:7
-                           
                             }}
+                            className='cross-btn'
                         >
                             <RxCross2 />
                         </button>
@@ -315,12 +367,12 @@ const CreateOrder = () => {
                         <div className='border-bottom mb-2'>
                             <h4 className='d-flex justify-content-between'>Contact Information <span><GoPencil /></span></h4>
                             <p>{selectedCustomer.email}</p>
-                            <p>{selectedCustomer.contact}</p>
-                           
+                            <p>{selectedCustomer.phone}</p>
+                        
                         </div>
                         <div>
                             <h4 className='d-flex justify-content-between'>Billing Address<span><GoPencil /></span></h4>
-                            <p>{selectedCustomer.address}</p>
+                            <p>{selectedCustomer.location}</p>
                         </div>
                         
                         
