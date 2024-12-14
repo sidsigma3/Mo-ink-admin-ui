@@ -1,14 +1,4 @@
-.modal-customer .modal-body> div{
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
 
-
-.modal-customer .modal-body> div >div{
-    display: flex;
-    flex-direction: column;
-    width: 50%;
-}
 
 .modal-customer .modal-body label{
     display: block;
@@ -19,7 +9,7 @@
 .modal-customer .modal-body input{
     border: 1px solid #D1D5DB;
     border-radius: 0.3rem;
-    width: 100%;
+    width: 97%;
     font-size: 0.9rem;
     font-weight: 400;
     padding: 0.2rem 0.55rem;

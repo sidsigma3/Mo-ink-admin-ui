@@ -31,16 +31,20 @@ header .profile-ctn p{
 
 
 
-header .myAcc button svg{
+header .myAcc-ctn button svg{
     border: none;
     background: none;
     color: #93A3AB;
 }
 
 
-header .myAcc button{
+header .myAcc-ctn button{
     background:none;
     border: none;
+}
+
+header .myAcc-ctn .avatar-mob{
+    display: none;
 }
 
 
@@ -52,6 +56,11 @@ header .myAcc button{
     header{
         z-index: 1000;
     }
+
+    header .myAcc-ctn .avatar-mob{
+        display: grid;
+    }
+    
 
     header .bell-icon{}
 

@@ -6,3 +6,21 @@
     color: white !important;
 }
 
+.sm-btn{
+    display: none;
+}
+
+@media(max-width:768px){
+    .sm-btn{
+        display: grid;
+        padding: 0.5rem 0.5rem !important;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        border-radius: 50%;
+    }
+
+
+    .lg-btn{
+        display: none;
+    }
+}

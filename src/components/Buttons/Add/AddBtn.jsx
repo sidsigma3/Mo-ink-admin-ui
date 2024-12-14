@@ -10,7 +10,7 @@ const AddBtn = ({text,clickFunction}) => {
     </button>
 
     <button className='btn btn-primary add-btn sm-add-btn'>
-       <MdAdd size={18}/>
+       <MdAdd size={23}/>
     </button>
     </>
   )

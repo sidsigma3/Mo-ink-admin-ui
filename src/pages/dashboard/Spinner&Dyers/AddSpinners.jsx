@@ -9,6 +9,7 @@ import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/Stat
 import "./AddSpinners.css"
 import { useSpinnerDyers } from '../../../components/Context/SpinnersAndDyersContext';
 import { RiFilePaper2Line } from "react-icons/ri";
+import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 
 const AddSpinners = () => {
   
@@ -31,7 +32,7 @@ const AddSpinners = () => {
   const [formData, setFormData] = useState({
     firstName: customer?.firstName || "",
     lastName: customer?.lastName || "",
-    language: customer?.language || "",
+    whatsapp: customer?.whatsapp || "",
     phone: customer?.phone || "",
     email: customer?.email || "",
     company: customer?.company || "",
@@ -141,12 +142,12 @@ const handleTag = (value) =>{
     </div>
 
     <div className="col-md-6 d-flex flex-column">
-        <label>Language</label>
-        <input type="text" name="language" value={formData.language} onChange={handleChange} />
+        <label>Whatsapp No.</label>
+        <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
     </div>
 
     <div className="col-md-6 d-flex flex-column">
-        <label>Phone No.</label>
+        <label>Calling No.</label>
         <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
     </div>
 
@@ -286,7 +287,7 @@ const handleTag = (value) =>{
 
         <div className='d-flex justify-content-between mt-2'>
             <DeleteBtn></DeleteBtn>
-            <AddBtn text={'Save'} clickFunction={handleSubmit}></AddBtn>
+            <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
         </div>
 
 </div>

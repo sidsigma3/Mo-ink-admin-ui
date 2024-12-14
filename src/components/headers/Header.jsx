@@ -36,10 +36,10 @@ const Header = () => {
 
   return (
    <>
-        <header>
-            <div className='container-fluid d-flex align-items-center'>
-                <div className='row d-flex align-items-center justify-content-between w-100'>
-                    <div className='col-sm-2 col-lg-2 logo-ctn'>
+        <header className='shadow-sm'>
+            <div className='container-fluid d-flex align-items-center px-4'>
+                <div className='d-flex align-items-center justify-content-between w-100'>
+                    <div className='logo-ctn'>
                         <Link to={'/'}><img src='./logo.png' className='logo'></img></Link>
                     </div>
 
@@ -52,12 +52,14 @@ const Header = () => {
                    
                     </div> */}
 
-                    <div className='col-sm-4 col-lg-3 myAcc d-flex align-items-center justify-content-center gap-2'>
+                    <div className='myAcc-ctn d-flex align-items-center justify-content-center gap-4'>
                         <button>
-                            <FaRegBell size={20} />
+                            <FaRegBell size={25} />
                         </button>
 
-                        <button className='d-flex align-items-center gap-2 w-100 justify-content-center' onClick={handleClick} > <img src='./profile-pic.png'></img>
+                        <button className='avatar-mob' onClick={handleClick} > <img src='./profile-pic.png'></img></button>
+
+                        <button className='d-flex myAcc align-items-center gap-2 w-100 justify-content-center' onClick={handleClick} > <img src='./profile-pic.png'></img>
                         
                         <div className='profile-ctn'>
                             <h4>Johny Larsen</h4>

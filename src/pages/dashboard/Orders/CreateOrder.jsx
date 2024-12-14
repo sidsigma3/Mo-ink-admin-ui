@@ -110,7 +110,7 @@ const CreateOrder = () => {
 
   return (
     <div className='create-order'>
-        <div className='top d-flex gap-3' style={{cursor:'pointer'}}>
+        <div className='top d-flex gap-3 mb-2 mt-2' style={{cursor:'pointer'}}>
             <span onClick={() => navigate('/orders')}><IoArrowBackOutline size={25}/></span>
            { Object.keys(order).length === 0 ? (
             <h5>Create Order</h5>
@@ -152,72 +152,94 @@ const CreateOrder = () => {
                     <button className='btn btn-primary' onClick={() => setShowModalOrder(true)}>Browse</button>
                     </div>
                     </div>
-
                     {orderDetails.length > 0 && (
-                        <div className='order-detail'>   
-                            {/* Table header */}
-                            <div className='head row border-bottom pb-2 mb-2'>
-                                <div className='col'><h4>Product</h4></div>
-                                <div className='col'><h4>Counter</h4></div>
-                                <div className='col'><h4>Color</h4></div>
-                                <div className='col'><h4>Weight</h4></div>
-                                <div className='col'><h4>Total</h4></div>
-                            </div>
+                        <div className="order-detail">
+                            {/* Table */}
+                            <table className="table ">
+                            {/* Table Header */}
+                            <thead>
+                                <tr >
+                                <th className='fw-medium'>Product</th>
+                                <th className='fw-medium'>Counter</th>
+                                <th className='fw-medium'>Color</th>
+                                <th className='fw-medium'>Weight</th>
+                                <th className='fw-medium'>Total</th>
+                                </tr>
+                            </thead>
 
-                            {/* Table body */}
-                            <div className='body'>
-                            {orderDetails.map((order, index) => (
-                                <div className="row border-bottom py-2" key={index}>
-                                {/* Product ID */}
-                                <div className="col">{order.productName}</div>
+                            {/* Table Body */}
+                            <tbody>
+                                {orderDetails.map((order, index) => (
+                                <tr key={index}>
+                                    {/* Product ID */}
+                                    <td>{order.productName}</td>
 
-                                {/* Size */}
-                                <div className="col">
-                                     <div className='badge fw-normal' style={{width:'50%',padding:'0.3rem 0.6rem',borderRadius:'1rem',backgroundColor:'#EFEFEF',border:'1px solid #B9C0CD',textAlign:'center',color:'black'}}>{order.size}</div>
-                                </div>
-                                
-                                {/* Colors Column */}
-                                <div className="col d-flex flex-column align-items-start justify-content-around">
-                                    {order.color.map((colorObj, colorIndex) => (
+                                    {/* Size */}
+                                    <td>
                                     <div
-                                        key={colorIndex}
+                                        className="badge fw-normal"
                                         style={{
-                                        backgroundColor: colorObj,
-                                        width: '25px',
-                                        height: '25px',
-                                        borderRadius: '50%',
-                                        border: '2px solid #ccc',
-                                        marginBottom: '5px'
+                                        width: '70%',
+                                        padding: '0.3rem 0.6rem',
+                                        borderRadius: '1rem',
+                                        backgroundColor: '#EFEFEF',
+                                        border: '1px solid #B9C0CD',
+                                        textAlign: 'center',
+                                        color: 'black',
                                         }}
-                                    ></div>
-                                    ))}
-                                </div>
+                                    >
+                                        {order.size}
+                                    </div>
+                                    </td>
 
-                                {/* Weight Inputs Column */}
-                                <div className="col d-flex flex-column">
-                                    {order.color.map((colorObj, colorIndex) => (
-                                    <input
-                                        key={colorIndex}
-                                        type="number"
-                                        placeholder="Weight"
-                                        className="form-control mb-2"
-                                        style={{ width: '70%' }}
-                                        value={colorObj.weight || ''} // Use stored weight if available
-                                        onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
-                                    />
-                                    ))}
-                                </div>
+                                    {/* Colors Column */}
+                                    <td>
+                                    <div className="d-flex flex-wrap">
+                                        {order.color.map((colorObj, colorIndex) => (
+                                        <div
+                                            key={colorIndex}
+                                            style={{
+                                            backgroundColor: colorObj,
+                                            width: '25px',
+                                            height: '25px',
+                                            borderRadius: '50%',
+                                            border: '2px solid #ccc',
+                                            margin: '5px',
+                                            }}
+                                        ></div>
+                                        ))}
+                                    </div>
+                                    </td>
 
-                                {/* Total column - can be calculated or set manually */}
-                                <div className="col">
-                                    {/* Placeholder for calculated total */}
+                                    {/* Weight Inputs Column */}
+                                    <td>
+                                    <div className="d-flex flex-column">
+                                        {order.color.map((colorObj, colorIndex) => (
+                                        <input
+                                            key={colorIndex}
+                                            type="number"
+                                            placeholder="Weight"
+                                            className="rounded border-secondary-subtle mb-2 p-1 weight-input"
+                                            value={colorObj.weight || ''} // Use stored weight if available
+                                            onChange={(e) =>
+                                            handleWeightChange(order.productId, order.size, colorIndex, e.target.value)
+                                            }
+                                        />
+                                        ))}
+                                    </div>
+                                    </td>
+
+                                    {/* Total Column */}
+                                    <td>
                                     <span>{/* Insert calculation or static value */}</span>
-                                </div>
-                                </div>
-                            ))}
-                            </div>
+                                    </td>
+                                </tr>
+                                ))}
+                            </tbody>
+                            </table>
                         </div>
                         )}
+
 
 
                     <ModalAssign
@@ -225,12 +247,12 @@ const CreateOrder = () => {
                         handleClose={()=> setShowModalAssign(false)}
                     >
                     </ModalAssign>
-                    {orderDetails.length > 0 && (
+                    {/* {orderDetails.length > 0 && (
 
                     <div className='d-flex justify-content-end w-100 mt-2'>
                         <button onClick={()=> setShowModalAssign(true)} className='btn btn-primary btn-sm'>Assign</button>
                     </div>
-                    )}
+                    )} */}
                                                 
                 </div>
 
@@ -324,7 +346,7 @@ const CreateOrder = () => {
                         </ModalCustomer>
 
 
-                    <div className='customer-list'>
+                    <div className='customer-list mt-3'>
                         <h4>Recent Customers</h4>
                         <ul>
                         {customers.map((customer, index) => (
@@ -351,7 +373,7 @@ const CreateOrder = () => {
                             cursor: 'pointer',
                             position:'absolute',
                             top:-3,
-                            right:7
+                            right:-4
                             }}
                             className='cross-btn'
                         >

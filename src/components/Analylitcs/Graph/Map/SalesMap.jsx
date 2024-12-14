@@ -4,7 +4,7 @@ import "./SalesMap.css"
 
 const SalesMap = () => {
   return (
-    <div  className="sales-map p-3">
+    <div  className="sales-map p-3 shadow">
         <h4>Sales Demography</h4>
         <h3>7,259</h3>
 

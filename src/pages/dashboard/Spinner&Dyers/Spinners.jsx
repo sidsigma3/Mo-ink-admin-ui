@@ -11,6 +11,7 @@ import { LuDot } from "react-icons/lu";
 import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/StatusFilter'
 import { Pagination } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
+import "./Spinners.css"
 
 const Spinners = () => {
 
@@ -73,8 +74,8 @@ const Spinners = () => {
 
   return (
     <div className='spinner-page'>
-         <div className='top d-flex justify-content-between'>
-            <h4>Spinners & Dyers</h4>
+         <div className='top d-flex justify-content-between mb-2'>
+            <h4 style={{fontSize:'1.3rem'}}>Spinners & Dyers</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn></ExportBtn>
@@ -87,19 +88,14 @@ const Spinners = () => {
             </div>
         </div>
 
-        <div className='w-50 d-flex gap-2'>
-            <ProductFilter></ProductFilter>
-            {/* <Dropdown onSelect={handleSelect}  size="sm">
-            <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100">
-                <p className="m-0">{selectedStatus}</p>
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu className='w-100'>
-                <Dropdown.Item eventKey="Active">Active</Dropdown.Item>
-                <Dropdown.Item eventKey="Inactive">Inactive</Dropdown.Item>
-            </Dropdown.Menu>
-            </Dropdown> */}
-            <StatusFilter status={'Active'}></StatusFilter>
+        <div className='d-flex gap-2 filter-sec'>
+            <div className='w-75'>
+                <ProductFilter></ProductFilter>
+            </div>
+         
+            <div className='w-25'>
+                <StatusFilter status={'Active'}></StatusFilter> 
+            </div>
         </div>
 
         <div className='table-ctn'>
@@ -111,7 +107,7 @@ const Spinners = () => {
                         <th>Tag</th>
                         <th>Assigned Orders</th>
                         <th>Last Order</th>
-                        <th></th>
+                        <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -123,7 +119,7 @@ const Spinners = () => {
                 <div 
                 style={{
                     padding:'0.2rem 0.4rem',
-                    border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'50%',
+                    border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'4rem',
                     backgroundColor:customer.tag === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
                     borderColor:customer.tag === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
                     color : customer.tag === 'Spinner' ? '#1E40AF' : '#92400E' ,

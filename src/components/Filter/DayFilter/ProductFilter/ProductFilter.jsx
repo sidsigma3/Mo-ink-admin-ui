@@ -17,8 +17,8 @@ const ProductFilter = () => {
 
   return (
    
-        <div className='d-flex bg-white  p-2 gap-3 border order-id w-100'>
-                <div className='d-flex align-items-center justify-content-between ps-1' style={{width:'39%' }}>
+        <div className='d-flex bg-white  p-2 gap-3 border order-id w-100 ps-0'>
+                <div className='d-flex align-items-center justify-content-between border border-right' style={{width:'39%' }}>
                     {/* <h5>Order ID</h5>
                     <span><MdKeyboardArrowDown size={18}/></span> */}
 

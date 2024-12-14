@@ -12,6 +12,7 @@ import ModalOrder from "../../../components/Modal/ModalOrder";
 import ModalCustomerList from "../../../components/Modal/ModalCustomerList";
 import { RxCross2 } from "react-icons/rx";
 import { useDiscounts } from "../../../components/Context/DiscountContext";
+import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
 
 
 const AddDiscountPage = () => {
@@ -600,11 +601,11 @@ const handleMaxUsageChange = (field1,field2) => {
             <DeleteBtn></DeleteBtn>
 
             {state?.index === undefined &&(
-            <AddBtn clickFunction={handleSubmit} text={"Add"}></AddBtn>
+            <SubmitBtn clickFunction={handleSubmit} text={"Add"}></SubmitBtn>
             )}
 
             {state?.index !== undefined &&(
-                <AddBtn clickFunction={handleSubmit} text={"Save"}></AddBtn>
+                <SubmitBtn clickFunction={handleSubmit} text={"Save"}></SubmitBtn>
             )}
 
           </div>

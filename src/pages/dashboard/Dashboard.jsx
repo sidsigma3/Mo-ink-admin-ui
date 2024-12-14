@@ -40,9 +40,9 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-      <div className="bg-white graph-ctn">
-        <h4 className="fs-5">Product Sold</h4>
-       <h5 className="fs-6 mb-3"> <span className="text-success me-1">+3.4%</span>from last period</h5>
+      <div className="bg-white graph-ctn shadow-sm p-3">
+        <h5 style={{fontSize:'1.2rem'}}>Product Sold</h5>
+       <h5 className="mb-3" style={{fontSize:'1rem'}}> <span className="text-success me-1">+3.4%</span>from last period</h5>
        <ProductSoldGraph></ProductSoldGraph>
       </div>
 

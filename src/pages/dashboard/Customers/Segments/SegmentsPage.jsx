@@ -10,6 +10,7 @@ import { useSegments } from '../../../../components/Context/SegmentsContext'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Pagination } from 'react-bootstrap'
 import { Dropdown } from 'react-bootstrap'
+import "./SegmentsPage.css"
 
 const SegmentsPage = () => {
 
@@ -103,8 +104,8 @@ const SegmentsPage = () => {
 
   return (
     <div className='segments-page'>
-         <div className='top d-flex justify-content-between'>
-            <h4>Segments</h4>
+         <div className='top d-flex justify-content-between mb-2'>
+            <h4 style={{fontSize:'1.3rem'}}>Segments</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn></ExportBtn>
@@ -118,9 +119,14 @@ const SegmentsPage = () => {
 
         </div>
 
-        <div className='w-50 d-flex gap-2'>
-            <ProductFilter></ProductFilter>
-            <StatusFilter status={'Active'}></StatusFilter>
+        <div className='d-flex gap-2 filter-sec'>
+            <div className='w-75'>
+                <ProductFilter></ProductFilter>
+            </div>
+         
+            <div className='w-25'>
+                <StatusFilter status={'Active'}></StatusFilter> 
+            </div>
         </div>
 
         <div className='table-ctn'>
@@ -131,7 +137,7 @@ const SegmentsPage = () => {
                         <th>Type</th>
                         <th>Customers</th>
                         <th>Conditions</th>
-                        <th></th>
+                        <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
                 <tbody>

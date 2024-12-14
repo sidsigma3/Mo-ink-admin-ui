@@ -43,8 +43,8 @@ const DiscountsPage = () => {
 
   return (
     <div className='discounts'>
-        <div className='top d-flex justify-content-between'>
-            <h4>Discounts</h4>
+        <div className='top d-flex justify-content-between mb-2'>
+            <h4 style={{fontSize:'1.3rem'}}>Discounts</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn></ExportBtn>
@@ -56,8 +56,13 @@ const DiscountsPage = () => {
         </div>
 
         <div className='d-flex gap-2 filter-sec'>
-          <ProductFilter></ProductFilter>
-          <StatusFilter status={'Active'}></StatusFilter>
+            <div className='w-75'>
+                <ProductFilter></ProductFilter>
+            </div>
+         
+            <div className='w-25'>
+                <StatusFilter status={'Active'}></StatusFilter> 
+            </div>
         </div>
 
 
@@ -70,7 +75,7 @@ const DiscountsPage = () => {
                 <th>Method</th>
                 <th>Customer</th>
                 <th>Used</th>
-                <th></th>
+                <th style={{width:'1rem'}}></th>
               </tr>
             </thead>
 
@@ -79,7 +84,7 @@ const DiscountsPage = () => {
             <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
               <td>{discount.discountCode}</td>
               <td>
-                <div style={{backgroundColor:discount.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'50%'}}>
+                <div style={{backgroundColor:discount.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
                 {discount.status}
                 </div>
               </td>
@@ -88,7 +93,7 @@ const DiscountsPage = () => {
               <td>{discount.used}</td>
               <td>
                     <Dropdown>
-                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
+                        <Dropdown.Toggle as="div" variant="light" id="dropdown-basic" className='border border-0'>
                         <BsThreeDotsVertical />
                         </Dropdown.Toggle>
 
@@ -112,7 +117,7 @@ const DiscountsPage = () => {
 
           <div className="data-cards">
         {discountData.map((product,index) => (
-          <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
+          <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
                  <h3>{product.discountCode}</h3>

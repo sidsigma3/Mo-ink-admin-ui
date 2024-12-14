@@ -1,0 +1,18 @@
+.spinner-page .filter-sec{
+    width: 50%;
+}
+
+
+@media(max-width:1024px){
+    .spinner-page .filter-sec{
+        width: 70%;
+    }
+}
+
+
+@media(max-width:768px){
+    .spinner-page .filter-sec{
+        width: 100%;
+    }
+}
+

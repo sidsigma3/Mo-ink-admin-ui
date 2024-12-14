@@ -1,0 +1,81 @@
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f9f9f9;
+  }
+  
+  .form-container {
+    position: relative;
+   
+    overflow: hidden;
+    
+  }
+  
+  .form-container.login,
+  .form-container.signup {
+    position: absolute;
+   
+    top: 0;
+    left: 0;
+  
+    transition: transform 0.3s ease, ; 
+    /* transition-delay: 2s; */
+  }
+  /* opacity 5s ease */
+  
+  .form-container.login {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .form-container.signup {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+  
+  input:checked ~ .form-container.login {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+  
+  input:checked ~ .form-container.signup {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  /* .toggle-ctn {
+    margin-top: 1rem;
+  }
+  
+  .toggle-btn {
+    width: 15rem;
+    height: 3rem;
+    border-radius: 1.5rem;
+    background-color: #f1f1f1;
+    position: relative;
+    display: block;
+  }
+  
+  .toggle-btn::before {
+    content: "Login";
+    position: absolute;
+    left: 0.2rem;
+    top: 0.2rem;
+    height: 2.6rem;
+    width: 7rem;
+    background-color: #0561fc;
+    border-radius: 1.5rem;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+  }
+  
+  input:checked + .toggle-btn::before {
+    content: "Sign Up";
+    transform: translateX(7.6rem);
+  } */
+  

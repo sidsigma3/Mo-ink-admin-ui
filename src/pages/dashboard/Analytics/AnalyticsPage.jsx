@@ -259,7 +259,7 @@ const AnalyticsPage = () => {
   return (
     <div className='analytics-page'>
         <div className='top d-flex justify-content-between'>
-            <h4>Analytics</h4>
+            <h4 style={{fontSize:'1.3rem'}}>Analytics</h4>
             <Filter></Filter>
         </div>
 

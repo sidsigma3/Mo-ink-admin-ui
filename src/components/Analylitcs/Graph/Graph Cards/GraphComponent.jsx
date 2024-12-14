@@ -67,7 +67,7 @@ const centerTextPlugin = {
 
 
   return (
-    <div className="graph-card">
+    <div className="graph-card shadow">
     <h4>{text}</h4>
     <h3>{number}</h3>
     <div>

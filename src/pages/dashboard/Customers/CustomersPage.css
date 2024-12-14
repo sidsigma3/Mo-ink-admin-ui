@@ -1,7 +1,6 @@
 .table-ctn {
     border: 1px solid #ddd;
     border-radius: 1rem;
-  
     overflow: auto;
     margin-top: 1rem;
   }
@@ -44,6 +43,18 @@
     
   }
 
+  .table-ctn{
+
+    .dropdown-toggle::after {
+      display: none !important; 
+    }
+  }
+
+
+  .customer-page .filter-sec{
+    width: 50% !important;
+}
+
   @media (max-width: 1024px) {
     .table-ctn{
      
@@ -53,18 +64,27 @@
     .table-ctn table{
       width: 110vw;
     }
+
+    .customer-page .filter-sec{
+      width: 70%;
+  }
   }
 
 
   
   @media (max-width: 768px) {
+
+    .table-ctn .pagination{
+      display: none;
+  }
     .table-ctn table {
       display: none;
     }
   
     .table-ctn .data-cards {
       display: block;
-      padding: 1rem;
+      padding: 0;
+      border: 0;
     }
   
     .table-ctn .data-card {
@@ -82,6 +102,14 @@
     .table-ctn .data-card p {
       margin: 0.2rem 0;
       font-size: 1rem;
+    }
+
+    .table-ctn {
+      border: none;
+    }
+
+    .customer-page .filter-sec{
+      width: 100% !important;
     }
   }
   

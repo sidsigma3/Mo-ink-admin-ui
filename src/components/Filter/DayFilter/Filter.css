@@ -1,15 +1,15 @@
 .filter{
-    background-color: white;
-    padding: 0 0.5rem;
+    /* background-color: white;
     border-radius: 0.5rem;
-    width: 9.5rem;
+    width: 9.5rem; */
 }
 
 .filter button{
     background: none;
     border: none;
     font-size: 0.8rem;
-    padding: 0 0.1rem !important;
+    padding: 0.3rem 0.5rem !important;
+    border: 1px solid lightgrey !important;
 }
 
 .filter button span{

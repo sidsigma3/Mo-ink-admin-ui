@@ -12,6 +12,8 @@ import TotalOrders from '../Analytics/Graphs/TotalOrders';
 import { FaMinus } from "react-icons/fa";
 import { VscCreditCard } from "react-icons/vsc";
 import { useSegments } from '../../../components/Context/SegmentsContext';
+import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
+import { MdAdd } from "react-icons/md";
 
 
 const AddCustomerPage = () => {
@@ -30,7 +32,7 @@ const AddCustomerPage = () => {
   const [formData, setFormData] = useState({
     firstName: customer?.firstName || "",
     lastName: customer?.lastName || "",
-    language: customer?.language || "",
+    whatsapp: customer?.whatsapp || "",
     phone: customer?.phone || "",
     email: customer?.email || "",
     company: customer?.company || "",
@@ -172,14 +174,14 @@ const AddCustomerPage = () => {
 
   return (
     <div className='add-customer'>
-      <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
+      <div className="top d-flex gap-3 mt-2" style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/customers")}>
           <IoArrowBackOutline size={25} />
         </span>
         <h5>New Customer</h5>
       </div>
 
-        <div className='main d-flex gap-3'>
+        <div className='main d-flex gap-3 mt-2'>
 
             <div className='left'>
 
@@ -195,12 +197,12 @@ const AddCustomerPage = () => {
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
-                    <label>Language</label>
-                    <input type="text" name="language" value={formData.language} onChange={handleChange} />
+                    <label>WhatsApp No.</label>
+                    <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
-                    <label>Phone No.</label>
+                    <label>Calling No.</label>
                     <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
                 </div>
 
@@ -283,9 +285,13 @@ const AddCustomerPage = () => {
                         <label>Add balance</label>
                         <div className='d-flex gap-2 mt-2'>
                         <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='₹ INR'></input>
-                        <AddBtn clickFunction={handleAddMoney}></AddBtn>
+                        {/* <AddBtn clickFunction={handleAddMoney}></AddBtn> */}
+
+                        <button className='btn btn-primary d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.28rem 1.2rem'}} onClick={handleAddMoney}>
+                        <MdAdd size={19}/>
+                        </button>
                         
-                        <button className='btn btn-danger d-flex align-items-cneter px-3' style={{height:'1.8rem'}} onClick={handleSubtractMoney}>
+                        <button className='btn btn-danger d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.55rem 1.2rem'}} onClick={handleSubtractMoney}>
                         <FaMinus size={12}/>
                         </button>
                         </div>
@@ -335,7 +341,7 @@ const AddCustomerPage = () => {
 
                     <div className='d-flex justify-content-between mt-2'>
                         <DeleteBtn></DeleteBtn>
-                        <AddBtn text={'Save'} clickFunction={handleSubmit}></AddBtn>
+                        <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
                     </div>
 
             </div>
@@ -392,19 +398,23 @@ const AddCustomerPage = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 
-                {/* Display filtered segments to select from */}
-                <div className="filtered-segments">
-                    {filteredSegments.map((segment, index) => (
-                    <div
-                        key={index}
-                        className="segment-item"
-                        onClick={() => addSegmentAsChip(segment)}  // Add segment as chip when clicked
-                        style={{ cursor: 'pointer', padding: '5px', border: '1px solid #ccc', margin: '5px' }}
-                    >
-                        {segment.title}
-                    </div>
-                    ))}
-                </div>
+                        
+                {searchTerm.length > 0  &&(
+                     <div className="filtered-segments">
+                     {filteredSegments.map((segment, index) => (
+                     <div
+                         key={index}
+                         className="segment-item"
+                         onClick={() => addSegmentAsChip(segment)}  // Add segment as chip when clicked
+                         style={{ cursor: 'pointer', padding: '5px', border: '1px solid #ccc', margin: '5px' }}
+                     >
+                         {segment.title}
+                     </div>
+                     ))}
+                 </div>
+                )}
+
+               
 
                 {/* Display selected segments as chips */}
                 <div className="chips-container mt-2">

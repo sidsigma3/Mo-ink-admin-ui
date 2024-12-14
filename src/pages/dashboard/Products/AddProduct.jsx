@@ -14,6 +14,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import AddBtn from "../../../components/Buttons/Add/AddBtn";
 import { ProductContext } from './../../../components/Context/ProductContext';
 import DeleteBtn from "../../../components/Buttons/Delete/DeleteBtn";
+import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
 
 
 const AddProduct = () => {
@@ -37,7 +38,7 @@ const AddProduct = () => {
     compareAtPrice: product?.compareAtPrice || '',
     costPerItem: product?.costPerItem || '',
     profit: product?.profit || '',
-    margin: product?.margin || '',
+    gst: product?.gst || '',
     size: product?.size || '',
     stock: product?.stock || '',
     colorVariants: product?.colorVariants || [],
@@ -418,16 +419,6 @@ const AddProduct = () => {
             </div>
 
             <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
-              <label>Profit</label>
-              <input 
-              type="number"
-              name="profit"
-              value={formData.profit}
-              onChange={handleInputChange}
-              ></input>
-            </div>
-
-            <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
               <label>Margin</label>
               <input 
                type="number"
@@ -436,6 +427,18 @@ const AddProduct = () => {
                onChange={handleInputChange}
               ></input>
             </div>
+
+
+            <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
+              <label>GST on this product</label>
+              <input 
+              type="number"
+              name="gst"
+              value={formData.gst}
+              onChange={handleInputChange}
+              ></input>
+            </div>
+
           </div>
         </div>
 
@@ -572,7 +575,7 @@ const AddProduct = () => {
                             e.target.value
                           )
                         }
-                        placeholder="Size (e.g., Large)"
+                        placeholder="Counter"
                       />
 
                       <input
@@ -622,7 +625,7 @@ const AddProduct = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Color Name"
+                          placeholder="Name"
                           
                         />
                         <input
@@ -638,7 +641,7 @@ const AddProduct = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Hex Code (#FFFFFF)"
+                          placeholder="Hex Code"
                           style={{ marginRight: "10px" }}
                         />
                         <div
@@ -798,7 +801,7 @@ const AddProduct = () => {
                                 onChange={(e) =>
                                 handleVariantValueChangeTable(sizeIndex, colorIndex, "hex", e.target.value)
                                 }
-                                placeholder="Hex Code (#FFFFFF)"
+                                placeholder="Hex Code"
                             />
                             
                             </td>
@@ -847,10 +850,9 @@ const AddProduct = () => {
        
     </div>
 
-    <div className="w-100 d-flex justify-content-between mt-2">
+    <div className="w-100 d-flex justify-content-between mt-3">
         <DeleteBtn></DeleteBtn>
-
-        <AddBtn clickFunction={handleSubmit} text={'Save'}></AddBtn>
+        <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
     </div>
 
 

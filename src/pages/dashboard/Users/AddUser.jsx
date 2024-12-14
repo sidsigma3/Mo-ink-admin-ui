@@ -20,7 +20,7 @@ const AddUser = () => {
     const [formData, setFormData] = useState({
         firstName: customer?.firstName || "",
         lastName: customer?.lastName || "",
-        language: customer?.language || "",
+        whatsapp: customer?.whatsapp || "",
         phone: customer?.phone || "",
         email: customer?.email || "",
         company: customer?.company || "",
@@ -69,12 +69,12 @@ const AddUser = () => {
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>Language</label>
-                <input type="text" name="language" value={formData.language} onChange={handleChange} />
+                <label>WhatsApp No.</label>
+                <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>Phone No.</label>
+                <label>Calling No.</label>
                 <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
             </div>
 

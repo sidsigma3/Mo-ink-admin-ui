@@ -4,6 +4,7 @@ import { LuDot } from "react-icons/lu";
 import { ProductContext } from "./../../../Context/ProductContext";
 import { useNavigate } from "react-router-dom";
 import { Table } from 'react-bootstrap';
+import { Pagination } from 'react-bootstrap';
 
 const ProductsTable = ({sampleProducts}) => {
 
@@ -13,6 +14,17 @@ const ProductsTable = ({sampleProducts}) => {
   const handleRowClick = (index) => {
     navigate('/add-product', { state: { index } });
   };
+
+
+  let active = 2;
+  let items = [];
+  for (let number = 1; number <= 5; number++) {
+    items.push(
+      <Pagination.Item key={number} active={number === active}>
+        {number}
+      </Pagination.Item>,
+    );
+  }
 
   return (
     <div className="product-table">
@@ -69,9 +81,13 @@ const ProductsTable = ({sampleProducts}) => {
         </tbody>
       </Table>
 
+      <div className='d-flex justify-content-end mt-2'>
+          <Pagination className='z-index-n1'>{items}</Pagination>
+          </div>
+
       <div className="product-cards">
         {sampleProducts.map((product,index) => (
-          <div className="product-card" key={product.index} onClick={() => handleRowClick(index)}>
+          <div className="product-card shadow-sm" key={product.index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
                  <h3>{product.productName}</h3>

@@ -202,3 +202,10 @@ font-weight: 500;
     }
     
 }
+
+
+@media(max-width:768px){
+    .variant-add .size-sec input{
+        width: 3rem;
+    }
+}

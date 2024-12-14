@@ -8,6 +8,7 @@ import { Table } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Pagination } from 'react-bootstrap'
 import { Dropdown } from 'react-bootstrap'
+import "./UserPage.css"
 
 const UserPage = () => {
 
@@ -59,8 +60,8 @@ const UserPage = () => {
 
   return (
     <div className='user-page'>
-         <div className='top d-flex justify-content-between'>
-            <h4>Users</h4>
+         <div className='top d-flex justify-content-between mb-2'>
+            <h4 style={{fontSize:'1.3rem'}}>Users</h4>
 
             <div className='d-flex gap-2'>
                 {/* <ExportBtn></ExportBtn> */}
@@ -74,10 +75,14 @@ const UserPage = () => {
         </div>
 
 
-        <div className='w-50 d-flex gap-2'>
-            <ProductFilter></ProductFilter>
-            {/* <StatusFilter status={'Active'}></StatusFilter> */}
-        
+        <div className='d-flex gap-2 filter-sec'>
+            <div className='w-100'>
+                <ProductFilter></ProductFilter>
+            </div>
+         
+            {/* <div className='w-25'>
+                <StatusFilter status={'Active'}></StatusFilter> 
+            </div> */}
         </div>
 
         <div className='table-ctn'>
@@ -88,7 +93,7 @@ const UserPage = () => {
                         <th>Email</th>
                         <th>Role</th>
                         <th>Joined On</th>
-                        <th></th>
+                        <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
                 <tbody>

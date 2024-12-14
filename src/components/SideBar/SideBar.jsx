@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState ,useRef ,useEffect } from 'react'
 import "./SideBar.css"
 import { CiHome } from "react-icons/ci";
 import { LuShoppingCart } from "react-icons/lu";
@@ -14,20 +14,50 @@ import { LuSettings } from "react-icons/lu";
 import { GrBug } from "react-icons/gr";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { TfiMenuAlt } from "react-icons/tfi";
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { BsArrowReturnRight } from "react-icons/bs";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 
 const SideBar = () => {
+
+    const navigate = useNavigate()
+
     const [selected,setSelected] = useState('dashboard')
 
     const [hoverSelected , setHoverSelected] = useState('')
 
     const [isMoreMenuOpen, setMoreMenuOpen] = useState(false);
 
+
+    const menuRef = useRef(null);
+    const buttonRef = useRef(null);
+
+
+  // Close the menu if clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+
+        if (
+            menuRef.current && !menuRef.current.contains(event.target) && 
+            buttonRef.current && !buttonRef.current.contains(event.target)
+          ) {
+            setMoreMenuOpen(false); // Close the menu
+          }
+    };
+
+    // Add event listener to the document body
+    document.body.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      // Cleanup the listener
+      document.body.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+
   return (
-    <div className='sideBar'>
+    <div className='sideBar shadow'>
 
         <div className='menu'>
         <ul className='on-mobile'>
@@ -43,11 +73,15 @@ const SideBar = () => {
                 </Link>
             </li>
 
-            <li className={selected === 'profile' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
+            {/* <li className={selected === 'profile' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
                
-                <button  onClick={()=>setSelected('profile')}><span className='icon'><MdOutlinePersonOutline  size={28}/></span>Profile</button>
+                <button 
+                 onClick={()=>{
+                    setSelected('profile')
+                    navigate('/profile')
+                }}><span className='icon'><MdOutlinePersonOutline  size={28}/></span>Profile</button>
                 
-            </li>
+            </li> */}
 
             <li className={selected === 'products' ? 'selected' : 'not-selected'}>
                  <Link to={'/products'}>
@@ -55,15 +89,31 @@ const SideBar = () => {
                 </Link>
             </li>
 
-            <li className='show-on-mobile'>
-                <button onClick={() => setMoreMenuOpen(!isMoreMenuOpen)}><span className='icon'><TfiMenuAlt  size={28}/></span>More</button>
+
+            <li className={selected === 'analytics' ? 'selected' : 'not-selected'}>
+                <Link to={'/analytics'}>
+                <button  onClick={()=>setSelected('analytics')}>
+              
+                    <span className='icon'>
+                        <GoGraph  size={25} style={{ strokeWidth: '0.4'}}/>
+                    </span>
+             
+                    Analytics</button>
+                </Link>
+            </li>
+
+            <li className={selected === 'more' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
+                <button   ref={buttonRef} onClick={() => {
+                    setMoreMenuOpen(!isMoreMenuOpen)
+                    setSelected('more')
+                    }}><span className='icon'><TfiMenuAlt  size={28}/></span>More</button>
             </li>
 
 
             {isMoreMenuOpen && (
-        <div className="more-menu">
+        <div className="more-menu" ref={menuRef}>
             <ul>
-          <li
+          {/* <li
             className={`${
               selected === 'analytics' ? 'selected' : 'not-selected'
             }`}
@@ -76,7 +126,7 @@ const SideBar = () => {
                 Analytics
               </button>
             </Link>
-          </li>
+          </li> */}
 
           <li
             className={`${
@@ -115,7 +165,7 @@ const SideBar = () => {
 
             <li className={selected === 'manufactures' ? 'selected' : 'not-selected'}>
                 <Link to={'/spinners-and-dyers'}>
-                <button  onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={25}/></span>Spinners & Dyers</button>
+                <button  onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={25}/></span><div>Spinners &</div><div> Dyers</div></button>
                 </Link>
             </li>
 
@@ -130,17 +180,7 @@ const SideBar = () => {
 
 
 
-            <li className={selected === 'analytics' ? 'selected hide-on-mobile' : 'not-selected hide-on-mobile'}>
-                <Link to={'/analytics'}>
-                <button  onClick={()=>setSelected('analytics')}>
-              
-                    <span className='icon'>
-                        <GoGraph  size={25} style={{ strokeWidth: '0.4'}}/>
-                    </span>
-             
-                    Analytics</button>
-                </Link>
-            </li>
+           
 
             <li className={selected === 'discount' ? 'selected hide-on-mobile' : 'not-selected hide-on-mobile'}> 
                 <Link to={'/discounts'}>

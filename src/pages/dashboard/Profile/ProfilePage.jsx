@@ -1,10 +1,24 @@
 import { Avatar } from '@mui/material'
-import React from 'react'
+import React , {useState} from 'react'
 import { LuHome } from "react-icons/lu";
 import { MdEmail } from "react-icons/md";
 import "./ProfilePage.css"
+import { MdEdit } from "react-icons/md";
+import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 
 const ProfilePage = () => {
+
+  const [imageSrc, setImageSrc] = useState("/Avatar.png");
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setImageSrc(imageUrl);
+    }
+  };
+
+
   return (
     <div className='profile-page'>
         <div>
@@ -18,9 +32,27 @@ const ProfilePage = () => {
                 <img className='profile-cover' style={{width:'100%'}} src='/profile-cover-pic.png'></img>
             </div>
 
-            <div className='position-absolute avatar' >
-                <img  src='/Avatar.png'></img>
+            <div className="position-absolute avatar-container avatar">
+            <label htmlFor="file-input" className="avatar">
+                <img src={imageSrc} alt="Avatar" />
+                <div className="edit-overlay">
+                <MdEdit />
+                <text style={{fontSize:'0.7rem'}}>Change Profile pic</text>
+                <i className="fas fa-edit"></i>
+                </div>
+            </label>
+            <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: "none" }}
+            />
             </div>
+
+            {/* <div className='position-absolute avatar' >
+                <img  src='/Avatar.png'></img>
+            </div> */}
 
             <div className='d-flex justify-content-between profile-info'>
                 <div>
@@ -70,7 +102,9 @@ const ProfilePage = () => {
                     <input type='text' className='rounded mt-2'></input>
                 </div>
 
-
+                <div className='d-flex justify-content-end mt-3'>
+                    <SubmitBtn text={'Save'}></SubmitBtn>
+                </div>
 
             </div>
 

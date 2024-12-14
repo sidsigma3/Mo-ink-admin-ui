@@ -13,6 +13,7 @@ import AddBtn from '../../../../components/Buttons/Add/AddBtn';
 import DeleteBtn from '../../../../components/Buttons/Delete/DeleteBtn';
 import { useSegments } from '../../../../components/Context/SegmentsContext';
 import { useLocation } from 'react-router-dom';
+import SubmitBtn from '../../../../components/Buttons/Submit/SubmitBtn';
 
 const AddSegmentsPage = () => {
 
@@ -225,11 +226,11 @@ const AddSegmentsPage = () => {
                 <DeleteBtn></DeleteBtn>
 
                 {state?.index === undefined &&(
-                <AddBtn clickFunction={handleSave} text={"Add"}></AddBtn>
+                <SubmitBtn clickFunction={handleSave} text={"Add"}></SubmitBtn>
                 )}
 
                 {state?.index !== undefined &&(
-                    <AddBtn clickFunction={handleSave} text={"Save"}></AddBtn>
+                    <SubmitBtn clickFunction={handleSave} text={"Save"}></SubmitBtn>
                 )}
 
           </div>

@@ -47,8 +47,8 @@ const CustomersPage = () => {
 
   return (
     <div className='customer-page'>
-          <div className='top d-flex justify-content-between'>
-            <h4>Customers</h4>
+          <div className='top d-flex justify-content-between mb-2'>
+            <h4 style={{fontSize:'1.3rem'}}>Customers</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn></ExportBtn>
@@ -63,9 +63,14 @@ const CustomersPage = () => {
         </div>
 
 
-        <div className='w-50 d-flex gap-2'>
-            <ProductFilter></ProductFilter>
-            <StatusFilter status={'Active'}></StatusFilter>
+        <div className='d-flex gap-2 filter-sec'>
+            <div className='w-75'>
+                <ProductFilter></ProductFilter>
+            </div>
+         
+            <div className='w-25'>
+                <StatusFilter status={'Active'}></StatusFilter> 
+            </div>
         </div>
 
 
@@ -78,7 +83,7 @@ const CustomersPage = () => {
                         <th>Wallet</th>
                         <th>Orders</th>
                         <th>Last Order</th>
-                        <th></th>
+                        <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,7 +96,7 @@ const CustomersPage = () => {
                 <td>{customer.lastOrder}</td>
                 <td>
                     <Dropdown>
-                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
+                        <Dropdown.Toggle  variant="light" id="dropdown-basic" className='border border-0'>
                         <BsThreeDotsVertical />
                         </Dropdown.Toggle>
 

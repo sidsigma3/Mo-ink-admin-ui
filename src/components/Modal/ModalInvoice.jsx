@@ -34,7 +34,7 @@ const ModalInvoice = ({show,handleClose}) => {
 
             <div className='d-flex flex-column gap-1 flex-grow-1 mt-2'>
                     <label>Custom message</label>
-                    <input className='rounded ps-1 py-1 border border-secondary-subtle' style={{fontSize:'0.8rem',height:'6rem'}}></input>
+                    <textarea className='rounded ps-1 py-1 border border-secondary-subtle' style={{fontSize:'0.8rem',height:'6rem'}}></textarea>
             </div>  
 
 

@@ -208,7 +208,7 @@
     }
 
     .order-table .order-cards .order-card h3{
-        font-size: 1.3rem;
+        font-size: 1rem;
     }
 
     .order-table .order-cards .order-card h5{
@@ -218,6 +218,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-bottom: 0;
+        height: 1.5rem;
     }
 
     .order-table  .order-cards .assign-button{
@@ -232,9 +234,16 @@
     }
 
     .order-table .order-cards .order-card .manufacturer-name{
-        border: 1px solid #93A3AB;
-        padding: 0.3rem 0.8rem;
-        border-radius: 1rem;
+        border: 1px solid #0561FC;
+        background-color: #0561FC;
+        color: white;
+        height: 1.8rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 5rem;
+        font-size: 0.8rem;
+
     }
 
     .order-table .order-cards .order-card .green{
@@ -242,6 +251,7 @@
         border: 1px solid #6EE7B7;
         color: #41b788;
         border-radius: 0.3rem;
+       
     }
     
     .order-table .order-cards .order-card .grey{
@@ -271,6 +281,14 @@
         border: 1px solid #FCA5A5;
         color: #be5757;
         border-radius: 0.3rem;
+    }
+
+    .order-table .pagination{
+        display: none;
+    }
+
+    .table-ctn-order {
+        border: none;
     }
 
 

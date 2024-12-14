@@ -108,15 +108,7 @@ const Products = () => {
     const navigate =useNavigate()
 
 
-    let active = 2;
-    let items = [];
-    for (let number = 1; number <= 5; number++) {
-      items.push(
-        <Pagination.Item key={number} active={number === active}>
-          {number}
-        </Pagination.Item>,
-      );
-    }
+  
 
   return (
     <div className='products'>
@@ -154,9 +146,7 @@ const Products = () => {
 
         <div>
             <ProductsTable sampleProducts={sampleProducts}></ProductsTable>
-            <div className='d-flex justify-content-end mt-2'>
-          <Pagination>{items}</Pagination>
-          </div>
+         
         </div>
 
     </div>

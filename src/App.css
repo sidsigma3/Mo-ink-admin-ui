@@ -61,7 +61,7 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
 }
 
 .sidebarWrapper{
-  width: 25%;
+  width: 20rem;
   /* height: calc(100vh - 12vh); */
   position: sticky;
   top: 0;

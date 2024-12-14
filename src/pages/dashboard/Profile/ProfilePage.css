@@ -26,6 +26,48 @@
     }
 }
 
+.avatar-container {
+    position: relative;
+    width: 150px; /* Set your desired size */
+    height: 150px;
+    overflow: hidden;
+    border-radius: 50%; /* Makes the container circular */
+    cursor: pointer;
+  }
+  
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: opacity 0.3s ease;
+  }
+  
+  .edit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5); /* Dark transparent overlay */
+    color: white;
+    font-size: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 50%;
+  }
+  
+  .avatar-container:hover .edit-overlay {
+    opacity: 1; /* Show the overlay on hover */
+  }
+  
+  .avatar-container:hover img {
+    opacity: 0.7; /* Slightly dim the image on hover */
+  }
+
 @media(min-width:1440px){
     .profile-page{
 
@@ -74,6 +116,7 @@
         }
 
         .profile-info{
+            padding-left: 0 !important;
             padding:1rem;
             margin-top: 3rem;
             justify-content: center !important;

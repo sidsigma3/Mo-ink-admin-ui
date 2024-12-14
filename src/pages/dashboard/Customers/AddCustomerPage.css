@@ -41,7 +41,7 @@
 }
 
 
-.table-ctn {
+/* .table-ctn {
     border: 1px solid #ddd;
     border-radius: 1rem;
   
@@ -85,10 +85,10 @@
   .table-ctn .data-cards {
     display: none;
     
-  }
+  } */
 
   @media (max-width: 1024px) {
-    .table-ctn{
+    /* .table-ctn{
      
       overflow: auto;
     }
@@ -96,7 +96,7 @@
     .table-ctn table{
       width: 110vw;
     }
-  
+   */
 
     .add-customer .main {
         flex-wrap: wrap-reverse;
@@ -114,7 +114,7 @@
 
   
   @media (max-width: 768px) {
-    .table-ctn table {
+    /* .table-ctn table {
       display: none;
     }
 
@@ -142,6 +142,6 @@
     .table-ctn .data-card p {
       margin: 0.2rem 0;
       font-size: 1rem;
-    }
+    } */
   }
   

@@ -17,7 +17,10 @@
 @media(max-width:768px){
     .sm-add-btn{
         display: grid !important;
-        padding: 0.2rem 0.5rem !important;
+        padding: 0.5rem 0.5rem !important;
+        border-radius: 50%;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
     }
 
     .lg-add-btn{
