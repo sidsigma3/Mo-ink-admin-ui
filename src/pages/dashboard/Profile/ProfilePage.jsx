@@ -6,7 +6,7 @@ import "./ProfilePage.css"
 import { MdEdit } from "react-icons/md";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 
-const ProfilePage = () => {
+const ProfilePage = ({setIsAuthenticated}) => {
 
   const [imageSrc, setImageSrc] = useState("/Avatar.png");
 
@@ -19,11 +19,21 @@ const ProfilePage = () => {
   };
 
 
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    setIsAuthenticated(false);
+  };
+
   return (
     <div className='profile-page'>
-        <div>
-            <h5>Welocme , Johny Larsen</h5>
-            <h6 className='text-primary'>Thrusday , 06 Dec 2024</h6>
+        <div className='d-flex justify-content-between'>
+            <div>
+                <h5>Welocme , Johny Larsen</h5>
+                <h6 className='text-primary'>Thrusday , 06 Dec 2024</h6>
+            </div>
+           
+            <button className='btn btn-outline-danger h-50' onClick={handleLogout}>Log out</button>
+
         </div>
 
 

@@ -109,7 +109,7 @@ function App() {
                                       <Route path='/users' element={<UserPage></UserPage>}></Route>
                                       <Route path='/add-user' element={<AddUser></AddUser>}></Route>
                                       <Route path='/settings' element={<SettingPage></SettingPage>}></Route>
-                                      <Route path='/profile' element={<ProfilePage></ProfilePage>}></Route>
+                                      <Route path='/profile' element={<ProfilePage setIsAuthenticated={setIsAuthenticated}></ProfilePage>}></Route>
                                     </Routes>
                                     </BulkAssignProvider>
                                   </SegmentsProvider>
