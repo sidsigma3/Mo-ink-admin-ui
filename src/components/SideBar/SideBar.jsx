@@ -67,11 +67,24 @@ const SideBar = () => {
                 </Link>
             </li>
 
+
+            <div  onMouseEnter={() => setHoverSelected('orders')}  onMouseLeave={() => setHoverSelected(null)}>
             <li className={selected === 'orders' ? 'selected' : 'not-selected'}>
                 <Link to={'/orders'}>
                 <button  onClick={()=>setSelected('orders')}><span className='icon'><LuShoppingCart  size={25}/></span>Orders</button>
                 </Link>
             </li>
+
+            {hoverSelected === 'orders' && (
+                    <div className={selected === 'vendors' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
+                    <Link to={'/vendor-order'} >
+                        <button onClick={()=>setSelected('vendors')} className='d-flex gap-3' style={{border:'none',background:'none' ,textDecoration:'none'}}> <span><BsArrowReturnRight /></span>Vendor Orders</button>
+                    </Link>
+                    </div>
+                   
+              )}
+
+            </div>
 
             {/* <li className={selected === 'profile' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
                

@@ -1,80 +1,113 @@
-import React from "react";
-import "./GraphComponent.css"
-
-
+import React, { useEffect, useRef } from "react";
 import {
-  Chart as ChartJS,
+  Chart,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarController,
   BarElement,
   Title,
   Tooltip,
   Legend,
-  Filler,
-  ArcElement,
 } from "chart.js";
-import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
 
-// Register required Chart.js modules
-ChartJS.register(
+// Register required Chart.js components
+Chart.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarController,
   BarElement,
-  ArcElement,
   Title,
   Tooltip,
-  Legend,
-  Filler
+  Legend
 );
 
-const GraphComponent = ({ type, data, options ,text ,number ,plugins}) => {
+const TopSalesExecutiveChart = () => {
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
 
+  const customersData = [
+    { name: "Customer A", sales: 5000 },
+    { name: "Customer B", sales: 4000 },
+    { name: "Customer C", sales: 3000 },
+    { name: "Customer D", sales: 2500 },
+    { name: "Customer E", sales: 2000 },
+    { name: "Customer F", sales: 1500 },
+  ];
 
+  const sortedCustomers = customersData.sort((a, b) => b.sales - a.sales);
 
-const centerTextPlugin = {
-    id: "centerText",
-    beforeDraw(chart) {
-        if (chart.config.type === "doughnut") {
-        const { width, height, ctx } = chart;
-        const total = chart.data.datasets[0].data.reduce(
-            (acc, value) => acc + value,
-            0
-        );
+  const chartData = {
+    labels: sortedCustomers.map((customer) => customer.name),
+    datasets: [
+      {
+        label: "Customer Purchase",
+        data: sortedCustomers.map((customer) => customer.sales),
+        backgroundColor: sortedCustomers.map((_, index) => {
+          const opacity = 0.2 + (0.8 * (index + 1)) / sortedCustomers.length;
+          return `rgba(5, 97, 252, ${opacity})`;
+        }),
+        borderColor: "rgba(5, 97, 252, 1)",
+        borderWidth: 1,
+        borderRadius: 7,
+        barThickness: 25,
+      },
+    ],
+  };
 
-        ctx.save();
-        ctx.font = "bold 18px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = "#0561FC";
-        ctx.fillText(`${total} Visitors`, width / 2, height / 2-10);
-        ctx.restore();
-        }
+  const chartOptions = {
+    indexAxis: "y", // Horizontal bars
+    maintainAspectRatio: false,
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const customerName = context.label;
+            const sales = context.raw;
+            return `${customerName}: $${sales.toLocaleString()}`;
+          },
+        },
+      },
     },
-    };
+    scales: {
+      x: {
+        grid: { display: false },
+        title: {
+          display: false,
+        },
+      },
+      y: {
+        grid: { display: false },
+        title: {
+          display: false,
+        },
+      },
+    },
+  };
 
-  // Dynamically determine the chart component to render
-  const ChartComponent = {
-    line: Line,
-    bar: Bar,
-    pie: Pie,
-    doughnut: Doughnut,
-  }[type] || Line; // Default to Line chart if `type` is invalid
+  useEffect(() => {
+    const ctx = chartRef.current.getContext("2d");
 
+    // Destroy any existing chart instance before creating a new one
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
 
+    chartInstance.current = new Chart(ctx, {
+      type: "bar", // Specify the chart type
+      data: chartData,
+      options: chartOptions,
+    });
+  }, [chartData, chartOptions]);
 
   return (
-    <div className="graph-card shadow">
-    <h4>{text}</h4>
-    <h3>{number}</h3>
-    <div>
-    <ChartComponent data={data} options={options}  plugins={type === "doughnut" ? [centerTextPlugin] : []}/>
+    <div style={{ width: "100%", height: "400px" }}>
+      <canvas ref={chartRef}></canvas>
     </div>
-    </div>
-  )
+  );
 };
 
-export default GraphComponent;
+export default TopSalesExecutiveChart;

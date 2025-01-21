@@ -15,6 +15,9 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import BulkAssignPage from './BulkAssign/BulkAssignPage';
+import OrderCart from './OrderCart/OrderCart';
+
+import Badge from '@mui/material/Badge';
 
 const TabPanel = ({ children, value, index }) => {
     return value === index ? <div>{children}</div> : null;
@@ -23,12 +26,14 @@ const TabPanel = ({ children, value, index }) => {
 
 
 const Orders = () => {
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(0);
+
+    const [orders,setOrders] = useState([])
 
     const handleChange = (event, newValue) => {
       setValue(newValue);
     };
-  
+
 
   return (
     <div className='order'>
@@ -91,10 +96,10 @@ const Orders = () => {
         </div>
 
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs">
-            <Tab label="Order Dashboard" />
-            <Tab label="Bulk Assign" />
-            <Tab label="Order Cart" />
+        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" >
+            <Tab className="text-capitalize" label="Order Dashboard" />
+            <Tab className="text-capitalize" label="Bulk Assign" />
+            <Tab className="text-capitalize" label="Order Cart" />
             </Tabs>
         </Box>
 
@@ -107,13 +112,12 @@ const Orders = () => {
         <TabPanel value={value} index={1}>
             <div className="bulk-assign-ctn">
           
-           <BulkAssignPage></BulkAssignPage>
+           <BulkAssignPage setOrders={setOrders}></BulkAssignPage>
             </div>
         </TabPanel>
         <TabPanel value={value} index={2}>
-            <div className="order-cart-ctn">
-                hello
-            {/* <OrderCart /> */}
+            <div className="order-cart-ctn">     
+                <OrderCart orders={orders}></OrderCart>
             </div>
         </TabPanel>
 

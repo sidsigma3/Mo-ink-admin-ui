@@ -26,19 +26,19 @@ const initialBulkAssignData = [
       {
         "2/92": [
           {
-            color: "yellow",
-            inventory: "265kg",
-            unAssigned: "135kg",
+            color: "mustard",
+            inventory: "246kg",
+            unAssigned: "789kg",
           },
           {
-            color: "pink",
-            inventory: "265kg",
-            unAssigned: "135kg",
+            color: "purple",
+            inventory: "25kg",
+            unAssigned: "15kg",
           },
           {
-            color: "orange",
-            inventory: "265kg",
-            unAssigned: "135kg",
+            color: "cyan",
+            inventory: "78kg",
+            unAssigned: "65kg",
           },
         ],
       },
@@ -124,6 +124,67 @@ const initialBulkAssignData = [
       },
     ],
   },
+  {
+    Silk: [
+      {
+        "2/74": [
+          {
+            color: "yellow",
+            inventory: "265kg",
+            unAssigned: "135kg",
+          },
+          {
+            color: "pink",
+            inventory: "265kg",
+            unAssigned: "135kg",
+          },
+          {
+            color: "orange",
+            inventory: "265kg",
+            unAssigned: "135kg",
+          },
+        ],
+      },
+      {
+        "2/92": [
+          {
+            color: "mustard",
+            inventory: "246kg",
+            unAssigned: "789kg",
+          },
+          {
+            color: "purple",
+            inventory: "25kg",
+            unAssigned: "15kg",
+          },
+          {
+            color: "cyan",
+            inventory: "78kg",
+            unAssigned: "65kg",
+          },
+        ],
+      },
+      {
+        "2/42": [
+          {
+            color: "yellow",
+            inventory: "265kg",
+            unAssigned: "135kg",
+          },
+          {
+            color: "pink",
+            inventory: "265kg",
+            unAssigned: "135kg",
+          },
+          {
+            color: "orange",
+            inventory: "265kg",
+            unAssigned: "135kg",
+          },
+        ],
+      },
+    ],
+  }
 ];
 
 // Context Creation

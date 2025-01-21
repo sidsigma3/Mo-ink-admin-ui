@@ -36,6 +36,9 @@ import VerifyCode from './pages/dashboard/Authnticate/Verify/VerifyCode';
 import ResetPassword from './pages/dashboard/Authnticate/ResetPassword/ResetPassword';
 import AuthPage from './pages/dashboard/Authnticate/AuthPage';
 import { BulkAssignProvider } from './components/Context/BulkAssignContext';
+import VendorOrder from './pages/dashboard/Orders/Vendor Order/VendorOrder';
+import { VendorOrderProvider } from './components/Context/VendorOrderContext';
+import VendorOrderDetails from './pages/dashboard/Orders/Vendor Order/VendorOrderDetails';
 
 function App() {
 
@@ -90,6 +93,7 @@ function App() {
                                 <SpinnerDyersProvider>
                                   <SegmentsProvider>
                                   <BulkAssignProvider>
+                                    <VendorOrderProvider>
                                     <Routes>
                                       <Route path="/dashboard" element={<Dashboard />} />
                                        <Route path="/orders" element={<Orders />} />            
@@ -110,7 +114,10 @@ function App() {
                                       <Route path='/add-user' element={<AddUser></AddUser>}></Route>
                                       <Route path='/settings' element={<SettingPage></SettingPage>}></Route>
                                       <Route path='/profile' element={<ProfilePage setIsAuthenticated={setIsAuthenticated}></ProfilePage>}></Route>
+                                      <Route path='/vendor-order' element={<VendorOrder></VendorOrder>}></Route>
+                                      <Route path="/vendor-order-details/:orderId" element={<VendorOrderDetails></VendorOrderDetails>} />
                                     </Routes>
+                                      </VendorOrderProvider>
                                     </BulkAssignProvider>
                                   </SegmentsProvider>
                                 </SpinnerDyersProvider>

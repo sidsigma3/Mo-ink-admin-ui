@@ -57,7 +57,7 @@ const OrderTable = () => {
 
             <th>Order Status</th>
 
-            <th style={{ width: "11.3rem" }}>Manufacturer</th>
+            <th style={{ width: "11.3rem" }}>V.O I'D</th>
           </tr>
         </thead>
 
