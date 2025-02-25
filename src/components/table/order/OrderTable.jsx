@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import "./OrderTable.css";
 import { useOrderContext } from "../../Context/OrderContext";
 import { useNavigate } from "react-router-dom";
@@ -7,12 +7,29 @@ import { Pagination } from "react-bootstrap";
 import { BiWallet } from "react-icons/bi";
 import { LuDot } from "react-icons/lu";
 import ModalAssign from "../../Modal/ModalAssign";
-const OrderTable = () => {
-  const { orders } = useOrderContext();
+import { getAllOrders } from "../../../services/OrderService";
 
+const OrderTable = () => {
+ 
+  const [orders, setOrders] = useState([]);
   const [showModalAssign, setShowModalAssign] = useState(false);
 
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await getAllOrders();
+        setOrders(data);
+      } catch (error) {
+        console.error("Failed to fetch orders", error);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
 
   const handleRowClick = (order) => {
     navigate("/create-order", { state: { order } });
@@ -69,19 +86,19 @@ const OrderTable = () => {
               onClick={() => handleRowClick(order)}
             >
               <td style={{ fontWeight: 500 }}>{order.orderId}</td>
-              <td>{order.date}</td>
-              <td>{order.customer}</td>
-              <td>{order.quantity}</td>
-              <td>{order.weight}</td>
-              <td>{order.amount}</td>
+              <td>{order.createdAt}</td>
+              <td>{order.customer.customerName}</td>
+              <td>{order.variants.length}</td>
+              <td>{order.totalAmount}</td>
+              <td>{order.payment.amount}</td>
               <td>
                 <div className={order.payment === "Paid" ? "green" : "grey"}>
-                  {order.payment}
+                  {order.payment.paymentStatus}
                 </div>
               </td>
               <td>
-                <div className={statusClassMap[order.orderStatus]}>
-                  {order.orderStatus}
+                <div className={statusClassMap[order.status]}>
+                  {order.status}
                 </div>
               </td>
               <td>
@@ -119,11 +136,11 @@ const OrderTable = () => {
         {orders.map((order) => (
           <div
             className="order-card shadow-sm"
-            key={order.id}
+            key={order.orderId}
             onClick={() => handleRowClick(order)}
           >
             <div className="d-flex justify-content-between">
-              <h4>{order.date}</h4>
+              <h4>{order.createdAt}</h4>
               <div
                 style={{
                   padding: "0.2rem 0.4rem",
@@ -140,7 +157,7 @@ const OrderTable = () => {
                 <span className="mb-1">
                   <BiWallet size={18}/>
                 </span>
-                <h3 className="m-0">{order.amount}</h3>
+                <h3 className="m-0">{order.payment.amount}</h3>
               </div>
             </div>
 
@@ -148,7 +165,7 @@ const OrderTable = () => {
 
             <div className="d-flex justify-content-between">
               <p>
-                {order.customer}{" "}
+                {order.customer.customerName}{" "}
                 <span>
                   <LuDot size={25} />
                 </span>
@@ -159,16 +176,16 @@ const OrderTable = () => {
                   <LuDot size={25} />
                 </span>
               </p>
-              <p>{order.weight}</p>
+              <p>{order.totalAmount}</p>
             </div>
 
             <div className="d-flex justify-content-between align-items-center">
               <div className="d-flex justify-content-between gap-1">
-                <h5 className={statusClassMap[order.orderStatus]}>
-                  {order.orderStatus}
+                <h5 className={statusClassMap[order.status]}>
+                  {order.status}
                 </h5>
                 <h5 className={order.payment === "Paid" ? "green" : "grey"}>
-                  {order.payment}
+                  {order.payment.paymentStatus}
                 </h5>
               </div>
 

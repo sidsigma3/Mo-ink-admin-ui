@@ -1,20 +1,44 @@
-import React ,{ useContext } from 'react';
+import React ,{ useContext, useEffect , useState } from 'react';
 import './ProductsTable.css';
 import { LuDot } from "react-icons/lu";
 import { ProductContext } from "./../../../Context/ProductContext";
 import { useNavigate } from "react-router-dom";
 import { Table } from 'react-bootstrap';
 import { Pagination } from 'react-bootstrap';
+import { getAllProduct } from '../../../../services/ProductService';
 
-const ProductsTable = ({sampleProducts}) => {
+const ProductsTable = () => {
 
   const { products } = useContext(ProductContext);
   const navigate = useNavigate();
 
-  const handleRowClick = (index) => {
-    navigate('/add-product', { state: { index } });
+  const [productData,setProductData] = useState([])
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllProduct();
+        setProductData(data.data)
+        console.log(data)
+        console.log(productData)
+      
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+  
+    fetchData(); 
+  }, []); 
+  
+
+  
+
+  const handleRowClick = (index,ix) => {
+    navigate('/add-product', { state: { index,ix,finalData } });
   };
 
+  console.log(productData)
 
   let active = 2;
   let items = [];
@@ -25,6 +49,61 @@ const ProductsTable = ({sampleProducts}) => {
       </Pagination.Item>,
     );
   }
+
+  
+  const aggregateProductData = (productData) => {
+    return productData.map((product) => {
+      const groupedVariants = product.variants.reduce((acc, variant) => {
+        const { size, color, availableWeight ,id } = variant;
+  
+        if (!acc[size]) {
+          acc[size] = {
+            id,
+            size,
+            variants: [],
+            totalWeight: 0,
+          };
+        }
+
+        
+  
+        // Add unique colors for this size
+        if (!acc[size].variants.some((v) => v.colorName === color.colorName)) {
+          acc[size].variants.push({
+            colorName: color.colorName,
+            hexCode: color.hexCode || "#ccc",
+            available:variant.availableWeight,
+            price:variant.pricePerKg,
+            id:variant.id,
+          });
+        }
+        
+        // Accumulate availableWeight for this size
+        acc[size].totalWeight += Number(availableWeight);
+  
+        return acc;
+      }, {});
+  
+      // Return the aggregated product with grouped variants
+      return {
+        productId: product.id,
+        productName: product.productName,
+        productDescription: product.productDescription,
+        productImage: product.productImage,
+        compareAtPrice:product.productPrice?.compareAtPrice,
+        costPerItemPerKg:product.productPrice?.costPerItemPerKg,
+        gstOnProduct:product.productPrice?.gstOnProduct,
+        pricePerKg:product.productPrice?.pricePerKg,
+        availableStatus:product.availableStatus,
+        groupedVariants: Object.values(groupedVariants),
+      };
+    });
+  };
+
+
+  const finalData = aggregateProductData(productData)
+  
+  console.log(finalData)
 
   return (
     <div className="product-table">
@@ -40,78 +119,103 @@ const ProductsTable = ({sampleProducts}) => {
           </tr>
         </thead>
         <tbody>
-        {products.map((product, index) => (
-            <tr key={product.productId} onClick={() => handleRowClick(index)} style={{ cursor: "pointer" }}>
-              <td>{product.productName}</td>
-              <td>
-                <div style={{padding:'0.3rem 0.5rem',backgroundColor:'#EFEFEF',border:'1px solid #B9C0CD' ,borderRadius:'0.9rem',width:'45%',textAlign:'center'}}>
-                {product.size}
-                </div>
-                </td>
-                <td>{product.colorVariants.length} Variants</td>
+          {finalData.map((product, index) => (
+            product.groupedVariants.map((item, ix) => (
+              <tr 
+                key={`${product.productId}-${ix}`} 
+                onClick={() => handleRowClick(index,ix)} 
+                style={{ cursor: "pointer" }}
+              >
+                <td>{product.productName}</td>
                 <td>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-            
-            <div style={{ display: 'flex', marginLeft: '10px' }}>
-                {product.colorVariants.map((color, index) => (
-                <div
-                    key={index}
+                  <div 
                     style={{
-                    width: '25px',
-                    height: '25px',
-                    backgroundColor: color,
-                    borderRadius: '50%',
-                    marginLeft: index === 0 ? '0' : '-10px',
-                    border: '1px solid #fff',
+                      padding: '0.3rem 0.5rem', 
+                      backgroundColor: '#EFEFEF', 
+                      border: '1px solid #B9C0CD', 
+                      borderRadius: '0.9rem', 
+                      width: '45%', 
+                      textAlign: 'center'
                     }}
-                 
-                ></div>
-                ))}
-            </div>
-            </div>
-            </td>
-              <td>{product.stock} Kgs</td>
-              <td>
-                <div style={{backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'70%'}}>
-                {product.status}
-                </div>          
-              </td>
-            </tr>
+                  >
+                    {item.size}
+                  </div>
+                </td>
+                <td>{item.variants.length} Variants</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', marginLeft: '10px' }}>
+                      {item.variants.map((color, colorIndex) => (
+                        <div
+                          key={colorIndex}
+                          style={{
+                            width: '25px',
+                            height: '25px',
+                            backgroundColor: color.hexCode,
+                            borderRadius: '50%',
+                            marginLeft: colorIndex === 0 ? '0' : '-10px',
+                            border: '1px solid #fff',
+                          }}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
+                </td>
+                <td>{item.totalWeight}Kgs</td>
+                <td>
+                  <div 
+                    style={{
+                      backgroundColor: product.availableStatus === 'Active' ? '#D1FAE5' : '#F3F4F6',
+                      border: '1px solid',
+                      borderColor: product.availableStatus === 'Active' ? '#6EE7B7' : '#D1D5DB',
+                      borderRadius: '0.2rem',
+                      textAlign: 'center',
+                      width: '70%',
+                    }}
+                  >
+                    {product.availableStatus}
+                  </div>
+                </td>
+              </tr>
+            ))
           ))}
         </tbody>
       </Table>
 
       <div className='d-flex justify-content-end mt-2'>
-          <Pagination className='z-index-n1'>{items}</Pagination>
-          </div>
+        <Pagination className='z-index-n1'>{items}</Pagination>
+      </div>
 
       <div className="product-cards">
-        {sampleProducts.map((product,index) => (
-          <div className="product-card shadow-sm" key={product.index} onClick={() => handleRowClick(index)}>
+
+      {finalData.map((product, index) => (
+          product.groupedVariants.map((item, ix) => (
+
+          <div className="product-card shadow-sm" key={ix} onClick={() => handleRowClick(index,ix)}>
 
             <div className='d-flex justify-content-between'>
                  <h3>{product.productName}</h3>
                  <div style={{padding:'0.3rem 0.5rem',backgroundColor:'#EFEFEF',border:'1px solid #B9C0CD' ,borderRadius:'1.2rem',width:'20%',textAlign:'center'}}>
-                 <p><strong></strong> {product.size}</p>
+                 <p><strong></strong> {item.size}</p>
                  </div>
             </div>
 
             <div className='d-flex mt-3'>
             
-            <p><strong></strong> {product.colorVariants.length} Variants</p>
+            <p><strong></strong> {item.variants.length} Variants</p>
 
             <span><LuDot  size={25}/></span>
 
             <div style={{ display: 'flex', alignItems: 'center' }}>
            
             <div style={{ display: 'flex' }}>
-                {product.colorVariants.map((color, index) => (
+                {item.variants.map((color, index) => (
                 <div
                     key={index}
                     style={{
                     width: '35px',
                     height: '35px',
-                    backgroundColor: color,
+                    backgroundColor: color.colorName,
                     borderRadius: '50%',
                     marginLeft: index === 0 ? '0' : '-10px',
                     border: '1px solid #fff',
@@ -125,14 +229,15 @@ const ProductsTable = ({sampleProducts}) => {
 
             <div className='d-flex justify-content-between mt-2 pe-4'>
                  <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
-                    {product.status}
+                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.availableStatus === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.availableStatus==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
+                    {product.availableStatus}
                     </div>
                 </p>
-                 <p>{product.stock} Kgs</p>
+                 <p>{item.totalWeight} Kgs</p>
             </div>
           </div>
-        ))}
+        ))))}
+
       </div>
     </div>
   );

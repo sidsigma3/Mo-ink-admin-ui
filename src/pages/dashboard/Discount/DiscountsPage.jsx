@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState , useEffect} from 'react'
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn'
 import AddBtn from '../../../components/Buttons/Add/AddBtn'
 import ProductFilter from '../../../components/Filter/DayFilter/ProductFilter/ProductFilter'
@@ -12,14 +12,33 @@ import { LuDot } from "react-icons/lu";
 import { Pagination } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Dropdown } from 'react-bootstrap'
+import { getAllDiscount } from '../../../services/DiscountService'
 
 const DiscountsPage = () => {
 
   const navigate = useNavigate ()
-  const { discountData , setDiscountData} = useDiscounts();
+  
+
+  const [discountData , setDiscountData] = useState([])
+  
+      useEffect(() => {
+          const fetchData = async () => {
+            try {
+              const data = await getAllDiscount();
+              console.log(data)
+              setDiscountData(data.data)
+              
+            } catch (error) {
+              console.error('Error fetching Customers:', error);
+            }
+          };
+        
+        fetchData(); 
+      }, []); 
+  
 
   const handleRowClick = (index) => {
-    navigate('/add-discount', { state: { index } });
+    navigate('/add-discount', { state: { index , discountData} });
   };
 
   let active = 2;
@@ -82,14 +101,28 @@ const DiscountsPage = () => {
             <tbody>
             {discountData.map((discount, index) => (
             <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-              <td>{discount.discountCode}</td>
               <td>
-                <div style={{backgroundColor:discount.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
-                {discount.status}
+                <div>
+                <h5>{discount.discountCode}</h5>
+                <div className='d-flex gap-3 align-itmes-cenetr'>
+                <p className="text-muted m-0">
+                  {discount.discountType === "Percentage"
+                    ? `${discount.discountValue}% off on ${discount?.applicableProducts[0]?.productName}`
+                    : `₹${discount.discountValue} off on cotton yarn`}
+                </p>
+               
+                <p className='text-muted m-0'>{discount.minPurchaseRequirement}</p>
+                </div>
+                </div>
+                
+                </td>
+              <td>
+                <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
+                {discount.discountStatus}
                 </div>
               </td>
-              <td>{discount.method}</td>
-              <td style={{textTransform:'capitalize'}}>{discount.selectedOptionCustomer}</td>
+              <td>{discount.discountMethod}</td>
+              <td style={{textTransform:'capitalize'}}>{discount.eligibleCustomers.length}</td>
               <td>{discount.used}</td>
               <td>
                     <Dropdown>

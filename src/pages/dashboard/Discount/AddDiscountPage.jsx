@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate ,useLocation} from "react-router-dom";
 import StatusFilter from "../../../components/Filter/DayFilter/StatusFilter/StatusFilter";
@@ -13,127 +13,287 @@ import ModalCustomerList from "../../../components/Modal/ModalCustomerList";
 import { RxCross2 } from "react-icons/rx";
 import { useDiscounts } from "../../../components/Context/DiscountContext";
 import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
-
+import { getAllProduct } from "../../../services/ProductService";
+import { getAllSegment } from "../../../services/SegmentService";
+import ModalSegmentList from "../../../components/Modal/ModalSegmentList";
+import { getAllCustomer } from "../../../services/CustomerService";
+import { addDiscount , updateDiscount } from "../../../services/DiscountService";
+import ModalProdcutSelect from "../../../components/Modal/ModalProdcutSelect";
 
 const AddDiscountPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { addDiscount , discountData } = useDiscounts();
+  const [errors, setErrors] = useState({});
 
-  const discount = state?.index !== undefined ? discountData[state.index] : null;
+  const {index , discountData} = state || {}
 
-  const [formData, setFormData] = useState({
+  // const { addDiscount , discountData } = useDiscounts();
+
+  const discount = state?.index !== undefined ? discountData[index] : null;
+
+  const parseMinPurchaseRequirement = (requirementString) => {
+    if (!requirementString || requirementString === "No minimum purchase requirement") {
+        return { "No": "" };
+    }
+
+    const minPurchaseMatch = requirementString.match(/Minimum purchase amount \(₹\) : (\d+)/);
+   
+    if (minPurchaseMatch) {
+        return {"minPurchase" : minPurchaseMatch[1] };
+    }
+
+    const minQuantityMatch = requirementString.match(/Minimum quantity required: (\d+)/);
+    if (minQuantityMatch) {
+        return { "minQuantity": minQuantityMatch[1] };
+    }
+
+    return { type: "No", value: "" };
+};
+
+const parseMinPurchaseRequirementType = (requirementString) => {
+  if (!requirementString || requirementString === "No minimum purchase requirement") {
+      return  "No"
+  }
+
+  const minPurchaseMatch = requirementString.match(/Minimum purchase amount \(₹\) : (\d+)/);
+  if (minPurchaseMatch) {
+      return  "minPurchase"
+  }
+
+  const minQuantityMatch = requirementString.match(/Minimum quantity required: (\d+)/);
+  if (minQuantityMatch) {
+      return  "minQuantity"
+  }
+
+  return { type: "No", value: "" };
+};
+
+const [formData, setFormData] = useState(() => {
+  const parsedActiveDates = discount?.activeDates || {
+    startDate: "",
+    startTime: "",
+    hasEndDate: false,
+    endDate: "",
+    endTime: ""
+  };
+
+  if (discount?.startDateTime) {
+    const startDateObj = new Date(discount.startDateTime);
+    parsedActiveDates.startDate = startDateObj.toISOString().split("T")[0];
+  
+    // Extract only HH:MM format for time
+    parsedActiveDates.startTime = startDateObj.toTimeString().slice(0, 5);
+  }
+  
+  if (discount?.endDateTime) {
+    const endDateObj = new Date(discount.endDateTime);
+    parsedActiveDates.endDate = endDateObj.toISOString().split("T")[0];
+  
+    // Extract only HH:MM format for time
+    parsedActiveDates.endTime = endDateObj.toTimeString().slice(0, 5);
+    parsedActiveDates.hasEndDate = true;
+  }
+
+  return {
     used: discount?.used || 0,
     discountCode: discount?.discountCode || "",   
-    discountType: discount?.type || "Percentage", // Default selected type
+    discountType: discount?.discountType || "Percentage", // Default selected type
     discountValue: discount?.discountValue || "",
-    appliesTo: discount?.appliesTo || [], // Products or categories applied to
-    minPurchaseRequirement: discount?.minPurchaseRequirement || {
-      type: "No", // No, min-purchase, min-quantity
+    appliesTo: discount?.applicableProducts || [], // Products or categories applied to
+    minPurchaseRequirement: parseMinPurchaseRequirement(discount?.minPurchaseRequirement) || {
+      type: "No", 
       value: ""
     },
-    customerEligibility: discount?.customerEligibility || {
-      type: "All", // All, specific-segment, specific-customer
-      customers: []
-    },
-    maxUsage: discount?.maxUsage || {
-      limitTotal: false,
-      limitPerCustomer: false
-    },
-    activeDates: discount?.activeDates || {
-      startDate: "",
-      startTime: "",
-      hasEndDate: false,
-      endDate: "",
-      endTime: ""
-    },
-    status: discount?.status || "Active" // Default status
-  });
+    customerEligibility: discount?.customerEligibilityType
+      ? { type: discount.customerEligibilityType, customers: [] }
+      : { type: "All", customers: [] },
+      maxUsage: discount?.maxPurchaseRequirements ==='limitTotal'
+      ? { limitTotal: true, limitPerCustomer: false }  
+      : discount?.maxPurchaseRequirements === 'limitPerCustomer'
+      ? { limitTotal: false, limitPerCustomer: true } 
+      : { limitTotal: false, limitPerCustomer: false }, 
+    
+    activeDates: parsedActiveDates ,
+    status: discount?.status || "Active" 
+  }});
 
+   const [segments,setSegments] = useState([])
+      
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const data = await getAllSegment();
+            setSegments(data.data)
+           
+          } catch (error) {
+            console.error('Error fetching products:', error);
+          }
+        };
+      
+        fetchData(); 
+      }, []); 
+
+
+      const [productData,setProductData] = useState([])
+
+      useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const data = await getAllProduct();
+            setProductData(data.data)
+          
+          } catch (error) {
+            console.error('Error fetching products:', error);
+          }
+        };
+      
+        fetchData(); 
+      }, []);
+
+
+   
+
+      const aggregateProductData = (productData) => {
+        return productData.map((product) => {
+          const groupedVariants = product.variants.reduce((acc, variant) => {
+            const { size, color, availableWeight ,id } = variant;
+      
+            if (!acc[size]) {
+              acc[size] = {
+                id,
+                size,
+                variants: [],
+                totalWeight: 0,
+              };
+            }
+    
+            
+      
+            // Add unique colors for this size
+            if (!acc[size].variants.some((v) => v.colorName === color.colorName)) {
+              acc[size].variants.push({
+                colorName: color.colorName,
+                hexCode: color.hexCode || "#ccc",
+                available:variant.availableWeight,
+                price:variant.pricePerKg,
+                id:variant.id,
+              });
+            }
+            
+            // Accumulate availableWeight for this size
+            acc[size].totalWeight += Number(availableWeight);
+      
+            return acc;
+          }, {});
+      
+          // Return the aggregated product with grouped variants
+          return {
+            productId: product.id,
+            productName: product.productName,
+            productDescription: product.productDescription,
+            productImage: product.productImage,
+            compareAtPrice:product.productPrice?.compareAtPrice,
+            costPerItemPerKg:product.productPrice?.costPerItemPerKg,
+            gstOnProduct:product.productPrice?.gstOnProduct,
+            pricePerKg:product.productPrice?.pricePerKg,
+            availableStatus:product.availableStatus,
+            groupedVariants: Object.values(groupedVariants),
+          };
+        });
+      };
+    
+     
+  const finalData = aggregateProductData(productData)
+
+  const [selectedMethod, setSelectedMethod] = useState(discount?.discountMethod || "Code");
+
+  const [productSelect, setProductSelect] = useState(discount?.applicableProducts || []);
+ 
+  const [customers,setCustomers] = useState([])
+    
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllCustomer();
+        setCustomers(data.data)
+        
+      } catch (error) {
+        console.error('Error fetching Customers:', error);
+      }
+    };
   
+      fetchData(); 
+    }, []); 
 
-  const [selectedMethod, setSelectedMethod] = useState(discount?.selectedMethod || "Code");
+    
 
-  const [productSelect, setProductSelect] = useState(discount?.productSelect || []);
+  const [selectedSegment,setSelectedSegment] = useState(discount?.applicableSegments || [])
+ 
+  const [customer, setCustomer] = useState([]);
+  useEffect(() => {
+   
+    if (discount && discount.eligibleCustomers && Array.isArray(discount.eligibleCustomers)) {
+      const matchedCustomers = discount.eligibleCustomers.map((item) => {
+        const customerId = Number(item.customerId); 
+  
+        const foundCustomer = customers.find(val => Number(val.customerId) === customerId);
+  
+        return foundCustomer
+          ? {
+              customerName: foundCustomer.customerName,
+              email: foundCustomer.email,
+              customerId: foundCustomer.customerId
+            }
+          : null;
+      }).filter(Boolean); 
+  
+      setCustomer(matchedCustomers);
+    } else {
+   
+      setCustomer([]);
+    }
+  }, [customers, discount]); 
 
-  const [customer,setCustomer] = useState(discount?.customer || [])
 
   const handleReceiveOrder = (order) => {
+    console.log(order)
     setProductSelect(order);
-    console.log(productSelect)
+    
   };
 
   const handleCustomerAdd = (list) =>{
     setCustomer(list)
-    console.log(customer)
+  }
+
+  const handleSegmentAdd = (list) =>{
+    setSelectedSegment(list)
   }
 
 
   const handleDeleteOrder = (index) => {
     const updatedProductSelect = productSelect.filter((product, ix) => ix !== index);
-    setProductSelect(updatedProductSelect); // Update the state with the new array
+    setProductSelect(updatedProductSelect); 
   };
 
   const handleDeleteCustomer = (index) =>{
     const updated = customer.filter((item,ix) => ix != index );
     setCustomer(updated)
   }
+
+  const handleDeleteSegment = (index) =>{
+    const updated = selectedSegment.filter((item,ix) => ix != index );
+    setSelectedSegment(updated)
+  }
   
 
-  const products = [
-    {
-      id: 1,
-      name: "Cotton Yarn",
-      size: ["2/60", "2/74", "2/80", "2/92"],
-      colors: [
-        "#FF5733",
-        "#33FFCE",
-        "#850713",
-        "#3967FF",
-        "#00A65E",
-        "#000080",
-        "#030303",
-        "#FF33A6",
-        "#334CFF",
-      ],
-      stock: {
-        "2/60": 30,
-        "2/74": 60,
-        "2/80": 90,
-        "2/92": 20,
-      },
-    },
-    {
-      id: 2,
-      name: "Silk",
-      size: ["2/60", "2/74", "2/80", "2/92"],
-      colors: [
-        "#FF5733",
-        "#33FFCE",
-        "#850713",
-        "#3967FF",
-        "#00A65E",
-        "#000080",
-        "#030303",
-        "#FF33A6",
-        "#334CFF",
-      ],
-      stock: {
-        "2/60": 30,
-        "2/74": 60,
-        "2/80": 90,
-        "2/92": 20,
-      },
-    },
-  ];
-
+  
   const handleToggleChange = (event, newMethod) => {
     if (newMethod !== null) {
       setSelectedMethod(newMethod);
     }
   };
 
-  const [selectedType, setSelectedType] = useState("Percentage"); // Default status selection
+  const [selectedType, setSelectedType] = useState("Percentage"); 
 
   const handleSelect = (status) => {
     setSelectedType(status);
@@ -141,18 +301,19 @@ const AddDiscountPage = () => {
 
   const [showModalOrder, setShowModalOrder] = useState(false);
   const [showModalCustomer, setShowModalCustomer] = useState(false);
+  const [showModalSegment, setShowModalSegment] = useState(false);
 
-  const [selectedOption, setSelectedOption] = useState(discount?.selectedOption || "");
-  const [selectedOptionCustomer, setSelectedOptionCustomer] = useState(discount?.selectedOptionCustomer || "");
+  const [selectedOption, setSelectedOption] = useState(parseMinPurchaseRequirementType(discount?.minPurchaseRequirement) || "");
+  const [selectedOptionCustomer, setSelectedOptionCustomer] = useState(discount?.customerEligibilityType || "All");
 
-  // Handler for setting the selected option
+ 
   const handleSelection = (option) => {
-    // Toggle the selected option on/off
+   
     setSelectedOption((prev) => (prev === option ? "" : option));
   };
 
   const handleSelectionCustomer = (option) => {
-    // Toggle the selected option on/off
+ 
     setSelectedOptionCustomer((prev) => (prev === option ? "" : option));
   };
 
@@ -220,37 +381,96 @@ const handleMaxUsageChange = (field1,field2) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
+    setErrors({}); // Reset errors before validation
 
-    setFormData((prev) => ({
-        ...prev,
-        selectedOptionCustomer,
-        selectedOption,
-        method:selectedMethod,
-        productSelect,
-        customer
-      }));
+    let validationErrors = {};
 
-      const newDiscountData = {
-        ...formData,
-        selectedOptionCustomer,
-        selectedOption,
-        method: selectedMethod,
-        productSelect,
-        customer,
-      };
+   
+    // if (!formData.discountTitle?.trim()) validationErrors.discountTitle = "Discount title is required.";
+    if (!formData.discountCode?.trim()) validationErrors.discountCode = "Discount code is required.";
+    if (!formData.discountType) validationErrors.discountType = "Please select a discount type.";
+    if (!formData.discountValue || formData.discountValue <= 0) validationErrors.discountValue = "Valid discount value is required.";
+    if (!selectedOptionCustomer) validationErrors.customerEligibilityType = "Please select customer eligibility.";
+    if (selectedOptionCustomer === "specific-segment" && selectedSegment.length === 0)
+        validationErrors.specificSegment = "Select at least one customer segment.";
+    if (selectedOptionCustomer === "specific-customer" && customer.length === 0)
+        validationErrors.specificCustomer = "Select at least one specific customer.";
+    if (selectedOptionCustomer === "All" && customers.length === 0)
+        validationErrors.allCustomers = "No customers available.";
+    if (productSelect.length === 0) validationErrors.products = "Select at least one product.";
+    if (!formData.activeDates.startDate) validationErrors.startDate = "Start date is required.";
+    if (!formData.activeDates.startTime) validationErrors.startTime = "Start time is required.";
+    // if (formData.activeDates.hasEndDate && !formData.activeDates.endDate)
+    //     validationErrors.endDate = "End date is required when 'Has End Date' is selected.";
+
+    // Stop submission if errors exist
+    if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+    }
+   
+    let eligibleCustomerIds = [];
+  
+    if (selectedOptionCustomer === "specific-segment") {
+      
+      const segmentCustomerIds = selectedSegment.flatMap(segment => segment.customers.map(c => Number(c.customerId)));
+      eligibleCustomerIds = [...new Set(segmentCustomerIds)]; // Remove duplicates
+    } else if (selectedOptionCustomer === "specific-customer") {
+      
+        eligibleCustomerIds = customer.map(c => Number(c.customerId));
+    } else if (selectedOptionCustomer === "All") {
+      
+        eligibleCustomerIds = customers.map(c => Number(c.customerId));
+    }
+  
     
-      if (state?.index !== undefined) {
-        // Pass the index for updating the specific discount
-        addDiscount({ ...newDiscountData, index: state.index });
-      } else {
-        // Add as a new discount
-        addDiscount(newDiscountData);
-      }
-    
-    console.log(formData);
+    let minPurchaseRequirementString = "No minimum purchase requirement";
+    if (selectedOption === "minPurchase") {
+      minPurchaseRequirementString = `Minimum purchase amount (₹) : ${formData.minPurchaseRequirement[selectedOption]}`;
+    } else if (selectedOption === "minQuantity") {
+      minPurchaseRequirementString = `Minimum quantity required: ${formData.minPurchaseRequirement[selectedOption]}`;
+    }
+
+   
+    const maxPurchaseRequirements = formData.maxUsage?.limitTotal
+    ? "limitTotal"
+    : "limitPerCustomer";
+  
+   
+    const formatDateTime = (date, time) => {
+      return date ? `${date}T${time || "00:00:00"}` : null;
+    };
+  
+    const newDiscountData = {
+      discountTitle: formData.discountCode,
+      discountCode: formData.discountCode,
+      discountType: formData.discountType,
+      discountValue: formData.discountValue,
+      customerEligibilityType: selectedOptionCustomer,
+      discountStatus: formData.status,
+      minPurchaseRequirement: minPurchaseRequirementString,
+      maxPurchaseRequirements,
+      discountMethod: selectedMethod,
+      applicableProductIds: productSelect.map(p => Number(p.productId)), // Extract product IDs
+      applicableSegmentIds:selectedSegment.map(s =>Number(s.segmentId)),
+      eligibleCustomerIds,
+      startDateTime: formatDateTime(formData.activeDates.startDate, formData.activeDates.startTime),
+      endDateTime: formData.activeDates.hasEndDate
+        ? formatDateTime(formData.activeDates.endDate, formData.activeDates.endTime)
+        : null
+      
+    };
+  
+    if (state?.index !== undefined) {
+      // Update existing discount
+          await updateDiscount(discount?.discountId, newDiscountData);
+    } else {
+          await addDiscount(newDiscountData)
+          console.log(newDiscountData)
+    }
+  
     navigate('/discounts');
-    // Send `formData` to the parent component or API
   };
   
 
@@ -307,6 +527,7 @@ const handleMaxUsageChange = (field1,field2) => {
               onChange={handleDiscountCodeChange}>
                 
               </input>
+              {errors.discountCode && <p className="text-danger">{errors.discountCode}</p>}
             </div>
           </div>
 
@@ -327,22 +548,31 @@ const handleMaxUsageChange = (field1,field2) => {
                   <Dropdown.Item eventKey="Percentage">
                     Percentage
                   </Dropdown.Item>
-                  <Dropdown.Item eventKey="Fixed Amount">
+                  <Dropdown.Item eventKey="FixedAmount">
                     Fixed Amount
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
                 
               <input value={formData.discountValue} onChange={(e)=>handleDiscountValueChange(e)} className="w-50 mt-1" type="number"></input>
+              {errors.discountValue && <p className="text-danger">{errors.discountValue}</p>}
             </div>
 
-            <ModalOrder
+            {/* <ModalOrder
               show={showModalOrder}
               handleClose={() => setShowModalOrder(false)}
-              products={products}
+              products={finalData}
               // addToCart={addToCart}
               onOrderCreate={handleReceiveOrder}
-            ></ModalOrder>
+            ></ModalOrder> */}
+
+
+            <ModalProdcutSelect
+              show={showModalOrder}
+              handleClose={() => setShowModalOrder(false)}
+              products={finalData}
+              onOrderCreate={handleReceiveOrder}
+            ></ModalProdcutSelect>
 
             <div className="mt-2">
               <label>Applies to</label>
@@ -361,44 +591,14 @@ const handleMaxUsageChange = (field1,field2) => {
 
             <div className="product-select">
             {productSelect.map((product,ix) => (
-                <ul key={product.name}> {/* Use a unique key */}
-                {product.color.map((color, index) => (
-                    <li key={index} className="d-flex align-items-center justify-content-between">
+                <ul> 
+                  <li key={ix}>
+                      {product.productName}
+                  </li>
 
-                        <div className="d-flex align-items-center justify-content-between  w-50">
-                        {product.productName} 
-                        <div>
-                        <div style={{padding:'0.3rem 0.8rem',backgroundColor:'#EFEFEF',border:'1px solid #B9C0CD' ,borderRadius:'0.9rem',textAlign:'center'}}>
-                        {product.size} 
-                        </div>
-                        </div>
-                        
-
-                            <div
-                                    key={index}
-                                    style={{
-                                    backgroundColor: color,
-                                    width: "20px",
-                                    height: "20px",
-                                    borderRadius: "50%",
-                                    border: "2px solid #ccc",
-                                
-                                    padding:"0"
-                                    }}
-                                ></div>
-                        </div>
-
-                        <button onClick={()=>handleDeleteOrder(ix)}>
-                        <RxCross2 />
-                        </button>
-                    
-
-
-                        
-                    </li>
-                ))}
                 </ul>
             ))}
+            {errors.products && <p className="text-danger">{errors.products}</p>}
             </div>
           </div>
 
@@ -436,7 +636,7 @@ const handleMaxUsageChange = (field1,field2) => {
                     checked={selectedOption === "minQuantity"}
                     onChange={() => handleSelection("minQuantity")}
                   />
-                  <label>Minimum Quantity of items</label>
+                  <label>Minimum Quantity of items (kg)</label>
                 </div>
                 {/* Render input field if 'min-quantity' is selected */}
                 {selectedOption === "minQuantity" && (
@@ -474,23 +674,47 @@ const handleMaxUsageChange = (field1,field2) => {
                 handleClose={() => setShowModalCustomer(false)}
                 // products={products}
                 // addToCart={addToCart}
+                customers = {customers}
                 onCustomerAdd={handleCustomerAdd}
                 ></ModalCustomerList>
 
+
+                <ModalSegmentList
+                show={showModalSegment}
+                handleClose={()=>setShowModalSegment(false)}
+                onSegmentAdd= {handleSegmentAdd}
+                segments = {segments}
+                ></ModalSegmentList>
+
                 {selectedOptionCustomer === "specific-segment" && (
-                  <div className="d-flex align-items-center gap-2 ps-4">
+                  <div className="ps-4 w-100">
                              
-                    <div className="d-flex gap-2 mb-3 mt-3">
+                    <div className="d-flex gap-2 mb-3 mt-3 w-50">
                         <SearchBox></SearchBox>
                         <div>
                         <button
                             className="btn btn-primary"
-                            onClick={() => setShowModalCustomer(true)}
+                            onClick={() => setShowModalSegment(true)}
                         >
                             Browse
                         </button>
                         </div>
                     </div>
+
+                    <div className="customer-list-ctn"> 
+                    <ul>
+                    {selectedSegment.map((item,index)=>(
+                            <li id={index} className="d-flex align-items-center justify-content-between">
+                                <h5>{item.segmentTitle}</h5>
+                                 <h5>{item.segmentType}</h5>
+                                 <button onClick={()=>handleDeleteSegment(index)}>
+                                <RxCross2 />
+                                </button> 
+                            </li>
+                       
+                    ))}
+                     </ul>
+                  </div>
                   
                   </div>
                 )}
@@ -528,7 +752,7 @@ const handleMaxUsageChange = (field1,field2) => {
 
                        
                             <li id={index} className="d-flex align-items-center justify-content-between">
-                                <h5>{item.name}</h5>
+                                <h5>{item.customerName}</h5>
                                  <h5>{item.email}</h5>
                                  <button onClick={()=>handleDeleteCustomer(index)}>
                                 <RxCross2 />
@@ -556,7 +780,7 @@ const handleMaxUsageChange = (field1,field2) => {
               </li>
               <li>
                 <input type="checkbox" checked={formData.maxUsage.limitPerCustomer===true}  onChange={()=>handleMaxUsageChange('limitPerCustomer','limitTotal')}></input>
-                <label>Limit to one user per customer</label>
+                <label>Limit to one use per customer</label>
               </li>
             </ul>
           </div>
@@ -568,10 +792,12 @@ const handleMaxUsageChange = (field1,field2) => {
               <div className="d-flex gap-2 flex-column flex-grow-1">
                 <label>Start date</label>
                 <input type="date" value={formData.activeDates.startDate} onChange={(e)=>handleActiveDatesChange('startDate',e)}></input>
+                {errors.startDate && <p className="text-danger">{errors.startDate}</p>}
               </div>
               <div className="d-flex gap-2 flex-column flex-grow-1">
                 <label>Start time (IST)</label>
                 <input type="time" value={formData.activeDates.startTime}  onChange={(e)=>handleActiveDatesChange('startTime',e)}></input>
+                {errors.startTime && <p className="text-danger">{errors.startTime}</p>}
               </div>
             </div>
 

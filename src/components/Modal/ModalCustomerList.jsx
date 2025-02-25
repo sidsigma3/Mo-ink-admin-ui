@@ -1,25 +1,43 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 import { Modal, Button, Dropdown } from "react-bootstrap";
 import { SketchPicker } from "react-color";
 import { IoIosArrowDown } from "react-icons/io";
 import Collapse from "react-bootstrap/Collapse";
 import { IoMdAdd } from "react-icons/io";
 import "./ModalCustomerList.css"
+import { getAllCustomer } from "../../services/CustomerService";
 
-const ModalCustomerList = ({ show, handleClose ,onCustomerAdd}) => {
+const ModalCustomerList = ({ show, handleClose ,customers,onCustomerAdd}) => {
 
     const [selectedCustomers, setSelectedCustomers] = useState([]);
+    // const [customers,setCustomer] = useState([])
 
-    const customers = [
-        { id: 1, name: "Cody Fisher", email: "codyfisher@gmail.com" },
-        { id: 2, name: "Jane Doe", email: "janedoe@gmail.com" },
-        { id: 3, name: "John Smith", email: "johnsmith@gmail.com" },
-      ];
+
+    // useEffect(() => {
+    //   const fetchData = async () => {
+    //     try {
+    //       const data = await getAllCustomer();
+    //       setCustomer(data.data)
+          
+    //     } catch (error) {
+    //       console.error('Error fetching Customers:', error);
+    //     }
+    //   };
+    
+    //     fetchData(); 
+    //   }, []); 
+    
+
+    // const customers = [
+    //     { id: 1, name: "Cody Fisher", email: "codyfisher@gmail.com" },
+    //     { id: 2, name: "Jane Doe", email: "janedoe@gmail.com" },
+    //     { id: 3, name: "John Smith", email: "johnsmith@gmail.com" },
+    //   ];
     
       const handleCheckboxChange = (customer) => {
         setSelectedCustomers((prev) =>
-          prev.some((c) => c.id === customer.id)
-            ? prev.filter((c) => c.id !== customer.id) // Remove if already selected
+          prev.some((c) => c.customerId === customer.customerId)
+            ? prev.filter((c) => c.customerId !== customer.customerId) // Remove if already selected
             : [...prev, customer] // Add if not selected
         );
       };
@@ -38,14 +56,14 @@ const ModalCustomerList = ({ show, handleClose ,onCustomerAdd}) => {
       </Modal.Header>
       <Modal.Body>
         <ul>
-        {customers.map((customer) => (
-          <li key={customer.id}>
+        {customers?.map((customer) => (
+          <li key={customer.customerId}>
             <input
-              type="checkbox"
+              type="checkbox"     
               onChange={() => handleCheckboxChange(customer)}
-              checked={selectedCustomers.some((c) => c.id === customer.id)}
+              checked={selectedCustomers.some((c) => c.customerId === customer.customerId)}
             />
-            <h5>{customer.name}</h5>
+            <h5>{customer.customerName}</h5>
             <span>
               <h4>.</h4>
             </span>

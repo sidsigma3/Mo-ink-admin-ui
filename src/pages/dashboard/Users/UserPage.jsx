@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState , useEffect} from 'react'
 import AddBtn from '../../../components/Buttons/Add/AddBtn'
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn'
 import { Link } from 'react-router-dom'
@@ -9,31 +9,26 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { Pagination } from 'react-bootstrap'
 import { Dropdown } from 'react-bootstrap'
 import "./UserPage.css"
+import { getAllUser } from '../../../services/UserService'
+import { useNavigate } from 'react-router-dom'
 
 const UserPage = () => {
 
+    const navigate = useNavigate()
+    const [users,setUsers] =useState([])
 
-    const [users,setUsers] =useState([
-        {
-          name: 'John Doe',
-          email: 'johndoe@example.com',
-          role: 'Sales',
-          joinedOn: '2024-10-10',
-        },
-        {
-          name: 'Jane Smith',
-          email: 'janesmith@example.com',
-          role: 'Admin',
-          joinedOn: '2024-09-15',
-        },
-        {
-          name: 'Alice Johnson',
-          email: 'alicejohnson@example.com',
-          role: 'Owner',
-          joinedOn: '2024-08-20',
-        },
-      ]);
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const data = await getAllUser();
+            setUsers(data.data)
+          } catch (error) {
+            console.error('Error fetching products:', error);
+          }
+        };
       
+        fetchData(); 
+      }, []); 
 
 
     const handleDelete = (index) => {
@@ -56,7 +51,10 @@ const UserPage = () => {
         );
     }
         
-
+    const handleRowClick = (index) => {
+      console.log(index,users)
+      navigate('/add-user', { state: { index,users } });
+    };
 
   return (
     <div className='user-page'>
@@ -98,8 +96,10 @@ const UserPage = () => {
                 </thead>
                 <tbody>
                     {users.map((user, index) => (
-                        <tr key={index}>
-                        <td>{user.name}</td>
+                        <tr key={index}  
+                        onClick={() => handleRowClick(index)}
+                         >
+                        <td>{user.firstName + user.lastName}</td>
                         <td>{user.email}</td>
                         <td>
                         <div
@@ -110,27 +110,27 @@ const UserPage = () => {
                                 borderRadius: '0.2rem',
                                 textAlign: 'center',
                                 backgroundColor:
-                                  user.role === 'Owner'
+                                   user.role.toLowerCase() === 'owner'
                                     ? '#FEDBDC'
-                                    : user.role === 'Admin'
+                                    :  user.role.toLowerCase() === 'admin'
                                     ? '#DBEAFE'
-                                    : user.role === 'Sales'
+                                    :  user.role.toLowerCase() === 'sales'
                                     ? '#FFECFA'
                                     : '#FFFFFF', // Default background color if none match
                                 borderColor:
-                                  user.role === 'Owner'
+                                   user.role.toLowerCase() === 'owner'
                                     ? '#FD9395'
-                                    : user.role === 'Admin'
+                                    :  user.role.toLowerCase() === 'admin'
                                     ? '#93C5FD'
-                                    : user.role === 'Sales'
+                                    :  user.role.toLowerCase() === 'sales'
                                     ? '#F75FFF'
                                     : '#CCCCCC', // Default border color if none match
                                 color:
-                                  user.role === 'Owner'
+                                   user.role.toLowerCase() === 'owner'
                                     ? '#B91C1C' // Red text for Owner
-                                    : user.role === 'Admin'
+                                    :  user.role.toLowerCase() === 'admin'
                                     ? '#1E40AF' // Blue text for Admin
-                                    : user.role === 'Sales'
+                                    :  user.role.toLowerCase() === 'sales'
                                     ? '#7A1E7A' // Purple text for Sales
                                     : '#000000', // Default text color if none match
                               }}

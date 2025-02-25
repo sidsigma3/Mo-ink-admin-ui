@@ -1,4 +1,4 @@
-import React , {useState} from 'react'
+import React , {useState , useEffect} from 'react'
 import AddBtn from '../../../../components/Buttons/Add/AddBtn'
 import ExportBtn from '../../../../components/Buttons/Export/ExportBtn'
 import { Link ,useNavigate } from 'react-router-dom'
@@ -11,13 +11,30 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { Pagination } from 'react-bootstrap'
 import { Dropdown } from 'react-bootstrap'
 import "./SegmentsPage.css"
+import { getAllSegment } from '../../../../services/SegmentService'
 
 const SegmentsPage = () => {
 
     const navigate = useNavigate ()
    
-
     const { rows, setRows } = useSegments();
+
+    const [segments,setSegments] = useState([])
+    
+      useEffect(() => {
+          const fetchData = async () => {
+            try {
+              const data = await getAllSegment();
+              setSegments(data.data)
+             
+            } catch (error) {
+              console.error('Error fetching products:', error);
+            }
+          };
+        
+          fetchData(); 
+        }, []); 
+      
 
     // const [rows, setRows] = useState([
     //     {
@@ -88,7 +105,7 @@ const SegmentsPage = () => {
       };
 
       const handleRowClick = (index) => {
-        navigate('/add-segments', { state: { index } });
+        navigate('/add-segments', { state: { index , segments } });
       };
       
 
@@ -101,6 +118,24 @@ const SegmentsPage = () => {
             </Pagination.Item>,
             );
         }
+
+        const formatSegmentCondition = (conditionString) => {
+          try {
+              const conditions = JSON.parse(conditionString); // Convert string back to array
+              if (!Array.isArray(conditions) || conditions.length === 0) return "No Conditions";
+      
+              return conditions.map(condition => {
+                  if (condition.field === "City" || condition.field === "State") {
+                      return `${condition.field} is ${condition.chips.join(", ")}`;
+                  } else {
+                      return `${condition.field} ${condition.operator} ${condition.value}`;
+                  }
+              }).join(" AND ");
+          } catch (error) {
+              return conditionString;
+          }
+      };
+      
 
   return (
     <div className='segments-page'>
@@ -141,12 +176,12 @@ const SegmentsPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                {rows.map((row, index) => (
+                {segments.map((row, index) => (
                     <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-                    <td>{row.title}</td>
-                    <td>{row.type === 'Conditional' ? 'Automated' : 'Label'}</td>
-                    <td>{row.customers}</td>
-                    <td>{formatConditions(row.conditions, row.customerList)}</td>
+                    <td>{row.segmentTitle}</td>
+                    <td>{row.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</td>
+                    <td>{row.customerCount}</td>
+                    <td>{formatSegmentCondition(row.segmentCondition)}</td>
                     <td>
                     <Dropdown>
                         <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>

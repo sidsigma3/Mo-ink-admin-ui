@@ -1,4 +1,4 @@
-import React, { useState ,useContext } from "react";
+import React, { useState ,useContext , useEffect } from "react";
 import { IoArrowBackOutline } from "react-icons/io5";
 import StatusFilter from "../../../components/Filter/DayFilter/StatusFilter/StatusFilter";
 import { TextField } from "@mui/material";
@@ -15,38 +15,99 @@ import AddBtn from "../../../components/Buttons/Add/AddBtn";
 import { ProductContext } from './../../../components/Context/ProductContext';
 import DeleteBtn from "../../../components/Buttons/Delete/DeleteBtn";
 import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
-
+import { addProduct , deleteProduct, updateProduct } from "../../../services/ProductService";
 
 const AddProduct = () => {
 
   const { state } = useLocation();
-  const { products ,addProduct } = useContext(ProductContext);  
+  const { index, ix, finalData } = state || {}; // Provide a default empty object
+  const [errors, setErrors] = useState({});
+  const [sizeColorError, setSizeColorError] = useState("");
+
   const navigate = useNavigate();
-  const product = state?.index !== undefined ? products[state.index] : null;
+
+  const product = (typeof index === 'number' && finalData) ? finalData[index] : null;
+
+ 
+  const transformProductData = (product) => {
+    const groupedVariants = product.groupedVariants;
+  
+    // Extract sizes
+    const sizes = groupedVariants.map((group) => ({
+      value: group.size,
+    }));
+  
+    // Extract unique colors
+    const uniqueColors = [];
+    groupedVariants.forEach((group) => {
+      group.variants.forEach((variant) => {
+        if (
+          !uniqueColors.some((color) => color.value === variant.colorName)
+        ) {
+          uniqueColors.push({
+            value: variant.colorName,
+            color: variant.colorName,
+            hex: variant.hexCode,
+            id:variant.id,
+          });
+        }
+      });
+    });
+  
+    // Generate `sizeColorMap`
+    const sizeColorMap = groupedVariants.map((group) => ({
+      size: group.size,
+      colors: group.variants.map((variant) => ({
+        name: variant.colorName,
+        hex: variant.hexCode,
+        available:variant.available,
+        price:variant.price,
+        id:variant.id,
+      })),
+    }));
+  
+    // Combine into `variants`
+    const variants = [
+      { name: "Size", values: sizes },
+      { name: "Color", values: uniqueColors },
+    ];
+  
+    return { variants, sizeColorMap };
+  };
+
+
+
+
+  // const product =
+  //   state?.index !== undefined
+  //     ? finalData[index].groupedVariants[ix]
+  //     : null;
+
   const [data, setData] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
-  const [status, setStatus] = useState(product?.status || "Active"); 
+  const [status, setStatus] = useState(product?.availableStatus || "Active"); 
 
   
-
+ 
  
 
   const [formData, setFormData] = useState({
     productName: product?.productName || '',
-    description: product?.description || '',
+    description: product?.productDescription || '',
     pricePerKg: product?.pricePerKg || '',
     compareAtPrice: product?.compareAtPrice || '',
-    costPerItem: product?.costPerItem || '',
+    costPerItem: product?.costPerItemPerKg || '',
     profit: product?.profit || '',
-    gst: product?.gst || '',
+    gst: product?.gstOnProduct || '',
     size: product?.size || '',
     stock: product?.stock || '',
-    colorVariants: product?.colorVariants || [],
-    status: product?.status || 'Active',
+    colorVariants: product?.groupedVariants || [],
+    status: product?.availableStatus || 'Active',
     media: product?.media || null,
   });
 
   
+  console.log(product)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -62,105 +123,150 @@ const AddProduct = () => {
   };
 
   
-  const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const newProducts = sizeColorMap.map(({ size, colors }) => {
-    const totalAvailable = calculateTotalAvailable(colors);
-    const averagePrice = calculateAveragePrice(colors);
+    setErrors({}); // Reset errors before validation
 
-    return {
-      ...formData,
-      productId: `PRD${Date.now()}-${size}`, 
-      size, // Add the size
-      colorVariants: colors.map((color) => color.hex.trim()), 
-      stock: totalAvailable, 
-      price: averagePrice, 
-      status,
-      sizeColorMap,
-      variants,
-    };
-  });
+    // Validation checks
+    let validationErrors = {};
 
-  if (state?.index !== undefined) {
-   
-    const updatedProducts = products.map((product) => {
-      if (product.productName === formData.productName) {
-      
-        return {
-          ...product,
-          ...formData, 
-          allVariants: newProducts, 
-          sizeColorMap,
-          variants, 
-        };
-      }
-      return product; 
+    if (!formData.productName.trim()) validationErrors.productName = "Product name is required.";
+    if (!formData.description.trim()) validationErrors.description = "Description is required.";
+    if (!formData.pricePerKg || formData.pricePerKg <= 0) validationErrors.pricePerKg = "Valid price per Kg is required.";
+    if (!formData.costPerItem || formData.costPerItem <= 0) validationErrors.costPerItem = "Valid cost per item is required.";
+    if (!formData.compareAtPrice || formData.compareAtPrice <= 0) validationErrors.compareAtPrice = "Valid Compare at price is required.";
+    // if (!formData.media) validationErrors.media = "Please upload a product image or media.";
+    if (!formData.gst || formData.gst < 0) validationErrors.gst = "Valid GST value is required.";
+    if (variants.length<2) validationErrors.variants = "At (Size & Color) variant is required.";
+    if (sizeColorMap.length<2) validationErrors.sizeColorMap = "Size and color combination is required.";
+
+    // Stop submission if there are errors
+    if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+    }
+
+    const plainTextDescription = formData.description.replace(/<\/?[^>]+(>|$)/g, "");
+    // Create variants with calculated prices and availability
+    const newVariants = sizeColorMap.map(({ size, colors }) => {
+      return colors.map((color) => ({
+        id:color.id || null ,
+        size,
+        color: {id:color.id || null , colorName: color.name , hexCode:color.hex },
+        availableWeight: Number(color.available), // Assuming 'available' corresponds to weight
+        pricePerKg: Number(color.price), // Use the price from each color variant
+      }));
     });
 
-  } else {
-    
-    newProducts.forEach((product) => addProduct(product));
-  }
+    // Calculate average price across all variants
+    const averagePrice = sizeColorMap.reduce(
+      (acc, { colors }) => {
+        const total = colors.reduce((sum, color) => sum + Number(color.price), 0);
+        return acc + total;
+      },
+      0
+    ) / sizeColorMap.reduce((count, { colors }) => count + colors.length, 0);
 
-  navigate('/products');
-};
+    // Prepare formatted data for the product
+    const formattedData = {
+      title: formData.productName,
+      price: averagePrice.toFixed(2),
+      description: plainTextDescription,
+      media: [formData.media] || ['localhost:8080/api/img'],
+      availableStatus:status,
+      productType: {
+        productName: formData.productName,
+        description: formData.description,
+      },
+      productPrice:{
+        pricePerKg: formData.pricePerKg,
+        compareAtPrice: formData.compareAtPrice,
+        costPerItemPerKg: formData.costPerItem,
+        gstOnProduct:formData.gst,
+      },
+      variants: newVariants.flat(),
+    };
 
- 
+    try {
+      if (state?.index !== undefined) {
+        // Update existing product
+        const productId = product.productId; // Assuming 'id' is the product ID
+        await updateProduct(productId, formattedData);
+      } else {
+        // Add new product
+        await addProduct(formattedData);
+      }
+
+      navigate('/products'); // Redirect after submission
+    } catch (error) {
+      // Handle error (optional)
+      console.error('Error submitting product:', error);
+    }
+  };
+
+  
+  const [variants, setVariants] = useState(product?.variants || []);
+  const [expandedVariant, setExpandedVariant] = useState(null);
 
   const [sizes, setSizes] = useState([{ value: "" }]); 
   const [colors, setColors] = useState([{ color: "white" }]); 
   const [sizeColorMap, setSizeColorMap] = useState(product?.sizeColorMap || []);
 
-  console.log(sizeColorMap)
+  useEffect(() => {
+    if (product) {
+      const { variants: newVariants, sizeColorMap: newSizeColorMap } = transformProductData(product);
+      setVariants(newVariants);
+      setSizeColorMap(newSizeColorMap);
+    }
+  }, [product]);
 
   const generateSizeColorMap = () => {
+    setSizeColorError("");
+
     const sizes = variants.find(v => v.name.toLowerCase() === "size")?.values || [];
     const colors = variants.find(v => v.name.toLowerCase() === "color")?.values || [];
-  
-    const map = sizes.map(size => {
-      return {
-        size: size.value,
-        colors: colors.map(color => ({
-          name: color.color,
-          hex: color.hex
-        }))
-      };
+
+    if (sizes.length === 0 || colors.length === 0) {
+      setSizeColorError("Please add both Size and Color variants before generating the map.");
+      return;
+    }
+
+    // Get the current sizeColorMap state
+    setSizeColorMap(prevMap => {
+        // Create a map of sizes and their respective colors from the previous state
+        const existingMap = prevMap.reduce((acc, item) => {
+            acc[item.size] = item.colors;
+            return acc;
+        }, {});
+
+        // Generate the new map based on current sizes and colors
+        const newMap = sizes.map(size => {
+            const existingColors = existingMap[size.value] || []; // Get existing colors for the size
+            const newColors = colors.map(color => ({
+                name: color.color,
+                hex: color.hex
+            }));
+
+            // Merge existing colors and new colors (prevent duplicates)
+            const mergedColors = [
+                ...existingColors,
+                ...newColors.filter(
+                    newColor => !existingColors.some(existingColor => existingColor.hex === newColor.hex)
+                )
+            ];
+
+            return {
+                size: size.value,
+                colors: mergedColors
+            };
+        });
+
+        return newMap;
     });
-  
-    setSizeColorMap(map);
-  };
-  
+};
 
 
-  const handleSizeChange = (index, value) => {
-    const updatedSizes = [...sizes];
-    updatedSizes[index].value = value;
-    setSizes(updatedSizes);
-  };
-
-
-  const addSizeField = () => {
-    setSizes([...sizes, { value: "" }]);
-  };
-
-
-  const removeSizeField = (index) => {
-    const updatedSizes = sizes.filter((_, i) => i !== index);
-    setSizes(updatedSizes);
-  };
-
-  
-  const handleColorChange = (index, color) => {
-    const updatedColors = [...colors];
-    updatedColors[index].color = color.hex;
-    setColors(updatedColors);
-  };
-
-
-  const addColorField = () => {
-    setColors([...colors, { color: "white" }]);
-  };
 
 
   const removeColorField = (sizeIndex, colorIndex) => {
@@ -176,20 +282,7 @@ const AddProduct = () => {
   const toggleRow = (index) => {
     setExpandedRow(expandedRow === index ? null : index);
   };
-
-  const [showColorPicker, setShowColorPicker] = useState({});
-
-  const toggleColorPicker = (index) => {
-    setShowColorPicker((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index], 
-    }));
-  };
-
-  const addColorToList = () => {};
-
-  const [variants, setVariants] = useState(product?.variants || []);
-  const [expandedVariant, setExpandedVariant] = useState(null);
+ 
 
   const addVariant = () => {
     setVariants([
@@ -221,25 +314,6 @@ const AddProduct = () => {
       return updatedMap;
     });
   };
-
-
-// const handleVariantValueChange = (variantIndex, valueIndex, key, value) => {
-//     setVariants((prevVariants) => {
-//       const updatedVariants = [...prevVariants];
-  
-//       // Check if the variant and value index exist to avoid undefined errors
-//       if (
-//         updatedVariants[variantIndex] &&
-//         updatedVariants[variantIndex].values &&
-//         updatedVariants[variantIndex].values[valueIndex]
-//       ) {
-//         updatedVariants[variantIndex].values[valueIndex][key] = value;
-//       }
-  
-//       return updatedVariants;
-//     });
-//   };
-  
   
 
   const addVariantValue = (index) => {
@@ -280,8 +354,6 @@ const AddProduct = () => {
     setSizeColorMap(updatedMap);
   };
   
-
- 
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
@@ -327,7 +399,19 @@ const AddProduct = () => {
 
   
   
-  
+const handleDelete = async() =>{
+  try {
+    const productId = product.productId
+    await deleteProduct(productId)
+    navigate('/products'); // Redirect after submission
+  } catch (error) {
+    // Handle error (optional)
+    console.error('Error Deleting product:', error);
+  }
+
+}  
+
+
 
   
   return (
@@ -349,6 +433,7 @@ const AddProduct = () => {
               value={formData.productName}
               onChange={handleInputChange}
             />
+            {errors.productName && <p className="text-danger">{errors.productName}</p>}
           </div>
 
           <div className="desc-input-ctn d-flex flex-column p-2">
@@ -370,14 +455,17 @@ const AddProduct = () => {
                 ],
               }}
             />
-          </div>
+            {errors.description && <p className="text-danger">{errors.description}</p>}
 
+          </div>
+         
           <div className="media-input-ctn mt-5 p-2">
             <label>Media</label>
             <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
               <input type="file" onChange={handleMediaChange}></input>
               <h4>Accepts images,videos,or 3D models</h4>
             </div>
+            {errors.media && <p className="text-danger">{errors.media}</p>}
           </div>
         </div>
 
@@ -392,6 +480,7 @@ const AddProduct = () => {
                  value={formData.pricePerKg}
                  onChange={handleInputChange}
               ></input>
+               {errors.pricePerKg && <p className="text-danger">{errors.pricePerKg}</p>}
             </div>
 
             <div className="d-flex flex-column col">
@@ -403,10 +492,11 @@ const AddProduct = () => {
                onChange={handleInputChange}
               >
               </input>
+              {errors.compareAtPrice && <p className="text-danger">{errors.compareAtPrice}</p>}
             </div>
           </div>
 
-          <div className="row mt-2">
+          <div className="row mt-3">
             <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-12">
               <label>Cost Per item/Kg</label>
               <input
@@ -416,9 +506,10 @@ const AddProduct = () => {
                 onChange={handleInputChange}             
                >
               </input>
+              {errors.costPerItem && <p className="text-danger">{errors.costPerItem}</p>}
             </div>
 
-            <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
+            {/* <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
               <label>Margin</label>
               <input 
                type="number"
@@ -426,23 +517,25 @@ const AddProduct = () => {
                value={formData.margin}
                onChange={handleInputChange}
               ></input>
-            </div>
+            </div> */}
 
 
             <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
-              <label>GST on this product</label>
+              <label>GST(%) on this product</label>
               <input 
               type="number"
               name="gst"
               value={formData.gst}
               onChange={handleInputChange}
               ></input>
+               {errors.gst && <p className="text-danger">{errors.gst}</p>}
             </div>
 
           </div>
         </div>
 
         <div className="variant-ctn mt-2 p-3 rounded">
+            {errors.variants && <p className="text-danger">{errors.variants}</p>}
             <div className="top d-flex justify-content-between">
                 <h4>Variant</h4>
             <button 
@@ -538,23 +631,21 @@ const AddProduct = () => {
                 <label>Variant Name:</label>
                 </div>
                 <div className="mt-1">
-                <input
-                 className="w-100"
-                  type="text"
+                <select
+                  className="w-100 rounded border border-secondary-subtle p-1"
                   value={variant.name}
                   onClick={(e) => e.stopPropagation()}
-                  onChange={(e) =>
-                    handleVariantNameChange(variantIndex, e.target.value)
-                  }
-                  placeholder="e.g., Size or Color"
-                />
+                  onChange={(e) => handleVariantNameChange(variantIndex, e.target.value)}
+                >
+                  <option value="">Select Variant Type</option>
+                  <option value="size">Size</option>
+                  <option value="color">Color</option>
+                </select>
               </div>
               <div>
               <label className="ms-5 mt-2">Variant Values</label>
                  </div> 
            
-
-              
                 {variant.values.map((value, valueIndex) => (
                   <div
                     key={valueIndex}
@@ -700,6 +791,8 @@ const AddProduct = () => {
 
 
                     {variants.length > 0 && (
+                      <div>
+                          {sizeColorError && <p className="text-danger">{sizeColorError}</p>}
                         <div className="d-flex justify-content-end">
                         <button
                             style={{
@@ -714,6 +807,7 @@ const AddProduct = () => {
                             Submit
                         </button>
                         </div>
+                        </div>
                     )}
         
 
@@ -724,7 +818,7 @@ const AddProduct = () => {
                 <tr>
                     <th>Counter</th>
                     <th>Variants</th>
-                    <th>Available</th>
+                    <th>Available (Kg)</th>
                     <th>Price/Kg</th>
                     <th></th>
                 </tr>
@@ -774,7 +868,17 @@ const AddProduct = () => {
                     entry.colors.map((color, colorIndex) => (
                         <tr key={colorIndex}>
                         <td >
-                        
+                            <div>
+                              <input 
+                               className="w-75"
+                               type="text"
+                               value={color.name || ""}
+                               onChange={(e) =>
+                               handleVariantValueChangeTable(sizeIndex, colorIndex, "name", e.target.value)
+                               }
+                               placeholder="name"
+                              ></input>
+                            </div>
                         </td>
                         <td style={{ alignItems: "center" }} className="d-flex justify-content-between">
                             <div >
@@ -851,7 +955,7 @@ const AddProduct = () => {
     </div>
 
     <div className="w-100 d-flex justify-content-between mt-3">
-        <DeleteBtn></DeleteBtn>
+        <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
         <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
     </div>
 

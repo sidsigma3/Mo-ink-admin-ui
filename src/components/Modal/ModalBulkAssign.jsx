@@ -2,6 +2,7 @@ import React from 'react'
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from 'react-bootstrap'
 import { AiOutlineSend } from "react-icons/ai";
 
+
 const ModalBulkAssign = ({show,handleClose}) => {
   return (
    <Modal show={show} onHide={handleClose} centered>

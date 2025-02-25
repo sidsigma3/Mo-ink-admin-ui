@@ -1,157 +1,94 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Dropdown } from "react-bootstrap";
 import { SketchPicker } from "react-color";
 import { IoIosArrowDown } from "react-icons/io";
 import Collapse from "react-bootstrap/Collapse";
 import { IoMdAdd } from "react-icons/io";
 import "./ModalOrder.css"
+import CataloguePage from "./CatalougePage";
 
 const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedColors, setSelectedColors] = useState("#000000");
-  const [selectedProducts, setSelectedProducts] = useState({});
-
-  const [open, setOpen] = useState(false);
-
+ 
   const [openProductId, setOpenProductId] = useState(null);
+  const [selectedSize, setSelectedSize] = useState({});
+  const [showCatalogue, setShowCatalogue] = useState(false);
+  const [currentVariant, setCurrentVariant] = useState(null);
+  const [selectedColors, setSelectedColors] = useState({});
 
-  const [showColorPicker, setShowColorPicker] = useState({});
-
-  const [selectedColor, setSelectedColor] = useState("#000000");
-  const [colorList, setColorList] = useState({});
-  const [selectedSize,setSelectedSize] = useState({})
-  
-
-  console.log(selectedSize)
-  console.log(colorList)
-
-
+  // Handles size selection for a product
   const sizeSelectHandler = (productId, size) => {
     setSelectedSize((prev) => ({
       ...prev,
       [productId]: {
-        ...(prev[productId] || {}), // Initialize product object if it doesn't exist
-        [size]: !prev[productId]?.[size], // Toggle selected state for the specific size
+        ...(prev[productId] || {}),
+        [size]: !prev[productId]?.[size],
       },
     }));
   };
 
-  
-  
-
-
-
-
+  // Toggles visibility of a product's variant list
   const toggleCollapse = (productId) => {
-    setOpenProductId(openProductId === productId ? null : productId); 
+    setOpenProductId(openProductId === productId ? null : productId);
   };
 
-  const handleSelectSize = (productId, size) => {
-    setSelectedProducts((prev) => ({
+  // Opens the Catalogue Page inside the modal
+  const openCatalogue = (variant) => {
+    setCurrentVariant(variant);
+    setShowCatalogue(true);
+  };
+
+  // Handles selection of color from Catalogue Page
+  const handleColorSelection = (colorHex, colorName) => {
+    if (!currentVariant) return;
+
+    setSelectedColors((prev) => ({
       ...prev,
-      [productId]: {
-        ...prev[productId],
-        [size]: {
-          colors: prev[productId]?.[size]?.colors || [],
-        },
+      [currentVariant.id]: {
+        ...prev[currentVariant.id],
+        [currentVariant.size]: { colorHex, colorName },
       },
     }));
+
+    setShowCatalogue(false); // Close catalogue after selection
   };
 
-  const handleSelectColor = (productId, size, color) => {
-    setSelectedProducts((prev) => ({
-      ...prev,
-      [productId]: {
-        ...prev[productId],
-        [size]: {
-          ...prev[productId][size],
-          colors: [...new Set([...prev[productId][size].colors, color])], // Unique colors
-        },
-      },
-    }));
-  };
-
-  const handleAddToCart = () => {
-    const itemsToCart = Object.keys(selectedProducts)
-      .map((productId) => {
-        const sizes = selectedProducts[productId];
-        return Object.keys(sizes).map((size) => ({
-          productId,
-          size,
-          colors: sizes[size].colors,
-        }));
-      })
-      .flat();
-    addToCart(itemsToCart);
+  // Creates the final order
+  const handleOrderCreation = () => {
+    const order = Object.keys(selectedSize) // Iterate over variantIds
+      .flatMap((variantId) =>
+        Object.keys(selectedSize[variantId]) // Iterate over sizes for this variant
+          .filter((size) => selectedSize[variantId][size]) // Check if size is selected (true)
+          .map((size) => {
+            // Find the correct product using variantId
+            const product = products.find((p) =>
+              p.groupedVariants?.some((v) => v.variants.some((variant) => variant.id === Number(variantId)))
+            );
+  
+            // Ensure we found a product
+            if (!product) return null;
+  
+            // Find the variant group by size
+            const variant = product.groupedVariants?.find((v) => v.size === size);
+  
+            // Find the selected variant by variantId
+            const selectedVariant = variant?.variants?.find((v) => v.id === Number(variantId));
+  
+            return {
+              productId: product.productId, // Retrieve productId correctly
+              productName:product.productName,
+              size,
+              colors: selectedColors[variantId]?.[size]?.colorHex || [], // Ensure it's an array
+              variant,
+              product
+            };
+          })
+      ) 
+      .filter((item) => item !== null && item.colors.length > 0); // Remove null items and only keep valid selections
+  
+    onOrderCreate(order);
     handleClose();
   };
-
-
   
-
-
-
-  const toggleColorPicker = (size) => {
-    setShowColorPicker((prevState) => ({
-      ...prevState,
-      [size]: !prevState[size], // Toggle visibility for the clicked size
-    }));
-  };
-
-  const handleColorChange = (color) => {
-    setSelectedColor(color.hex); // Update the selected color
-  };
-
-  // Add selected color to the product's color list
-  const addColorToList = (productId, size) => {
-    setColorList((prevState) => {
-      const updatedColors = {
-        ...prevState,
-        [productId]: {
-          ...prevState[productId],
-          [size]: [
-            ...(prevState[productId]?.[size] || []), // Keep existing colors, if any
-            selectedColor, // Add the new selected color
-          ],
-        },
-      };
-      return updatedColors;
-    });
-    // Close the color picker after adding the color
-    setShowColorPicker((prevState) => ({
-      ...prevState,
-      [size]: false,
-    }));
-  };
-
-
- 
-  // Example usage: Logging the order object when a button is clicked
-  const handleOrderCreation = () => {
-    const order = Object.keys(selectedSize)
-      .map((productId) => {
-        // Find the product details by productId
-        const product = products.find((p) => String(p.id) === String(productId));
-        console.log(productId)
-        console.log(product.name)
-  
-        return Object.keys(selectedSize[productId])
-          .filter((size) => selectedSize[productId][size])
-          .map((size) => ({
-            productId,
-            productName: product ? product.name : 'Product', 
-            size,
-            color: colorList[productId]?.[size] || 'default color', 
-          }));
-      })
-      .flat();
-  
-    // Pass the order details to the parent component
-    onOrderCreate(order);
-    handleClose()
-  };
-
-
 
 
   return (
@@ -160,96 +97,83 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
         <Modal.Title>All Products</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {products.map((product) => (
-          <div key={product.id}>
-            <div
-              className="mb-4 d-flex justify-content-between align-items-center"
-              onClick={() => toggleCollapse(product.id)} // Toggle the specific product's collapse
-              aria-controls={`collapse-${product.id}`}
-              aria-expanded={openProductId === product.id}
-            >
-              <h5>{product.name}</h5>
-              <span>
-                <IoIosArrowDown />
-              </span>
-            </div>
-
-            <Collapse in={openProductId === product.id}>
-              <div id={`collapse-${product.id}`}>
-                {product.size.map((size) => (
-                  <div
-                    key={size}
-                    className="size-section mb-3 d-flex justify-content-between"
-                  > 
-
-                    <div className="d-flex align-items-center gap-5">
-
-                    <button   key={size} onClick={()=>sizeSelectHandler(product.id,size)} className={selectedSize[product.id]?.[size]? 'selected' : 'not-selected' }>Size: {size}</button>
-                  
-                     <div className="d-flex gap-2">
-                       
-                        {(colorList[product.id]?.[size] || [] ).map((color, index) => (
-                        <button
-                            key={index}
-                            style={{
-                            backgroundColor: color,
-                            width: "20px",
-                            height: "20px",
-                            borderRadius: "50%",
-                            border: "2px solid #ccc",
-                            cursor: "pointer",
-                            padding:"0"
-                            }}
-                        ></button>
-                        ))}
-                    </div>
-                    </div>
-
-                    <span onClick={() => toggleColorPicker(size)}>
-                        <img src="./color-wheel.png"></img>
-                    </span>
-
-               
-                    {showColorPicker[size] && (
-                      <div className="color-picker-ctn">
-                        <SketchPicker
-                          color={selectedColor}
-                          onChange={handleColorChange}
-                          className="color-picker"
-                        />
-                        <Button
-                          className="add-color"
-                          variant="primary"
-                          onClick={() => addColorToList(product.id, size)}
-                        >
-                          Import <span><IoMdAdd /></span>
-                        </Button>
-                      </div>
-                    )}
-
-                    {/* {product.stock && product.stock[size] ? (
-                      <div className="mt-2">
-                        <h6>{product.stock[size]} Kgs in Stock</h6>
-                      </div>
-                    ) : (
-                      <div className="mt-2">
-                        <h6>Null</h6>
-                      </div>
-                    )} */}
-                  </div>
-                ))}
+        {!showCatalogue ? (
+          products.map((product) => (
+            <div key={product.productId}>
+              <div
+                className="mb-4 d-flex justify-content-between align-items-center"
+                onClick={() => toggleCollapse(product.productId)}
+                aria-controls={`collapse-${product.productId}`}
+                aria-expanded={openProductId === product.productId}
+              >
+                <h5>{product.productName}</h5>
+                <span>
+                  <IoIosArrowDown />
+                </span>
               </div>
-            </Collapse>
-          </div>
-        ))}
+
+              <Collapse in={openProductId === product.productId}>
+                <div id={`collapse-${product.productId}`}>
+                  {product.groupedVariants.map((variant) => (
+                    <div
+                      key={variant.id}
+                      className="size-section mb-3 d-flex justify-content-between"
+                    >
+                      <div className="d-flex align-items-center gap-5">
+                        <button
+                          key={variant.id}
+                          onClick={() => sizeSelectHandler(variant.id, variant.size)}
+                          className={selectedSize[variant.id]?.[variant.size] ? 'selected' : 'not-selected'}
+                        >
+                          Size: {variant.size}
+                        </button>
+                      </div>
+
+                  
+                      {selectedColors[variant.id]?.[variant.size] && (
+                        <div className="selected-color-box d-flex gap-3">
+                          {selectedColors[variant.id][variant.size].colorHex.map((color, index) => (
+                            <div key={index} className="d-flex flex-column gap-2">
+                              <div
+                                style={{
+                                  width: "30px",
+                                  height: "30px",
+                                  borderRadius: "50%",
+                                  backgroundColor: color.hexCode.trim(), // Ensure no extra spaces
+                                  border: "1px solid #ccc",
+                                }}
+                              ></div>
+                              <span>{color.colorName}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+
+                        <span onClick={() => openCatalogue(variant)} className="d-flex align-items-center">
+                        <img src="./color-wheel.png" alt="Color Selector" />
+                      </span>
+
+                    </div>
+                  ))}
+                </div>
+              </Collapse>
+            </div>
+          ))
+        ) : (
+          // Show Catalogue Page inside the modal
+          <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} />
+        )}
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="flex justify-content-between">
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
         <Button variant="primary" onClick={handleOrderCreation}>
           Add to Cart
         </Button>
+
+        
       </Modal.Footer>
     </Modal>
   );

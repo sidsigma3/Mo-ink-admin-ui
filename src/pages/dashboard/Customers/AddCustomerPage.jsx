@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState , useEffect } from 'react'
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate , useLocation} from 'react-router-dom';
 import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/StatusFilter';
@@ -14,55 +14,156 @@ import { VscCreditCard } from "react-icons/vsc";
 import { useSegments } from '../../../components/Context/SegmentsContext';
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import { MdAdd } from "react-icons/md";
-
+import { addCustomer,updateCustomer , deleteCustomer , addMoneyToWallet ,subtractMoneyFromWallet , getWalletTransactions } from '../../../services/CustomerService';
+import { getAllSegment } from '../../../services/SegmentService';
 
 const AddCustomerPage = () => {
 
   const { state } = useLocation();
+  const { index, customers } = state || {};
   const { rows, setRows } = useSegments();
+  const [errors, setErrors] = useState({});
+
+
   const navigate =useNavigate()
-  const { customers ,setCustomers } = useCustomerContext();
+  // const { customers ,setCustomers } = useCustomerContext();
+  const [segments,setSegments] = useState([])
+      
+  useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const data = await getAllSegment();
+          setSegments(data.data)
+          
+        } catch (error) {
+          console.error('Error fetching products:', error);
+        }
+      };
+    
+      fetchData(); 
+    }, []); 
+
+  const customer =  (typeof index === 'number' && customers) ? customers[index] : null;
 
   const [amount, setAmount] = useState(""); // Amount input
 
-  const customer = state?.index !== undefined ? customers[state.index] : null;
+ 
 
   const [status,setStatus] = useState(customer?.status || 'Active')
 
-  const [formData, setFormData] = useState({
-    firstName: customer?.firstName || "",
-    lastName: customer?.lastName || "",
-    whatsapp: customer?.whatsapp || "",
-    phone: customer?.phone || "",
-    email: customer?.email || "",
-    company: customer?.company || "",
-    gstin: customer?.gstin || "",
-    chequePhoto: null,
-    address: customer?.address || "",
-    apartment: customer?.apartment || "",
-    country: customer?.country || "",
-    state: customer?.state || "",
-    city: customer?.city || "",
-    pinCode: customer?.pinCode || "",
-    
+  const [formData, setFormData] = useState(() => {
+    const nameParts = customer?.customerName?.split(" ") || [];
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+    return {
+      firstName,
+      lastName,
+      email: customer?.email || "",
+      phone: customer?.phoneNumber || "",
+      whatsapp: customer?.whatsappNumber || "",
+      company: customer?.company || "",
+      gstin: customer?.gstNumber || "",
+      chequePhoto: null,
+      address: customer?.customerAddress || "",
+      street: customer?.street || "",
+      country: customer?.country || "",
+      state: customer?.state || "",
+      city: customer?.city || "",
+      pinCode: customer?.zipcode || "",
+      password: customer?.password || "",
+    };
   });
 
+  const [initialFormData, setInitialFormData] = useState(formData);
+  const [isChanged, setIsChanged] = useState(false);
+  
+  // Update initialFormData when customer changes
+  useEffect(() => {
+      setFormData(prev => {
+          const nameParts = customer?.customerName?.split(" ") || [];
+          const firstName = nameParts[0] || "";
+          const lastName = nameParts.slice(1).join(" ") || "";
+          
+          const updatedForm = {
+              firstName,
+              lastName,
+              email: customer?.email || "",
+              phone: customer?.phoneNumber || "",
+              whatsapp: customer?.whatsappNumber || "",
+              company: customer?.company || "",
+              gstin: customer?.gstNumber || "",
+              chequePhoto: null,
+              address: customer?.customerAddress || "",
+              street: customer?.street || "",
+              country: customer?.country || "",
+              state: customer?.state || "",
+              city: customer?.city || "",
+              pinCode: customer?.zipcode || "",
+              password: customer?.password || "",
+          };
+          
+          setInitialFormData(updatedForm);  // Store the initial state for tracking changes
+          return updatedForm;
+      });
+  }, [customer]);
 
-  const [selectedSegments, setSelectedSegments] = useState(customer?.segment || []);  // State to track selected segments
+
+  const [selectedSegments, setSelectedSegments] = useState(customer?.segments || []);  // State to track selected segments
   const [searchTerm, setSearchTerm] = useState('');  // State for input field
 
-  // Filter segments based on the search term
-  const filteredSegments = rows.filter((segment) =>
-    segment.title.toLowerCase().includes(searchTerm.toLowerCase())
+  
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [walletBalance,setWalletBalance] = useState()
+
+  const fetchTransactions = async () => {
+    if (customer===null) return;
+   
+    const customerId = customer.customerId; 
+   
+    setLoading(true);
+    try {
+     
+      const data = await getWalletTransactions(customerId);
+      setTransactions(data); // Update state with API response
+    } catch (error) {
+      console.error("Error loading transactions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+  
+    fetchTransactions();
+  }, [customer]);
+
+
+  useEffect(() => {
+    if (transactions?.length > 0) {
+      const total = transactions.reduce((acc, item) => {
+        return item.type === "CREDIT"
+          ? acc + parseFloat(item.amount)
+          : acc - parseFloat(item.amount);
+      }, 0); // Initial value is 0
+      setWalletBalance(total);
+    } else {
+      setWalletBalance(0); // Set to 0 if no transactions
+    }
+  }, [transactions]);
+
+  
+
+  const filteredSegments = segments.filter((segment) =>
+    segment.segmentTitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Add segment to selected chips
   const addSegmentAsChip = (segment) => {
-    if (!selectedSegments.includes(segment)) {
-      setSelectedSegments([...selectedSegments, segment]);
+    if (!selectedSegments.some((s) => Object.keys(s)[0] === segment.segmentId.toString())) {
+      setSelectedSegments([...selectedSegments,  segment ]);
     }
   };
-
   // Remove segment chip
   const removeSegmentChip = (index) => {
     const updatedSelectedSegments = selectedSegments.filter((_, i) => i !== index);
@@ -74,112 +175,160 @@ const AddCustomerPage = () => {
   }
 
 
- 
-
-   const handleAddMoney = () => {
-    if (!amount || isNaN(amount)) return alert("Enter a valid amount.");
-
-    const updatedCustomers = [...customers];
-    const customer = updatedCustomers[state?.index];
-
-    customer.wallet = `₹${parseInt(customer.wallet.replace(/[₹,]/g, "")) + parseInt(amount)}`;
-    customer.purchaseData.push({
-      source: "Admin",
-      type: "Credit",
-      amount: `₹${amount}`,
-      date: new Date().toISOString().split("T")[0],
-    });
-
-    setCustomers(updatedCustomers);
-    setAmount("");
+  const handleAddMoney = async () => {
+    if (!amount || isNaN(amount)) {
+      return alert("Enter a valid amount.");
+    }
+  
+    try {
+     
+      const customerId = customer.customerId
+      await addMoneyToWallet(customerId, amount);
+      fetchTransactions();
+      setAmount(""); // Clear input
+      alert("Money added successfully.");
+    } catch (error) {
+      alert("Failed to add money to wallet.");
+    }
   };
 
-  const handleSubtractMoney = () => {
-    if (!amount || isNaN(amount)) return alert("Enter a valid amount.");
-
-    const updatedCustomers = [...customers];
-    const customer = updatedCustomers[state?.index];
-    const currentWallet = parseInt(customer.wallet.replace(/[₹,]/g, ""));
-
-    if (currentWallet < amount) return alert("Insufficient balance.");
-
-    customer.wallet = `₹${currentWallet - parseInt(amount)}`;
-    customer.purchaseData.push({
-      source: "Admin",
-      type: "Debit",
-      amount: `₹${amount}`,
-      date: new Date().toISOString().split("T")[0],
-    });
-
-    setCustomers(updatedCustomers);
-    setAmount("");
+  const handleSubtractMoney = async () => {
+    if (!amount || isNaN(amount)) {
+      return alert("Enter a valid amount.");
+    }
+  
+    try {
+      const customerId = customer.customerId
+      await subtractMoneyFromWallet(customerId, amount);
+      fetchTransactions();
+      setAmount(""); 
+      alert("Money deducted successfully.");
+    } catch (error) {
+      alert("Failed to subtract money from wallet.");
+    }
   };
-
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: files ? files[0] : value, // Handle file input separately
-    });
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-      if (state?.index !== undefined) {
-
-        const newCustomer = {
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email,
-            phone: formData.phone,
-            location: formData.city,
-            lastOrder: "N/A", 
-            status,
-            totalOrders:0,
-            wallet:customer.wallet,
-            purchaseData:customer.purchaseData,
-            segment:selectedSegments,
-            ...formData,
-          };
-      
-        const updatedCustomers = [...customers];
-        updatedCustomers[state?.index] = newCustomer; // Update the customer at the specified index
-        setCustomers(updatedCustomers);
-      } else {
-
-        const newCustomer = {
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email,
-            phone: formData.phone,
-            wallet: "₹0", // Default wallet value
-            location: formData.city,
-            lastOrder: "N/A", 
-            purchaseData: [],
-            status,
-            totalOrders:0,
-            ...formData,
-          };
-        // Adding a new customer
-        setCustomers([newCustomer, ...customers]);
-      }
-
-     
-    
-      // Add the new customer to the array
    
-      navigate('/customers')
+    const updatedFormData = {
+        ...formData,
+        [name]: files ? files[0] : value,
+    };
+
+    setFormData(updatedFormData);
+
+  
+    setIsChanged(JSON.stringify(updatedFormData) !== JSON.stringify(initialFormData));
 };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setErrors({}); // Reset errors
+
+    let validationErrors = {};
+
+    // Validate Required Fields
+    if (!formData.firstName?.trim()) validationErrors.firstName = "First name is required.";
+    if (!formData.lastName?.trim()) validationErrors.lastName = "Last name is required.";
+    if (!formData.phone?.trim()) validationErrors.phone = "Phone number is required.";
+    if (!formData.email?.trim()) validationErrors.email = "Email is required.";
+    if (!formData.password?.trim()) validationErrors.password = "Password is required.";
+    if (!formData.company?.trim()) validationErrors.company = "Company is required.";
+    if (!formData.street?.trim()) validationErrors.street = "Apartment,Suite etc is required.";
+    if (!formData.country?.trim()) validationErrors.country = "Country name is required.";
+    if (!formData.state?.trim()) validationErrors.state = "State is required.";
+    if (!formData.city?.trim()) validationErrors.city = "City is required.";
+    if (!/^\d{10}$/.test(formData.phone)) validationErrors.phone = "Enter a valid 10-digit phone number.";
+    if (!formData.whatsapp?.trim()) validationErrors.whatsapp = "WhatsApp number is required.";
+    if (!/^\d{10}$/.test(formData.whatsapp)) validationErrors.whatsapp = "Enter a valid 10-digit WhatsApp number.";
+    // if (!formData.gstin?.trim()) validationErrors.gstin = "GST number is required.";
+    // if (!/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[Z]{1}\d{1}$/.test(formData.gstin))
+    //     validationErrors.gstin = "Enter a valid GSTIN.";
+    if (!formData.pinCode?.trim()) validationErrors.pinCode = "Pincode is required.";
+    if (!/^\d{6}$/.test(formData.pinCode)) validationErrors.pinCode = "Enter a valid 6-digit pincode.";
+    if (!formData.address?.trim()) validationErrors.address = "Address is required.";
+    // if (selectedSegments.length === 0) validationErrors.segmentIds = "Select at least one segment.";
+
+    // Stop submission if errors exist
+    if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+    }
+
+
+    const segmentIds = selectedSegments.map(segment => segment.segmentId);
+  
+    const newCustomer = {
+      customerName: `${formData.firstName} ${formData.lastName}`,
+      phoneNumber: formData.phone,
+      whatsappNumber:formData.whatsapp,
+      gstNumber:formData.gstin,
+      // wallet: state?.index !== undefined ? customer.wallet : "₹0", // Use wallet from the existing customer or default to ₹0
+      zipcode:formData.pinCode,
+      customerAddress: formData.address,
+      lastOrder: "N/A",
+      customerStatus:status,
+      // totalOrders: state?.index !== undefined ? customer.totalOrders : 0, // Use totalOrders from the existing customer or default to 0
+      // purchaseData: state?.index !== undefined ? customer.purchaseData : [], // Use existing purchaseData or default to an empty array
+      segmentIds,
+      ...formData,
+    };
+
+
+  
+    try {
+      if (state?.index !== undefined) {
+        // Update existing customer
+        await updateCustomer(customer.customerId, newCustomer);
+      
+      } else {
+        // Add new customer
+        await addCustomer(newCustomer);
+      
+      }
+  
+      navigate('/customers'); 
+    } catch (error) {
+      console.error("Error saving customer:", error);
+     
+    }
+  };
+
+
+
+  const handleDelete = async() =>{
+       try {
+          const id = customer.customerId
+          await deleteCustomer(id)
+          navigate('/customers'); // Redirect after submission
+        } catch (error) {
+          // Handle error (optional)
+          console.error('Error Deleting product:', error);
+        }
+  }
 
   return (
     <div className='add-customer'>
-      <div className="top d-flex gap-3 mt-2" style={{ cursor: "pointer" }}>
-        <span onClick={() => navigate("/customers")}>
-          <IoArrowBackOutline size={25} />
-        </span>
-        <h5>New Customer</h5>
-      </div>
+
+      {state?.index !== undefined ? (
+          <div className='d-flex gap-3 mb-3'> 
+                    <span onClick={() => navigate("/customers")}>
+                    <IoArrowBackOutline size={25} />
+                </span>
+          <h4>{customer.customerName}</h4>
+        </div>
+          ):
+          (
+        <div className="top d-flex gap-3 mt-2" style={{ cursor: "pointer" }}>
+          <span onClick={() => navigate("/customers")}>
+            <IoArrowBackOutline size={25} />
+          </span>
+          <h5>New Customer</h5>
+        </div>
+        )}
 
         <div className='main d-flex gap-3 mt-2'>
 
@@ -189,31 +338,43 @@ const AddCustomerPage = () => {
                 <div className="col-md-6 d-flex flex-column">
                     <label>First Name</label>
                     <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
+                    {errors.firstName && <p className="text-danger">{errors.firstName}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>Last Name</label>
                     <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
+                    {errors.lastName && <p className="text-danger">{errors.lastName}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>WhatsApp No.</label>
                     <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
+                    {errors.whatsapp && <p className="text-danger">{errors.whatsapp}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>Calling No.</label>
                     <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
+                    {errors.phone && <p className="text-danger">{errors.phone}</p>}
                 </div>
 
-                <div className="col-md-12 d-flex flex-column">
+                <div className="col-md-6 d-flex flex-column">
                     <label>Email</label>
                     <input type="text" name="email" value={formData.email} onChange={handleChange} />
+                    {errors.email && <p className="text-danger">{errors.email}</p>}
+                </div>
+
+                <div className="col-md-6 d-flex flex-column">
+                    <label>Password</label>
+                    <input type="text" name="password" value={formData.password} onChange={handleChange} />
+                    {errors.password && <p className="text-danger">{errors.password}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>Company</label>
                     <input type="text" name="company" value={formData.company} onChange={handleChange} />
+                    {errors.company && <p className="text-danger">{errors.company}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
@@ -226,6 +387,7 @@ const AddCustomerPage = () => {
                     placeholder="Add GSTIN No. to authenticate"
                     onChange={handleChange}
                     />
+                    {errors.gstin && <p className="text-danger">{errors.gstin}</p>}
                 </div>
 
                 <div className="media-input-ctn mt-5 p-2 col-md-12">
@@ -233,115 +395,130 @@ const AddCustomerPage = () => {
                     <input type="file" name="chequePhoto" onChange={handleChange} />
                     <h4>Add photo of cancelled cheque</h4>
                     </div>
+                    {errors.chequePhoto && <p className="text-danger">{errors.chequePhoto}</p>}
                 </div>
 
                 <div className="col-md-12 d-flex flex-column">
                     <label>Address</label>
                     <input type="text" name="address" value={formData.address} onChange={handleChange} />
+                    {errors.address && <p className="text-danger">{errors.address}</p>}
                 </div>
 
                 <div className="col-md-12 d-flex flex-column">
                     <label>Apartment, Suite, etc.</label>
-                    <input type="text" name="apartment" value={formData.apartment} onChange={handleChange} />
+                    <input type="text" name="street" value={formData.street} onChange={handleChange} />
+                    {errors.street && <p className="text-danger">{errors.street}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>Country/Region</label>
                     <input type="text" name="country" value={formData.country} onChange={handleChange} />
+                    {errors.country && <p className="text-danger">{errors.country}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>State</label>
                     <input type="text" name="state" value={formData.state} onChange={handleChange} />
+                    {errors.state && <p className="text-danger">{errors.state}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>City</label>
                     <input type="text" name="city" value={formData.city} onChange={handleChange} />
+                    {errors.city && <p className="text-danger">{errors.city}</p>}
                 </div>
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>PIN code</label>
                     <input type="text" name="pinCode" value={formData.pinCode} onChange={handleChange} />
+                    {errors.pinCode && <p className="text-danger">{errors.pinCode}</p>}
                 </div>
 
 
 
                 </div>
 
+
+            { state &&(
 
                 <div className='bg-white mt-2 p-3 w-100 rounded'>
-                    <div className='d-flex justify-content-between'>
-                    <h5>Manage Wallet</h5>
+                <div className='d-flex justify-content-between'>
+                <h5>Manage Wallet</h5>
 
-                    {/* {manageWallet === false && (
-                         <AddBtn clickFunction={handleAddWallet}></AddBtn>
-                    )} */}
-                   
-                    </div>
+                {/* {manageWallet === false && (
+                    <AddBtn clickFunction={handleAddWallet}></AddBtn>
+                )} */}
 
-                  
-                    <div>
-                        <label>Add balance</label>
-                        <div className='d-flex gap-2 mt-2'>
-                        <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='₹ INR'></input>
-                        {/* <AddBtn clickFunction={handleAddMoney}></AddBtn> */}
-
-                        <button className='btn btn-primary d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.28rem 1.2rem'}} onClick={handleAddMoney}>
-                        <MdAdd size={19}/>
-                        </button>
-                        
-                        <button className='btn btn-danger d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.55rem 1.2rem'}} onClick={handleSubtractMoney}>
-                        <FaMinus size={12}/>
-                        </button>
-                        </div>
-                    </div>
-                  
-
-
-                   
-                    <div className="table-ctn">
-                        {customers[state?.index]?.purchaseData?.length > 0 ? (
-                        <Table>
-                            <thead>
-                            <tr>
-                                {Object.keys(customers[state?.index].purchaseData[0]).map((key) => (
-                                <th key={key}>{key.charAt(0).toUpperCase() + key.slice(1)}</th>
-                                ))}
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {customers[state?.index].purchaseData.map((item, ix) => (
-                                <tr key={ix}>
-                                <td>{item.source}</td>
-                                <td
-                                    style={{
-                                    color: item.type === "Credit" ? "#3CAA82" : "#FF0000",
-                                    }}
-                                >
-                                    {item.type}
-                                </td>
-                                <td>{item.amount}</td>
-                                <td>{item.date}</td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </Table>
-                        ) : (
-                        <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
-                            <RiFilePaper2Line size={50} />
-                            <h5 className="fs-6">There's no transaction till now!</h5>
-                        </div>
-                        )}
-                    </div>
-                  
-                                        
                 </div>
 
 
+                <div>
+                    <label>Add balance</label>
+                    <div className='d-flex gap-2 mt-2'>
+                    <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='₹ INR'></input>
+                    {/* <AddBtn clickFunction={handleAddMoney}></AddBtn> */}
+
+                    <button className='btn btn-primary d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.28rem 1.2rem'}} onClick={handleAddMoney}>
+                    <MdAdd size={19}/>
+                    </button>
+                    
+                    <button className='btn btn-danger d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.55rem 1.2rem'}} onClick={handleSubtractMoney}>
+                    <FaMinus size={12}/>
+                    </button>
+                    </div>
+                </div>
+
+
+
+
+                <div className="table-ctn">
+                {loading ? (
+                  <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
+                    <span>Loading...</span>
+                  </div>
+                ) : transactions.length > 0 ? (
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th>Source</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transactions.map((item, ix) => (
+                        <tr key={ix}>
+                          <td>{item.source}</td>
+                          <td
+                            style={{
+                              color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000",
+                            }}
+                          >
+                            {item.type}
+                          </td>
+                          <td>₹{item.amount.toFixed(2)}</td>
+                          <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                ) : (
+                  <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
+                    <RiFilePaper2Line size={50} />
+                    <h5 className="fs-6">There's no transaction till now!</h5>
+                  </div>
+                )}
+              </div>
+
+                                    
+                </div>
+            )}
+
+                
                     <div className='d-flex justify-content-between mt-2'>
-                        <DeleteBtn></DeleteBtn>
-                        <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
+                        <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
+                        <SubmitBtn text={'Save'} clickFunction={handleSubmit} disabled={!isChanged} />
                     </div>
 
             </div>
@@ -354,37 +531,39 @@ const AddCustomerPage = () => {
             </div>
 
             <div className='bg-white p-3 rounded mt-2'>
-                    <div className='d-flex gap-3 border-bottom'>
-                    <div className="d-flex gap-3 position-relative" style={{ width: '100px', height: '100px' }}>
-                        <svg width="100" height="100" viewBox="0 0 100 100">
-                            <circle
-                            cx="50"
-                            cy="50"
-                            r="35"
-                            stroke="#B9C0CD"
-                            stroke-width="5"
-                            fill="none"
-                            stroke-dasharray="240"
-                            stroke-dashoffset="70"
-                            />
-                        </svg>
+              <div className='d-flex gap-3 border-bottom'>
+                  <div className="d-flex gap-3 position-relative" style={{ width: '100px', height: '100px' }}>
+                      <svg width="100" height="100" viewBox="0 0 100 100">
+                          <circle
+                              cx="50"
+                              cy="50"
+                              r="35"
+                              stroke={walletBalance > 0 ? "#007bff" : "#B9C0CD"} // Blue if wallet has balance
+                              strokeWidth="5"
+                              fill="none"
+                              strokeDasharray="240"
+                              strokeDashoffset="70"
+                          />
+                      </svg>
 
-                        {/* Icon in the center */}
-                        <div
-                            className="position-absolute d-flex justify-content-center align-items-center text-secondary"
-                            style={{ top: 0, left: 0, width: '100%', height: '100%' }}
-                        >
-                            <VscCreditCard size={30} />
-                        </div>
-                        </div>
+                      {/* Icon in the center */}
+                      <div
+                          className="position-absolute d-flex justify-content-center align-items-center"
+                          style={{ top: 0, left: 0, width: '100%', height: '100%', color: walletBalance > 0 ? "#007bff" : "#6c757d" }}
+                      >
+                          <VscCreditCard size={30} />
+                      </div>
+                  </div>
 
+                  <div>
+                      <h5>Wallet Balance</h5>
+                      <h5 className={`fs-3 mt-3 ${walletBalance > 0 ? 'text-primary' : 'text-secondary'}`}>
+                          ₹{walletBalance || 0}
+                      </h5>
+                  </div>
+              </div>
+          </div>
 
-                        <div>
-                            <h5>Wallet Balance</h5>
-                            <h5 className='text-secondary fs-3 mt-3'>{customer?.wallet || 0 }</h5>
-                        </div>
-                    </div>
-            </div>
 
             <div className="bg-white p-3 rounded mt-2">
                 <h5>Segments</h5>
@@ -408,7 +587,7 @@ const AddCustomerPage = () => {
                          onClick={() => addSegmentAsChip(segment)}  // Add segment as chip when clicked
                          style={{ cursor: 'pointer', padding: '5px', border: '1px solid #ccc', margin: '5px' }}
                      >
-                         {segment.title}
+                         {segment.segmentTitle}
                      </div>
                      ))}
                  </div>
@@ -430,7 +609,7 @@ const AddCustomerPage = () => {
                         borderRadius: '20px',
                         }}
                     >
-                        {segment.title}
+                        {segment.segmentTitle}
                         <button
                         onClick={() => removeSegmentChip(index)}  // Remove chip when clicked
                         style={{

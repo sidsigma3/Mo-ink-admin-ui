@@ -168,7 +168,7 @@ const VendorOrderDetails = () => {
                             <div className='bg-secondary-subtle rounded-circle p-2 text-white'><LuFileDown size={20}/></div>
                         </div>
         
-                        <table className='w-100 mt-2'>
+                        <table className='w-100 table border rounded mt-2'>
                             
                             <tbody>
                                  <tr>

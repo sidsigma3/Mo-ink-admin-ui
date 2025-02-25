@@ -6,33 +6,37 @@ import { useSpinnerDyers } from '../../../components/Context/SpinnersAndDyersCon
 import "./AddUser.css"
 import { Dropdown } from 'react-bootstrap';
 import { FiShoppingCart } from "react-icons/fi";
+import { addUser, updateUser } from '../../../services/UserService';
+import DeleteBtn from '../../../components/Buttons/Delete/DeleteBtn';
+import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 
 const AddUser = () => {
 
+    const {state} = useLocation()
+    const { index, users} = state || {};
     const navigate = useNavigate()
-
-    const {state} = useLocation
-
     const {data,setData} = useSpinnerDyers ()
 
-    const customer = state?.index !== undefined ? data[state.index] : null;
-
+    const customer = state?.index !== undefined ? users[index] : null;
+    
     const [formData, setFormData] = useState({
         firstName: customer?.firstName || "",
         lastName: customer?.lastName || "",
-        whatsapp: customer?.whatsapp || "",
-        phone: customer?.phone || "",
+        whatsapp: customer?.whatsappNumber || "",
+        phone: customer?.phoneNumber || "",
         email: customer?.email || "",
+        password: customer?.password || "",
         company: customer?.company || "",
         gstin: customer?.gstin || "",
         chequePhoto: null,
-        address: customer?.address || "",
-        apartment: customer?.apartment || "",
+        address: customer?.userAddress || "",
+        apartment: customer?.street || "",
         country: customer?.country || "",
         state: customer?.state || "",
         city: customer?.city || "",
-        pinCode: customer?.pinCode || "",
-        
+        pinCode: customer?.zipcode || "",
+        status:customer?.userStatus || "ACTIVE",
+        role:customer?.role || 'SALES',
       });
     
 
@@ -45,15 +49,119 @@ const AddUser = () => {
       };
     
 
+      const handleRole = (selectedRole) => {
+        setFormData(prev => ({
+            ...prev,
+            role: selectedRole // Update role with selected value
+        }));
+    };
+    
+
+      const handleSubmit = async(e) => {
+        e.preventDefault();
+    
+          if (state?.index !== undefined) {
+    
+            const newUser = {
+                firstName: formData.firstName,
+                lastName:formData.lastName,
+                email: formData.email,
+                whatsappNumber:formData.whatsapp,
+                phoneNumber: formData.phone,
+                userAddress:formData,
+                userStatus:formData.status,
+                zipcode:formData.pinCode,
+                userAddress:formData.address,
+                street:formData.apartment,
+                ...formData,
+              };
+          
+            await updateUser(customer?.id,newUser);
+
+          } else {
+    
+            const newUser = {
+                firstName: formData.firstName,
+                lastName:formData.lastName,
+                email: formData.email,
+                whatsappNumber:formData.whatsapp,
+                phoneNumber: formData.phone,
+                userAddress:formData,
+                userStatus:formData.status,
+                zipcode:formData.pinCode,
+                userAddress:formData.address,
+                street:formData.apartment,
+                ...formData,
+              };
+
+            console.log(newUser)
+              
+            await addUser(newUser);
+            
+          }
+    
+         
+          navigate('/users')
+    };
+    
+
   return (
     <div className='add-user'>
-         <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
-        <span onClick={() => navigate("/users")}>
-          <IoArrowBackOutline size={25} />
-        </span>
-        <h5>New User</h5>
-      </div>
 
+        {state?.index !== undefined ? (
+             <div className='d-flex gap-3 mb-3'> 
+                 <span onClick={() => navigate("/users")}>
+                 <IoArrowBackOutline size={25} />
+                 </span>
+             <h4>{formData.firstName + " "+formData.lastName}</h4>
+             <div
+                     style={{
+                         width: '5rem',
+                         padding: '0.2rem 0.4rem',
+                         border: '1px solid',
+                         borderRadius: '0.2rem',
+                         textAlign: 'center',
+                         backgroundColor:
+                             formData.role.toLowerCase() === 'owner'
+                             ? '#FEDBDC'
+                             :  formData.role.toLowerCase() === 'admin'
+                             ? '#DBEAFE'
+                             :  formData.role.toLowerCase() === 'sales'
+                             ? '#FFECFA'
+                             : '#FFFFFF', // Default background color if none match
+                         borderColor:
+                             formData.role.toLowerCase() === 'owner'
+                             ? '#FD9395'
+                             :  formData.role.toLowerCase() === 'admin'
+                             ? '#93C5FD'
+                             :  formData.role.toLowerCase() === 'sales'
+                             ? '#F75FFF'
+                             : '#CCCCCC', // Default border color if none match
+                         color:
+                             formData.role.toLowerCase() === 'owner'
+                             ? '#B91C1C' // Red text for Owner
+                             :  formData.role.toLowerCase() === 'admin'
+                             ? '#1E40AF' // Blue text for Admin
+                             :  formData.role.toLowerCase() === 'sales'
+                             ? '#7A1E7A' // Purple text for Sales
+                             : '#000000', // Default text color if none match
+                         }}
+                 >
+                     {
+                         formData.role}
+                         </div>
+         </div>
+        ):
+        (
+        <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
+         <span onClick={() => navigate("/users")}>
+          <IoArrowBackOutline size={25} />
+            </span>
+            <h5>New User</h5>
+        </div>
+        )}
+
+    
 
       <div className='bottom d-flex gap-3'>
         <div className='left'>
@@ -78,9 +186,14 @@ const AddUser = () => {
                 <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
             </div>
 
-            <div className="col-md-12 d-flex flex-column">
+            <div className="col-md-6 d-flex flex-column">
                 <label>Email</label>
                 <input type="text" name="email" value={formData.email} onChange={handleChange} />
+            </div>
+
+            <div className="col-md-6 d-flex flex-column">
+                <label>Password</label>
+                <input type="text" name="password" value={formData.password} onChange={handleChange} />
             </div>
 
             <div className="col-md-6 d-flex flex-column">
@@ -89,7 +202,7 @@ const AddUser = () => {
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>GSTIN No.</label>
+                <label>Adhaar No.</label>
                 <input
                 className="fs-6 ps-2"
                 type="text"
@@ -141,11 +254,11 @@ const AddUser = () => {
 
             </div>
 
-
-            <div className='last-sales bg-white rounded p-3 mt-2'>
-                <h5>Last sales</h5>
-
+            <div className='d-flex justify-content-between mt-2'>
+            <DeleteBtn></DeleteBtn>
+            <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
             </div>
+    
 
         </div>
 
@@ -155,21 +268,21 @@ const AddUser = () => {
                 <StatusFilter status={'Active'} ></StatusFilter>
             </div>
 
-            <div className='bg-white p-3 rounded mt-2'>
-                <h5>Role</h5>
-                <Dropdown>
-                    <Dropdown.Toggle  variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1">
-                            Sales
-                    </Dropdown.Toggle>
+        <div className='bg-white p-3 rounded mt-2'>
+            <h5>Role</h5>
+            <Dropdown onSelect={handleRole}>
+                <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1">
+                    {formData.role || "Select Role"}
+                </Dropdown.Toggle>
 
-                    <Dropdown.Menu>
-                        <Dropdown.Item>Sales</Dropdown.Item>
-                        <Dropdown.Item>Admin</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-            </div>
+                <Dropdown.Menu>
+                    <Dropdown.Item eventKey="SALES">Sales</Dropdown.Item>
+                    <Dropdown.Item eventKey="ADMIN">Admin</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+        </div>
 
-            <div className='bg-white p-3 rounded mt-2 d-flex'>
+            {/* <div className='bg-white p-3 rounded mt-2 d-flex'>
                
                 <div className="d-flex gap-3 position-relative" style={{ width: '100px', height: '100px' }}>
                         <svg width="100" height="100" viewBox="0 0 100 100">
@@ -185,7 +298,7 @@ const AddUser = () => {
                             />
                         </svg>
 
-                        {/* Icon in the center */}
+                       
                         <div
                             className="position-absolute d-flex justify-content-center align-items-center text-secondary"
                             style={{ top: 0, left: 0, width: '100%', height: '100%' }}
@@ -196,7 +309,7 @@ const AddUser = () => {
 
 
                         <h5>Total sales</h5>
-            </div>
+            </div> */}
         </div>
 
       </div>

@@ -10,21 +10,19 @@ import "./AddSpinners.css"
 import { useSpinnerDyers } from '../../../components/Context/SpinnersAndDyersContext';
 import { RiFilePaper2Line } from "react-icons/ri";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
+import { addVendor, updateVendor } from '../../../services/VendorsService';
 
 const AddSpinners = () => {
   
   const navigate = useNavigate ()
   const { state } = useLocation();
 
-  const [amount, setAmount] = useState(""); // Amount input
+  const {index,data} = state || {}
 
-  const { customers ,setCustomers } = useCustomerContext();
-
-  const {data,setData} = useSpinnerDyers ()
-
-  const customer = state?.index !== undefined ? data[state.index] : null;
+  const customer = state?.index !== undefined ? data[index] : null;
 
   const [manageWallet,setManageWallet] = useState(false)
+
   const [status,setStatus] = useState(customer?.status || 'Active')
 
   const [tag,setTag] = useState (customer?.tag || 'Spinner')  
@@ -32,18 +30,18 @@ const AddSpinners = () => {
   const [formData, setFormData] = useState({
     firstName: customer?.firstName || "",
     lastName: customer?.lastName || "",
-    whatsapp: customer?.whatsapp || "",
-    phone: customer?.phone || "",
+    whatsapp: customer?.whatsappNumber || "",
+    phone: customer?.phoneNumber || "",
     email: customer?.email || "",
     company: customer?.company || "",
-    gstin: customer?.gstin || "",
+    gstin: customer?.gstNumber || "",
     chequePhoto: null,
     address: customer?.address || "",
-    apartment: customer?.apartment || "",
+    apartment: customer?.street || "",
     country: customer?.country || "",
     state: customer?.state || "",
     city: customer?.city || "",
-    pinCode: customer?.pinCode || "",
+    pinCode: customer?.zipcode || "",
     
   });
 
@@ -64,51 +62,48 @@ const AddSpinners = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
       if (state?.index !== undefined) {
 
         const newCustomer = {
-            name: `${formData.firstName} ${formData.lastName}`,
+            firstName: formData.firstName, 
+            lastName:formData.lastName,
             email: formData.email,
-            phone: formData.phone,
-            location: formData.city,
-            lastOrder: "N/A", 
-            status,
-            totalOrders:0,
-            wallet:customer.wallet,
-            tag:tag,
-            purchaseData:customer.purchaseData,
+            phoneNumber: formData.phone,
+            whatsappNumber:formData.whatsapp,
+            gstNumber:formData.gstin,
+            status:status.toUpperCase(),
+            vendorType:tag.toUpperCase(),
+            zipcode:formData.pinCode,
+            street:formData.apartment,
             ...formData,
           };
       
-        const updatedCustomers = [...data];
-        updatedCustomers[state?.index] = newCustomer; // Update the customer at the specified index
-        setData(updatedCustomers);
-      } else {
 
+        await updateVendor(customer.vendorId,newCustomer);
+        
+      } else {
+        
         const newCustomer = {
-            name: `${formData.firstName} ${formData.lastName}`,
+            firstName: formData.firstName, 
+            lastName:formData.lastName,
             email: formData.email,
-            phone: formData.phone,
-            wallet: "₹0", // Default wallet value
-            location: formData.city,
-            lastOrder: "N/A", 
-            purchaseData: [],
-            status,
-            tag,
-            totalOrders:0,
+            phoneNumber: formData.phone,
+            whatsappNumber:formData.whatsapp,
+            gstNumber:formData.gstin,
+            status:status.toUpperCase(),
+            vendorType:tag.toUpperCase(),
+            zipcode:formData.pinCode,
+            street:formData.apartment,
             ...formData,
           };
-        // Adding a new customer
-        setData([newCustomer, ...data]);
+        
+          await addVendor(newCustomer)
+
       }
 
-     
-    
-      // Add the new customer to the array
-   
       navigate('/spinners-and-dyers')
 };
 
@@ -219,69 +214,13 @@ const handleTag = (value) =>{
         <div className='d-flex justify-content-between'>
         <h5>Assign Order</h5>
 
-        {/* {manageWallet === false && (
-             <AddBtn clickFunction={handleAddWallet}></AddBtn>
-        )} */}
-       
         </div>
 
         <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
                 <RiFilePaper2Line size={50} />
                 <h5 className="fs-6">There's no transaction till now!</h5>
             </div>
-
-        {/* {manageWallet === true && (
-        <div>
-            <label>Add balance</label>
-            <div className='d-flex gap-2 mt-2'>
-            <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='₹ INR'></input>
-            <AddBtn clickFunction={handleAddMoney}></AddBtn>
-           
-            <button className='btn btn-outline-danger d-flex align-items-cneter' style={{height:'2rem'}} onClick={handleSubtractMoney}>
-            <FaMinus size={15}/>
-            </button>
-            </div>
-        </div>
-          )}
-
-
-        {manageWallet && (
-        <div className="table-ctn">
-            {customers[state?.index]?.purchaseData?.length > 0 ? (
-            <Table>
-                <thead>
-                <tr>
-                    {Object.keys(customers[state?.index].purchaseData[0]).map((key) => (
-                    <th key={key}>{key.charAt(0).toUpperCase() + key.slice(1)}</th>
-                    ))}
-                </tr>
-                </thead>
-                <tbody>
-                {customers[state?.index].purchaseData.map((item, ix) => (
-                    <tr key={ix}>
-                    <td>{item.source}</td>
-                    <td
-                        style={{
-                        color: item.type === "Credit" ? "#3CAA82" : "#FF0000",
-                        }}
-                    >
-                        {item.type}
-                    </td>
-                    <td>{item.amount}</td>
-                    <td>{item.date}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </Table>
-            ) : (
-            <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
-                <RiFilePaper2Line size={50} />
-                <h5 className="fs-6">There's no transaction till now!</h5>
-            </div>
-            )}
-        </div>
-        )} */}
-                            
+                        
     </div>
 
 

@@ -97,14 +97,15 @@ const FilterConditions = ({onConditionsChange,condition}) => {
       {conditions.map((condition, index) => (
         <div key={index} className='d-flex gap-3 align-items-center mb-3 justify-content-between'>
           {/* Field Dropdown */}
+          <div>
           <div className='d-flex gap-3'>
-          <Dropdown>
-            <Dropdown.Toggle id="dropdown-basic"  variant="light">
+          <Dropdown style={{width:'8rem'}}>
+            <Dropdown.Toggle id="dropdown-basic"  className='w-100'  variant="light">
               {condition.field || 'Select Field'}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item onClick={() => handleFieldChange(index, 'Weight')}>Weight</Dropdown.Item>
-              <Dropdown.Item onClick={() => handleFieldChange(index, 'Amount')}>Amount</Dropdown.Item>
+              {/* <Dropdown.Item onClick={() => handleFieldChange(index, 'Weight')}>Weight</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleFieldChange(index, 'Amount')}>Amount</Dropdown.Item> */}
               <Dropdown.Item onClick={() => handleFieldChange(index, 'City')}>City</Dropdown.Item>
               <Dropdown.Item onClick={() => handleFieldChange(index, 'State')}>State</Dropdown.Item>
             </Dropdown.Menu>
@@ -191,6 +192,29 @@ const FilterConditions = ({onConditionsChange,condition}) => {
             </Dropdown>
           )}
           </div>
+
+          <div>
+          { ['City', 'State'].includes(condition.field) && (
+              conditions.map((condition, index) =>
+                condition.chips.length > 0 ? (
+                  <div key={`chips-${index}`} className="d-flex flex-wrap gap-2 mb-1 mt-2">
+                    {condition.chips.map((chip, chipIndex) => (
+                      <span key={chipIndex} className="badge bg-light d-flex align-items-center text-black fw-normal border border-secondary">
+                        {chip}
+                        <AiOutlineClose
+                          size={14}
+                          className="ms-2 cursor-pointer"
+                          onClick={() => handleRemoveChip(index, chipIndex)}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                ) : null
+              ))
+            }
+          </div>
+
+          </div>
           {/* Remove Condition Button */}
           <button className='border border-0 bg-white text-danger' variant="danger" onClick={() => handleRemoveCondition(index)}>
            <MdOutlineDelete  size={23}/>
@@ -199,22 +223,7 @@ const FilterConditions = ({onConditionsChange,condition}) => {
       ))}
 
       {/* Chips for City/State */}
-      {conditions.map((condition, index) =>
-        condition.chips.length > 0 ? (
-          <div key={`chips-${index}`} className="d-flex flex-wrap gap-2 mb-3">
-            {condition.chips.map((chip, chipIndex) => (
-              <span key={chipIndex} className="badge bg-light d-flex align-items-center text-black fw-normal border border-secondary">
-                {chip}
-                <AiOutlineClose
-                  size={14}
-                  className="ms-2 cursor-pointer"
-                  onClick={() => handleRemoveChip(index, chipIndex)}
-                />
-              </span>
-            ))}
-          </div>
-        ) : null
-      )}
+      
 
       {/* Add Condition Button */}
       <button className='bg-white border border-0 text-primary d-flex-align-items-center' onClick={handleAddCondition}>

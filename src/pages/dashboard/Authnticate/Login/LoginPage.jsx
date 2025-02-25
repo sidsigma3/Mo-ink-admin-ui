@@ -2,6 +2,7 @@ import React ,{useState} from 'react'
 import "./LoginPage.css"
 import ToggleBtn from '../../../../components/Buttons/ToggleButton/ToggleBtn'
 import { useNavigate } from 'react-router-dom'
+import { loginUser } from '../../../../services/LoginService'
 
 const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
 
@@ -10,13 +11,16 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
   
-    const handleLogin = () => {
-        if (username === "admin" && password === "admin") {
+    const handleLogin = async () => {
+        const response = await loginUser(username, password);
+    
+        if (response.success) {
           localStorage.setItem("isAuthenticated", "true");
-          setAuthStatus(true); // Update the state in App
+          localStorage.setItem("userData", JSON.stringify(response.data));
+          setAuthStatus(true);
           navigate("/dashboard");
         } else {
-          setError("Invalid username or password");
+          setError(response.message);
         }
       };
 

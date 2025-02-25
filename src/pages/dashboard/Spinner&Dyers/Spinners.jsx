@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState , useEffect} from 'react'
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn'
 import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
 import AddBtn from '../../../components/Buttons/Add/AddBtn'
@@ -12,14 +12,29 @@ import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/Stat
 import { Pagination } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "./Spinners.css"
+import { getAllVendors } from '../../../services/VendorsService'
 
 const Spinners = () => {
 
     const [selectedStatus, setSelectedStatus] = useState("View All"); // Default status selection
 
-    const {data,setData} = useSpinnerDyers ()
-
     const navigate = useNavigate()
+
+    const [data,setData] =useState([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const data = await getAllVendors();
+            setData(data.data)
+          } catch (error) {
+            console.error('Error fetching products:', error);
+          }
+        };
+      
+        fetchData(); 
+      }, []); 
+
 
     const handleSelect = (status) => {
         setSelectedStatus(status);
@@ -45,7 +60,7 @@ const Spinners = () => {
 
 
   const handleRowClick = (index) => {
-    navigate('/add-spinner-and-dyers', { state: { index } });
+    navigate('/add-spinner-and-dyers', { state: { index , data } });
   };
 
 
@@ -113,19 +128,19 @@ const Spinners = () => {
                 <tbody>
           {data.map((customer, index) => (
             <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-              <td>{customer.name}</td>
-              <td>{customer.location}</td>
+              <td>{customer.firstName} {customer.lastName}</td>
+              <td>{customer.city}</td>
               <td>
                 <div 
                 style={{
                     padding:'0.2rem 0.4rem',
                     border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'4rem',
-                    backgroundColor:customer.tag === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
-                    borderColor:customer.tag === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
-                    color : customer.tag === 'Spinner' ? '#1E40AF' : '#92400E' ,
+                    backgroundColor:customer.vendorType === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
+                    borderColor:customer.vendorType === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
+                    color : customer.vendorType === 'Spinner' ? '#1E40AF' : '#92400E' ,
                 }}
                 >
-               {customer.tag}
+               {customer.vendorType}
                </div>
               </td>
               <td>{customer.assignOrders || 0}</td>
