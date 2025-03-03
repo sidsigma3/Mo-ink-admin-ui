@@ -93,12 +93,12 @@ const AddCustomerPage = () => {
               company: customer?.company || "",
               gstin: customer?.gstNumber || "",
               chequePhoto: null,
-              address: customer?.customerAddress || "",
-              street: customer?.street || "",
-              country: customer?.country || "",
-              state: customer?.state || "",
-              city: customer?.city || "",
-              pinCode: customer?.zipcode || "",
+              address: customer?.addresses[0].customerAddress || "",
+              street: customer?.addresses[0].street || "",
+              country: customer?.addresses[0].country || "",
+              state: customer?.addresses[0].state || "",
+              city: customer?.addresses[0].city || "",
+              pinCode: customer?.addresses[0].zipcode || "",
               password: customer?.password || "",
           };
           
@@ -266,14 +266,23 @@ const AddCustomerPage = () => {
       phoneNumber: formData.phone,
       whatsappNumber:formData.whatsapp,
       gstNumber:formData.gstin,
-      // wallet: state?.index !== undefined ? customer.wallet : "₹0", // Use wallet from the existing customer or default to ₹0
       zipcode:formData.pinCode,
       customerAddress: formData.address,
       lastOrder: "N/A",
       customerStatus:status,
-      // totalOrders: state?.index !== undefined ? customer.totalOrders : 0, // Use totalOrders from the existing customer or default to 0
-      // purchaseData: state?.index !== undefined ? customer.purchaseData : [], // Use existing purchaseData or default to an empty array
       segmentIds,
+      addresses: [
+        {
+            customerAddress: formData.address,
+            street: formData.street || "",
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+            zipcode: formData.pinCode,
+            addressType: "HOME",
+        },
+       
+    ],
       ...formData,
     };
 
@@ -298,6 +307,7 @@ const AddCustomerPage = () => {
   };
 
 
+  console.log(errors)
 
   const handleDelete = async() =>{
        try {

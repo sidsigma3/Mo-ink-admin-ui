@@ -62,25 +62,64 @@ const AddSpinners = () => {
     });
   };
 
+  const [formErrors, setFormErrors] = useState({});
+
+  const validateForm = () => {
+    let errors = {};
+  
+    if (!formData.firstName.trim()) errors.firstName = "First name is required.";
+    if (!formData.lastName.trim()) errors.lastName = "Last name is required.";
+    if (!formData.email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Enter a valid email address.";
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required.";
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      errors.phone = "Enter a valid 10-digit phone number.";
+    }
+    if (!formData.whatsapp.trim()) errors.whatsapp = "WhatsApp number is required.";
+    if (!formData.gstin.trim()) errors.gstin = "GSTIN is required.";
+    if (!formData.address.trim()) errors.address = "Address is required.";
+    if (!formData.city.trim()) errors.city = "City is required.";
+    if (!formData.state.trim()) errors.state = "State is required.";
+    if (!formData.company.trim()) errors.company = "Company is required.";
+    if (!formData.apartment.trim()) errors.apartment = "Address is required.";
+    if (!formData.state.trim()) errors.state = "State is required.";
+    if (!formData.country.trim()) errors.country = "Country is required.";
+    if (!formData.pinCode.trim()) {
+      errors.pinCode = "Pin code is required.";
+    } else if (!/^\d{6}$/.test(formData.pinCode)) {
+      errors.pinCode = "Enter a valid 6-digit pin code.";
+    }
+  
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0; // Returns true if no errors
+  };
+  
+
   const handleSubmit = async(e) => {
     e.preventDefault();
 
-      if (state?.index !== undefined) {
+    if (!validateForm()) return; 
 
-        const newCustomer = {
-            firstName: formData.firstName, 
-            lastName:formData.lastName,
-            email: formData.email,
-            phoneNumber: formData.phone,
-            whatsappNumber:formData.whatsapp,
-            gstNumber:formData.gstin,
-            status:status.toUpperCase(),
-            vendorType:tag.toUpperCase(),
-            zipcode:formData.pinCode,
-            street:formData.apartment,
-            ...formData,
-          };
-      
+    if (state?.index !== undefined) {
+
+    const newCustomer = {
+        firstName: formData.firstName, 
+        lastName:formData.lastName,
+        email: formData.email,
+        phoneNumber: formData.phone,
+        whatsappNumber:formData.whatsapp,
+        gstNumber:formData.gstin,
+        status:status.toUpperCase(),
+        vendorType:tag.toUpperCase(),
+        zipcode:formData.pinCode,
+        street:formData.apartment,
+        ...formData,
+        };
+
 
         await updateVendor(customer.vendorId,newCustomer);
         
@@ -111,6 +150,9 @@ const AddSpinners = () => {
 const handleTag = (value) =>{
     setTag(value)
 }
+
+
+
   
     return (
     <div className='add-spinners'>
@@ -129,31 +171,37 @@ const handleTag = (value) =>{
     <div className="col-md-6 d-flex flex-column">
         <label>First Name</label>
         <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
+        {formErrors.firstName && <p className="text-danger">{formErrors.firstName}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>Last Name</label>
         <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
+        {formErrors.lastName && <p className="text-danger">{formErrors.lastName}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>Whatsapp No.</label>
         <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
+        {formErrors.whatsapp && <p className="text-danger">{formErrors.whatsapp}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>Calling No.</label>
         <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
+        {formErrors.phone && <p className="text-danger">{formErrors.phone}</p>}
     </div>
 
     <div className="col-md-12 d-flex flex-column">
         <label>Email</label>
         <input type="text" name="email" value={formData.email} onChange={handleChange} />
+        {formErrors.email  && <p className="text-danger">{formErrors.email }</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>Company</label>
         <input type="text" name="company" value={formData.company} onChange={handleChange} />
+        {formErrors.company && <p className="text-danger">{formErrors.company}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
@@ -166,6 +214,7 @@ const handleTag = (value) =>{
         placeholder="Add GSTIN No. to authenticate"
         onChange={handleChange}
         />
+         {formErrors.gstin && <p className="text-danger">{formErrors.gstin}</p>}
     </div>
 
     <div className="media-input-ctn mt-5 p-2 col-md-12">
@@ -173,36 +222,43 @@ const handleTag = (value) =>{
         <input type="file" name="chequePhoto" onChange={handleChange} />
         <h4>Add photo of a business PAN</h4>
         </div>
+        {formErrors.chequePhoto && <p className="text-danger">{formErrors.chequePhoto}</p>}
     </div>
 
     <div className="col-md-12 d-flex flex-column">
         <label>Address</label>
         <input type="text" name="address" value={formData.address} onChange={handleChange} />
+        {formErrors.address && <p className="text-danger">{formErrors.address}</p>}
     </div>
 
     <div className="col-md-12 d-flex flex-column">
         <label>Apartment, Suite, etc.</label>
         <input type="text" name="apartment" value={formData.apartment} onChange={handleChange} />
+        {formErrors.apartment && <p className="text-danger">{formErrors.apartment}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>Country/Region</label>
         <input type="text" name="country" value={formData.country} onChange={handleChange} />
+        {formErrors.country && <p className="text-danger">{formErrors.country}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>State</label>
         <input type="text" name="state" value={formData.state} onChange={handleChange} />
+        {formErrors.state && <p className="text-danger">{formErrors.state}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>City</label>
         <input type="text" name="city" value={formData.city} onChange={handleChange} />
+        {formErrors.city && <p className="text-danger">{formErrors.city}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
         <label>PIN code</label>
         <input type="text" name="pinCode" value={formData.pinCode} onChange={handleChange} />
+        {formErrors.pinCode && <p className="text-danger">{formErrors.pinCode}</p>}
     </div>
 
 

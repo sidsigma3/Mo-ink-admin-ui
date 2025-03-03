@@ -150,7 +150,7 @@ useEffect(() => {
             {customers.map((customer, index) => (
               <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
                 <td>{customer.customerName}</td>
-                <td>{customer.city}</td>
+                <td>{customer.addresses[0].city}</td>
                 <td style={{ color: '#3CAA82' }}>
                 {walletBalances[customer.customerId] !== undefined 
                   ? walletBalances[customer.customerId] 

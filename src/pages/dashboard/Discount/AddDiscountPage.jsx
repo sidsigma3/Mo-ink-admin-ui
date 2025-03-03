@@ -495,8 +495,8 @@ const handleMaxUsageChange = (field1,field2) => {
       <div className="main d-flex gap-2 mt-2">
         <div className="left">
           <div className="method-sec">
-            <h5>Method</h5>
-            <ToggleButtonGroup
+            {/* <h5>Method</h5> */}
+            {/* <ToggleButtonGroup
               className="toggle-btn"
               value={selectedMethod}
               exclusive
@@ -518,7 +518,7 @@ const handleMaxUsageChange = (field1,field2) => {
               >
                 Automatic Discount
               </ToggleButton>
-            </ToggleButtonGroup>
+            </ToggleButtonGroup> */}
             <div className="d-flex flex-column">
               <label>Discount code</label>
               <input 

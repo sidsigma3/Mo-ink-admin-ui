@@ -57,53 +57,63 @@ const AddUser = () => {
     };
     
 
-      const handleSubmit = async(e) => {
+    const [formErrors, setFormErrors] = useState({});
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
     
-          if (state?.index !== undefined) {
+        let validationErrors = {};
     
-            const newUser = {
-                firstName: formData.firstName,
-                lastName:formData.lastName,
-                email: formData.email,
-                whatsappNumber:formData.whatsapp,
-                phoneNumber: formData.phone,
-                userAddress:formData,
-                userStatus:formData.status,
-                zipcode:formData.pinCode,
-                userAddress:formData.address,
-                street:formData.apartment,
-                ...formData,
-              };
-          
-            await updateUser(customer?.id,newUser);
-
-          } else {
+        // Basic field validations
+        if (!formData.firstName.trim()) validationErrors.firstName = "First name is required";
+        if (!formData.lastName.trim()) validationErrors.lastName = "Last name is required";
+        if (!formData.email.trim()) validationErrors.email = "Email is required";
+        if (!/^\S+@\S+\.\S+$/.test(formData.email)) validationErrors.email = "Invalid email format";
+        if (!formData.phone.trim()) validationErrors.phone = "Phone number is required";
+        if (!/^\d{10}$/.test(formData.phone)) validationErrors.phone = "Phone number must be 10 digits";
+        if (!formData.whatsapp.trim()) validationErrors.whatsapp = "WhatsApp number is required";
+        if (!/^\d{10}$/.test(formData.whatsapp)) validationErrors.whatsapp = "WhatsApp number must be 10 digits";
+        if (!formData.pinCode.trim()) validationErrors.pinCode = "PIN Code is required";
+        if (!/^\d{6}$/.test(formData.pinCode)) validationErrors.pinCode = "PIN Code must be 6 digits";
+        if (!formData.password.trim()) validationErrors.password = "Password is required";
+        if (!formData.company.trim()) validationErrors.company = "Comapany is required";
+        if (!formData.address.trim()) validationErrors.address = "Address is required";
+        if (!formData.gstin.trim()) validationErrors.gstin = "Addhar is required";
+        if (!formData.country.trim()) validationErrors.country = "Country is required";
+        if (!formData.state.trim()) validationErrors.state = "State is required";
+        if (!formData.city.trim()) validationErrors.city = "City is required";
+        if (!formData.apartment.trim()) validationErrors.apartment = "Street/Apartment is required";
     
-            const newUser = {
-                firstName: formData.firstName,
-                lastName:formData.lastName,
-                email: formData.email,
-                whatsappNumber:formData.whatsapp,
-                phoneNumber: formData.phone,
-                userAddress:formData,
-                userStatus:formData.status,
-                zipcode:formData.pinCode,
-                userAddress:formData.address,
-                street:formData.apartment,
-                ...formData,
-              };
-
-            console.log(newUser)
-              
-            await addUser(newUser);
-            
-          }
+        // If errors exist, stop submission
+        if (Object.keys(validationErrors).length > 0) {
+            setFormErrors(validationErrors);
+            return;
+        }
     
-         
-          navigate('/users')
+        const newUser = {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            whatsappNumber: formData.whatsapp,
+            phoneNumber: formData.phone,
+            userAddress: formData.address, // Fixed duplicate key issue
+            userStatus: formData.status,
+            zipcode: formData.pinCode,
+            street: formData.apartment,
+            ...formData,
+        };
+    
+        try {
+            if (state?.index !== undefined) {
+                await updateUser(customer?.id, newUser);
+            } else {
+                await addUser(newUser);
+            }
+            navigate('/users');
+        } catch (error) {
+            console.error("Error submitting user:", error);
+        }
     };
-    
 
   return (
     <div className='add-user'>
@@ -169,36 +179,43 @@ const AddUser = () => {
             <div className="col-md-6 d-flex flex-column">
                 <label>First Name</label>
                 <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
+                {formErrors.firstName && <div className="invalid-feedback d-block">{formErrors.firstName}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>Last Name</label>
                 <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
+                {formErrors.lastName && <div className="invalid-feedback d-block">{formErrors.lastName}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>WhatsApp No.</label>
                 <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
+                {formErrors.whatsapp && <div className="invalid-feedback d-block">{formErrors.whatsapp}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>Calling No.</label>
                 <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
+                {formErrors.phone && <div className="invalid-feedback d-block">{formErrors.phone}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>Email</label>
                 <input type="text" name="email" value={formData.email} onChange={handleChange} />
+                {formErrors.email && <div className="invalid-feedback d-block">{formErrors.email}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>Password</label>
                 <input type="text" name="password" value={formData.password} onChange={handleChange} />
+                {formErrors.password && <div className="invalid-feedback d-block">{formErrors.password}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>Company</label>
                 <input type="text" name="company" value={formData.company} onChange={handleChange} />
+                {formErrors.company && <div className="invalid-feedback d-block">{formErrors.company}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
@@ -211,6 +228,7 @@ const AddUser = () => {
                 placeholder="Add GSTIN No. to authenticate"
                 onChange={handleChange}
                 />
+                {formErrors.gstin && <div className="invalid-feedback d-block">{formErrors.gstin}</div>}
             </div>
 
             <div className="media-input-ctn mt-5 p-2 col-md-12">
@@ -218,36 +236,43 @@ const AddUser = () => {
                 <input type="file" name="chequePhoto" onChange={handleChange} />
                 <h4>Add photo of a business PAN</h4>
                 </div>
+                {formErrors.chequePhoto && <div className="invalid-feedback d-block">{formErrors.chequePhoto}</div>}
             </div>
 
             <div className="col-md-12 d-flex flex-column">
                 <label>Address</label>
                 <input type="text" name="address" value={formData.address} onChange={handleChange} />
+                {formErrors.address && <div className="invalid-feedback d-block">{formErrors.address}</div>}
             </div>
 
             <div className="col-md-12 d-flex flex-column">
                 <label>Apartment, Suite, etc.</label>
                 <input type="text" name="apartment" value={formData.apartment} onChange={handleChange} />
+                {formErrors.apartment && <div className="invalid-feedback d-block">{formErrors.apartment}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>Country/Region</label>
                 <input type="text" name="country" value={formData.country} onChange={handleChange} />
+                {formErrors.country && <div className="invalid-feedback d-block">{formErrors.country}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>State</label>
                 <input type="text" name="state" value={formData.state} onChange={handleChange} />
+                {formErrors.state && <div className="invalid-feedback d-block">{formErrors.state}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>City</label>
                 <input type="text" name="city" value={formData.city} onChange={handleChange} />
+                {formErrors.city && <div className="invalid-feedback d-block">{formErrors.city}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
                 <label>PIN code</label>
                 <input type="text" name="pinCode" value={formData.pinCode} onChange={handleChange} />
+                {formErrors.pinCode && <div className="invalid-feedback d-block">{formErrors.pinCode}</div>}
             </div>
 
 

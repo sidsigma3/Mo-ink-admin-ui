@@ -126,66 +126,71 @@ const AddSegmentsPage = () => {
         });
     };
 
+    const [errors, setErrors] = useState({});
+
     const handleSave = async () => {
-      let customerIds = [];
-      let segmentCondition = "";
-  
-      if (segmentData.segmentType.toUpperCase() === "LABEL") {
-          // Directly store selected customers
-          customerIds = selectedCustomer.map(item => item.customerId);
-          segmentCondition = "Selected Customers"; // Default condition for labels
-      } else {
-          // Filter customers based on conditions (City, State)
-          const matchingCustomers = filterCustomersByConditions(customers, segmentData.conditions);
-          customerIds = matchingCustomers.map(customer => customer.customerId);
-          segmentCondition = JSON.stringify(segmentData.conditions); // Store actual conditions
-      }
-  
-      const newSegment = {
-          segmentTitle: segmentData.title,
-          segmentType: segmentData.segmentType.toUpperCase(),
-          segmentCondition, // Use the updated segmentCondition
-          status: segmentData.status,
-          customerIds: customerIds,
-      };
-  
-      try {
-          if (state?.index !== undefined) {
-              await updateSegment(segment.id, newSegment);
-          } else {
-              await addSegment(newSegment);
-          }
-          navigate('/segments');
-      } catch (error) {
-          console.error("Error saving segment:", error);
-      }
-  };
-  
-  
-    //   const handleSave = async () => {
-    //     const newSegment = {
-    //         segmentTitle: segmentData.title,
-    //         segmentType: segmentData.segmentType.toUpperCase(),
-    //         segmentCondition: JSON.stringify(segmentData.conditions), 
-    //         segmentStatus: segmentData.status,
-    //         customerIds: selectedCustomer.map(item => item.customerId),
-    //     };
+        let validationErrors = {};
     
-    //     try {
-    //         if (state?.index !== undefined) {
-        
-    //             await updateSegment(segment.id, newSegment);
-    //         } else {
-        
-    //             await addSegment(newSegment);
-    //         }
+        // Basic Validations
+        if (!segmentData.title?.trim()) {
+            validationErrors.title = "Segment title is required";
+        }
     
-    //         navigate('/segments');
-    //     } catch (error) {
-    //         console.error("Error saving segment:", error);
-    //     }
-    // };
+        if (!segmentData.segmentType) {
+            validationErrors.segmentType = "Segment type is required";
+        }
     
+        if (
+            segmentData.segmentType.toUpperCase() === "LABEL" && 
+            selectedCustomer.length === 0
+        ) {
+            validationErrors.selectedCustomer = "At least one customer must be selected";
+        }
+    
+        if (
+            segmentData.segmentType.toUpperCase() !== "LABEL" && 
+            (!segmentData.conditions || Object.keys(segmentData.conditions).length === 0)
+        ) {
+            validationErrors.conditions = "At least one condition must be added";
+        }
+    
+        // If there are errors, stop execution
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+    
+        let customerIds = [];
+        let segmentCondition = "";
+    
+        if (segmentData.segmentType.toUpperCase() === "LABEL") {
+            customerIds = selectedCustomer.map(item => item.customerId);
+            segmentCondition = "Selected Customers";
+        } else {
+            const matchingCustomers = filterCustomersByConditions(customers, segmentData.conditions);
+            customerIds = matchingCustomers.map(customer => customer.customerId);
+            segmentCondition = JSON.stringify(segmentData.conditions);
+        }
+    
+        const newSegment = {
+            segmentTitle: segmentData.title,
+            segmentType: segmentData.segmentType.toUpperCase(),
+            segmentCondition,
+            status: segmentData.status,
+            customerIds: customerIds,
+        };
+    
+        try {
+            if (state?.index !== undefined) {
+                await updateSegment(segment.id, newSegment);
+            } else {
+                await addSegment(newSegment);
+            }
+            navigate('/segments');
+        } catch (error) {
+            console.error("Error saving segment:", error);
+        }
+    };
     
       const handleStatusChange = (status) => {
         setSegmentData((prevData) => ({
@@ -212,6 +217,7 @@ const AddSegmentsPage = () => {
                     <div className='title-sec bg-white p-3 d-flex flex-column rounded'>
                         <label>Title</label>
                         <input type="text" value={segmentData.title} onChange={handleTitleChange} />
+                        {errors.title && <p className="text-danger">{errors.title}</p>}
                     </div>
 
                     <div className='seg-type p-3 bg-white mt-2 rounded'>
@@ -248,6 +254,8 @@ const AddSegmentsPage = () => {
                             </p>
                         </div>
 
+                        {errors.segmentType && <p className="text-danger">{errors.segmentType}</p>}
+
                     </div>
 
 
@@ -275,8 +283,9 @@ const AddSegmentsPage = () => {
                         Browse
                     </button>
                     </div>
+                   
                 </div>
-
+                {errors.selectedCustomer && <p className="text-danger">{errors.selectedCustomer}</p>}
 
                 <div className="customer-list-ctn"> 
                 <ul>
@@ -309,7 +318,7 @@ const AddSegmentsPage = () => {
                           condition = {segmentData?.conditions}
                         >
                         </FilterConditions>
-
+                        {errors.conditions && <p className="text-danger">{errors.conditions}</p>}
                     </div>
                     )}
 
