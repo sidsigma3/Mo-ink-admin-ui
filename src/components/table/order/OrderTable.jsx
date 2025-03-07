@@ -8,6 +8,7 @@ import { BiWallet } from "react-icons/bi";
 import { LuDot } from "react-icons/lu";
 import ModalAssign from "../../Modal/ModalAssign";
 import { getAllOrders } from "../../../services/OrderService";
+import { updateOrder } from "../../../services/OrderService";
 
 const OrderTable = () => {
  
@@ -16,20 +17,53 @@ const OrderTable = () => {
 
   const navigate = useNavigate();
 
+  const statusOptions = [
+    "New Order",
+    "Dispatch from Inventory",
+    "Send to Vendor",
+    "Dispatch from Vendor",
+    "Delivered",
+    "Order Cancelled",
+  ];
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const data = await getAllOrders();
-        setOrders(data);
-      } catch (error) {
-        console.error("Failed to fetch orders", error);
-      }
-    };
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+        // Fetch the existing order details before updating
+        const existingOrder = orders.find(order => order.orderId === orderId);
 
-    fetchOrders();
-  }, []);
+        if (!existingOrder) {
+            console.error("Order not found.");
+            return;
+        }
 
+        const updatedOrderData = {
+            ...existingOrder, // Keep all existing fields
+            status: newStatus, // Update only status
+        };
+
+        await updateOrder(orderId, updatedOrderData);
+        fetchOrders();
+
+      alert("Order status updated successfully.");
+    } catch (error) {
+        console.error("Failed to update order status:", error);
+    }
+};
+
+
+
+const fetchOrders = async () => {
+  try {
+      const data = await getAllOrders();
+      setOrders(data);
+  } catch (error) {
+      console.error("Failed to fetch orders", error);
+  }
+};
+
+useEffect(() => {
+  fetchOrders();
+}, []);
 
   const handleRowClick = (order) => {
     navigate("/create-order", { state: { order } });
@@ -38,8 +72,8 @@ const OrderTable = () => {
   const statusClassMap = {
     "New Order": "blue",
     Delivered: "green",
-    Shipped: "yellow",
-    Rejected: "red",
+    "Send to Vendor": "yellow",
+    "Order Cancelled": "red",
     "In Transit": "grey",
   };
 
@@ -86,7 +120,7 @@ const OrderTable = () => {
               onClick={() => handleRowClick(order)}
             >
               <td style={{ fontWeight: 500 }}>{order.orderId}</td>
-              <td>{order.createdAt}</td>
+              <td>{new Date(order.createdAt).toLocaleString()}</td>
               <td>{order.customer.customerName}</td>
               <td>{order.variants.length}</td>
               <td>{order.totalAmount}</td>
@@ -96,11 +130,19 @@ const OrderTable = () => {
                   {order.payment.paymentStatus}
                 </div>
               </td>
-              <td>
-                <div className={statusClassMap[order.status]}>
-                  {order.status}
-                </div>
-              </td>
+              <td onClick={(e) => e.stopPropagation()}>
+              <select
+                className={statusClassMap[order.status]}
+                value={order.status}
+                onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
+              >
+                {statusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </td>
               <td>
                 <div className="manufacturer">
                   {order.manufacturer ? (
@@ -140,7 +182,7 @@ const OrderTable = () => {
             onClick={() => handleRowClick(order)}
           >
             <div className="d-flex justify-content-between">
-              <h4>{order.createdAt}</h4>
+            <h4>{new Date(order.createdAt).toLocaleString()}</h4>
               <div
                 style={{
                   padding: "0.2rem 0.4rem",
@@ -171,7 +213,7 @@ const OrderTable = () => {
                 </span>
               </p>
               <p>
-                {order.quantity} Quantity{" "}
+                {order.totalAmount} Quantity{" "}
                 <span>
                   <LuDot size={25} />
                 </span>

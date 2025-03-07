@@ -281,20 +281,26 @@ const CreateOrder = () => {
     const [walletDeduction, setWalletDeduction] = useState(0);
 
     useEffect(() => {
-        const fetchWallets = async () => {
-          if (selectedCustomer) {
-            const totalWallet = await getWalletTransactions(selectedCustomer.id);
-      
-            if (totalWallet.length > 0) {
-              setWalletBalances(totalWallet[totalWallet.length - 1].totalAmount);
-            } else {
-              setWalletBalances(0); // Fallback if the array is empty
-            }
-          }
-        };
-      
-        fetchWallets();
-      }, [selectedCustomer]);
+      const fetchWallets = async () => {
+        if (!selectedCustomer) return; // Ensure selectedCustomer exists
+    
+        try {
+          const totalWallet = await getWalletTransactions(
+            state ? selectedCustomer.id : selectedCustomer.customerId
+          );
+    
+          setWalletBalances(
+            totalWallet.length > 0 ? totalWallet[totalWallet.length - 1].totalAmount : 0
+          );
+        } catch (error) {
+          console.error("Error fetching wallet transactions:", error);
+          setWalletBalances(0); // Handle error gracefully
+        }
+      };
+    
+      fetchWallets();
+    }, [selectedCustomer, state]); 
+    
 
       const handleWalletDeductionChange = (value) => {
         // Prevent non-numeric input
@@ -353,19 +359,16 @@ const CreateOrder = () => {
     
       
       
-      
+      const [selectedPayment,setSelectedPayment] = useState('Select Payment Type')
       const [selectedDiscount,setSelectedDiscount] = useState('Add discount code')
 
       const handleSelectDiscount = (value) =>{
         setSelectedDiscount(value)
       }
 
+    
+    const shippingCharge = (calculateGrandTotal(orderDetails) * 5) / 100;
 
-      console.log(orderDetails)
-
-      const shippingCharge = (calculateGrandTotal(orderDetails) * 5) / 100;
-
-// Calculate GST (Weighted GST Based on Product Price)
     const totalPrice = calculateGrandTotal(orderDetails); // Get total price of all items
     const totalGST = (totalPrice * (Number(orderDetails[0]?.product?.gstOnProduct) || 0)) / 100; // Apply GST from product
     const effectiveGSTPercent = Number(orderDetails[0]?.product?.gstOnProduct) || 0; // Direct GST%
@@ -446,6 +449,41 @@ const CreateOrder = () => {
         alert("Failed to create order. Check console for details.");
       }
     };
+
+    const [discountPercentage, setDiscountPercentage] = useState(0);
+    const [codPercentage, setCodPercentage] = useState(0);
+    const [onlinePercentage, setOnlinePercentage] = useState(0);
+  
+    // Payment selection handler
+    const handleSelectPayment = (paymentType) => {
+      setSelectedPayment(paymentType);
+  
+      // Define discounts and payment split percentages
+      const paymentOptions = {
+        "100%": { discount: 1.5, cod: 0, online: 100 },
+        "75%": { discount: 0.75, cod: 25, online: 75 },
+        "50%": { discount: 0.5, cod: 50, online: 50 },
+        "25%": { discount: 0.5, cod: 75, online: 25 },
+        "0%": { discount: 0, cod: 100, online: 0 },
+      };
+  
+      const selectedOption = paymentOptions[paymentType] || { discount: 0, cod: 0, online: 0 };
+      setDiscountPercentage(selectedOption.discount);
+      setCodPercentage(selectedOption.cod);
+      setOnlinePercentage(selectedOption.online);
+    };
+  
+    // Grand total calculation
+    const grandTotal = calculateGrandTotal(orderDetails);
+    
+    // Discount calculation
+    const discountAmount = ((grandTotal * discountPercentage) / 100).toFixed(2);
+  
+    // Total after discount
+    const totalAfterDiscount = (grandTotal - discountAmount).toFixed(2);
+  
+    // Net payable amount
+    const netPayable = (totalAfterDiscount - walletDeduction).toFixed(2);
     
     
 
@@ -626,16 +664,16 @@ const CreateOrder = () => {
                     <h4>Payment</h4>
 
                     <div  className='container border p-3 rounded mb-3'>
-                    <table className="table">
+                    {/* <table className="table">
                     <tbody>
-                        {/* Subtotal */}
+                      
                         <tr>
                             <td>Subtotal</td>
                             <td>{orderDetails.reduce((acc, item) => acc + (item.colors.length || 0), 0)} items</td>
                             <td>₹{calculateGrandTotal(orderDetails).toFixed(2)}</td>
                         </tr>
 
-                        {/* Wallet Deduction */}
+                      
                         <tr>
                             <td>Wallet Balance</td>
                             <td>₹{walletBalances.toFixed(2)}</td>
@@ -652,7 +690,7 @@ const CreateOrder = () => {
                             </td>
                         </tr>
 
-                        {/* Discount Section */}
+                      
                         <tr>
                             <td>Discount</td>
                             <td >
@@ -683,21 +721,112 @@ const CreateOrder = () => {
                             </td>
                         </tr>
 
-                        {/* Shipping Charges */}
+                      
                         <tr>
                             <td>Shipping Charge</td>
                             <td>5%</td>
                             <td>₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td>
                         </tr>
 
-                        {/* Final Total */}
+                       
                         <tr>
                             <td><strong>Total</strong></td>
                             <td></td>
                             <td colSpan="2"><strong>₹{calculateTotalAmount()}</strong></td>
                         </tr>
                     </tbody>
+                </table> */}
+
+                <table className="w-100 rounded mt-2 font-semibold">
+                  <tbody>
+                   
+                    <tr>
+                      <td>Item Total (+GST)</td>
+                      <td>{orderDetails.reduce((acc, item) => acc + (item.colors.length || 0), 0)} items</td>
+                      <td style={{ textAlign: "end" }}>₹{calculateGrandTotal(orderDetails).toFixed(2)}</td>
+                    </tr>
+
+                   
+                    <tr>
+                      <td>
+                        <div>
+                          <p>Item Discount</p>
+                          <p className="text-gray-400 ps-3">By Payment Type</p>
+                          <p className="text-gray-400 ps-3">By Coupon Code</p>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div>
+                          <p>10.75%</p>
+                          <p className="text-gray-400">0.75%</p>
+                          <p className="text-gray-400">10%</p>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div>
+                          <p className="text-end">₹{((calculateGrandTotal(orderDetails) * 10.75) / 100).toFixed(2)}</p>
+                          <p className="text-gray-400 text-end">₹{((calculateGrandTotal(orderDetails) * 0.75) / 100).toFixed(2)}</p>
+                          <p className="text-gray-400 text-end">₹{((calculateGrandTotal(orderDetails) * 10) / 100).toFixed(2)}</p>
+                        </div>
+                      </td>
+                    </tr>
+
+                   
+                    <tr className="border-bottom">
+                      <td className="pb-3">Shipping or Delivery</td>
+                      <td></td>
+                      <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td>
+                    </tr>
+
+                  
+                    <tr>
+                      <td>To Pay</td>
+                      <td></td>
+                      <td className="text-end">₹{calculateTotalAmount()}</td>
+                    </tr>
+
+                   
+                    <tr className="border-bottom">
+                      <td>Wallet Balance</td>
+                      <td className="pb-3">₹{walletBalances.toFixed(2)}</td>
+                      <td style={{ textAlign: "end" }}>
+                        <input
+                          className="w-28 border border-secondary-subtle rounded-1 ps-2"
+                          type="number"
+                          placeholder="Enter amount"
+                          value={walletDeduction}
+                          onChange={(e) => handleWalletDeductionChange(e.target.value)}
+                          min="0"
+                          max={walletBalances}
+                        />
+                      </td>
+                    </tr>
+
+                  
+                    <tr className="border-b-2">
+            <td className="pb-4">Net Pay</td>
+            <td></td>
+            <td className="text-end">₹{netPayable}</td>
+          </tr>
+
+          {/* COD Payment (Dynamically Adjusted) */}
+          <tr>
+            <td>COD (After Delivery)</td>
+            <td>{codPercentage}%</td>
+            <td className="text-end">₹{((netPayable * codPercentage) / 100).toFixed(2)}</td>
+          </tr>
+
+          {/* Online Payment (Dynamically Adjusted) */}
+          <tr>
+            <td>Online Payment (Now)</td>
+            <td>{onlinePercentage}%</td>
+            <td className="text-end">₹{((netPayable * onlinePercentage) / 100).toFixed(2)}</td>
+          </tr>
+                  </tbody>
                 </table>
+
                       
 
                     </div>
@@ -815,7 +944,7 @@ const CreateOrder = () => {
                         </div>
                         <div>
                             <h4 className='d-flex justify-content-between'>Billing Address<span><GoPencil /></span></h4>
-                            <p>{selectedCustomer.customerAddress}</p>
+                            <p>{selectedCustomer.addresses[0].street}</p>
                         </div>
                         
                         
@@ -850,6 +979,61 @@ const CreateOrder = () => {
                     </div>
                   </Dropdown.Item>
                 ))}
+              </Dropdown.Menu>
+            </Dropdown>
+
+
+            </div>
+
+            <div className='ctn mt-3'>
+            <h5>Payment Type</h5>
+
+            <Dropdown onSelect={handleSelectPayment} size="sm" className="status">
+              <Dropdown.Toggle
+                variant="light"
+                id="dropdown-basic"
+                className="d-flex align-items-center justify-content-between gap-2 w-100"
+              >
+                <p className="m-0 text-primary">{selectedPayment || "Select Payment Type"}</p>
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu className="w-100">
+              <Dropdown.Item eventKey={"100%"}>
+                    <div className='p-2 border-bottom'>                             
+                        <h4 className='text-xl font-medium'><span className='text-primary'>100%</span> Online Payment</h4>
+                        <h5>1.50% discount will be applied.</h5>
+                    </div>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey={"75%"}>
+                    <div className='p-2 border-bottom'>
+                        <div>
+                        <h4 className='text-xl font-medium'><span className='text-primary'>75%</span>Online + <span className='text-primary'>25%</span> COD</h4>
+                        <h5>0.75% discount will be applied.</h5>
+                        </div>
+
+                    </div>
+                </Dropdown.Item>
+
+                <Dropdown.Item eventKey={"50%"}>
+                    <div className='p-2 border-bottom'>
+                        <h4 className='text-xl font-medium'><span className='text-primary'>50%</span> Online + <span className='text-primary'>50%</span>COD</h4>
+                        <h5>0.50% discount will be applied.</h5>
+                    </div>
+                </Dropdown.Item>
+
+                <Dropdown.Item eventKey={"25%"}>
+                    <div className='p-2 border-bottom'>
+                        <h4 className='text-xl font-medium'><span className='text-primary'>25%</span> Online + <span className='text-primary'>75%</span> COD</h4>
+                        <h5>0.50% discount will be applied.</h5>
+                    </div>
+                </Dropdown.Item>
+
+                <Dropdown.Item eventKey={"0%"}>
+                    <div className='p-2 border-bottom'>
+                        <h4 className='text-xl font-medium'><span className='text-primary'>0%</span> Online + <span className='text-primary'>100%</span> COD</h4>
+                        <h5>No discount will be applied.</h5>
+                    </div>
+                </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
 

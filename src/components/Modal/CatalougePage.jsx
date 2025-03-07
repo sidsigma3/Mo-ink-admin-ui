@@ -115,7 +115,7 @@ const filteredVariants = variant.variants.filter((item) =>
             <div>
               <input className="w-100 p-2 rounded border  mb-4" onChange={(e)=>handleSearchColor(e)} placeholder="Search by name or hexcode"></input>
             </div>
-            <div className="d-flex justify-content-bwteen"> 
+            <div className="d-flex justify-content-between"> 
             <h3 className="h6 fw-semibold border-bottom pb-2">Custom Colors</h3>
             {customColors.length > 0 && (
               <button className="btn btn-outline-primary d-flex align-items-center gap-2" onClick={() => setIsAddingColor(true)}>
