@@ -12,7 +12,10 @@ import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/Stat
 import { Pagination } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "./Spinners.css"
-import { getAllVendors } from '../../../services/VendorsService'
+import { addVendor, getAllVendors } from '../../../services/VendorsService'
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 
 const Spinners = () => {
 
@@ -21,6 +24,9 @@ const Spinners = () => {
     const navigate = useNavigate()
 
     const [data,setData] =useState([])
+
+    const [file, setFile] = useState(null);
+    const [parsedData, setParsedData] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -84,7 +90,74 @@ const Spinners = () => {
     setData([data[index],...data]);
   };
 
-    
+  const handleExportExcel = () => {
+    const excelData = data.map(customer => ({
+      Name: `${customer.firstName} ${customer.lastName}`,
+      Location: customer.city,
+      Tag: customer.vendorType,
+      "Assigned Orders": customer.assignOrders || 0,
+      "Last Order": customer.lastOrder || "N/A",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const dataBlob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(dataBlob, "customers.xlsx");
+  };
+
+
+  const handleFileUpload = (event) => {
+    const selectedFile = event.target.files[0];
+    setFile(selectedFile);
+  };
+
+  // Read and process Excel file
+  const handleProcessFile = () => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+      setParsedData(jsonData);
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // Submit data to backend
+  const handleSubmit = async () => {
+    if (!parsedData.length) return alert("No data to submit!");
+
+    try {
+      await Promise.all(
+        parsedData.map(async (customer) => {
+          const newCustomer = {
+            firstName: customer["First Name"] || "",
+            lastName: customer["Last Name"] || "",
+            email: customer["Email"] || "",
+            phoneNumber: customer["Phone Number"] || "",
+            whatsappNumber: customer["WhatsApp Number"] || "",
+            gstNumber: customer["GST Number"] || "",
+            status: customer["Status"]?.toUpperCase() || "ACTIVE",
+            vendorType: customer["Vendor Type"]?.toUpperCase() || "SPINNER",
+            zipcode: customer["Zip Code"] || "",
+            street: customer["Street"] || "",
+          };
+          await addVendor(newCustomer);
+        })
+      );
+      alert("Upload Successful!");
+    } catch (error) {
+      console.error("Error uploading vendors:", error);
+      alert("Upload Failed!");
+    }
+  };
 
 
   return (
@@ -93,9 +166,10 @@ const Spinners = () => {
             <h4 style={{fontSize:'1.3rem'}}>Spinners & Dyers</h4>
 
             <div className='d-flex gap-2'>
-                <ExportBtn></ExportBtn>
+                <ExportBtn onClick={handleExportExcel}></ExportBtn>
 
-                <ImportBtn></ImportBtn>
+                <input type="file" accept=".xlsx" onChange={handleFileUpload} />
+                <ImportBtn onClick={handleProcessFile}></ImportBtn>
         
                 <Link to={'/add-spinner-and-dyers'}>
                 <AddBtn text={"Add New"}></AddBtn>
@@ -133,8 +207,8 @@ const Spinners = () => {
               <td>
                 <div 
                 style={{
-                    padding:'0.2rem 0.4rem',
-                    border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'4rem',
+                    padding:'0.2rem 0.5rem',
+                    border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem',
                     backgroundColor:customer.vendorType === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
                     borderColor:customer.vendorType === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
                     color : customer.vendorType === 'Spinner' ? '#1E40AF' : '#92400E' ,

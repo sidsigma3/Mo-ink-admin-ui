@@ -268,7 +268,7 @@ const handleTag = (value) =>{
 
     <div className='bg-white mt-2 p-3 w-100 rounded'>
         <div className='d-flex justify-content-between'>
-        <h5>Assign Order</h5>
+        <h5>Assigned Order</h5>
 
         </div>
 

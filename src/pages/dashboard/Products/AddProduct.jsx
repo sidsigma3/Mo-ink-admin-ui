@@ -16,6 +16,7 @@ import { ProductContext } from './../../../components/Context/ProductContext';
 import DeleteBtn from "../../../components/Buttons/Delete/DeleteBtn";
 import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
 import { addProduct , deleteProduct, updateProduct } from "../../../services/ProductService";
+import * as XLSX from "xlsx";
 
 const AddProduct = () => {
 
@@ -413,6 +414,62 @@ const handleDelete = async() =>{
 
 
 
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.readAsBinaryString(file);
+
+  reader.onload = (e) => {
+    const binaryStr = e.target.result;
+    const workbook = XLSX.read(binaryStr, { type: "binary" });
+
+    // Assuming the first sheet contains the required data
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    // Convert sheet to JSON
+    const data = XLSX.utils.sheet_to_json(sheet);
+
+    parseSizeColorData(data);
+  };
+};
+
+const parseSizeColorData = (data) => {
+  const sizes = new Set();
+  const colors = [];
+
+  data.forEach((row) => {
+    if (row.Size) sizes.add(String(row.Size).trim());
+
+    if (row.Color && row.Hex) {
+      const color = row.Color.trim();
+      const hex = row.Hex.trim();
+
+      // Check if the color is already added (to prevent duplicates)
+      if (!colors.some(c => c.color === color && c.hex === hex)) {
+        colors.push({ color, hex });
+      }
+    }
+  });
+
+  // Convert Set to Array
+  const sizeArray = [...sizes].map((size) => ({ value: size }));
+
+  // Update state with extracted variants
+  setVariants([
+    { name: "size", values: sizeArray },
+    { name: "color", values: colors }, // Now colors are properly stored
+  ]);
+
+  // Auto-generate size-color map after updating variants
+  setTimeout(() => {
+    generateSizeColorMap();
+  }, 100);
+};
+
+
   
   return (
 
@@ -538,6 +595,12 @@ const handleDelete = async() =>{
             {errors.variants && <p className="text-danger">{errors.variants}</p>}
             <div className="top d-flex justify-content-between">
                 <h4>Variant</h4>
+
+              <div>
+              <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+              {sizeColorError && <p className="text-danger">{sizeColorError}</p>}
+            </div>
+
             <button 
             style={{display:"flex",gap:"1rem" ,alignItems:"center"}}
             onClick={addVariant}>

@@ -246,6 +246,7 @@ const AddSegmentsPage = () => {
                                     id="Automated"
                                     checked={segmentData.segmentType.toLowerCase() === "automated"}
                                     onChange={handleSegmentTypeChange}
+                                    disabled={true}
                                 />
                                 <label htmlFor='Automated' className='fw-medium'>Conditional</label>
                             </div>

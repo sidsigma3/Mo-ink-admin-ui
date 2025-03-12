@@ -2,10 +2,10 @@ import React from 'react'
 import { PiExportBold } from "react-icons/pi";
 import "./ExportBtn.css"
 
-const ExportBtn = () => {
+const ExportBtn = ({onClick}) => {
   return (
     <>
-     <button className='export-btn btn lg-btn'>
+     <button className='export-btn btn lg-btn' onClick={onClick}>
          <span> Export </span><PiExportBold size={18}/>
     </button>
 

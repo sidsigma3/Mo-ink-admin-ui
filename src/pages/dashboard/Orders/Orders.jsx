@@ -1,4 +1,4 @@
-import React ,{useState}from 'react'
+import React ,{useState , useRef }from 'react'
 import "./Orders.css"
 import { IoSearchOutline } from "react-icons/io5";
 import Filter from '../../../components/Filter/DayFilter/Filter';
@@ -27,12 +27,15 @@ const TabPanel = ({ children, value, index }) => {
 
 const Orders = () => {
     const [value, setValue] = useState(0);
-
+    const orderTableRef = useRef(null);
     const [orders,setOrders] = useState([])
 
     const handleChange = (event, newValue) => {
       setValue(newValue);
     };
+
+
+    
 
 
   return (
@@ -44,7 +47,7 @@ const Orders = () => {
               
                 <Filter></Filter>
 
-                <ExportBtn></ExportBtn>
+                <ExportBtn onClick={() => orderTableRef.current?.exportOrders()}></ExportBtn>
                 
                 <Link to={'/create-order'}>
                     <AddBtn
@@ -106,7 +109,7 @@ const Orders = () => {
         {/* Tab Panels */}
         <TabPanel value={value} index={0}>
             <div className="order-table-ctn">
-            <OrderTable />
+            <OrderTable ref={orderTableRef}/>
             </div>
         </TabPanel>
         <TabPanel value={value} index={1}>

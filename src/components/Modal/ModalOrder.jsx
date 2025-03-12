@@ -14,8 +14,8 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
   const [showCatalogue, setShowCatalogue] = useState(false);
   const [currentVariant, setCurrentVariant] = useState(null);
   const [selectedColors, setSelectedColors] = useState({});
+  const [currentId,setCurrentId] = useState('')
 
-  // Handles size selection for a product
   const sizeSelectHandler = (productId, size) => {
     setSelectedSize((prev) => ({
       ...prev,
@@ -26,18 +26,19 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
     }));
   };
 
-  // Toggles visibility of a product's variant list
+
   const toggleCollapse = (productId) => {
     setOpenProductId(openProductId === productId ? null : productId);
   };
 
-  // Opens the Catalogue Page inside the modal
-  const openCatalogue = (variant) => {
+ 
+  const openCatalogue = (variant,id) => {
+    setCurrentId(id)
     setCurrentVariant(variant);
     setShowCatalogue(true);
   };
 
-  // Handles selection of color from Catalogue Page
+ 
   const handleColorSelection = (colorHex, colorName) => {
     if (!currentVariant) return;
 
@@ -49,41 +50,41 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
       },
     }));
 
-    setShowCatalogue(false); // Close catalogue after selection
+    setShowCatalogue(false); 
   };
 
-  // Creates the final order
+  
   const handleOrderCreation = () => {
-    const order = Object.keys(selectedSize) // Iterate over variantIds
+    const order = Object.keys(selectedSize) 
       .flatMap((variantId) =>
-        Object.keys(selectedSize[variantId]) // Iterate over sizes for this variant
-          .filter((size) => selectedSize[variantId][size]) // Check if size is selected (true)
+        Object.keys(selectedSize[variantId]) 
+          .filter((size) => selectedSize[variantId][size]) 
           .map((size) => {
-            // Find the correct product using variantId
+           
             const product = products.find((p) =>
               p.groupedVariants?.some((v) => v.variants.some((variant) => variant.id === Number(variantId)))
             );
   
-            // Ensure we found a product
+         
             if (!product) return null;
   
-            // Find the variant group by size
+          
             const variant = product.groupedVariants?.find((v) => v.size === size);
   
-            // Find the selected variant by variantId
+      
             const selectedVariant = variant?.variants?.find((v) => v.id === Number(variantId));
   
             return {
-              productId: product.productId, // Retrieve productId correctly
+              productId: product.productId, 
               productName:product.productName,
               size,
-              colors: selectedColors[variantId]?.[size]?.colorHex || [], // Ensure it's an array
+              colors: selectedColors[variantId]?.[size]?.colorHex || [], 
               variant,
               product
             };
           })
       ) 
-      .filter((item) => item !== null && item.colors.length > 0); // Remove null items and only keep valid selections
+      .filter((item) => item !== null && item.colors.length > 0); 
   
     onOrderCreate(order);
     handleClose();
@@ -139,7 +140,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                                   width: "30px",
                                   height: "30px",
                                   borderRadius: "50%",
-                                  backgroundColor: color.hexCode.trim(), // Ensure no extra spaces
+                                  backgroundColor: color.hexCode.trim(), 
                                   border: "1px solid #ccc",
                                 }}
                               ></div>
@@ -150,7 +151,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                       )}
 
 
-                        <span onClick={() => openCatalogue(variant)} className="d-flex align-items-center">
+                        <span onClick={() => openCatalogue(variant,product.productId)} className="d-flex align-items-center">
                         <img src="./color-wheel.png" alt="Color Selector" />
                       </span>
 
@@ -162,7 +163,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
           ))
         ) : (
           // Show Catalogue Page inside the modal
-          <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} />
+          <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} id={currentId}/>
         )}
       </Modal.Body>
       <Modal.Footer className="flex justify-content-between">

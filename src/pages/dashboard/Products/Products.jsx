@@ -1,4 +1,4 @@
-import React from 'react'
+import React ,{useRef} from 'react'
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn'
 import AddBtn from '../../../components/Buttons/Add/AddBtn'
 import ProductFilter from '../../../components/Filter/DayFilter/ProductFilter/ProductFilter'
@@ -11,6 +11,7 @@ import { Pagination } from 'react-bootstrap'
 
 const Products = () => {
 
+  const exportRef = useRef(null);
     
   const navigate =useNavigate()
 
@@ -25,11 +26,11 @@ const Products = () => {
             </div>
 
             <div className='d-flex gap-2'>
-                <ExportBtn>
+                <ExportBtn onClick={() => exportRef.current.exportToExcel()}>
 
                 </ExportBtn>
 
-                <ImportBtn></ImportBtn>
+                {/* <ImportBtn></ImportBtn> */}
 
                 <Link to={'/add-product'}>
                 <AddBtn  
@@ -52,7 +53,7 @@ const Products = () => {
         </div>
 
         <div>
-            <ProductsTable ></ProductsTable>
+            <ProductsTable ref={exportRef}></ProductsTable>
          
         </div>
 

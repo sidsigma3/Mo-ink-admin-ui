@@ -14,7 +14,8 @@ import { Pagination } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Dropdown } from 'react-bootstrap'
 import { getAllCustomer , getWalletTransactions} from '../../../services/CustomerService'
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 
 const CustomersPage = () => {
@@ -104,6 +105,45 @@ useEffect(() => {
 }, [customers])
 
 
+const exportToExcel = () => {
+  if (!customers || !customers.length) {
+    alert("No customer customers available for export.");
+    return;
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(
+    customers.map(customer => ({
+      "Customer Name": customer.customerName,
+      "City": customer.addresses[0]?.city || "N/A",
+      "Wallet Balance": customer.walletBalance !== undefined ? customer.walletBalance : "N/A",
+      "Total Orders": customer.totalOrders,
+      "Last Order": customer.lastOrder || "N/A",
+    }))
+  );
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const dataBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  saveAs(dataBlob, "Customers_List.xlsx");
+};
+
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+const getCustomerOrderStats = (customerId) => {
+  const customerOrders = orders.filter(order => order.customer.id === customerId);
+
+  const totalOrders = customerOrders.length;
+  const lastOrderDate = customerOrders.length > 0
+    ? new Intl.DateTimeFormat("en-GB").format(new Date(
+        Math.max(...customerOrders.map(order => new Date(order.createdAt)))
+      ))
+    : "N/A"; // Default if no orders
+
+  return { totalOrders, lastOrderDate };
+};
+
 
   return (
     <div className='customer-page'>
@@ -111,9 +151,9 @@ useEffect(() => {
             <h4 style={{fontSize:'1.3rem'}}>Customers</h4>
 
             <div className='d-flex gap-2'>
-                <ExportBtn></ExportBtn>
+                <ExportBtn onClick={exportToExcel}></ExportBtn>
 
-                <ImportBtn></ImportBtn>
+                {/* <ImportBtn></ImportBtn> */}
 
                 <Link to={'/add-customer'}>
                 <AddBtn text={"Add New"}></AddBtn>
@@ -147,18 +187,19 @@ useEffect(() => {
                     </tr>
                 </thead>
                 <tbody>
-            {customers.map((customer, index) => (
-              <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-                <td>{customer.customerName}</td>
-                <td>{customer.addresses[0].city}</td>
-                <td style={{ color: '#3CAA82' }}>
-                {walletBalances[customer.customerId] !== undefined 
-                  ? walletBalances[customer.customerId] 
-                  : "Loading..."}
-                </td>
-                <td>{customer.totalOrders}</td>
-                <td>{customer.lastOrder}</td>
-                <td>
+            {customers.map((customer, index) => {
+              const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
+
+              return (
+                <tr key={index} style={{ cursor: "pointer" }}>
+                  <td>{customer.customerName}</td>
+                  <td>{customer.addresses[0]?.city || "N/A"}</td>
+                  <td style={{ color: "#3CAA82" }}>
+                    {walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "Loading..."}
+                  </td>
+                  <td>{totalOrders}</td>
+                  <td>{lastOrderDate}</td>
+                  <td>
                     <Dropdown>
                         <Dropdown.Toggle  variant="light" id="dropdown-basic" className='border border-0'>
                         <BsThreeDotsVertical />
@@ -170,10 +211,11 @@ useEffect(() => {
                         </Dropdown.Menu>
                     </Dropdown>
                     </td>
-              </tr>
-            ))}
+                </tr>
+              );
+            })}
           </tbody>
-
+            
             </Table>
 
             <div className='d-flex justify-content-end mt-2'>

@@ -13,6 +13,17 @@ export const getAllProduct = async () => {
   }
 };
 
+export const getProductById = async (id) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/product/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting product:', error);
+    throw error;
+  }
+};
+
+
 // Add a new product
 export const addProduct = async (productData) => {
   try {

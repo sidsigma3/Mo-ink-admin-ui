@@ -31,6 +31,8 @@ const CreateOrder = () => {
 
     const order =state?.order || {};
 
+    const isViewMode = !!state
+
     const [showModalOrder, setShowModalOrder] = useState(false);
     const [showModalCustomer,setShowModalCustomer] =useState(false)
     const [showModalAssign,setShowModalAssign] = useState(false)
@@ -360,10 +362,16 @@ const CreateOrder = () => {
       
       
       const [selectedPayment,setSelectedPayment] = useState('Select Payment Type')
-      const [selectedDiscount,setSelectedDiscount] = useState('Add discount code')
+      const [selectedDiscount,setSelectedDiscount] = useState('')
+      const [selectedDiscountValue, setSelectedDiscountValue] = useState(null);
 
-      const handleSelectDiscount = (value) =>{
-        setSelectedDiscount(value)
+      const handleSelectDiscount = (discountCode) => {
+        const selectedItem = discountData.find(item => item.discountCode === discountCode);
+          
+          if (selectedItem) {
+            setSelectedDiscount(selectedItem.discountCode);
+            setSelectedDiscountValue(selectedItem.discountValue);
+          }
       }
 
     
@@ -486,6 +494,50 @@ const CreateOrder = () => {
     const netPayable = (totalAfterDiscount - walletDeduction).toFixed(2);
     
     
+    const calculatePriceBreakdown = (order, colorObj) => {
+      const colorHex = typeof colorObj === "string"
+          ? colorObj.trim().toLowerCase()
+          : colorObj.hexCode?.trim().toLowerCase();
+  
+      // Find the matching variant item
+      const matchingItem = order.variant.variants.find(item =>
+          item.hexCode.trim().toLowerCase() === colorHex
+      );
+  
+      // Calculate base price
+      const baseTotal = matchingItem ? (colorObj.weight * matchingItem.price) : 0;
+  
+      // Apply GST
+      const gstRate = order.product.gstOnProduct || 0; // Get GST%
+      const gstAmount = (baseTotal * gstRate) / 100;
+      const finalTotal = baseTotal + gstAmount; // Price + GST
+  
+      return { baseTotal, gstAmount, finalTotal, gstRate };
+  };
+  
+
+  const paymentDescriptions = {
+    "100%": "100% Online Payment",
+    "75%": "75% Online + 25% COD",
+    "50%": "50% Online + 50% COD",
+    "25%": "25% Online + 75% COD",
+    "0%": "0% Online + 100% COD",
+  };
+
+  const [selectedAddress, setSelectedAddress] = useState(
+    selectedCustomer?.addresses?.[0] || {}
+  );
+
+
+  const handleSelectAddress = (addressType) => {
+    const newSelectedAddress = selectedCustomer.addresses.find(
+      (address) => address.addressType === addressType
+    );
+    if (newSelectedAddress) {
+      setSelectedAddress(newSelectedAddress);
+    }
+  };
+  
 
   return (
     <div className='create-order'>
@@ -537,107 +589,102 @@ const CreateOrder = () => {
                             <table className="table ">
                             {/* Table Header */}
                             <thead>
-                                <tr >
-                                <th className='fw-medium'>Product</th>
-                                <th className='fw-medium'>Counter</th>
-                                <th className='fw-medium'>Color</th>
-                                <th className='fw-medium'>Weight</th>
-                                <th className='fw-medium'>Total</th>
+                                <tr>
+                                    <th className='fw-medium'>Product</th>
+                                    <th className='fw-medium'>Counter</th>
+                                    <th className='fw-medium'>Color</th>
+                                    <th className='fw-medium'>Weight</th>
+                                    <th className='fw-medium'>Base Price</th>
+                                    <th className='fw-medium'>GST Amount</th>
+                                    <th className='fw-medium'>Total (Including GST)</th>
                                 </tr>
                             </thead>
 
-                            {/* Table Body */}
                             <tbody>
-                                {orderDetails.map((order, index) => (
-                                <tr key={index}>
-                                    {/* Product ID */}
-                                    <td>{order.productName}</td>
+                              {orderDetails.map((order, index) => {
+                                  // Initialize total price variables
+                                  let totalBasePrice = 0;
+                                  let totalGSTAmount = 0;
+                                  let totalFinalPrice = 0;
 
-                                    {/* Size */}
-                                    <td>
-                                    <div
-                                        className="badge fw-normal"
-                                        style={{
-                                        width: '70%',
-                                        padding: '0.3rem 0.6rem',
-                                        borderRadius: '1rem',
-                                        backgroundColor: '#EFEFEF',
-                                        border: '1px solid #B9C0CD',
-                                        textAlign: 'center',
-                                        color: 'black',
-                                        }}
-                                    >
-                                        {order.size}
-                                    </div>
-                                    </td>
+                                  return (
+                                      <tr key={index}>
+                                          {/* Product Name */}
+                                          <td>{order.productName}</td>
 
-                                    {/* Colors Column */}
-                                    <td>
-                                    <div className="d-flex flex-column">
-                                        {order.colors.map((colorObj, colorIndex) => (
-                                        <div
-                                            key={colorIndex}
-                                            style={{
-                                            backgroundColor: colorObj.hexCode,
-                                            width: '25px',
-                                            height: '25px',
-                                            borderRadius: '50%',
-                                            border: '2px solid #ccc',
-                                            margin: '5px',
-                                            }}
-                                        ></div>
-                                        ))}
-                                    </div>
-                                    </td>
+                                          {/* Size */}
+                                          <td>
+                                              <div className="badge fw-normal" style={{
+                                                  width: '70%',
+                                                  padding: '0.3rem 0.6rem',
+                                                  borderRadius: '1rem',
+                                                  backgroundColor: '#EFEFEF',
+                                                  border: '1px solid #B9C0CD',
+                                                  textAlign: 'center',
+                                                  color: 'black',
+                                              }}>
+                                                  {order.size}
+                                              </div>
+                                          </td>
 
-                                    {/* Weight Inputs Column */}
-                                    <td>
-                                    <div className="d-flex flex-column">
-                                        {order.colors.map((colorObj, colorIndex) => (
-                                        <input
-                                            key={colorIndex}
-                                            type="number"
-                                            style={{border:'1px solid'}}
-                                            placeholder="Weight"
-                                            className="rounded border-secondary-subtle mb-2 p-1 weight-input"
-                                            value={colorObj.weight || ''} 
-                                            onChange={(e) =>
-                                            handleWeightChange(order.productId, order.size, colorIndex, e.target.value)
-                                            }
-                                        />
-                                        ))}
-                                    </div>
-                                    </td>
-                                    <div className='d-flex flex-column'>
-                                    {order.colors.map((colorObj, colorIndex) => {
-                                    const colorHex = typeof colorObj === "string" 
-                                        ? colorObj.trim().toLowerCase() 
-                                        : colorObj.hexCode?.trim().toLowerCase();
+                                          {/* Colors Column */}
+                                          <td>
+                                              <div className="d-flex flex-column">
+                                                  {order.colors.map((colorObj, colorIndex) => (
+                                                      <div
+                                                          key={colorIndex}
+                                                          style={{
+                                                              backgroundColor: colorObj.hexCode,
+                                                              width: '25px',
+                                                              height: '25px',
+                                                              borderRadius: '50%',
+                                                              border: '2px solid #ccc',
+                                                              margin: '5px',
+                                                          }}
+                                                      ></div>
+                                                  ))}
+                                              </div>
+                                          </td>
 
-                                    // Find the matching variant item
-                                    const matchingItem = order.variant.variants.find(item => 
-                                        item.hexCode.trim().toLowerCase() === colorHex
-                                    );
+                                          {/* Weight Inputs Column */}
+                                          <td>
+                                              <div className="d-flex flex-column">
+                                                  {order.colors.map((colorObj, colorIndex) => (
+                                                      <input
+                                                          key={colorIndex}
+                                                          type="number"
+                                                          style={{ border: '1px solid' }}
+                                                          placeholder="Weight"
+                                                          className="rounded border-secondary-subtle mb-2 p-1 weight-input"
+                                                          value={colorObj.weight || ''} 
+                                                          onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
+                                                          disabled={isViewMode}
+                                                      />
+                                                  ))}
+                                              </div>
+                                          </td>
 
-                                    // Calculate base price
-                                    const baseTotal = matchingItem ? (colorObj.weight * matchingItem.price) : 0;
+                                          {/* Price Calculation */}
+                                          <td colSpan="3">
+                                              <div className="d-flex flex-column">
+                                              {order.colors.map((colorObj, colorIndex) => {
+                                                    const { baseTotal, gstAmount, finalTotal, gstRate } = calculatePriceBreakdown(order, colorObj);
 
-                                    // Apply GST
-                                    const gstRate = order.product.gstOnProduct || 0; // Get GST%
-                                    const gstAmount = (baseTotal * gstRate) / 100;
-                                    const finalTotal = baseTotal + gstAmount; // Price + GST
+                                                    return (
+                                                        <div key={colorIndex} className="d-flex justify-content-between">
+                                                            <span>₹{baseTotal.toFixed(2)}</span>
+                                                            <span>₹{gstAmount.toFixed(2)} ({gstRate}%)</span>
+                                                            <span>₹{finalTotal.toFixed(2)}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                              </div>
+                                          </td>
+                                      </tr>
+                                  );
+                              })}
+                          </tbody>
 
-                                    return (
-                                        <div key={colorIndex}>
-                                        {matchingItem ? `₹${finalTotal.toFixed(2)}` : 'N/A'}
-                                        </div>
-                                    );
-                                    })}
-                                </div>
-
-                                </tr>
-                                ))}
-                            </tbody>
                             </table>
                         </div>
                         )}
@@ -741,7 +788,7 @@ const CreateOrder = () => {
                   <tbody>
                    
                     <tr>
-                      <td>Item Total (+GST)</td>
+                      <td>Total Cost (Including GST)</td>
                       <td>{orderDetails.reduce((acc, item) => acc + (item.colors.length || 0), 0)} items</td>
                       <td style={{ textAlign: "end" }}>₹{calculateGrandTotal(orderDetails).toFixed(2)}</td>
                     </tr>
@@ -750,7 +797,7 @@ const CreateOrder = () => {
                     <tr>
                       <td>
                         <div>
-                          <p>Item Discount</p>
+                          <p>Total Discount</p>
                           <p className="text-gray-400 ps-3">By Payment Type</p>
                           <p className="text-gray-400 ps-3">By Coupon Code</p>
                         </div>
@@ -758,16 +805,16 @@ const CreateOrder = () => {
 
                       <td>
                         <div>
-                          <p>10.75%</p>
-                          <p className="text-gray-400">0.75%</p>
+                          <p>{(discountPercentage + 10).toFixed(2)}%</p>
+                          <p className="text-gray-400">{discountPercentage.toFixed(2)}%</p>
                           <p className="text-gray-400">10%</p>
                         </div>
                       </td>
 
                       <td>
                         <div>
-                          <p className="text-end">₹{((calculateGrandTotal(orderDetails) * 10.75) / 100).toFixed(2)}</p>
-                          <p className="text-gray-400 text-end">₹{((calculateGrandTotal(orderDetails) * 0.75) / 100).toFixed(2)}</p>
+                          <p className="text-end">₹{((calculateGrandTotal(orderDetails) * (discountPercentage + 10)) / 100).toFixed(2)}</p>
+                          <p className="text-gray-400 text-end">₹{((calculateGrandTotal(orderDetails) * discountPercentage) / 100).toFixed(2)}</p>
                           <p className="text-gray-400 text-end">₹{((calculateGrandTotal(orderDetails) * 10) / 100).toFixed(2)}</p>
                         </div>
                       </td>
@@ -782,16 +829,16 @@ const CreateOrder = () => {
 
                   
                     <tr>
-                      <td>To Pay</td>
-                      <td></td>
-                      <td className="text-end">₹{calculateTotalAmount()}</td>
+                      <td className='pt-3'>Net Pay</td>
+                      <td ></td>
+                      <td className="text-end pt-3">₹{calculateTotalAmount()}</td>
                     </tr>
 
-                   
+
                     <tr className="border-bottom">
-                      <td>Wallet Balance</td>
-                      <td className="pb-3">₹{walletBalances.toFixed(2)}</td>
-                      <td style={{ textAlign: "end" }}>
+                      <td className='pb-3 pt-2'>Wallet Balance</td>
+                      <td className='pb-3 pt-2'>₹{walletBalances.toFixed(2)}</td>
+                      <td style={{ textAlign: "end" }} className='pb-3 pt-2'>
                         <input
                           className="w-28 border border-secondary-subtle rounded-1 ps-2"
                           type="number"
@@ -800,30 +847,31 @@ const CreateOrder = () => {
                           onChange={(e) => handleWalletDeductionChange(e.target.value)}
                           min="0"
                           max={walletBalances}
+                          disabled={isViewMode}
                         />
                       </td>
                     </tr>
 
                   
-                    <tr className="border-b-2">
-            <td className="pb-4">Net Pay</td>
-            <td></td>
-            <td className="text-end">₹{netPayable}</td>
-          </tr>
+                    <tr className="border-b-2 border-bottom">
+                      <td className="pb-3 pt-2">To Pay</td>
+                      <td></td>
+                      <td className="text-end pb-3 pt-2">₹{netPayable}</td>
+                    </tr>
 
-          {/* COD Payment (Dynamically Adjusted) */}
-          <tr>
-            <td>COD (After Delivery)</td>
-            <td>{codPercentage}%</td>
-            <td className="text-end">₹{((netPayable * codPercentage) / 100).toFixed(2)}</td>
-          </tr>
+                    {/* COD Payment (Dynamically Adjusted) */}
+                    <tr>
+                      <td className='pt-2'>COD (After Delivery)</td>
+                      <td className='pt-2'>{codPercentage}%</td>
+                      <td className="text-end pt-2">₹{((netPayable * codPercentage) / 100).toFixed(2)}</td>
+                    </tr>
 
-          {/* Online Payment (Dynamically Adjusted) */}
-          <tr>
-            <td>Online Payment (Now)</td>
-            <td>{onlinePercentage}%</td>
-            <td className="text-end">₹{((netPayable * onlinePercentage) / 100).toFixed(2)}</td>
-          </tr>
+                    {/* Online Payment (Dynamically Adjusted) */}
+                    <tr>
+                      <td>Online Payment (Now)</td>
+                      <td>{onlinePercentage}%</td>
+                      <td className="text-end">₹{((netPayable * onlinePercentage) / 100).toFixed(2)}</td>
+                    </tr>
                   </tbody>
                 </table>
 
@@ -937,15 +985,31 @@ const CreateOrder = () => {
                         </div>
 
                         <div className='border-bottom mb-2'>
-                            <h4 className='d-flex justify-content-between'>Contact Information <span><GoPencil /></span></h4>
+                            <h4 className='d-flex justify-content-between'>Contact Information</h4>
                             <p>{selectedCustomer.email}</p>
                             <p>{selectedCustomer.phoneNumber}</p>
                         
                         </div>
                         <div>
-                            <h4 className='d-flex justify-content-between'>Billing Address<span><GoPencil /></span></h4>
-                            <p>{selectedCustomer.addresses[0].street}</p>
-                        </div>
+                        <h4 className='d-flex justify-content-between'>
+                          Billing Address
+                          <Dropdown onSelect={handleSelectAddress}>
+                            <Dropdown.Toggle variant="light" id="dropdown-basic" className='w-100'>
+                              {selectedAddress.addressType || "Select Address"}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                              {selectedCustomer.addresses.map((address, index) => (
+                                <Dropdown.Item key={index} eventKey={address.addressType}>
+                                  {address.addressType}
+                                </Dropdown.Item>
+                              ))}
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </h4>
+                        <p>{selectedAddress.street}</p>
+                        <p>{selectedAddress.city}, {selectedAddress.state} - {selectedAddress.zipCode}</p>
+                      </div>
                         
                         
                         
@@ -963,7 +1027,11 @@ const CreateOrder = () => {
                 id="dropdown-basic"
                 className="d-flex align-items-center justify-content-between gap-2 w-100"
               >
-                <p className="m-0 text-primary">{selectedDiscount || "Select Discount"}</p>
+                  <p className="m-0 text-primary">
+                    {selectedDiscount 
+                      ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
+                      : "Select Discount"}
+                  </p>
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="w-100">
@@ -994,7 +1062,7 @@ const CreateOrder = () => {
                 id="dropdown-basic"
                 className="d-flex align-items-center justify-content-between gap-2 w-100"
               >
-                <p className="m-0 text-primary">{selectedPayment || "Select Payment Type"}</p>
+                <p className="m-0 text-primary"> {paymentDescriptions[selectedPayment] || "Select Payment Type"}</p>
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="w-100">

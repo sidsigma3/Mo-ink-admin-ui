@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from "react";
+import React, { useState , useEffect ,forwardRef ,useImperativeHandle } from "react";
 import "./OrderTable.css";
 import { useOrderContext } from "../../Context/OrderContext";
 import { useNavigate } from "react-router-dom";
@@ -9,8 +9,9 @@ import { LuDot } from "react-icons/lu";
 import ModalAssign from "../../Modal/ModalAssign";
 import { getAllOrders } from "../../../services/OrderService";
 import { updateOrder } from "../../../services/OrderService";
+import * as XLSX from "xlsx";
 
-const OrderTable = () => {
+const OrderTable = forwardRef((props, ref) => {
  
   const [orders, setOrders] = useState([]);
   const [showModalAssign, setShowModalAssign] = useState(false);
@@ -25,6 +26,42 @@ const OrderTable = () => {
     "Delivered",
     "Order Cancelled",
   ];
+
+  const paymentStatusOption = [
+    "Unpaid",
+    "Partially Paid",
+    "Fully Paid"
+  ]
+
+  const handlePaymentStatusChange = async (orderId, newStatus) => {
+    try {
+        // Find the existing order details
+        const existingOrder = orders.find(order => order.orderId === orderId);
+
+        if (!existingOrder) {
+            console.error("Order not found.");
+            return;
+        }
+
+        // Prepare updated order data with new payment status
+        const updatedOrderData = {
+            ...existingOrder,
+            payment: {
+                ...existingOrder.payment,
+                paymentStatus: newStatus, // Update payment status
+            },
+        };
+
+        // Send update request to backend
+        await updateOrder(orderId, updatedOrderData);
+        fetchOrders(); // Refresh order list
+
+        alert("Payment status updated successfully.");
+    } catch (error) {
+        console.error("Failed to update payment status:", error);
+    }
+};
+
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -87,6 +124,38 @@ useEffect(() => {
     );
   }
 
+
+  const exportOrders = () => {
+    if (!orders || orders.length === 0) {
+      alert("No orders available to export.");
+      return;
+    }
+
+    const formattedData = orders.map((order) => ({
+      "Order ID": order.orderId,
+      "Date": new Intl.DateTimeFormat("en-GB").format(new Date(order.createdAt)),
+      "Customer": order.customer.customerName,
+      "Quantity": order.variants.length,
+      "Weight": order.totalAmount,
+      "Amount": order.payment.amount,
+      "Payment Status": order.payment.paymentStatus,
+      "Order Status": order.status,
+    }));
+
+    // Convert JSON to Sheet
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+
+    // Download the Excel file
+    XLSX.writeFile(workbook, "Orders.xlsx");
+  };
+
+
+  useImperativeHandle(ref, () => ({
+    exportOrders,
+  }));
+
   return (
     <div className="order-table table-ctn-order">
       <Table hover>
@@ -120,15 +189,23 @@ useEffect(() => {
               onClick={() => handleRowClick(order)}
             >
               <td style={{ fontWeight: 500 }}>{order.orderId}</td>
-              <td>{new Date(order.createdAt).toLocaleString()}</td>
+              <td>{new Intl.DateTimeFormat('en-GB').format(new Date(order.createdAt))}</td>
               <td>{order.customer.customerName}</td>
               <td>{order.variants.length}</td>
               <td>{order.totalAmount}</td>
               <td>{order.payment.amount}</td>
-              <td>
-                <div className={order.payment === "Paid" ? "green" : "grey"}>
-                  {order.payment.paymentStatus}
-                </div>
+              <td onClick={(e) => e.stopPropagation()}>
+                <select
+                  className={order.payment.paymentStatus === "Fully Paid" ? "green" : order.payment.paymentStatus === 'Unpaid' ? "grey" :'yellow'}
+                  value={order.payment.paymentStatus}
+                  onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
+                >
+                  {paymentStatusOption.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
               </td>
               <td onClick={(e) => e.stopPropagation()}>
               <select
@@ -251,6 +328,6 @@ useEffect(() => {
       </div>
     </div>
   );
-};
+});
 
 export default OrderTable;

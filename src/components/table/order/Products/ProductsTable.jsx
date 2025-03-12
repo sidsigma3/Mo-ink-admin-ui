@@ -1,4 +1,4 @@
-import React ,{ useContext, useEffect , useState } from 'react';
+import React ,{useContext, useEffect , useState } from 'react';
 import './ProductsTable.css';
 import { LuDot } from "react-icons/lu";
 import { ProductContext } from "./../../../Context/ProductContext";
@@ -6,10 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { Table } from 'react-bootstrap';
 import { Pagination } from 'react-bootstrap';
 import { getAllProduct } from '../../../../services/ProductService';
+import { forwardRef, useImperativeHandle } from "react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
-const ProductsTable = () => {
+const ProductsTable = forwardRef((props,ref) => {
 
-  const { products } = useContext(ProductContext);
+  
   const navigate = useNavigate();
 
   const [productData,setProductData] = useState([])
@@ -105,6 +108,34 @@ const ProductsTable = () => {
   
   console.log(finalData)
 
+  useImperativeHandle(ref, () => ({
+    exportToExcel: () => {
+      if (!finalData || !finalData.length) {
+        alert("No product finalData available for export.");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(
+        finalData.map(product => ({
+          "Product Name": product.productName,
+          "Description": product.productDescription,
+          "Available Status": product.availableStatus,
+          "Price per Kg": product.pricePerKg || "N/A",
+          "Total Variants": product.groupedVariants.length,
+          "Total Weight (Kgs)": product.groupedVariants.reduce((sum, item) => sum + item.totalWeight, 0),
+        }))
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+      const dataBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      saveAs(dataBlob, "Products_List.xlsx");
+    },
+  }));
+
   return (
     <div className="product-table">
       <Table hover>
@@ -144,8 +175,8 @@ const ProductsTable = () => {
                 <td>{item.variants.length} Variants</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', marginLeft: '10px' }}>
-                      {item.variants.map((color, colorIndex) => (
+                    <div style={{ display: 'flex', marginLeft: '10px', position: 'relative' }}>
+                      {item.variants.slice(0, 3).map((color, colorIndex) => (
                         <div
                           key={colorIndex}
                           style={{
@@ -158,9 +189,30 @@ const ProductsTable = () => {
                           }}
                         ></div>
                       ))}
+                      {item.variants.length > 1 && (
+                        <div
+                          style={{
+                            width: '30px',
+                            height: '25px',
+                            borderRadius: '50%',
+                            marginLeft: '-10px',
+                            backgroundColor: '#ccc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '18px',
+                            color: '#000',
+                            border: '1px solid #fff',
+                          }}
+                        >
+                          {/* +{item.variants.length - 3} */}
+                          +30
+                        </div>
+                      )}
                     </div>
                   </div>
                 </td>
+
                 <td>{item.totalWeight}Kgs</td>
                 <td>
                   <div 
@@ -241,6 +293,6 @@ const ProductsTable = () => {
       </div>
     </div>
   );
-};
+});
 
 export default ProductsTable;

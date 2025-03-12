@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { getProductById , updateProduct } from "../../services/ProductService";
 
-const CataloguePage = ({ onColorSelect, onClose,variant }) => {
+const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddingColor, setIsAddingColor] = useState(false);
@@ -45,22 +46,73 @@ const CataloguePage = ({ onColorSelect, onClose,variant }) => {
   const handleSaveColor = () => {
     if (newColor.colorName && newColor.hexCode) {
     setTempCustomColors((prev) => [...prev, newColor]);
-    setNewColor({ colorName: "", hexCode: "" }); // Reset input fields
+    setNewColor({ colorName: "", hexCode: "" }); 
     }
 };
 
-// Add colors from temporary list to the catalog & switch view
-const handleAddColor = () => {
+
+const handleAddColor = async () => {
+  if (tempCustomColors.length === 0) {
+    alert("Please select at least one color before adding.");
+    return;
+  }
+
+  const confirmAdd = window.confirm("Are you sure you want to add these colors as new variants?");
+  if (!confirmAdd) return;
+
+  try {
+    // Fetch the existing product details
+    const response = await getProductById(id);
+    const productData = response.data;
+
+    // Extract unique sizes from existing variants
+    const uniqueSizes = [...new Set(productData.variants.map(variant => variant.size))];
+
+    // Create new variants by combining new colors with existing sizes
+    const newVariants = tempCustomColors.flatMap((color) =>
+      uniqueSizes.map((size) => ({
+        color: {
+          colorName: color.colorName,
+          hexCode: color.hexCode,
+        },
+        size, // Assign existing sizes
+        availableWeight: "100", // Default weight
+        pricePerKg: 150, // Default price
+      }))
+    );
+
+    // Append new variants to the product
+    const { productTypes, ...cleanedProductData } = productData; // Remove productTypes
+
+    const updatedProductData = {
+      ...cleanedProductData,
+      productType: productData.productTypes,
+      variants: [...productData.variants, ...newVariants],
+    };
+
+    console.log(updatedProductData)
+
+    // Send update request to API
+    await updateProduct(id, updatedProductData);
+
+    // Update local state
     setCustomColors((prev) => [...prev, ...tempCustomColors]);
     setTempCustomColors([]); // Clear temporary colors
     setIsAddingColor(false); // Switch back to catalog view
-};
 
+    alert("New color variants added successfully!");
+   
+  } catch (error) {
+    console.error("Error adding color variant:", error);
+    alert("Failed to add color variant. Please try again.");
+  }
+};
 
 const handleSearchColor = (e) =>{
   setSearchColor(e.target.value.toLowerCase());
 }
 
+console.log(variant)
 
 const filteredVariants = variant.variants.filter((item) =>
   item.colorName.toLowerCase().includes(searchColor) || 
@@ -91,12 +143,17 @@ const filteredVariants = variant.variants.filter((item) =>
             {tempCustomColors.length > 0 && (
               <div className="mt-4">
                 <h5 className="fs-5">Custom Colors:</h5>
-                <div className="row gap-3 p-2">
+                <div className="d-flex flex-wrap gap-2 p-2">
                 {tempCustomColors.map((item, index) => (
-                   <div key={index} className="col-4 border rounded p-2">
-                   <div className="position-relative w-100" style={{height:'9rem'}}>
+                   <div key={index} className="border rounded p-2"
+                   style={{ 
+                    cursor: "pointer", 
+                    width: "calc(25% - 10px)"
+                  }}
+                   >
+                   <div className="position-relative w-100" style={{height:'5.5rem'}}>
                    <img src="/wool-item-1.png" className="img-fluid" alt="Product" />
-                     <div className="position-absolute top-0 start-0 w-100" style={{height:'9rem' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
+                     <div className="position-absolute top-0 start-0 w-100" style={{height:'5.5rem' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
                      </div>
                    </div>
                    <div className="text-center mt-2">
@@ -123,16 +180,19 @@ const filteredVariants = variant.variants.filter((item) =>
               </button>
             )}
             </div>
-            <div className="row mt-3">
+            <div className="d-flex flex-wrap gap-2 mt-3">
               {customColors.map((item, index) => (
                <div key={index}
                className={`col-4 border rounded p-2 ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
                onClick={() => handleColorClick(item)}
-               style={{ cursor: "pointer" }}
+               style={{ 
+                cursor: "pointer", 
+                width: "calc(25% - 10px)"
+                }}
                 >
-                <div className="position-relative w-100" style={{height:'9rem'}}>
+                <div className="position-relative w-100" style={{height:'5.5rem'}}>
                 <img src="/wool-item-1.png" className="img-fluid" alt="Product" />
-                  <div className="position-absolute top-0 start-0 w-100" style={{height:'9rem' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
+                  <div className="position-absolute top-0 start-0 w-100" style={{height:'5.5rem' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
                   </div>
                 </div>
                 <div className="text-center mt-2">
@@ -148,16 +208,19 @@ const filteredVariants = variant.variants.filter((item) =>
               </button>
             )}
             <h4 className="h6 fw-semibold mt-4">Preset Catalogue</h4>
-            <div className="row" style={{height:'auto'}}>
+            <div className="d-flex gap-2" style={{height:'auto'}}>
               {filteredVariants.map((item, index) => (
                 <div key={index} 
-                    className={`col-4 border rounded p-2 ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
+                    className={`border rounded p-2 ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
                     onClick={() => handleColorClick(item)}
-                    style={{ cursor: "pointer" }}
+                    style={{ 
+                      cursor: "pointer", 
+                      width: "calc(25% - 10px)"  // Adjust width based on the gap 
+                    }}
                 >
-                  <div className="position-relative w-100" style={{height:'9rem'}}>
+                  <div className="position-relative w-100" style={{height:'5.5rem'}}>
                   <img src="/wool-item-1.png" className="img-fluid" alt="Product" />
-                    <div className="position-absolute top-0 start-0 w-100" style={{height:'9rem' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
+                    <div className="position-absolute top-0 start-0 w-100" style={{height:'5.5rem' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
                     </div>
                   </div>
                   <div className="text-center mt-2">

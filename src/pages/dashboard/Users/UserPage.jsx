@@ -90,6 +90,7 @@ const UserPage = () => {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                         <th>Joined On</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>
@@ -105,7 +106,7 @@ const UserPage = () => {
                         <div
                             style={{
                                 width: '50%',
-                                padding: '0.2rem 0.4rem',
+                                padding: '0.1rem 0.5rem',
                                 border: '1px solid',
                                 borderRadius: '0.2rem',
                                 textAlign: 'center',
@@ -139,7 +140,12 @@ const UserPage = () => {
                              user.role}
                         </div>
                         </td>
-                        <td>{user.joinedOn}</td>
+                        <td>
+                        <div style={{backgroundColor:user.userStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:user.userStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'5rem',padding:'0'}}>
+                        {user.userStatus}
+                        </div>
+                        </td>
+                        <td>{new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}</td>
                         <td>
                         <Dropdown>
                             <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
