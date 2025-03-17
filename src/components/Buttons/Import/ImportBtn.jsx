@@ -2,10 +2,10 @@ import React from 'react'
 import { CgImport } from "react-icons/cg";
 import "./ImportBtn.css"
 
-const ImportBtn = () => {
+const ImportBtn = ({onClick}) => {
   return (
     <>
-     <button className='import-btn btn lg-btn'>
+     <button className='import-btn btn lg-btn' onClick={onClick}>
          <span> Import </span><CgImport size={19}/>
     </button>
 

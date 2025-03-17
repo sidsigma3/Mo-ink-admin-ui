@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/v1/api/orders";
+// const BASE_URL = "http://localhost:8080/v1/api/orders";
+const BASE_URL = ' http://82.25.105.65:8080/v1/api/orders'
+
 
 export const createOrder = async (orderData) => {
   try {

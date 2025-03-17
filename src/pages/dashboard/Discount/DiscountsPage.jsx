@@ -20,6 +20,7 @@ const DiscountsPage = () => {
   
 
   const [discountData , setDiscountData] = useState([])
+   const [filteredData, setFilteredData] = useState([]);
   
       useEffect(() => {
           const fetchData = async () => {
@@ -60,6 +61,19 @@ const DiscountsPage = () => {
     setDiscountData([discountData[index],...discountData]);
   };
 
+
+  const handleFilterChange = (filter, value) => {
+    const lowercasedValue = value.toLowerCase();
+
+    const filtered = discountData.filter((item) => {
+        if (filter === "Order Id") return item.orderId.toString().includes(value);
+        if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
+        return true;
+    });
+
+    setFilteredData(filtered);
+    };
+
   return (
     <div className='discounts'>
         <div className='top d-flex justify-content-between mb-2'>
@@ -76,7 +90,10 @@ const DiscountsPage = () => {
 
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
-                <ProductFilter></ProductFilter>
+              <ProductFilter 
+                  filterOptions={["Order Id", "Customer"]} 
+                  onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+              />
             </div>
          
             <div className='w-25'>

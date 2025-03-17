@@ -107,8 +107,6 @@ const AddProduct = () => {
     media: product?.media || null,
   });
 
-  
-  console.log(product)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -431,7 +429,7 @@ const handleFileUpload = (event) => {
 
     // Convert sheet to JSON
     const data = XLSX.utils.sheet_to_json(sheet);
-
+    console.log(data)
     parseSizeColorData(data);
   };
 };
@@ -439,34 +437,42 @@ const handleFileUpload = (event) => {
 const parseSizeColorData = (data) => {
   const sizes = new Set();
   const colors = [];
+ 
 
   data.forEach((row) => {
     if (row.Size) sizes.add(String(row.Size).trim());
 
-    if (row.Color && row.Hex) {
-      const color = row.Color.trim();
-      const hex = row.Hex.trim();
-
-      // Check if the color is already added (to prevent duplicates)
-      if (!colors.some(c => c.color === color && c.hex === hex)) {
-        colors.push({ color, hex });
+    if (row.Color && row.HexCode) {
+      const colorName = row.Color.trim();
+      const hexCode = row.HexCode.trim();
+      
+      console.log(colorName,hexCode)
+     
+      // Prevent duplicate colors
+      if (!colors.some(c => c.colorName === colorName && c.hexCode === hexCode)) {
+        colors.push({ 
+          color:colorName,
+          hex:hexCode });
       }
     }
   });
 
-  // Convert Set to Array
+  // Convert Set to Array for sizes
   const sizeArray = [...sizes].map((size) => ({ value: size }));
 
+  console.log("Extracted Sizes:", sizeArray);
+  console.log("Extracted Colors:", colors);
+
   // Update state with extracted variants
-  setVariants([
+  setVariants((prevVariants) => [
     { name: "size", values: sizeArray },
-    { name: "color", values: colors }, // Now colors are properly stored
+    { name: "color", values: colors },
   ]);
 
-  // Auto-generate size-color map after updating variants
-  setTimeout(() => {
-    generateSizeColorMap();
-  }, 100);
+  // Wait for state update and then generate size-color map
+  // setTimeout(() => {
+  //   generateSizeColorMap();
+  // }, 1000);
 };
 
 

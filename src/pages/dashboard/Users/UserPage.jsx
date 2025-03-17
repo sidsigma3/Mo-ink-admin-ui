@@ -16,7 +16,7 @@ const UserPage = () => {
 
     const navigate = useNavigate()
     const [users,setUsers] =useState([])
-
+    const [filteredData, setFilteredData] = useState([]);
     useEffect(() => {
         const fetchData = async () => {
           try {
@@ -56,6 +56,20 @@ const UserPage = () => {
       navigate('/add-user', { state: { index,users } });
     };
 
+
+    const handleFilterChange = (filter, value) => {
+      const lowercasedValue = value.toLowerCase();
+  
+      const filtered = users.filter((item) => {
+          if (filter === "Order Id") return item.orderId.toString().includes(value);
+          if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
+          return true;
+      });
+  
+      setFilteredData(filtered);
+      };
+  
+
   return (
     <div className='user-page'>
          <div className='top d-flex justify-content-between mb-2'>
@@ -75,7 +89,10 @@ const UserPage = () => {
 
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-100'>
-                <ProductFilter></ProductFilter>
+            <ProductFilter 
+                  filterOptions={["Order Id", "Customer"]} 
+                  onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+              />
             </div>
          
             {/* <div className='w-25'>

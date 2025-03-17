@@ -20,6 +20,7 @@ const SegmentsPage = () => {
     const { rows, setRows } = useSegments();
 
     const [segments,setSegments] = useState([])
+    const [filteredData, setFilteredData] = useState([]);
     
       useEffect(() => {
           const fetchData = async () => {
@@ -135,6 +136,18 @@ const SegmentsPage = () => {
               return conditionString;
           }
       };
+
+      const handleFilterChange = (filter, value) => {
+        const lowercasedValue = value.toLowerCase();
+    
+        const filtered = segments.filter((item) => {
+            if (filter === "Order Id") return item.orderId.toString().includes(value);
+            if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
+            return true;
+        });
+    
+        setFilteredData(filtered);
+        };
       
 
   return (
@@ -156,7 +169,10 @@ const SegmentsPage = () => {
 
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
-                <ProductFilter></ProductFilter>
+            <ProductFilter 
+                  filterOptions={["Order Id", "Customer"]} 
+                  onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+              />
             </div>
          
             <div className='w-25'>

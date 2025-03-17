@@ -469,9 +469,8 @@ const CreateOrder = () => {
       // Define discounts and payment split percentages
       const paymentOptions = {
         "100%": { discount: 1.5, cod: 0, online: 100 },
-        "75%": { discount: 0.75, cod: 25, online: 75 },
         "50%": { discount: 0.5, cod: 50, online: 50 },
-        "25%": { discount: 0.5, cod: 75, online: 25 },
+        "30%": { discount: 0.3, cod: 70, online: 30 },
         "0%": { discount: 0, cod: 100, online: 0 },
       };
   
@@ -495,24 +494,37 @@ const CreateOrder = () => {
     
     
     const calculatePriceBreakdown = (order, colorObj) => {
+      if (!order || !order.variant || !order.variant.variants || !colorObj) {
+          return { baseTotal: 0, gstAmount: 0, finalTotal: 0, gstRate: 0 };
+      }
+  
       const colorHex = typeof colorObj === "string"
           ? colorObj.trim().toLowerCase()
-          : colorObj.hexCode?.trim().toLowerCase();
+          : colorObj.hexCode?.trim().toLowerCase() || "";
   
       // Find the matching variant item
       const matchingItem = order.variant.variants.find(item =>
-          item.hexCode.trim().toLowerCase() === colorHex
+          item.hexCode?.trim().toLowerCase() === colorHex
       );
   
+      // Ensure weight and price are valid numbers, defaulting to 0
+      const weight = colorObj.weight || 0;
+      const price = matchingItem?.price || 0;
+  
       // Calculate base price
-      const baseTotal = matchingItem ? (colorObj.weight * matchingItem.price) : 0;
+      const baseTotal = weight * price;
   
       // Apply GST
-      const gstRate = order.product.gstOnProduct || 0; // Get GST%
+      const gstRate = order.product?.gstOnProduct || 0; // Get GST%
       const gstAmount = (baseTotal * gstRate) / 100;
-      const finalTotal = baseTotal + gstAmount; // Price + GST
+      const finalTotal = baseTotal + gstAmount;
   
-      return { baseTotal, gstAmount, finalTotal, gstRate };
+      return {
+          baseTotal: isNaN(baseTotal) ? 0 : baseTotal,
+          gstAmount: isNaN(gstAmount) ? 0 : gstAmount,
+          finalTotal: isNaN(finalTotal) ? 0 : finalTotal,
+          gstRate: isNaN(gstRate) ? 0 : gstRate
+      };
   };
   
 
@@ -575,12 +587,12 @@ const CreateOrder = () => {
         <div className='main-sec d-flex gap-2'>
             <div className='left col-xl-9 col-lg-12 col-md-12 col-sm-12'>
                 <div className='products bg-white p-4 mb-3 rounded'>
-                    <h5>Products</h5>
+                    <h5>Order Details</h5>
                     
                     <div className='d-flex gap-2 mb-3 mt-3'>
-                    <SearchBox></SearchBox>
+                    {/* <SearchBox></SearchBox> */}
                     <div>
-                    <button className='btn btn-primary' onClick={() => setShowModalOrder(true)}>Browse</button>
+                    <button className='btn btn-primary' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
                     </div>
                     </div>
                     {orderDetails.length > 0 && (
@@ -593,10 +605,11 @@ const CreateOrder = () => {
                                     <th className='fw-medium'>Product</th>
                                     <th className='fw-medium'>Counter</th>
                                     <th className='fw-medium'>Color</th>
-                                    <th className='fw-medium'>Weight</th>
-                                    <th className='fw-medium'>Base Price</th>
-                                    <th className='fw-medium'>GST Amount</th>
-                                    <th className='fw-medium'>Total (Including GST)</th>
+                                    <th className='fw-medium'>Color Name</th>
+                                    <th className='fw-medium'>Weight (Kgs)</th>
+                                    <th className='fw-medium'>Cost</th>
+                                    <th className='fw-medium'>GST</th>
+                                    <th className='fw-medium'>Total</th>
                                 </tr>
                             </thead>
 
@@ -646,6 +659,24 @@ const CreateOrder = () => {
                                               </div>
                                           </td>
 
+                                          <td>
+                                              <div className="d-flex flex-column">
+                                                  {order.colors.map((colorObj, colorIndex) => (
+                                                      <div
+                                                          key={colorIndex}
+                                                          // style={{
+                                                          //     backgroundColor: colorObj.hexCode,
+                                                          //     width: '25px',
+                                                          //     height: '25px',
+                                                          //     borderRadius: '50%',
+                                                          //     border: '2px solid #ccc',
+                                                          //     margin: '5px',
+                                                          // }}
+                                                      >{colorObj.colorName}</div>
+                                                  ))}
+                                              </div>
+                                          </td>
+
                                           {/* Weight Inputs Column */}
                                           <td>
                                               <div className="d-flex flex-column">
@@ -655,7 +686,7 @@ const CreateOrder = () => {
                                                           type="number"
                                                           style={{ border: '1px solid' }}
                                                           placeholder="Weight"
-                                                          className="rounded border-secondary-subtle mb-2 p-1 weight-input"
+                                                          className="rounded border-secondary-subtle mb-2 p-1 weight-input w-75"
                                                           value={colorObj.weight || ''} 
                                                           onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
                                                           disabled={isViewMode}
@@ -673,7 +704,8 @@ const CreateOrder = () => {
                                                     return (
                                                         <div key={colorIndex} className="d-flex justify-content-between">
                                                             <span>₹{baseTotal.toFixed(2)}</span>
-                                                            <span>₹{gstAmount.toFixed(2)} ({gstRate}%)</span>
+                                                            {/* <span>₹{gstAmount.toFixed(2)} ({gstRate}%)</span> */}
+                                                            <span>{gstRate}%</span>
                                                             <span>₹{finalTotal.toFixed(2)}</span>
                                                         </div>
                                                     );
@@ -822,7 +854,7 @@ const CreateOrder = () => {
 
                    
                     <tr className="border-bottom">
-                      <td className="pb-3">Shipping or Delivery</td>
+                      <td className="pb-3">Handling Charges</td>
                       <td></td>
                       <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td>
                     </tr>
@@ -1072,29 +1104,31 @@ const CreateOrder = () => {
                         <h5>1.50% discount will be applied.</h5>
                     </div>
                 </Dropdown.Item>
-                <Dropdown.Item eventKey={"75%"}>
+               
+
+                <Dropdown.Item eventKey={"50%"}>
+                    <div className='p-2 border-bottom'>
+                        <h4 className='text-xl font-medium'><span className='text-primary'>50%</span> Online + <span className='text-primary'>50%</span> COD</h4>
+                        <h5>0.50% discount will be applied.</h5>
+                    </div>
+                </Dropdown.Item>
+
+                <Dropdown.Item eventKey={"30%"}>
                     <div className='p-2 border-bottom'>
                         <div>
-                        <h4 className='text-xl font-medium'><span className='text-primary'>75%</span>Online + <span className='text-primary'>25%</span> COD</h4>
-                        <h5>0.75% discount will be applied.</h5>
+                        <h4 className='text-xl font-medium'><span className='text-primary'>30%</span>Online + <span className='text-primary'>70%</span> COD</h4>
+                        <h5>0.30% discount will be applied.</h5>
                         </div>
 
                     </div>
                 </Dropdown.Item>
 
-                <Dropdown.Item eventKey={"50%"}>
-                    <div className='p-2 border-bottom'>
-                        <h4 className='text-xl font-medium'><span className='text-primary'>50%</span> Online + <span className='text-primary'>50%</span>COD</h4>
-                        <h5>0.50% discount will be applied.</h5>
-                    </div>
-                </Dropdown.Item>
-
-                <Dropdown.Item eventKey={"25%"}>
+                {/* <Dropdown.Item eventKey={"25%"}>
                     <div className='p-2 border-bottom'>
                         <h4 className='text-xl font-medium'><span className='text-primary'>25%</span> Online + <span className='text-primary'>75%</span> COD</h4>
                         <h5>0.50% discount will be applied.</h5>
                     </div>
-                </Dropdown.Item>
+                </Dropdown.Item> */}
 
                 <Dropdown.Item eventKey={"0%"}>
                     <div className='p-2 border-bottom'>

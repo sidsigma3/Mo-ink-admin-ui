@@ -225,7 +225,7 @@ const AddUser = () => {
                 type="text"
                 name="gstin"
                 value={formData.gstin}
-                placeholder="Add GSTIN No. to authenticate"
+                placeholder="Add Adhaar No. to authenticate"
                 onChange={handleChange}
                 />
                 {formErrors.gstin && <div className="invalid-feedback d-block">{formErrors.gstin}</div>}

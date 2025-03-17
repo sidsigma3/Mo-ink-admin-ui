@@ -15,24 +15,28 @@ import "./Spinners.css"
 import { addVendor, getAllVendors } from '../../../services/VendorsService'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-
+import { Modal, Button } from "react-bootstrap";
 
 const Spinners = () => {
 
     const [selectedStatus, setSelectedStatus] = useState("View All"); // Default status selection
-
+    const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate()
 
     const [data,setData] =useState([])
-
+    const [filteredData, setFilteredData] = useState([]);
     const [file, setFile] = useState(null);
     const [parsedData, setParsedData] = useState([]);
+
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
     useEffect(() => {
         const fetchData = async () => {
           try {
             const data = await getAllVendors();
             setData(data.data)
+            setFilteredData(data.data)
           } catch (error) {
             console.error('Error fetching products:', error);
           }
@@ -111,12 +115,9 @@ const Spinners = () => {
 
   const handleFileUpload = (event) => {
     const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+    
     setFile(selectedFile);
-  };
-
-  // Read and process Excel file
-  const handleProcessFile = () => {
-    if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -125,12 +126,11 @@ const Spinners = () => {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-      setParsedData(jsonData);
+      setParsedData(jsonData); // Update parsedData correctly
     };
-    reader.readAsArrayBuffer(file);
+    reader.readAsArrayBuffer(selectedFile);
   };
 
-  // Submit data to backend
   const handleSubmit = async () => {
     if (!parsedData.length) return alert("No data to submit!");
 
@@ -144,8 +144,8 @@ const Spinners = () => {
             phoneNumber: customer["Phone Number"] || "",
             whatsappNumber: customer["WhatsApp Number"] || "",
             gstNumber: customer["GST Number"] || "",
-            status: customer["Status"]?.toUpperCase() || "ACTIVE",
-            vendorType: customer["Vendor Type"]?.toUpperCase() || "SPINNER",
+            status: (customer["Status"] || "ACTIVE").toUpperCase(),
+            vendorType: (customer["Vendor Type"] || "SPINNER").toUpperCase(),
             zipcode: customer["Zip Code"] || "",
             street: customer["Street"] || "",
           };
@@ -160,6 +160,19 @@ const Spinners = () => {
   };
 
 
+  const handleFilterChange = (filter, value) => {
+    const lowercasedValue = value.toLowerCase();
+
+    const filtered = data.filter((item) => {
+        if (filter === "Order Id") return item.orderId.toString().includes(value);
+        if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
+        return true;
+    });
+
+    setFilteredData(filtered);
+    };
+
+
   return (
     <div className='spinner-page'>
          <div className='top d-flex justify-content-between mb-2'>
@@ -168,8 +181,24 @@ const Spinners = () => {
             <div className='d-flex gap-2'>
                 <ExportBtn onClick={handleExportExcel}></ExportBtn>
 
-                <input type="file" accept=".xlsx" onChange={handleFileUpload} />
-                <ImportBtn onClick={handleProcessFile}></ImportBtn>
+                <Modal show={showModal} onHide={handleCloseModal} centered>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Upload Excel File</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <input type="file" accept=".xlsx" onChange={handleFileUpload} />
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                      Cancel
+                    </Button>
+                    <Button variant="success" onClick={handleSubmit}>
+                      Process File
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+
+                <ImportBtn onClick={handleOpenModal}></ImportBtn>
         
                 <Link to={'/add-spinner-and-dyers'}>
                 <AddBtn text={"Add New"}></AddBtn>
@@ -179,7 +208,10 @@ const Spinners = () => {
 
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
-                <ProductFilter></ProductFilter>
+              <ProductFilter 
+                  filterOptions={["Order Id", "Customer"]} 
+                  onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+              />
             </div>
          
             <div className='w-25'>
@@ -194,7 +226,7 @@ const Spinners = () => {
                         <th>Name</th>
                         <th>Location</th>
                         <th>Tag</th>
-                        <th>Assigned Orders</th>
+                        <th>Total Orders</th>
                         <th>Last Order</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>

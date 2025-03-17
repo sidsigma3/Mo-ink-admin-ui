@@ -18,10 +18,12 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { BsArrowReturnRight } from "react-icons/bs";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
+import { useLocation } from 'react-router-dom';
 
 const SideBar = () => {
 
     const navigate = useNavigate()
+    const location =useLocation()
 
     const [selected,setSelected] = useState('dashboard')
 
@@ -54,6 +56,37 @@ const SideBar = () => {
       document.body.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (location.pathname.includes("/vendor-order")) {
+      setSelected("vendors");
+    } else if (location.pathname.includes("/orders")) {
+      setSelected("orders");
+    } else if (location.pathname.includes("/dashboard")) {
+      setSelected("dashboard");
+    } else if (location.pathname.includes("/products")) {
+      setSelected("products");
+    }else if (location.pathname.includes("/analytics")) {
+      setSelected("analytics");
+    }else if (location.pathname.includes("/products")) {
+      setSelected("products");
+    }else if (location.pathname.includes("/discounts")) {
+      setSelected("discount");
+    }else if (location.pathname.includes("/customers")) {
+      setSelected("customers");
+    }else if (location.pathname.includes("/segments")) {
+      setSelected("segments");
+    }else if (location.pathname.includes("/spinners-and-dyers")) {
+      setSelected("manufactures");
+    }else if (location.pathname.includes("/users")) {
+      setSelected("users");
+    }
+    
+    else {
+      
+      setSelected(""); 
+    }
+  }, [location.pathname]);
 
 
   return (

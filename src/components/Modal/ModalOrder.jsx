@@ -132,7 +132,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
 
                   
                       {selectedColors[variant.id]?.[variant.size] && (
-                        <div className="selected-color-box d-flex gap-3">
+                        <div className="selected-color-box d-flex gap-3 overflow-auto" style={{width:'70%'}}>
                           {selectedColors[variant.id][variant.size].colorHex.map((color, index) => (
                             <div key={index} className="d-flex flex-column gap-2">
                               <div
@@ -144,7 +144,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                                   border: "1px solid #ccc",
                                 }}
                               ></div>
-                              <span>{color.colorName}</span>
+                              <span style={{width:'2.5rem'}}>{color.colorName}</span>
                             </div>
                           ))}
                         </div>

@@ -6,45 +6,49 @@ import { Dropdown } from 'react-bootstrap';
 
 
 
-const ProductFilter = () => {
-
-    const [selectedStatus, setSelectedStatus] = useState('Order Id'); // Default status selection
-
-    const handleSelect = (status) => {
-      setSelectedStatus(status);
-      // if (onStatusChange) onStatusChange(status); // Pass selected status to parent
+const ProductFilter = ({ filterOptions, onFilterChange }) => {
+    const [selectedFilter, setSelectedFilter] = useState(filterOptions[0]); // Default to first option
+    const [searchTerm, setSearchTerm] = useState("");
+  
+    const handleSelect = (filter) => {
+      setSelectedFilter(filter);
+      onFilterChange(filter, searchTerm);
     };
-
-  return (
-   
-        <div className='d-flex bg-white  p-2 gap-3 border order-id w-100 ps-0'>
-                <div className='d-flex align-items-center justify-content-between border border-right' style={{width:'39%' }}>
-                    {/* <h5>Order ID</h5>
-                    <span><MdKeyboardArrowDown size={18}/></span> */}
-
-                    <Dropdown onSelect={handleSelect}  size="sm" className='d-flex align-items-center w-100'>
-                    <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 border border-0 ">
-                        <p className="m-0 d-flex align-items-center gap-2">{selectedStatus}</p>
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu className='w-100'>
-                        <Dropdown.Item eventKey="Order Id">Order Id</Dropdown.Item>
-                        <Dropdown.Item eventKey="Date">Date</Dropdown.Item>
-                        <Dropdown.Item eventKey="Customer">Customer</Dropdown.Item>
-                    </Dropdown.Menu>
-                    </Dropdown>
-                </div>
-            
-            
-                <div className='d-flex align-items-center justify-content-between' style={{width:'61%'}}>
-                    <input type='text' placeholder='Search'></input>
-                    <span>  <IoSearchOutline /></span>
-                    
-                </div>
-            </div>
-
-   
-  )
-}
-
-export default ProductFilter
+  
+    const handleSearch = (e) => {
+      const value = e.target.value;
+      setSearchTerm(value);
+      onFilterChange(selectedFilter, value);
+    };
+  
+    return (
+      <div className="d-flex bg-white p-2 gap-3 border order-id w-100 ps-0">
+        {/* Dropdown Selection */}
+        <div className="d-flex align-items-center justify-content-between border border-right" style={{ width: "39%" }}>
+          <Dropdown onSelect={handleSelect} size="sm" className="d-flex align-items-center w-100">
+            <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 border border-0">
+              <p className="m-0 d-flex align-items-center gap-2">{selectedFilter}</p>
+            </Dropdown.Toggle>
+  
+            <Dropdown.Menu className="w-100">
+              {filterOptions.map((option, index) => (
+                <Dropdown.Item key={index} eventKey={option}>
+                  {option}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+  
+        {/* Search Input */}
+        <div className="d-flex align-items-center justify-content-between w-100" style={{ width: "61%" }}>
+          <input type="text" placeholder={`Search by ${selectedFilter}`} value={searchTerm} onChange={handleSearch} />
+          <span>
+            <IoSearchOutline />
+          </span>
+        </div>
+      </div>
+    );
+  };
+  
+  export default ProductFilter;

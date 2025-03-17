@@ -208,19 +208,20 @@ const filteredVariants = variant.variants.filter((item) =>
               </button>
             )}
             <h4 className="h6 fw-semibold mt-4">Preset Catalogue</h4>
-            <div className="d-flex gap-2" style={{height:'auto'}}>
+            <div className="container">
+            <div className="row g-0" style={{height:'auto'}}>
               {filteredVariants.map((item, index) => (
                 <div key={index} 
-                    className={`border rounded p-2 ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
+                    className={`col-3 col-sm-3 col-md-3 col-lg-2 border rounded p-2   ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
                     onClick={() => handleColorClick(item)}
                     style={{ 
                       cursor: "pointer", 
-                      width: "calc(25% - 10px)"  // Adjust width based on the gap 
+                      // width: "calc(25% - 10px)"  // Adjust width based on the gap 
                     }}
-                >
-                  <div className="position-relative w-100" style={{height:'5.5rem'}}>
+                > 
+                  <div className="position-relative w-100" style={{height:'50%'}}>
                   <img src="/wool-item-1.png" className="img-fluid" alt="Product" />
-                    <div className="position-absolute top-0 start-0 w-100" style={{height:'5.5rem' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
+                    <div className="position-absolute top-0 start-0 w-100" style={{height:'100%' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
                     </div>
                   </div>
                   <div className="text-center mt-2">
@@ -229,6 +230,7 @@ const filteredVariants = variant.variants.filter((item) =>
                   </div>
                 </div>
               ))}
+            </div>
             </div>
           </div>
         )}

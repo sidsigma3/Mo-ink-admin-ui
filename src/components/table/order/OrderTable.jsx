@@ -11,9 +11,14 @@ import { getAllOrders } from "../../../services/OrderService";
 import { updateOrder } from "../../../services/OrderService";
 import * as XLSX from "xlsx";
 
-const OrderTable = forwardRef((props, ref) => {
+const OrderTable = forwardRef(({data}, ref) => {
  
   const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    setOrders(data || []);
+  }, [data]);
+
   const [showModalAssign, setShowModalAssign] = useState(false);
 
   const navigate = useNavigate();
@@ -54,7 +59,7 @@ const OrderTable = forwardRef((props, ref) => {
 
         // Send update request to backend
         await updateOrder(orderId, updatedOrderData);
-        fetchOrders(); // Refresh order list
+        // fetchOrders(); // Refresh order list
 
         alert("Payment status updated successfully.");
     } catch (error) {
@@ -79,7 +84,7 @@ const OrderTable = forwardRef((props, ref) => {
         };
 
         await updateOrder(orderId, updatedOrderData);
-        fetchOrders();
+        // fetchOrders();
 
       alert("Order status updated successfully.");
     } catch (error) {
@@ -89,18 +94,18 @@ const OrderTable = forwardRef((props, ref) => {
 
 
 
-const fetchOrders = async () => {
-  try {
-      const data = await getAllOrders();
-      setOrders(data);
-  } catch (error) {
-      console.error("Failed to fetch orders", error);
-  }
-};
+// const fetchOrders = async () => {
+//   try {
+//       const data = await getAllOrders();
+//       setOrders(data);
+//   } catch (error) {
+//       console.error("Failed to fetch orders", error);
+//   }
+// };
 
-useEffect(() => {
-  fetchOrders();
-}, []);
+// useEffect(() => {
+//   fetchOrders();
+// }, []);
 
   const handleRowClick = (order) => {
     navigate("/create-order", { state: { order } });

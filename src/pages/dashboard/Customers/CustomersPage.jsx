@@ -16,7 +16,7 @@ import { Dropdown } from 'react-bootstrap'
 import { getAllCustomer , getWalletTransactions} from '../../../services/CustomerService'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-
+import { getAllOrders } from '../../../services/OrderService'
 
 const CustomersPage = () => {
 
@@ -25,6 +25,8 @@ const CustomersPage = () => {
     // const { customers ,setCustomer } = useCustomerContext();
 
     const [customers,setCustomer] = useState([])
+    const [orders, setOrders] = useState([]); 
+    const [filteredData, setFilteredData] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,7 +34,7 @@ const CustomersPage = () => {
             const data = await getAllCustomer();
             // console.log(data)
             setCustomer(data.data)
-            
+            setFilteredData(data.data)
           } catch (error) {
             console.error('Error fetching Customers:', error);
           }
@@ -104,33 +106,6 @@ useEffect(() => {
   fetchWallets();
 }, [customers])
 
-
-const exportToExcel = () => {
-  if (!customers || !customers.length) {
-    alert("No customer customers available for export.");
-    return;
-  }
-
-  const worksheet = XLSX.utils.json_to_sheet(
-    customers.map(customer => ({
-      "Customer Name": customer.customerName,
-      "City": customer.addresses[0]?.city || "N/A",
-      "Wallet Balance": customer.walletBalance !== undefined ? customer.walletBalance : "N/A",
-      "Total Orders": customer.totalOrders,
-      "Last Order": customer.lastOrder || "N/A",
-    }))
-  );
-
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
-
-  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  const dataBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  saveAs(dataBlob, "Customers_List.xlsx");
-};
-
-const orders = JSON.parse(localStorage.getItem("orders")) || [];
-
 const getCustomerOrderStats = (customerId) => {
   const customerOrders = orders.filter(order => order.customer.id === customerId);
 
@@ -144,6 +119,71 @@ const getCustomerOrderStats = (customerId) => {
   return { totalOrders, lastOrderDate };
 };
 
+
+
+const exportToExcel = () => {
+  if (!customers || !customers.length) {
+    alert("No customer customers available for export.");
+    return;
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(
+    customers.map(customer => {
+      const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId)
+      return {
+      "Customer Name": customer.customerName,
+      "City": customer.addresses[0]?.city || "N/A",
+      "Wallet Balance": walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "N/A",
+      "Address":customer.addresses[0].customerAddress,
+      "Email":customer.email,
+      "Company":customer.company,
+      "Calling Number":customer.phoneNumber,
+      "WhatsApp Number":customer.whatsappNumber,
+      "PAN":customer.panNumber,
+      'GST Number':customer.gstNumber,
+      "Total Orders": totalOrders,
+      "Last Order": lastOrderDate || "N/A",
+    }})
+  );
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const dataBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  saveAs(dataBlob, "Customers_List.xlsx");
+};
+
+const fetchOrders = async () => {
+  try {
+      const data = await getAllOrders();
+      setOrders(data);
+  } catch (error) {
+      console.error("Failed to fetch orders", error);
+  }
+};
+
+useEffect(() => {
+  fetchOrders();
+}, []);
+
+const handleFilterChange = (filter, value) => {
+  const lowercasedValue = value.toLowerCase();
+
+  const filtered = customers.filter((item) => {
+    if (filter === "City") {
+        return item.addresses.some(address => 
+            address.city && address.city.toString().toLowerCase().includes(lowercasedValue)
+        );
+    }
+    if (filter === "Customer") {
+        return item.customerName.toLowerCase().includes(lowercasedValue);
+    }
+    return true;
+});
+
+  setFilteredData(filtered);
+  };
 
   return (
     <div className='customer-page'>
@@ -165,7 +205,10 @@ const getCustomerOrderStats = (customerId) => {
 
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
-                <ProductFilter></ProductFilter>
+                <ProductFilter 
+                    filterOptions={["City", "Customer"]} 
+                    onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+                />
             </div>
          
             <div className='w-25'>
@@ -191,7 +234,7 @@ const getCustomerOrderStats = (customerId) => {
               const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
 
               return (
-                <tr key={index} style={{ cursor: "pointer" }}>
+                <tr key={index} style={{ cursor: "pointer" }} onClick={() => handleRowClick(index)}>
                   <td>{customer.customerName}</td>
                   <td>{customer.addresses[0]?.city || "N/A"}</td>
                   <td style={{ color: "#3CAA82" }}>

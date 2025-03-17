@@ -10,9 +10,8 @@ import { forwardRef, useImperativeHandle } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-const ProductsTable = forwardRef((props,ref) => {
+const ProductsTable = forwardRef(({data},ref) => {
 
-  
   const navigate = useNavigate();
 
   const [productData,setProductData] = useState([])
@@ -23,8 +22,6 @@ const ProductsTable = forwardRef((props,ref) => {
       try {
         const data = await getAllProduct();
         setProductData(data.data)
-        console.log(data)
-        console.log(productData)
       
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -41,7 +38,7 @@ const ProductsTable = forwardRef((props,ref) => {
     navigate('/add-product', { state: { index,ix,finalData } });
   };
 
-  console.log(productData)
+  
 
   let active = 2;
   let items = [];
@@ -104,7 +101,7 @@ const ProductsTable = forwardRef((props,ref) => {
   };
 
 
-  const finalData = aggregateProductData(productData)
+  const finalData = aggregateProductData(data)
   
   console.log(finalData)
 
@@ -191,18 +188,22 @@ const ProductsTable = forwardRef((props,ref) => {
                       ))}
                       {item.variants.length > 1 && (
                         <div
+                          // style={{
+                          //   width: '25px',
+                          //   height: '25px',
+                          //   borderRadius: '50%',
+                          //   marginLeft: '-10px',
+                          //   backgroundColor: '#ccc',
+                          //   display: 'flex',
+                          //   alignItems: 'center',
+                          //   justifyContent: 'center',
+                          //   fontSize: '18px',
+                          //   color: '#000',
+                          //   border: '1px solid #fff',
+                          // }}
                           style={{
-                            width: '30px',
-                            height: '25px',
-                            borderRadius: '50%',
-                            marginLeft: '-10px',
-                            backgroundColor: '#ccc',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '18px',
-                            color: '#000',
-                            border: '1px solid #fff',
+                            position:'absolute',
+                            right:-5,
                           }}
                         >
                           {/* +{item.variants.length - 3} */}
