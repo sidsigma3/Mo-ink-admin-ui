@@ -137,7 +137,7 @@ const exportToExcel = () => {
       "Address":customer.addresses[0].customerAddress,
       "Email":customer.email,
       "Company":customer.company,
-      "Calling Number":customer.phoneNumber,
+    "Calling Number":customer.phoneNumber,
       "WhatsApp Number":customer.whatsappNumber,
       "PAN":customer.panNumber,
       'GST Number':customer.gstNumber,
@@ -173,7 +173,7 @@ const handleFilterChange = (filter, value) => {
   const filtered = customers.filter((item) => {
     if (filter === "City") {
         return item.addresses.some(address => 
-            address.city && address.city.toString().toLowerCase().includes(lowercasedValue)
+            address.city && address.city.toLowerCase().includes(lowercasedValue)
         );
     }
     if (filter === "Customer") {
@@ -230,7 +230,7 @@ const handleFilterChange = (filter, value) => {
                     </tr>
                 </thead>
                 <tbody>
-            {customers.map((customer, index) => {
+            {filteredData.map((customer, index) => {
               const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
 
               return (
@@ -267,31 +267,35 @@ const handleFilterChange = (filter, value) => {
 
 
             <div className="data-cards">
-         {customers.map((item,index) => (
+         {filteredData.map((customer,index) => {
+            const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
+          return(
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3>{item.name}</h3>
+                 <h3>{customer.customerName}</h3>
                  <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:'#D1FAE5',border:'1px solid' ,borderColor:'#6EE7B7',borderRadius:'0.2rem',textAlign:'center',width:'100%' ,color:'#00A65E'}}>
-                      {/* <span><BiWallet /></span>      {item.wallet} */}
+                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:'#D1FAE5',border:'1px solid' ,borderColor:'#6EE7B7',borderRadius:'0.2rem',textAlign:'center',width:'4rem' ,color:'#00A65E'}}>
+                      ₹ {walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "Loading..."} 
                     </div>
                 </p>
             </div>
 
           
             
-            <p><strong></strong> {item.phone}</p>
+            <p><strong></strong> {customer.phoneNumber}</p>
     
          
 
-            <p className='fw-medium'><strong></strong> {item.location}</p>
+            <p className='fw-medium'><strong></strong> {customer.addresses[0]?.city || "N/A"}</p>
 
-            <p className='text-body-tertiary'>Last Order on {item.lastOrder}</p>
+            <p className='text-body-tertiary'>Last Order on {lastOrderDate}</p>
 
            
           </div>
-        ))}
+          )
+        }
+        )}
       </div>
 
 

@@ -293,3 +293,37 @@
 
 
 }
+
+.dropdown-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .dropdown-select {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    display: none;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    z-index: 10;
+  }
+  
+  .dropdown-wrapper:hover .dropdown-select {
+    display: block;
+  }
+  
+  .green {
+    color: green;
+  }
+  
+  .grey {
+    color: grey;
+  }
+  
+  .yellow {
+    color: orange;
+  }

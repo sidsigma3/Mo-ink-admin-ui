@@ -161,16 +161,25 @@ const Spinners = () => {
 
 
   const handleFilterChange = (filter, value) => {
-    const lowercasedValue = value.toLowerCase();
+    const lowercasedValue = value.trim().toLowerCase();
+
+    if (!lowercasedValue) {
+        setFilteredData(data); // Reset filter when input is empty
+        return;
+    }
 
     const filtered = data.filter((item) => {
-        if (filter === "Order Id") return item.orderId.toString().includes(value);
-        if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
-        return true;
+        if (filter === "Name" && item.firstName) {
+            return item.firstName.toLowerCase().includes(lowercasedValue);
+        }
+        if (filter === "City" && item.city) {
+            return item.city.toLowerCase().includes(lowercasedValue);
+        }
+        return true; // Keep item if no valid filter
     });
 
     setFilteredData(filtered);
-    };
+};
 
 
   return (
@@ -209,7 +218,7 @@ const Spinners = () => {
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
               <ProductFilter 
-                  filterOptions={["Order Id", "Customer"]} 
+                  filterOptions={["Name","City"]} 
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
@@ -232,7 +241,7 @@ const Spinners = () => {
                     </tr>
                 </thead>
                 <tbody>
-          {data.map((customer, index) => (
+          {filteredData.map((customer, index) => (
             <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
               <td>{customer.firstName} {customer.lastName}</td>
               <td>{customer.city}</td>
@@ -274,15 +283,15 @@ const Spinners = () => {
 
 
                 <div className="data-cards">
-        {data.map((customer,index) => (
+        {filteredData.map((customer,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3>{customer.name}</h3>
+                 <h3>{customer.firstName} {customer.lastName}</h3>
                  <p> 
                     <div
                      style={{
-                        width:'100%',
+                        width:'5rem',
                         padding:'0.2rem 0.4rem',
                         border:'1px solid',borderRadius:'0.2rem',textAlign:'center',
                         backgroundColor:customer.tag === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
@@ -290,15 +299,15 @@ const Spinners = () => {
                         color : customer.tag === 'Spinner' ? '#1E40AF' : '#92400E' ,
                     }}
                     >
-                    {customer.tag}
+                    {customer.vendorType}
                     </div>
                 </p>
             </div>
 
-            <p><strong></strong> {customer.phone}</p>
+            <p><strong></strong> {customer.phoneNumber}</p>
     
 
-            <p className='fw-medium'><strong></strong> {customer.location}</p>
+            <p className='fw-medium'><strong></strong> {customer.city}</p>
 
             <p className='text-body-tertiary'>Last Order on {customer.lastOrder}</p>
 

@@ -1,12 +1,32 @@
 .auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* height: 100vh; */
+  background-color: #f9f9f9;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+@media(max-width:768px){
+  .auth-page{
+    padding: 0;
+    height: 100vh;
+  }
+
+}
+
+
+/* .auth-page {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     background: #f9f9f9;
-  }
+  } */
   
-  .form-container {
+  /* .form-container {
     position: relative;
    
     overflow: hidden;
@@ -21,9 +41,9 @@
     left: 0;
   
     transition: transform 0.3s ease, ; 
-    /* transition-delay: 2s; */
+   
   }
-  /* opacity 5s ease */
+ 
   
   .form-container.login {
     transform: translateX(0);
@@ -43,7 +63,7 @@
   input:checked ~ .form-container.signup {
     transform: translateX(0);
     opacity: 1;
-  }
+  } */
   
   /* .toggle-ctn {
     margin-top: 1rem;

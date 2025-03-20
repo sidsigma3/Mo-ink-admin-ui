@@ -27,7 +27,7 @@ const SegmentsPage = () => {
             try {
               const data = await getAllSegment();
               setSegments(data.data)
-             
+              setFilteredData(data.data)
             } catch (error) {
               console.error('Error fetching products:', error);
             }
@@ -141,8 +141,8 @@ const SegmentsPage = () => {
         const lowercasedValue = value.toLowerCase();
     
         const filtered = segments.filter((item) => {
-            if (filter === "Order Id") return item.orderId.toString().includes(value);
-            if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
+            // if (filter === "Order Id") return item.orderId.toString().includes(value);
+            if (filter === "Title") return item.segmentTitle.toLowerCase().includes(lowercasedValue);
             return true;
         });
     
@@ -170,7 +170,7 @@ const SegmentsPage = () => {
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
             <ProductFilter 
-                  filterOptions={["Order Id", "Customer"]} 
+                  filterOptions={["Title"]} 
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
@@ -192,7 +192,7 @@ const SegmentsPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                {segments.map((row, index) => (
+                {filteredData.map((row, index) => (
                     <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
                     <td>{row.segmentTitle}</td>
                     <td>{row.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</td>
@@ -222,11 +222,11 @@ const SegmentsPage = () => {
 
 
             <div className="data-cards">
-        {rows.map((seg,index) => (
+        {filteredData.map((seg,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3>{seg.title}</h3>
+                 <h3>{seg.segmentTitle}</h3>
                  {/* <p> 
                     <div
                      style={{
@@ -243,12 +243,12 @@ const SegmentsPage = () => {
                 </p> */}
             </div>
 
-            <p><strong></strong>Customers : {seg.customers}</p>
+            <p><strong></strong>Customers : {seg.customerCount}</p>
     
 
-            <p className='fw-medium'><strong></strong> {seg.type === 'Conditional' ? 'Automated' : 'Label'}</p>
+            <p className='fw-medium'><strong></strong> {seg.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</p>
 
-            <p >{formatConditions(seg.conditions, seg.customerList)}</p>
+            <p >{formatSegmentCondition(seg.segmentCondition)}</p>
 
           </div>
         ))}

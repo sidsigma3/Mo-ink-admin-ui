@@ -8,7 +8,6 @@ import ReactQuill from "react-quill";
 import "./AddProduct.css";
 import { SketchPicker } from "react-color";
 import { IoMdAdd } from "react-icons/io";
-import { Button } from "react-bootstrap";
 import { MdDeleteOutline } from "react-icons/md";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import AddBtn from "../../../components/Buttons/Add/AddBtn";
@@ -17,6 +16,7 @@ import DeleteBtn from "../../../components/Buttons/Delete/DeleteBtn";
 import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
 import { addProduct , deleteProduct, updateProduct } from "../../../services/ProductService";
 import * as XLSX from "xlsx";
+import { Modal, Button } from "react-bootstrap";
 
 const AddProduct = () => {
 
@@ -24,7 +24,7 @@ const AddProduct = () => {
   const { index, ix, finalData } = state || {}; // Provide a default empty object
   const [errors, setErrors] = useState({});
   const [sizeColorError, setSizeColorError] = useState("");
-
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   const product = (typeof index === 'number' && finalData) ? finalData[index] : null;
@@ -152,7 +152,7 @@ const AddProduct = () => {
       return colors.map((color) => ({
         id:color.id || null ,
         size,
-        color: {id:color.id || null , colorName: color.name , hexCode:color.hex },
+        color: {id:color.id || null , colorName: color.color , hexCode:color.hex },
         availableWeight: Number(color.available), // Assuming 'available' corresponds to weight
         pricePerKg: Number(color.price), // Use the price from each color variant
       }));
@@ -254,17 +254,15 @@ const AddProduct = () => {
                     newColor => !existingColors.some(existingColor => existingColor.hex === newColor.hex)
                 )
             ];
-
             return {
-                size: size.value,
-                colors: mergedColors
-            };
-        });
+              size: size.value,
+              colors: mergedColors
+          };
+      });
 
-        return newMap;
-    });
+      return newMap;
+  });
 };
-
 
 
 
@@ -348,10 +346,25 @@ const AddProduct = () => {
   
   
   const updateColorField = (sizeIndex, colorIndex, field, value) => {
-    const updatedMap = [...sizeColorMap];
-    updatedMap[sizeIndex].colors[colorIndex][field] = value;
-    setSizeColorMap(updatedMap);
+    setSizeColorMap((prevMap) => {
+      return prevMap.map((sizeItem, sIdx) => {
+        if (sIdx !== sizeIndex) return sizeItem; // Keep other sizes unchanged
+  
+        return {
+          ...sizeItem,
+          colors: sizeItem.colors.map((colorItem, cIdx) => {
+            if (cIdx !== colorIndex) return colorItem; // Keep other colors unchanged
+  
+            return {
+              ...colorItem,
+              [field]: value, // Update the specific field (available or price)
+            };
+          }),
+        };
+      });
+    });
   };
+  
   
 
   const handleStatusChange = (newStatus) => {
@@ -411,72 +424,138 @@ const handleDelete = async() =>{
 }  
 
 
+const [selectedFile, setSelectedFile] = useState(null);
+  
+// Open modal
+const openModal = () => setShowModal(true);
 
-const handleFileUpload = (event) => {
+// Close modal
+const closeModal = () => {
+  setShowModal(false);
+  setSelectedFile(null);
+};
+
+// Handle file selection
+const handleFileChange = (event) => {
   const file = event.target.files[0];
+
   if (!file) return;
 
+  // Validate file type
+  if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+    alert("Invalid file type. Please upload an Excel file.");
+    return;
+  }
+
+  setSelectedFile(file);
+};
+
+// Handle file upload & process Excel data
+const handleUpload = () => {
+  if (!selectedFile) {
+    alert("Please select a file to upload.");
+    return;
+  }
+
   const reader = new FileReader();
-  reader.readAsBinaryString(file);
+  reader.readAsBinaryString(selectedFile);
 
   reader.onload = (e) => {
-    const binaryStr = e.target.result;
-    const workbook = XLSX.read(binaryStr, { type: "binary" });
+    try {
+      const binaryStr = e.target.result;
+      const workbook = XLSX.read(binaryStr, { type: "binary" });
 
-    // Assuming the first sheet contains the required data
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
+      // Get the first sheet
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
 
-    // Convert sheet to JSON
-    const data = XLSX.utils.sheet_to_json(sheet);
-    console.log(data)
-    parseSizeColorData(data);
+      // Convert sheet data to JSON
+      const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+      if (!data.length) {
+        alert("The uploaded file is empty.");
+        return;
+      }
+
+      console.log("Parsed Data:", data);
+      parseSizeColorData(data); // Call your processing function
+
+      // Close modal after processing
+      closeModal();
+    } catch (error) {
+      console.error("Error reading file:", error);
+      alert("Error processing the file. Please try again.");
+    }
+  };
+
+  reader.onerror = () => {
+    alert("Error reading file. Please try again.");
   };
 };
 
 const parseSizeColorData = (data) => {
-  const sizes = new Set();
-  const colors = [];
- 
+  const sizeColorMap = new Map(); // Stores size as key and unique colors as values
 
   data.forEach((row) => {
-    if (row.Size) sizes.add(String(row.Size).trim());
+    const size = row.Size ? String(row.Size).trim() : null;
+    const colorName = row.Color ? row.Color.trim() : null;
+    const hexCode = row.HexCode ? row.HexCode.trim().toLowerCase() : null;
+    const available = row.Availability ? Number(row.Availability) : 0;
+    const price = row.PricePerKg ? Number(row.PricePerKg) : 0;
 
-    if (row.Color && row.HexCode) {
-      const colorName = row.Color.trim();
-      const hexCode = row.HexCode.trim();
+    if (size && colorName && hexCode) {
+      if (!sizeColorMap.has(size)) {
+        sizeColorMap.set(size, new Map()); // Each size has its own color map
+      }
       
-      console.log(colorName,hexCode)
-     
-      // Prevent duplicate colors
-      if (!colors.some(c => c.colorName === colorName && c.hexCode === hexCode)) {
-        colors.push({ 
-          color:colorName,
-          hex:hexCode });
+      // Add color only if it's unique for this size
+      if (!sizeColorMap.get(size).has(hexCode)) {
+        sizeColorMap.get(size).set(hexCode, {
+          color: colorName,
+          hex: hexCode,
+          available,
+          price,
+        });
       }
     }
   });
 
-  // Convert Set to Array for sizes
-  const sizeArray = [...sizes].map((size) => ({ value: size }));
+  // Convert map to array format
+  const sizeArray = [...sizeColorMap.keys()].map((size) => ({
+    value: size,
+  }));
+
+  const formattedSizeColorMap = [...sizeColorMap.entries()].map(([size, colorMap]) => ({
+    size: size,
+    colors: [...colorMap.values()],
+  }));
 
   console.log("Extracted Sizes:", sizeArray);
-  console.log("Extracted Colors:", colors);
 
-  // Update state with extracted variants
-  setVariants((prevVariants) => [
+  console.log("Extracted Size-Color Map:", formattedSizeColorMap);
+  
+
+  setVariants([
     { name: "size", values: sizeArray },
-    { name: "color", values: colors },
+    { 
+      name: "color", 
+      values: Array.from(
+        new Map(
+          formattedSizeColorMap
+            .flatMap((entry) => entry.colors)
+            .map((color) => [color.hex, color]) 
+        ).values()
+      ),
+    },
   ]);
+  
 
-  // Wait for state update and then generate size-color map
-  // setTimeout(() => {
-  //   generateSizeColorMap();
-  // }, 1000);
+  setTimeout(() => {
+    setSizeColorMap(formattedSizeColorMap);
+  }, 500);
 };
 
 
-  
   return (
 
     <div className="add-product-ctn">
@@ -602,16 +681,42 @@ const parseSizeColorData = (data) => {
             <div className="top d-flex justify-content-between">
                 <h4>Variant</h4>
 
-              <div>
-              <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-              {sizeColorError && <p className="text-danger">{sizeColorError}</p>}
-            </div>
+
+           
+
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Upload File</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+              <input type="file" accept=".xls,.xlsx" onChange={handleFileChange} />
+            
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowModal(false)}>
+                  Cancel
+                </Button>
+                <Button variant="primary" onClick={handleUpload}>
+                  Upload
+                </Button>
+              </Modal.Footer>
+              </Modal>
+
+
+              <div className="d-flex gap-3">
+
+              <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+              Upload File
+            </button>
+
 
             <button 
             style={{display:"flex",gap:"1rem" ,alignItems:"center"}}
             onClick={addVariant}>
             <span><IoMdAddCircleOutline size={20}/></span>
             </button>
+
+            </div>
             </div>
      
       {variants.map((variant, variantIndex) => (
@@ -936,19 +1041,7 @@ const parseSizeColorData = (data) => {
                     {expandedRow === sizeIndex &&
                     entry.colors.map((color, colorIndex) => (
                         <tr key={colorIndex}>
-                        <td >
-                            <div>
-                              <input 
-                               className="w-75"
-                               type="text"
-                               value={color.name || ""}
-                               onChange={(e) =>
-                               handleVariantValueChangeTable(sizeIndex, colorIndex, "name", e.target.value)
-                               }
-                               placeholder="name"
-                              ></input>
-                            </div>
-                        </td>
+                        
                         <td style={{ alignItems: "center" }} className="d-flex justify-content-between">
                             <div >
                             <div
@@ -962,7 +1055,7 @@ const parseSizeColorData = (data) => {
                             }}
                             ></div>
 
-                                {color.name}
+                                {color.color}
                             </div>
                             
                          
@@ -978,6 +1071,20 @@ const parseSizeColorData = (data) => {
                             />
                             
                             </td>
+
+                            <td >
+                            <div>
+                              <input 
+                               className="w-75"
+                               type="text"
+                               value={color.color || ""}
+                               onChange={(e) =>
+                               handleVariantValueChangeTable(sizeIndex, colorIndex, "name", e.target.value)
+                               }
+                               placeholder="name"
+                              ></input>
+                            </div>
+                        </td>
                         <td>
                             <input
                             type="number"

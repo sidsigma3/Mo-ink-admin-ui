@@ -22,6 +22,7 @@ const UserPage = () => {
           try {
             const data = await getAllUser();
             setUsers(data.data)
+            setFilteredData(data.data)
           } catch (error) {
             console.error('Error fetching products:', error);
           }
@@ -61,8 +62,8 @@ const UserPage = () => {
       const lowercasedValue = value.toLowerCase();
   
       const filtered = users.filter((item) => {
-          if (filter === "Order Id") return item.orderId.toString().includes(value);
-          if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
+          // if (filter === "Order Id") return item.orderId.toString().includes(value);
+          if (filter === "Name") return item.firstName.toLowerCase().includes(lowercasedValue);
           return true;
       });
   
@@ -90,7 +91,7 @@ const UserPage = () => {
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-100'>
             <ProductFilter 
-                  filterOptions={["Order Id", "Customer"]} 
+                  filterOptions={["Name"]} 
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
@@ -113,7 +114,7 @@ const UserPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user, index) => (
+                    {filteredData.map((user, index) => (
                         <tr key={index}  
                         onClick={() => handleRowClick(index)}
                          >
@@ -122,7 +123,7 @@ const UserPage = () => {
                         <td>
                         <div
                             style={{
-                                width: '50%',
+                                width: '5rem',
                                 padding: '0.1rem 0.5rem',
                                 border: '1px solid',
                                 borderRadius: '0.2rem',
@@ -188,41 +189,41 @@ const UserPage = () => {
 
 
             <div className="data-cards">
-            {users.map((user,index) => (
+            {filteredData.map((user,index) => (
           <div className="data-card" key={index}>
 
-            <div className='d-flex justify-content-between'>
-                 <h3>{user.name}</h3>
+            <div className='d-flex justify-content-between'   onClick={() => handleRowClick(index)}>
+                 <h3>{user.firstName + user.lastName}</h3>
                  <p> 
                     <div
-                     style={{
-                        width: '100%',
-                        padding: '0.2rem 0.4rem',
+                      style={{
+                        width: '5rem',
+                        padding: '0.1rem 0.5rem',
                         border: '1px solid',
                         borderRadius: '0.2rem',
                         textAlign: 'center',
                         backgroundColor:
-                          user.role === 'Owner'
+                           user.role.toLowerCase() === 'owner'
                             ? '#FEDBDC'
-                            : user.role === 'Admin'
+                            :  user.role.toLowerCase() === 'admin'
                             ? '#DBEAFE'
-                            : user.role === 'Sales'
+                            :  user.role.toLowerCase() === 'sales'
                             ? '#FFECFA'
                             : '#FFFFFF', // Default background color if none match
                         borderColor:
-                          user.role === 'Owner'
+                           user.role.toLowerCase() === 'owner'
                             ? '#FD9395'
-                            : user.role === 'Admin'
+                            :  user.role.toLowerCase() === 'admin'
                             ? '#93C5FD'
-                            : user.role === 'Sales'
+                            :  user.role.toLowerCase() === 'sales'
                             ? '#F75FFF'
                             : '#CCCCCC', // Default border color if none match
                         color:
-                          user.role === 'Owner'
+                           user.role.toLowerCase() === 'owner'
                             ? '#B91C1C' // Red text for Owner
-                            : user.role === 'Admin'
+                            :  user.role.toLowerCase() === 'admin'
                             ? '#1E40AF' // Blue text for Admin
-                            : user.role === 'Sales'
+                            :  user.role.toLowerCase() === 'sales'
                             ? '#7A1E7A' // Purple text for Sales
                             : '#000000', // Default text color if none match
                       }}
@@ -237,7 +238,7 @@ const UserPage = () => {
 
             <p className='fw-medium'><strong></strong></p>
 
-            <p className='text-body-tertiary'>{user.joinedOn}</p>
+            <p className='text-body-tertiary'>{new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}</p>
 
           </div>
         ))}

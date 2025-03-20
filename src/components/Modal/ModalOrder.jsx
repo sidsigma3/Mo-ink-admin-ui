@@ -166,7 +166,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
           <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} id={currentId}/>
         )}
       </Modal.Body>
-      <Modal.Footer className="flex justify-content-between">
+      <Modal.Footer className="flex justify-content-between" style={{ display: showCatalogue === true ? 'none' : 'flex'}}>
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>

@@ -549,6 +549,19 @@ const CreateOrder = () => {
       setSelectedAddress(newSelectedAddress);
     }
   };
+
+  const calculateShippingCost = (orderDetails, selectedCustomer) => {
+    if (!selectedCustomer?.address) return 0;
+  
+    const customerState = selectedAddress.state.toLowerCase();
+    const ratePerKg = customerState === "odisha" ? 5 : 12;
+  
+    // Calculate the total weight from the order details
+    const totalWeight = orderDetails.reduce((acc, item) => acc + (item.quantity || 0), 0);
+  
+    return (totalWeight * ratePerKg).toFixed(2);
+  };
+  
   
 
   return (
@@ -589,7 +602,7 @@ const CreateOrder = () => {
                 <div className='products bg-white p-4 mb-3 rounded'>
                     <h5>Order Details</h5>
                     
-                    <div className='d-flex gap-2 mb-3 mt-3'>
+                    <div className='d-flex justify-content-center gap-2 mb-1 mt-3 border-bottom pb-5'>
                     {/* <SearchBox></SearchBox> */}
                     <div>
                     <button className='btn btn-primary' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
@@ -608,8 +621,8 @@ const CreateOrder = () => {
                                     <th className='fw-medium'>Color Name</th>
                                     <th className='fw-medium'>Weight (Kgs)</th>
                                     <th className='fw-medium'>Cost</th>
-                                    <th className='fw-medium'>GST</th>
-                                    <th className='fw-medium'>Total</th>
+                                    <th className='fw-medium' style={{textAlign:"center"}}>GST</th>
+                                    <th className='fw-medium' style={{textAlign:"end"}}>Total</th>
                                 </tr>
                             </thead>
 
@@ -642,7 +655,7 @@ const CreateOrder = () => {
 
                                           {/* Colors Column */}
                                           <td>
-                                              <div className="d-flex flex-column">
+                                              <div className="d-flex flex-column gap-1">
                                                   {order.colors.map((colorObj, colorIndex) => (
                                                       <div
                                                           key={colorIndex}
@@ -660,33 +673,25 @@ const CreateOrder = () => {
                                           </td>
 
                                           <td>
-                                              <div className="d-flex flex-column">
+                                              <div className="d-flex flex-column gap-3">
                                                   {order.colors.map((colorObj, colorIndex) => (
                                                       <div
                                                           key={colorIndex}
-                                                          // style={{
-                                                          //     backgroundColor: colorObj.hexCode,
-                                                          //     width: '25px',
-                                                          //     height: '25px',
-                                                          //     borderRadius: '50%',
-                                                          //     border: '2px solid #ccc',
-                                                          //     margin: '5px',
-                                                          // }}
                                                       >{colorObj.colorName}</div>
                                                   ))}
                                               </div>
                                           </td>
 
                                           {/* Weight Inputs Column */}
-                                          <td>
-                                              <div className="d-flex flex-column">
+                                          <td style={{width:'10rem'}}>
+                                              <div className="d-flex flex-column ">
                                                   {order.colors.map((colorObj, colorIndex) => (
                                                       <input
                                                           key={colorIndex}
                                                           type="number"
                                                           style={{ border: '1px solid' }}
                                                           placeholder="Weight"
-                                                          className="rounded border-secondary-subtle mb-2 p-1 weight-input w-75"
+                                                          className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
                                                           value={colorObj.weight || ''} 
                                                           onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
                                                           disabled={isViewMode}
@@ -697,7 +702,7 @@ const CreateOrder = () => {
 
                                           {/* Price Calculation */}
                                           <td colSpan="3">
-                                              <div className="d-flex flex-column">
+                                              <div className="d-flex flex-column gap-3">
                                               {order.colors.map((colorObj, colorIndex) => {
                                                     const { baseTotal, gstAmount, finalTotal, gstRate } = calculatePriceBreakdown(order, colorObj);
 
@@ -856,7 +861,8 @@ const CreateOrder = () => {
                     <tr className="border-bottom">
                       <td className="pb-3">Handling Charges</td>
                       <td></td>
-                      <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td>
+                      {/* <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td> */}
+                      <td className="text-end">₹{calculateShippingCost(orderDetails, selectedCustomer)}</td>
                     </tr>
 
                   
@@ -1025,7 +1031,7 @@ const CreateOrder = () => {
                         <div>
                         <h4 className='d-flex justify-content-between'>
                           Billing Address
-                          <Dropdown onSelect={handleSelectAddress}>
+                          <Dropdown onSelect={handleSelectAddress} style={{width:"6rem"}}>
                             <Dropdown.Toggle variant="light" id="dropdown-basic" className='w-100'>
                               {selectedAddress.addressType || "Select Address"}
                             </Dropdown.Toggle>

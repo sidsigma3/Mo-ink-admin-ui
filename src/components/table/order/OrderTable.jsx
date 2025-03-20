@@ -295,22 +295,65 @@ const OrderTable = forwardRef(({data}, ref) => {
                 </span>
               </p>
               <p>
-                {order.totalAmount} Quantity{" "}
+                {order.variants.length} Quantity{" "}
                 <span>
-                  <LuDot size={25} />
+                  <LuDot size={25} /> 
                 </span>
               </p>
               <p>{order.totalAmount}</p>
             </div>
 
             <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex justify-content-between gap-1">
-                <h5 className={statusClassMap[order.status]}>
+            <div className="dropdown-wrapper" onClick={(e) => e.stopPropagation()}>
+                <h5 
+                  className={statusClassMap[order.status]}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {order.status}
                 </h5>
-                <h5 className={order.payment === "Paid" ? "green" : "grey"}>
+                <select
+                  className={`dropdown-select ${statusClassMap[order.status]}`}
+                  value={order.status}
+                  onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
+                >
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="dropdown-wrapper" onClick={(e) => e.stopPropagation()}>
+                <h5 
+                  className={
+                    order.payment.paymentStatus === "Fully Paid" 
+                      ? "green" 
+                      : order.payment.paymentStatus === "Unpaid"
+                      ? "grey" 
+                      : "yellow"
+                  }
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {order.payment.paymentStatus}
                 </h5>
+                <select
+                  className={`dropdown-select ${
+                    order.payment.paymentStatus === "Fully Paid"
+                      ? "green"
+                      : order.payment.paymentStatus === "Unpaid"
+                      ? "grey"
+                      : "yellow"
+                  }`}
+                  value={order.payment.paymentStatus}
+                  onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
+                >
+                  {paymentStatusOption.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="manufacturer">

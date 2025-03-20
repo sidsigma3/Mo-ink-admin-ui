@@ -13,6 +13,8 @@ import { Pagination } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Dropdown } from 'react-bootstrap'
 import { getAllDiscount } from '../../../services/DiscountService'
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const DiscountsPage = () => {
 
@@ -20,7 +22,7 @@ const DiscountsPage = () => {
   
 
   const [discountData , setDiscountData] = useState([])
-   const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   
       useEffect(() => {
           const fetchData = async () => {
@@ -28,7 +30,7 @@ const DiscountsPage = () => {
               const data = await getAllDiscount();
               console.log(data)
               setDiscountData(data.data)
-              
+              setFilteredData(data.data)
             } catch (error) {
               console.error('Error fetching Customers:', error);
             }
@@ -66,12 +68,47 @@ const DiscountsPage = () => {
     const lowercasedValue = value.toLowerCase();
 
     const filtered = discountData.filter((item) => {
-        if (filter === "Order Id") return item.orderId.toString().includes(value);
-        if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
+        // if (filter === "Order Id") return item.orderId.toString().includes(value);
+        if (filter === "Discount Code") return item.discountCode.toLowerCase().includes(lowercasedValue);
         return true;
     });
 
     setFilteredData(filtered);
+    };
+
+    const exportToExcel = (discounts) => {
+      if (!discounts || !discounts.length) {
+        alert("No discounts available for export.");
+        return;
+      }
+    
+      const worksheet = XLSX.utils.json_to_sheet(
+        discounts.map((discount) => {
+          const applicableProduct = discount?.applicableProducts[0]?.productName || "N/A";
+          const discountInfo =
+            discount.discountType === "Percentage"
+              ? `${discount.discountValue}% off on ${applicableProduct}`
+              : `₹${discount.discountValue} off on ${applicableProduct}`;
+          return {
+            "Title": discount.discountCode,
+            "Status": discount.discountStatus,
+            "Method": discount.discountMethod,
+            "Eligible Customers": discount.eligibleCustomers.length,
+            "Used": discount.used,
+            "Discount Details": discountInfo,
+            "Minimum Purchase Requirement": discount.minPurchaseRequirement || "N/A"
+          };
+        })
+      );
+    
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Discounts");
+    
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const dataBlob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(dataBlob, "Discounts_List.xlsx");
     };
 
   return (
@@ -80,7 +117,7 @@ const DiscountsPage = () => {
             <h4 style={{fontSize:'1.3rem'}}>Discounts</h4>
 
             <div className='d-flex gap-2'>
-                <ExportBtn></ExportBtn>
+                <ExportBtn onClick={() => exportToExcel(filteredData)}></ExportBtn>
 
                 <Link to={'/add-discount'}>
                 <AddBtn text={"Add Discount"}></AddBtn>
@@ -91,7 +128,7 @@ const DiscountsPage = () => {
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
               <ProductFilter 
-                  filterOptions={["Order Id", "Customer"]} 
+                  filterOptions={["Discount Code"]} 
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
@@ -116,7 +153,7 @@ const DiscountsPage = () => {
             </thead>
 
             <tbody>
-            {discountData.map((discount, index) => (
+            {filteredData.map((discount, index) => (
             <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
               <td>
                 <div>
@@ -166,25 +203,29 @@ const DiscountsPage = () => {
 
 
           <div className="data-cards">
-        {discountData.map((product,index) => (
+        {filteredData.map((discount,index) => (
           <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3>{product.discountCode}</h3>
+                 <h3>{discount.discountCode}</h3>
                  <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
-                    {product.status}
-                    </div>
+                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
+                  {discount.discountStatus}
+                </div>
                 </p>
             </div>
 
             <div className='d-flex mt-3'>
             
-            <p><strong></strong> {product.method}</p>
+            <p className="text-muted m-0">
+                  {discount.discountType === "Percentage"
+                    ? `${discount.discountValue}% off on ${discount?.applicableProducts[0]?.productName}`
+                    : `₹${discount.discountValue} off on cotton yarn`}
+              </p>
 
             <span><LuDot  size={25}/></span>
 
-            <p><strong></strong> {product.selectedOptionCustomer}</p>
+            <p><strong></strong> {discount.minPurchaseRequirement}</p>
 
             {/* <div style={{ display: 'flex', alignItems: 'center' }}>
            

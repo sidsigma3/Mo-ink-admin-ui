@@ -2,7 +2,12 @@ import axios from 'axios';
 
 
 // const BASE_URL = 'http://localhost:8080/v1/api';
-const BASE_URL = ' http://82.25.105.65:8080/v1/api'
+
+const BASE_URL = 'https://srv754778.hstgr.cloud/v1/api'
+
+// https://srv754778.hstgr.cloud/v1/api/product
+// const BASE_URL = ' http://82.25.105.65:8080/v1/api'
+// const BASE_URL = process.env.BASE_URL
 
 export const getAllCustomer = async () => {
     try {

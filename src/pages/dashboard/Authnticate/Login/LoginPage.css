@@ -1,6 +1,5 @@
 .login-page{
-    padding: 2rem;
-    height: 100vh;
+    height: 93vh;
     width: 100vw;
 }
 
@@ -111,7 +110,7 @@
 
     .login-page{
         padding: 0;
-
+        height: 100vh;
         .login-page-ctn{
          
           

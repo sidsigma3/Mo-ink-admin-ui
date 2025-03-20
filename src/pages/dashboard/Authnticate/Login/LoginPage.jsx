@@ -2,12 +2,14 @@ import React ,{useState} from 'react'
 import "./LoginPage.css"
 import ToggleBtn from '../../../../components/Buttons/ToggleButton/ToggleBtn'
 import { useNavigate } from 'react-router-dom'
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { loginUser } from '../../../../services/LoginService'
 
 const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
   
@@ -39,11 +41,11 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
         </div>
 
         <div className='right-ctn'>
-            <h6 className='welcome'>Welocme to Moink & dyes </h6>
+            <h6 className='welcome'>Welcome to Moink & dyes </h6>
                <ToggleBtn click={togglePage} status={!isLogin}></ToggleBtn>
                 
 
-                <h6 className='mt-3'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Recusandae minus optio voluptates!</h6>
+                {/* <h6 className='mt-3'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Recusandae minus optio voluptates!</h6> */}
 
 
                 <div className="d-flex flex-column gap-2 mt-5">
@@ -56,15 +58,22 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
                     />
                 </div>
 
-                <div className="d-flex flex-column gap-2 mt-4">
+                <div className="d-flex flex-column gap-2 mt-4 position-relative">
                     <label>Password</label>
                     <input
-                    type="password"
-                    className="login-input"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    />
+                            type={showPassword ? "text" : "password"}
+                            className="login-input w-100"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <span
+                            className="position-absolute end-0 translate-middle-y me-3"
+                            style={{ cursor: "pointer", top:'3.5rem' }}
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </span>
                 </div>
 
 

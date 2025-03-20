@@ -12,14 +12,12 @@ const AuthPage = ({ setAuthStatus }) => {
   
     return (
       <div className="auth-page">
-        <div className={`d-flex form-container ${isLogin ? "login" : "signup"}`}>
-         
-            <LoginPage togglePage={togglePage} isLogin={isLogin} setAuthStatus={setAuthStatus}/>
-
-            <SignupPage togglePage={togglePage} isLogin={isLogin}/>
-      
-        </div>
-      </div>
+      {isLogin ? (
+        <LoginPage togglePage={togglePage} setAuthStatus={setAuthStatus} />
+      ) : (
+        <SignupPage togglePage={togglePage} />
+      )}
+    </div>
     );
   };
   

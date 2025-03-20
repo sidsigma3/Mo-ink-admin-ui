@@ -32,7 +32,6 @@ const ProductsTable = forwardRef(({data},ref) => {
   }, []); 
   
 
-  
 
   const handleRowClick = (index,ix) => {
     navigate('/add-product', { state: { index,ix,finalData } });
@@ -203,7 +202,7 @@ const ProductsTable = forwardRef(({data},ref) => {
                           // }}
                           style={{
                             position:'absolute',
-                            right:-5,
+                            right:-22,
                           }}
                         >
                           {/* +{item.variants.length - 3} */}
