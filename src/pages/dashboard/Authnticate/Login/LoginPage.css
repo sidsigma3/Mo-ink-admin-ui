@@ -46,7 +46,7 @@
 
     .right-ctn{
         width: 50%;
-        padding: 2rem;
+        padding: 8rem 14rem;
 
         h6{
             color: #5B5B5B;
@@ -70,6 +70,45 @@
 }
 
 
+@media(max-width:1424px){
+    .login-page{
+        .login-page-ctn{
+            .right-ctn{
+                padding: 8rem 12rem;
+            }
+        }
+    }
+}
+
+
+
+
+
+@media(max-width:1324px){
+    .login-page{
+        .login-page-ctn{
+            .right-ctn{
+                padding: 8rem 9rem;
+            }
+        }
+    }
+}
+
+
+
+@media(max-width:1224px){
+    .login-page{
+        .login-page-ctn{
+            .right-ctn{
+                padding: 8rem 7rem;
+            }
+        }
+    }
+}
+
+
+
+
 @media(max-width:1024px){
     .login-page{
         padding: 0;
@@ -81,7 +120,7 @@
             .right-ctn{
                 width: 100%;
                 position: absolute;
-                padding: 10rem !important;
+                padding: 3rem 8rem;
 
                 .welcome,label,h6,a{
                     color: white;
@@ -91,7 +130,7 @@
 
             .left-cover-pic{
                 width: 100%;
-              
+                filter: brightness(0.5) !important;
 
                 .left-cover-pic img {
                     width: 100%;
@@ -139,7 +178,7 @@
 
             .right-ctn{
               
-                padding: 3rem !important;
+                padding: 8rem 3rem !important;
 
 
             }

@@ -118,7 +118,7 @@ const UserPage = () => {
                         <tr key={index}  
                         onClick={() => handleRowClick(index)}
                          >
-                        <td>{user.firstName + user.lastName}</td>
+                        <td>{user.firstName +" "+user.lastName}</td>
                         <td>{user.email}</td>
                         <td>
                         <div
@@ -193,7 +193,7 @@ const UserPage = () => {
           <div className="data-card" key={index}>
 
             <div className='d-flex justify-content-between'   onClick={() => handleRowClick(index)}>
-                 <h3>{user.firstName + user.lastName}</h3>
+                 <h3>{user.firstName +" "+user.lastName}</h3>
                  <p> 
                     <div
                       style={{

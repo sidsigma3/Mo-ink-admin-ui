@@ -37,3 +37,13 @@ export const getAllUser = async () => {
     }
   };
   
+
+  export const deleteUser = async (userId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating product:', error);
+      throw error;
+    }
+  };

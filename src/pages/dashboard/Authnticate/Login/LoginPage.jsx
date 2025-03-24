@@ -58,8 +58,8 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
         
         <div className='left-cover-pic'>
             <img src='login-cover-pic.png'></img>
-            <h4>Lorem ipsum dolor sit.</h4>
-            <h5>Lorem ipsum dolor sit.</h5>
+            {/* <h4>Lorem ipsum dolor sit.</h4>
+            <h5>Lorem ipsum dolor sit.</h5> */}
         </div>
 
         <div className='right-ctn'>
@@ -110,7 +110,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
                 </div>
 
 
-                <button  className='btn btn-primary rounded-pill w-100 mt-4'  onClick={handleLogin}>Login</button>
+                <button  className='btn btn-primary rounded-pill w-100 mt-5'  onClick={handleLogin}>Login</button>
 
                 <h6 className='mt-3 text-center text-body-tertiary'>Or login with</h6>
 

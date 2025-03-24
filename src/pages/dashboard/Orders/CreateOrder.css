@@ -123,6 +123,14 @@
     .create-order .weight-input{
         width: 50%;
     }
+
+    .create-order .main-sec .left .products .order-detail{
+        overflow: auto;
+        .table{
+            width: 55rem;
+        }
+    }
+
     
 }
 
@@ -146,6 +154,14 @@
     .create-order .weight-input{
         width: 80%;
     }
+
+    .create-order .main-sec .left .products .order-detail{
+        overflow: auto;
+        .table{
+            width: 55rem;
+        }
+    }
+
     
 }
 

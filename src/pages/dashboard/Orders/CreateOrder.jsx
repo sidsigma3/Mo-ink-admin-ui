@@ -19,6 +19,8 @@ import { getAllCustomer , getWalletTransactions} from '../../../services/Custome
 import { Segment } from '@mui/icons-material';
 import { getAllDiscount } from '../../../services/DiscountService';
 import { createOrder } from '../../../services/OrderService';
+import emailjs from 'emailjs-com';
+import ReactWhatsapp from 'react-whatsapp';
 
 const CreateOrder = () => {
    
@@ -401,6 +403,42 @@ const CreateOrder = () => {
         return total > 0 ? total.toFixed(2) : "0.00"; // Ensures total doesn't go negative
     };
 
+    const sendOrderConfirmationEmail = (customerEmail, customerName, orderId, totalAmount) => {
+      emailjs.send(
+          "service_g6l5hk7",  // Replace with your EmailJS service ID
+          "template_os7d9ze", // Replace with your EmailJS template ID
+          {
+              name: customerName,
+              email: customerEmail,
+              orderId: orderId,
+              cost: totalAmount,
+              price:totalAmount,
+
+          },
+          "LcIAnvNjmXt6o9EiS" // Replace with your EmailJS public key
+      ).then((response) => {
+          console.log("Order confirmation email sent successfully", response.status, response.text);
+      }).catch((error) => {
+          console.error("Error sending order confirmation email:", error);
+      });
+  };
+
+
+  const sendWhatsAppMessage = (whatsappNumber, orderData) => {
+    const message = `Hello! Your order (${orderData.order_id}) has been placed successfully! 🎉
+
+      Order Details:
+      --------------------
+      ${orderData.orders.map(item => `📌 ${item.name} - ${item.units} units @ ₹${item.price}`).join("\n")}
+
+      Total Amount: ₹${orderData.totalAmount}
+      Payment Status: ${orderData.payment.paymentStatus}
+
+      Thank you for shopping with us! 🚀`;
+
+          window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
+      };
+
     
  
     const handleCreateOrder = async () => {
@@ -450,6 +488,11 @@ const CreateOrder = () => {
         // Send order data
         const response = await createOrder(orderData);
         console.log("Order Created:", response);
+        sendOrderConfirmationEmail(selectedCustomer.email, selectedCustomer.customerName, response.orderId, orderData.totalAmount);
+       
+        sendWhatsAppMessage(selectedCustomer.whatsappNumber, orderData);
+
+       
         alert("Order created successfully!");
     
       } catch (error) {
@@ -598,7 +641,7 @@ const CreateOrder = () => {
         </ModalOrder>
 
         <div className='main-sec d-flex gap-2'>
-            <div className='left col-xl-9 col-lg-12 col-md-12 col-sm-12'>
+            <div className='left col-xl-9 col-lg-12 col-md-12 col-12'>
                 <div className='products bg-white p-4 mb-3 rounded'>
                     <h5>Order Details</h5>
                     
@@ -943,6 +986,11 @@ const CreateOrder = () => {
                         show={showModalInvoice}
                         handleClose={()=>SetShowModalInvoice(false)}
                     ></ModalInvoice>
+
+                    {/* <ReactWhatsapp number={selectedCustomer.whatsappNumber} message={"hdshuihuih"}>
+                        <button className="whatsapp-btn">Send on WhatsApp</button>
+                    </ReactWhatsapp> */}
+
 
                     {orderDetails.length > 0 &&(
                         

@@ -6,7 +6,7 @@ import { useSpinnerDyers } from '../../../components/Context/SpinnersAndDyersCon
 import "./AddUser.css"
 import { Dropdown } from 'react-bootstrap';
 import { FiShoppingCart } from "react-icons/fi";
-import { addUser, updateUser } from '../../../services/UserService';
+import { addUser, updateUser , deleteUser} from '../../../services/UserService';
 import DeleteBtn from '../../../components/Buttons/Delete/DeleteBtn';
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 
@@ -114,6 +114,20 @@ const AddUser = () => {
             console.error("Error submitting user:", error);
         }
     };
+
+
+    const handleDelete = async (userId) => {
+        if (window.confirm("Are you sure you want to delete this user?")) {
+          try {
+            await deleteUser(userId);
+            alert("User deleted successfully!");
+            navigate("/users")
+          } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("Failed to delete user.");
+          }
+        }
+      };
 
   return (
     <div className='add-user'>
@@ -280,7 +294,7 @@ const AddUser = () => {
             </div>
 
             <div className='d-flex justify-content-between mt-2'>
-            <DeleteBtn></DeleteBtn>
+            <DeleteBtn clickFunction={()=>handleDelete(customer.userId)}></DeleteBtn>
             <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
             </div>
     
