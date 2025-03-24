@@ -605,7 +605,12 @@ const CreateOrder = () => {
                     <div className='d-flex justify-content-center gap-2 mb-1 mt-3 border-bottom pb-5'>
                     {/* <SearchBox></SearchBox> */}
                     <div>
+                    {isViewMode ? (
+                      <div>
+                      </div>
+                    ):(
                     <button className='btn btn-primary' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
+                    )}
                     </div>
                     </div>
                     {orderDetails.length > 0 && (
@@ -683,22 +688,30 @@ const CreateOrder = () => {
                                           </td>
 
                                           {/* Weight Inputs Column */}
-                                          <td style={{width:'10rem'}}>
-                                              <div className="d-flex flex-column ">
-                                                  {order.colors.map((colorObj, colorIndex) => (
-                                                      <input
-                                                          key={colorIndex}
-                                                          type="number"
-                                                          style={{ border: '1px solid' }}
-                                                          placeholder="Weight"
-                                                          className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
-                                                          value={colorObj.weight || ''} 
-                                                          onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
-                                                          disabled={isViewMode}
-                                                      />
-                                                  ))}
-                                              </div>
-                                          </td>
+                                          <td style={{ width: '10rem' }}>
+                                            <div className="d-flex flex-column">
+                                                {order.colors.map((colorObj, colorIndex) => (
+                                                    isViewMode ? (
+                                                        // Show plain text in view mode
+                                                        <span key={colorIndex} className="mb-1 p-1 w-75">
+                                                            {colorObj.weight || 'N/A'}
+                                                        </span>
+                                                    ) : (
+                                                        // Show input field in edit mode
+                                                        <input
+                                                            key={colorIndex}
+                                                            type="number"
+                                                            style={{ border: '1px solid' }}
+                                                            placeholder="Weight"
+                                                            className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
+                                                            value={colorObj.weight || ''} 
+                                                            onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
+                                                            disabled={isViewMode}
+                                                        />
+                                                    )
+                                                ))}
+                                            </div>
+                                        </td>
 
                                           {/* Price Calculation */}
                                           <td colSpan="3">
@@ -825,7 +838,7 @@ const CreateOrder = () => {
                   <tbody>
                    
                     <tr>
-                      <td>Total Cost (Including GST)</td>
+                      <td>Total Cost (Inc GST)</td>
                       <td>{orderDetails.reduce((acc, item) => acc + (item.colors.length || 0), 0)} items</td>
                       <td style={{ textAlign: "end" }}>₹{calculateGrandTotal(orderDetails).toFixed(2)}</td>
                     </tr>
@@ -874,21 +887,27 @@ const CreateOrder = () => {
 
 
                     <tr className="border-bottom">
-                      <td className='pb-3 pt-2'>Wallet Balance</td>
-                      <td className='pb-3 pt-2'>₹{walletBalances.toFixed(2)}</td>
-                      <td style={{ textAlign: "end" }} className='pb-3 pt-2'>
-                        <input
-                          className="w-28 border border-secondary-subtle rounded-1 ps-2"
-                          type="number"
-                          placeholder="Enter amount"
-                          value={walletDeduction}
-                          onChange={(e) => handleWalletDeductionChange(e.target.value)}
-                          min="0"
-                          max={walletBalances}
-                          disabled={isViewMode}
-                        />
+                      <td className="pb-3 pt-2">Wallet</td>
+                      <td className="pb-3 pt-2">₹{walletBalances.toFixed(2)}</td>
+                      <td style={{ textAlign: "end" }} className="pb-3 pt-2">
+                          {isViewMode ? (
+                              // Show plain text in view mode
+                              <span>{walletDeduction ? `₹${walletDeduction}` : "0"}</span>
+                          ) : (
+                              // Show input field in edit mode
+                              <input
+                                  className="w-28 border border-secondary-subtle rounded-1 ps-2"
+                                  type="number"
+                                  placeholder="Enter amount"
+                                  value={walletDeduction}
+                                  onChange={(e) => handleWalletDeductionChange(e.target.value)}
+                                  min="0"
+                                  max={walletBalances}
+                                  disabled={isViewMode}
+                              />
+                          )}
                       </td>
-                    </tr>
+                  </tr>
 
                   
                     <tr className="border-b-2 border-bottom">
@@ -899,14 +918,14 @@ const CreateOrder = () => {
 
                     {/* COD Payment (Dynamically Adjusted) */}
                     <tr>
-                      <td className='pt-2'>COD (After Delivery)</td>
+                      <td className='pt-2'>COD</td>
                       <td className='pt-2'>{codPercentage}%</td>
                       <td className="text-end pt-2">₹{((netPayable * codPercentage) / 100).toFixed(2)}</td>
                     </tr>
 
                     {/* Online Payment (Dynamically Adjusted) */}
                     <tr>
-                      <td>Online Payment (Now)</td>
+                      <td>Online </td>
                       <td>{onlinePercentage}%</td>
                       <td className="text-end">₹{((netPayable * onlinePercentage) / 100).toFixed(2)}</td>
                     </tr>
@@ -929,7 +948,7 @@ const CreateOrder = () => {
                         
 
                         <div className='d-flex justify-content-end w-100'>
-                            {state?.index !== undefined ? (
+                            { isViewMode === true ? (
                                 <Button onClick={()=>SetShowModalInvoice(true)}>Send Invoice</Button>
      
                             ):

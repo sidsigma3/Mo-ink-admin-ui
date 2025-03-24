@@ -1,7 +1,8 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/v1/api/user/login";
-// const API_URL = ' http://82.25.105.65:8080/v1/api/user/login'
+const BASE_URL = process.env.REACT_APP_BASE_URL
+const API_URL =  BASE_URL + "/user/login";
+
 
 
 export const loginUser = async (userEmailId, password) => {

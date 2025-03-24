@@ -16,7 +16,10 @@ import DeleteBtn from "../../../components/Buttons/Delete/DeleteBtn";
 import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
 import { addProduct , deleteProduct, updateProduct } from "../../../services/ProductService";
 import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import { Modal, Button } from "react-bootstrap";
+import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
+import ExportBtn from "../../../components/Buttons/Export/ExportBtn";
 
 const AddProduct = () => {
 
@@ -243,7 +246,7 @@ const AddProduct = () => {
         const newMap = sizes.map(size => {
             const existingColors = existingMap[size.value] || []; // Get existing colors for the size
             const newColors = colors.map(color => ({
-                name: color.color,
+                color: color.color,
                 hex: color.hex
             }));
 
@@ -555,6 +558,44 @@ const parseSizeColorData = (data) => {
   }, 500);
 };
 
+const handleExport = () => {
+  if (!sizeColorMap || sizeColorMap.length === 0) {
+      alert("No data available to export.");
+      return;
+  }
+
+  // Convert sizeColorMap to a structured array
+  const exportData = [];
+  
+  sizeColorMap.forEach(({ size, colors }) => {
+      colors.forEach(({ name, hex, available, price }) => {
+          exportData.push({
+              Size: size,
+              Color: name,
+              HexCode: hex,
+              Availability: available,
+              PricePerKg: price
+          });
+      });
+  });
+
+  // Create a new workbook and worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  
+  XLSX.utils.book_append_sheet(wb, ws, "Size-Color Data");
+
+  // Generate and trigger file download
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+  
+  saveAs(data, "Size_Color_Data.xlsx");
+};
+
+
+console.log(sizeColorMap)
+
+
 
   return (
 
@@ -705,16 +746,19 @@ const parseSizeColorData = (data) => {
 
               <div className="d-flex gap-3">
 
-              <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-              Upload File
-            </button>
+                {state && 
+                    <ExportBtn onClick={handleExport}></ExportBtn>
+                
+                }
+
+            <ImportBtn onClick={() => setShowModal(true)}></ImportBtn>
 
 
-            <button 
+            {/* <button 
             style={{display:"flex",gap:"1rem" ,alignItems:"center"}}
             onClick={addVariant}>
             <span><IoMdAddCircleOutline size={20}/></span>
-            </button>
+            </button> */}
 
             </div>
             </div>
@@ -742,7 +786,7 @@ const parseSizeColorData = (data) => {
             </div>
             <div>
             {variant.name.toLowerCase() === "size" && (
-                      <ul className="d-flex gap-2">
+                      <ul className="d-flex gap-2 flex-wrap">
                         {variant.values.map((value, valueIndex) => (
                             <li
                             style={{
@@ -764,7 +808,7 @@ const parseSizeColorData = (data) => {
             )}
 
             {variant.name.toLowerCase() === "color" && (
-                      <ul className="d-flex gap-2">
+                      <ul className="d-flex gap-2 flex-wrap">
                         {variant.values.map((value, valueIndex) => (
                              <li
                              style={{
@@ -1077,7 +1121,7 @@ const parseSizeColorData = (data) => {
                               <input 
                                className="w-75"
                                type="text"
-                               value={color.color || ""}
+                               value={color.color || color.name}
                                onChange={(e) =>
                                handleVariantValueChangeTable(sizeIndex, colorIndex, "name", e.target.value)
                                }

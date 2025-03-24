@@ -1,9 +1,11 @@
-import React ,{useState} from 'react'
+import React ,{useState , useEffect} from 'react'
 import "./LoginPage.css"
 import ToggleBtn from '../../../../components/Buttons/ToggleButton/ToggleBtn'
 import { useNavigate } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { loginUser } from '../../../../services/LoginService'
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
 
@@ -26,6 +28,26 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
         }
       };
 
+
+      const [user, setUser] = useState(null);
+
+        useEffect(() => {
+            axios
+            .get("http://localhost:5000/auth/user", { withCredentials: true })
+            .then((res) => setUser(res.data))
+            .catch(() => setUser(null));
+        }, []);
+
+        const handleLoginSuccess = (response) => {
+            console.log("Login Success:", response);
+            window.location.href = "http://localhost:5000/auth/google";
+        };
+
+        const handleLogout = () => {
+            axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
+            setUser(null);
+        };
+
   return (
     <div className='login-page'>
     <div className='login-page-ctn'>
@@ -33,7 +55,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
         <div className='logo-ctn'>
             <img src='logo.png'></img>
         </div>
-
+        
         <div className='left-cover-pic'>
             <img src='login-cover-pic.png'></img>
             <h4>Lorem ipsum dolor sit.</h4>
@@ -42,7 +64,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
 
         <div className='right-ctn'>
             <h6 className='welcome'>Welcome to Moink & dyes </h6>
-               <ToggleBtn click={togglePage} status={!isLogin}></ToggleBtn>
+               <ToggleBtn click={togglePage} status={isLogin}></ToggleBtn>
                 
 
                 {/* <h6 className='mt-3'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Recusandae minus optio voluptates!</h6> */}
@@ -85,7 +107,6 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
                 
                     <a href="/forgotPassword">Forgot password?</a>
                 
-                
                 </div>
 
 
@@ -93,9 +114,9 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
 
                 <h6 className='mt-3 text-center text-body-tertiary'>Or login with</h6>
 
-
-                <div>
-                    
+                
+                <div className='mt-4'>
+                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
                 </div>
                 
         </div>

@@ -60,25 +60,25 @@ const SideBar = () => {
   useEffect(() => {
     if (location.pathname.includes("/vendor-order")) {
       setSelected("vendors");
-    } else if (location.pathname.includes("/orders")) {
+    } else if  (location.pathname.includes("/orders") || location.pathname.includes("/create-order")) {
       setSelected("orders");
     } else if (location.pathname.includes("/dashboard")) {
       setSelected("dashboard");
-    } else if (location.pathname.includes("/products")) {
+    } else if (location.pathname.includes("/products") || location.pathname.includes("/add-product")) {
       setSelected("products");
     }else if (location.pathname.includes("/analytics")) {
       setSelected("analytics");
-    }else if (location.pathname.includes("/products")) {
+    }else if (location.pathname.includes("/products") || location.pathname.includes("/add-product")) {
       setSelected("products");
-    }else if (location.pathname.includes("/discounts")) {
+    }else if (location.pathname.includes("/discounts") || location.pathname.includes("/add-discount")) {
       setSelected("discount");
-    }else if (location.pathname.includes("/customers")) {
+    }else if (location.pathname.includes("/customers") || location.pathname.includes("/add-customer")) {
       setSelected("customers");
-    }else if (location.pathname.includes("/segments")) {
+    }else if (location.pathname.includes("/segments") || location.pathname.includes("/add-segments")) {
       setSelected("segments");
-    }else if (location.pathname.includes("/spinners-and-dyers")) {
+    }else if (location.pathname.includes("/spinners-and-dyers") || location.pathname.includes("/add-spinner-and-dyers")) {
       setSelected("manufactures");
-    }else if (location.pathname.includes("/users")) {
+    }else if (location.pathname.includes("/users") || location.pathname.includes("/add-user")) {
       setSelected("users");
     }
     

@@ -107,7 +107,7 @@ const AddCustomerPage = () => {
       });
   }, [customer]);
 
-
+  
   const [selectedSegments, setSelectedSegments] = useState(customer?.segments || []);  // State to track selected segments
   const [searchTerm, setSearchTerm] = useState('');  // State for input field
 

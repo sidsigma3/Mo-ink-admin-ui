@@ -18,6 +18,11 @@ import BulkAssignPage from './BulkAssign/BulkAssignPage';
 import OrderCart from './OrderCart/OrderCart';
 import Badge from '@mui/material/Badge';
 import { getAllOrders } from '../../../services/OrderService';
+import { DateRangePicker } from "react-date-range";
+import { format, parseISO } from "date-fns";
+import { enIN } from "date-fns/locale";
+import "react-date-range/dist/styles.css"; // Main styles
+import "react-date-range/dist/theme/default.css"; // Theme styles
 
 const TabPanel = ({ children, value, index }) => {
     return value === index ? <div>{children}</div> : null;
@@ -38,6 +43,22 @@ const Orders = () => {
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [totalWeightSold, setTotalWeightSold] = useState(0);
     const [totalQuantity,setTotalQuantity] =useState(0)
+
+    const [dateRange, setDateRange] = useState([
+        {
+          startDate: null,
+          endDate: null,
+          key: "selection",
+        },
+      ]);
+      const [showDatePicker, setShowDatePicker] = useState(false);
+      const [selectedFilter, setSelectedFilter] = useState("");
+      const [searchValue, setSearchValue] = useState("");
+    
+      // Function to adjust to Indian Standard Time (IST)
+      const toIST = (date) => {
+        return new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+      };
 
     useEffect(() => {
         fetchDashboardData();
@@ -75,16 +96,40 @@ const Orders = () => {
 
 
     const handleFilterChange = (filter, value) => {
-    const lowercasedValue = value.toLowerCase();
-
-    const filtered = ordersData.filter((item) => {
-        if (filter === "Order Id") return item.orderId.toString().includes(value);
-        if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(lowercasedValue);
-        return true;
-    });
-
-    setFilteredData(filtered);
-    };
+        setSelectedFilter(filter);
+        setSearchValue(value.toLowerCase());
+    
+        applyFilters(filter, value.toLowerCase(), dateRange[0].startDate, dateRange[0].endDate);
+      };
+    
+      // Function to filter data based on date range
+      const handleDateChange = (ranges) => {
+        setDateRange([ranges.selection]);
+        applyFilters(selectedFilter, searchValue, ranges.selection.startDate, ranges.selection.endDate);
+        setShowDatePicker(false)
+      };
+    
+      // Apply both date and product filters
+      const applyFilters = (filter, value, startDate, endDate) => {
+        let filtered = ordersData;
+    
+        if (filter && value) {
+          filtered = filtered.filter((item) => {
+            if (filter === "Order Id") return item.orderId.toString().includes(value);
+            if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(value);
+            return true;
+          });
+        }
+    
+        if (startDate && endDate) {
+          filtered = filtered.filter((item) => {
+            const orderDate = toIST(new Date(item.createdAt)); // Convert order date to IST
+            return orderDate >= toIST(startDate) && orderDate <= toIST(endDate);
+          });
+        }
+    
+        setFilteredData(filtered);
+      };
 
 
     const formatNumber = (num) => {
@@ -104,8 +149,30 @@ const Orders = () => {
             <h3>Orders</h3>
 
             <div className='btn-ctn'>
+            <div className="date-filter position-relative">
+                <button
+                    className="border rounded bg-white"
+                    onClick={() => setShowDatePicker(!showDatePicker)}
+                >
+                    {dateRange[0].startDate && dateRange[0].endDate
+                    ? `${format(toIST(dateRange[0].startDate), "dd MMM yyyy")} - ${format(toIST(dateRange[0].endDate), "dd MMM yyyy")}`
+                    : "Select Date Range"}
+                </button>
+
+                {showDatePicker && (
+                    <div className="position-absolute" style={{zIndex:'1000'}}>
+                    <DateRangePicker
+                        ranges={dateRange}
+                        onChange={handleDateChange}
+                        locale={enIN}
+                        moveRangeOnFirstSelection={false}
+                        editableDateInputs={true}
+                    />
+                    </div>
+                )}
+            </div>
               
-                <Filter></Filter>
+                {/* <Filter></Filter> */}
 
                 <ExportBtn onClick={() => orderTableRef.current?.exportOrders()}></ExportBtn>
                 

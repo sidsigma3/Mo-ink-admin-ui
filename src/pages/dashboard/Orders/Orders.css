@@ -111,6 +111,14 @@
 }
 
 
+.order .rdrDateRangePickerWrapper{
+    display: flex;
+    flex-direction: column;
+    
+} 
+
+
+
 @media (max-width: 1024px) {
 
     /* .order .info-ctn ul li::before {

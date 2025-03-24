@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 
-const BASE_URL = 'http://localhost:8080/v1/api';
-// const BASE_URL = ' http://82.25.105.65:8080/v1/api'
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 
 
 export const getAllUser = async () => {

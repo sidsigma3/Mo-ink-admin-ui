@@ -1,18 +1,12 @@
 import axios from 'axios';
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-// const BASE_URL = 'http://localhost:8080/v1/api';
-
-const BASE_URL = 'https://srv754778.hstgr.cloud/v1/api'
-
-// https://srv754778.hstgr.cloud/v1/api/product
-// const BASE_URL = ' http://82.25.105.65:8080/v1/api'
-// const BASE_URL = process.env.BASE_URL
+console.log(process.env)
 
 export const getAllCustomer = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/customer`);
-      console.log(response)
       return response.data;
       
     } catch (error) {

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { getProductById , updateProduct } from "../../services/ProductService";
 
+
+
 const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,12 +114,12 @@ const handleSearchColor = (e) =>{
   setSearchColor(e.target.value.toLowerCase());
 }
 
-console.log(variant)
-
 const filteredVariants = variant.variants.filter((item) =>
   item.colorName.toLowerCase().includes(searchColor) || 
   item.hexCode.toLowerCase().includes(searchColor)
 );
+
+const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
 
 
   return (
@@ -158,7 +160,7 @@ const filteredVariants = variant.variants.filter((item) =>
                    </div>
                    <div className="text-center mt-2">
                      <h5 className="fw-bold">{item.colorName}</h5>
-                     <h6 className="text-muted">{item.hexCode}</h6>
+                     <h5 className="text-muted text-md" style={{fontSize:'0.8rem'}}>{item.hexCode}</h5>
                    </div>
                  </div>
                   ))}
@@ -197,7 +199,7 @@ const filteredVariants = variant.variants.filter((item) =>
                 </div>
                 <div className="text-center mt-2">
                   <h5 className="fw-bold">{item.colorName}</h5>
-                  <h6 className="text-muted">{item.hexCode}</h6>
+                  <h6 className="text-muted text-md" style={{fontSize:'0.8rem'}}>{item.hexCode}</h6>
                 </div>
              </div>
               ))}
@@ -208,7 +210,7 @@ const filteredVariants = variant.variants.filter((item) =>
               </button>
             )}
             <h4 className="h6 fw-semibold mt-4">Preset Catalogue</h4>
-            <div className="container">
+            <div className="container" style={{height:"26rem", overflow:"auto"}}>
             <div className="row g-0" style={{height:'auto'}}>
               {filteredVariants.map((item, index) => (
                 <div key={index} 
@@ -219,14 +221,14 @@ const filteredVariants = variant.variants.filter((item) =>
                       // width: "calc(25% - 10px)"  // Adjust width based on the gap 
                     }}
                 > 
-                  <div className="position-relative w-100" style={{height:'50%'}}>
-                  <img src="/wool-item-1.png" className="img-fluid" alt="Product" />
+                  <div className="position-relative w-100" style={{height:'63%'}}>
+                  <img src="/wool-item-1.png" className="img-fluid" alt="Product" style={{objectFit:'cover',height:'100%'}}/>
                     <div className="position-absolute top-0 start-0 w-100" style={{height:'100%' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
                     </div>
                   </div>
-                  <div className="text-center mt-2">
-                    <h5 className="fw-bold">{item.colorName}</h5>
-                    <h6 className="text-muted">{item.hexCode}</h6>
+                  <div className="text-center mt-2" >
+                    <h5 className="fw-bold" style={{fontSize:"0.8rem"}}>{item.colorName}</h5>
+                    <h6 className="text-muted text-sm" style={{fontSize:'0.8rem'}}>{item.hexCode}</h6>
                   </div>
                 </div>
               ))}

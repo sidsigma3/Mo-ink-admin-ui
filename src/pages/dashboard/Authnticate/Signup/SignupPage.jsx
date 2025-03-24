@@ -3,44 +3,56 @@ import "./SignupPage.css"
 import ToggleBtn from '../../../../components/Buttons/ToggleButton/ToggleBtn'
 import { addUser } from '../../../../services/UserService'
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import emailjs from 'emailjs-com';
+
 
 const SignupPage = ({ togglePage ,isLogin}) => {
 
      const [showPassword, setShowPassword] = useState(false);
 
-    const handleSignup = async (e) => {
+     const handleSignup = async (e) => {
         e.preventDefault();
-      
+    
         const formData = new FormData(e.target);
         const signupData = {
-          firstName: formData.get('firstName'),
-          lastName: formData.get('lastName'),
-          phoneNumber: formData.get('phoneNumber'),
-          whatsappNumber: formData.get('whatsappNumber'),
-          email: formData.get('email'),
-          password: formData.get('password'),
-          company: formData.get('company'),
-          userAddress: formData.get('userAddress'),
-          city: formData.get('city'),
-          state: formData.get('state'),
-          country: formData.get('country'),
-          zipcode: formData.get('zipcode'),
-          userStatus: "ACTIVE",
-          role:"SALES"
+            firstName: formData.get('firstName'),
+            email: formData.get('email'),
         };
-      
+    
         try {
-          const response = await addUser(signupData);
-      
-          if (response) {
-            alert('Signup successful!');
+            // Simulate user signup (Replace with actual signup logic)
+            console.log('User Signed Up:', signupData);
+    
+            // Send Welcome Email
+            sendEmail(signupData.email, "Welcome to Our Service", `Hello ${signupData.firstName}, welcome to our platform!`);
+            
+            alert('Signup successful! Welcome email sent.');
             e.target.reset();  // Clear form on success
-          }
         } catch (error) {
-          console.error('Signup Error:', error);
-          alert('An error occurred during signup. Please try again.');
+            console.error('Signup Error:', error);
+            alert('An error occurred during signup. Please try again.');
         }
-      };
+    };
+    
+
+      const sendEmail = (email, subject, message) => {
+        emailjs.send(
+            "YOUR_SERVICE_ID",  // Replace with your EmailJS service ID
+            "YOUR_TEMPLATE_ID", // Replace with your EmailJS template ID
+            {
+                to_email: email,
+                subject: subject,
+                message: message
+            },
+            "YOUR_USER_ID" // Replace with your EmailJS public key
+        ).then((response) => {
+            console.log("Email sent successfully", response.status, response.text);
+        }).catch((error) => {
+            console.error("Error sending email:", error);
+        });
+    };
+
+
 
   return (
     <div className='signup-page'>
@@ -139,8 +151,10 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     </span>
                     </div>
 
-                    {/* Address */}
-                    <div className='d-flex flex-column gap-2 mt-4'>
+                    
+
+                  
+                    {/* <div className='d-flex flex-column gap-2 mt-4'>
                     <label>Address</label>
                     <input
                         name='userAddress'
@@ -150,7 +164,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     />
                     </div>
 
-                    {/* Location */}
+                    
                     <div className='row g-3 mt-2'>
                     <div className='d-flex flex-column gap-2 flex-grow-1 col-6'>
                         <label>City</label>
@@ -179,15 +193,25 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                         required
                         />
                     </div>
-                    </div>
+                    </div> */}
 
-                    {/* Company */}
+                
                     <div className='d-flex flex-column gap-2 mt-4'>
                     <label>Company</label>
                     <input
                         name='company'
                         className='login-input'
                         placeholder='Enter your Company'
+                        required
+                    />
+                    </div>
+
+                    <div className='d-flex flex-column gap-2 mt-4'>
+                    <label>Addhar Number</label>
+                    <input
+                        name='adharNumber'
+                        className='login-input'
+                        placeholder='Enter Addhar Number'
                         required
                     />
                     </div>

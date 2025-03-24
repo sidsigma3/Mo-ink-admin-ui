@@ -1,4 +1,4 @@
-import React from 'react'
+import React ,{useState}from 'react'
 import ImportBtn from '../../../../components/Buttons/Import/ImportBtn'
 import ExportBtn from '../../../../components/Buttons/Export/ExportBtn'
 import ProductFilter from '../../../../components/Filter/DayFilter/ProductFilter/ProductFilter'
@@ -15,8 +15,29 @@ const VendorOrder = () => {
 
     const { orders } = useVendorOrderContext();
 
+    const [filteredData, setFilteredData] = useState([]); 
+
     const handleRowClick = (orderId) => {
         navigate(`/vendor-order-details/${orderId}`);
+      };
+
+
+      const handleFilterChange = (filter, value) => {
+        const lowercasedValue = value.toLowerCase().trim();
+      
+        if (!lowercasedValue) {
+          setFilteredData(orders);
+          return;
+        }
+      
+        const filtered = orders.filter((item) => {
+          if (filter === "Product Id") return item.id.toString().includes(value);
+          if (filter === "Product Name") return item.productName.toLowerCase().includes(lowercasedValue);
+          return true;
+        });
+      
+        console.log(filtered);
+        setFilteredData(filtered);
       };
 
 
@@ -39,7 +60,10 @@ const VendorOrder = () => {
 
         <div className='order-filter-ctn d-flex gap-2 mb-2 w-50 mt-3'>
           
-          <ProductFilter></ProductFilter>
+          <ProductFilter 
+                filterOptions={["Order Id", "Customer"]} 
+                onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+          />
     
           <StatusFilter status={"Active"}></StatusFilter>
         </div>
