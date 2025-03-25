@@ -324,18 +324,18 @@ const AddSegmentsPage = () => {
                     )}
 
 
-                <div className="d-flex justify-content-between mt-3">
-                <DeleteBtn></DeleteBtn>
+                <div className="d-flex justify-content-between my-4">
+                    <DeleteBtn></DeleteBtn>
 
-                {state?.index === undefined &&(
-                <SubmitBtn clickFunction={handleSave} text={"Add"}></SubmitBtn>
-                )}
+                    {state?.index === undefined &&(
+                    <SubmitBtn clickFunction={handleSave} text={"Add"}></SubmitBtn>
+                    )}
 
-                {state?.index !== undefined &&(
-                    <SubmitBtn clickFunction={handleSave} text={"Save"}></SubmitBtn>
-                )}
+                    {state?.index !== undefined &&(
+                        <SubmitBtn clickFunction={handleSave} text={"Save"}></SubmitBtn>
+                    )}
 
-          </div>
+                </div>
 
             </div>
 

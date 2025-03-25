@@ -103,11 +103,11 @@ const Orders = () => {
       };
     
       // Function to filter data based on date range
-      const handleDateChange = (ranges) => {
-        setDateRange([ranges.selection]);
-        applyFilters(selectedFilter, searchValue, ranges.selection.startDate, ranges.selection.endDate);
-        setShowDatePicker(false)
-      };
+        const handleDateChange = (ranges) => {
+          setDateRange([ranges.selection]);
+          applyFilters(selectedFilter, searchValue, ranges.selection.startDate, ranges.selection.endDate);
+          setShowDatePicker(false)
+        };
     
       // Apply both date and product filters
       const applyFilters = (filter, value, startDate, endDate) => {
@@ -130,6 +130,27 @@ const Orders = () => {
     
         setFilteredData(filtered);
       };
+
+
+
+      const datePickerRef = useRef(null);
+
+      // Close date picker when clicking outside
+      useEffect(() => {
+          const handleClickOutside = (event) => {
+              if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+                  setShowDatePicker(false);
+              }
+          };
+  
+          if (showDatePicker) {
+              document.addEventListener("mousedown", handleClickOutside);
+          }
+  
+          return () => {
+              document.removeEventListener("mousedown", handleClickOutside);
+          };
+      }, [showDatePicker]);
 
 
     const formatNumber = (num) => {
@@ -160,7 +181,7 @@ const Orders = () => {
                 </button>
 
                 {showDatePicker && (
-                    <div className="position-absolute" style={{zIndex:'1000'}}>
+                    <div ref={datePickerRef}   className="position-absolute" style={{zIndex:'1000'}}>
                     <DateRangePicker
                         ranges={dateRange}
                         onChange={handleDateChange}
@@ -231,8 +252,8 @@ const Orders = () => {
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" >
             <Tab className="text-capitalize" label="Order Dashboard" />
-            <Tab className="text-capitalize" label="Bulk Assign" />
-            <Tab className="text-capitalize" label="Order Cart" />
+            {/* <Tab className="text-capitalize" label="Bulk Assign" />
+            <Tab className="text-capitalize" label="Order Cart" /> */}
             </Tabs>
         </Box>
 

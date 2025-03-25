@@ -19,6 +19,7 @@ import { BsArrowReturnRight } from "react-icons/bs";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { useLocation } from 'react-router-dom';
+import { AiOutlineLogout } from "react-icons/ai";
 
 const SideBar = () => {
 
@@ -87,6 +88,12 @@ const SideBar = () => {
       setSelected(""); 
     }
   }, [location.pathname]);
+
+  // const handleLogout = () => {
+  //   localStorage.removeItem("isAuthenticated");
+  //   setIsAuthenticated(false);
+  // };
+
 
 
   return (
@@ -283,6 +290,10 @@ const SideBar = () => {
 
             <li>
                 <button  onClick={()=>setSelected('report')}><span className='icon'><GrBug size={25}/></span>Report a bug</button>
+            </li>
+
+            <li>
+              <button ><span className='icon'><AiOutlineLogout size={25}/></span>Log out</button>
             </li>
 
 

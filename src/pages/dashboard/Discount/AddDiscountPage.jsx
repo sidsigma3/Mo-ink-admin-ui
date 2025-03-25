@@ -19,6 +19,7 @@ import ModalSegmentList from "../../../components/Modal/ModalSegmentList";
 import { getAllCustomer } from "../../../services/CustomerService";
 import { addDiscount , updateDiscount } from "../../../services/DiscountService";
 import ModalProdcutSelect from "../../../components/Modal/ModalProdcutSelect";
+import StatusInput from "../../../components/StatusInput/StatusInput";
 
 const AddDiscountPage = () => {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ const [formData, setFormData] = useState(() => {
       : { limitTotal: false, limitPerCustomer: false }, 
     
     activeDates: parsedActiveDates ,
-    status: discount?.status || "Active" 
+    status: discount?.discountStatus || "Active" 
   }});
 
    const [segments,setSegments] = useState([])
@@ -452,7 +453,7 @@ const handleMaxUsageChange = (field1,field2) => {
       minPurchaseRequirement: minPurchaseRequirementString,
       maxPurchaseRequirements,
       discountMethod: selectedMethod,
-      applicableProductIds: productSelect.map(p => Number(p.productId)), // Extract product IDs
+      applicableProductIds: productSelect.map(p => p.productId ? Number(p.productId) : Number(p.id)), 
       applicableSegmentIds:selectedSegment.map(s =>Number(s.segmentId)),
       eligibleCustomerIds,
       startDateTime: formatDateTime(formData.activeDates.startDate, formData.activeDates.startTime),
@@ -823,7 +824,7 @@ const handleMaxUsageChange = (field1,field2) => {
 
           </div>
 
-          <div className="d-flex justify-content-between mt-3">
+          <div className="d-flex justify-content-between my-4">
             <DeleteBtn></DeleteBtn>
 
             {state?.index === undefined &&(
@@ -850,7 +851,7 @@ const handleMaxUsageChange = (field1,field2) => {
         <div className="right">
           <div>
             <h5>Status</h5>
-            <StatusFilter status={formData.status} onStatusChange={handleStatusChange}></StatusFilter>
+            <StatusInput status={formData.status} onStatusChange={handleStatusChange}></StatusInput>
           </div>
         </div>
       </div>

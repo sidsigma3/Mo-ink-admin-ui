@@ -82,7 +82,7 @@ const UserPage = () => {
                
 
                 <Link to={'/add-user'}>
-                <AddBtn text={"Invite"}></AddBtn>
+                <AddBtn text={"Add User"}></AddBtn>
                 </Link>
             </div>
         </div>

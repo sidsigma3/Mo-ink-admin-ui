@@ -228,7 +228,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
             </div>
 
             <div className='right-cover-pic'>
-                <img src='signup-cover-pic.png'></img>
+                <img src='signup-cover-pic-2.png'></img>
                 {/* <h4>Lorem ipsum dolor sit.</h4>
                 <h5>Lorem ipsum dolor sit.</h5> */}
             </div>

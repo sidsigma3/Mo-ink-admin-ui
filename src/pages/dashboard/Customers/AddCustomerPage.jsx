@@ -16,6 +16,7 @@ import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import { MdAdd } from "react-icons/md";
 import { addCustomer,updateCustomer , deleteCustomer , addMoneyToWallet ,subtractMoneyFromWallet , getWalletTransactions } from '../../../services/CustomerService';
 import { getAllSegment } from '../../../services/SegmentService';
+import StatusInput from '../../../components/StatusInput/StatusInput';
 
 const AddCustomerPage = () => {
 
@@ -47,9 +48,7 @@ const AddCustomerPage = () => {
 
   const [amount, setAmount] = useState(""); // Amount input
 
- 
-
-  const [status,setStatus] = useState(customer?.status || 'Active')
+  const [status,setStatus] = useState(customer?.customerStatus || 'Active')
 
   const [formData, setFormData] = useState(() => {
     const nameParts = customer?.customerName?.split(" ") || [];
@@ -163,6 +162,8 @@ const AddCustomerPage = () => {
     if (!selectedSegments.some((s) => Object.keys(s)[0] === segment.segmentId.toString())) {
       setSelectedSegments([...selectedSegments,  segment ]);
     }
+
+    checkIfChanged(formData, status, searchTerm);
   };
   // Remove segment chip
   const removeSegmentChip = (index) => {
@@ -172,6 +173,7 @@ const AddCustomerPage = () => {
 
   const handleStatusChange = (stat) =>{
      setStatus(stat)
+     checkIfChanged(formData, stat, searchTerm);
   }
 
 
@@ -208,6 +210,16 @@ const AddCustomerPage = () => {
     }
   };
 
+  const checkIfChanged = (updatedFormData, updatedStatus, updatedSearchTerm) => {
+    const hasChanged = 
+        JSON.stringify(updatedFormData) !== JSON.stringify(initialFormData) || 
+        updatedStatus !== initialFormData.status ||
+        updatedSearchTerm !== "";
+
+    setIsChanged(hasChanged);
+};
+
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -219,8 +231,8 @@ const AddCustomerPage = () => {
 
     setFormData(updatedFormData);
 
-  
-    setIsChanged(JSON.stringify(updatedFormData) !== JSON.stringify(initialFormData));
+    checkIfChanged(updatedFormData, status, searchTerm);
+   
 };
 
   const handleSubmit = async (e) => {
@@ -320,6 +332,8 @@ const AddCustomerPage = () => {
         }
   }
 
+
+ 
   return (
     <div className='add-customer'>
 
@@ -497,7 +511,7 @@ const AddCustomerPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {transactions.map((item, ix) => (
+                      {transactions.slice().reverse().map((item, ix) => (
                         <tr key={ix}>
                           <td>{item.source}</td>
                           <td
@@ -526,7 +540,7 @@ const AddCustomerPage = () => {
             )}
 
                 
-                    <div className='d-flex justify-content-between mt-2'>
+                    <div className='d-flex justify-content-between mt-4 mb-4'>
                         <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
                         <SubmitBtn text={'Save'} clickFunction={handleSubmit} disabled={!isChanged} />
                     </div>
@@ -537,7 +551,7 @@ const AddCustomerPage = () => {
             <div className='right'>
             <div className='bg-white p-3 rounded'>
                 <h5>Status</h5>
-                <StatusFilter status={status} onStatusChange={handleStatusChange}></StatusFilter>
+                <StatusInput status={status} onStatusChange={handleStatusChange}></StatusInput>
             </div>
 
             <div className='bg-white p-3 rounded mt-2'>

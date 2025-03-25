@@ -5,10 +5,15 @@ import { MdEmail } from "react-icons/md";
 import "./ProfilePage.css"
 import { MdEdit } from "react-icons/md";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = ({setIsAuthenticated}) => {
 
+  const navigate = useNavigate()
+
   const [imageSrc, setImageSrc] = useState("/Avatar.png");
+
+  const userDetails =  JSON.parse(localStorage.getItem('userData'));
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -24,12 +29,23 @@ const ProfilePage = ({setIsAuthenticated}) => {
     setIsAuthenticated(false);
   };
 
+
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata", 
+  });
+
+
+  
   return (
     <div className='profile-page'>
         <div className='d-flex justify-content-between'>
             <div>
-                <h5>Welocme , Johny Larsen</h5>
-                <h6 className='text-primary'>Thrusday , 06 Dec 2024</h6>
+                <h5>Welocme , {userDetails.firstName} {" "} {userDetails.lastName}</h5>
+                <h6 className='text-primary'>{today}</h6>
             </div>
            
             <button className='btn btn-outline-danger h-50' onClick={handleLogout}>Log out</button>
@@ -66,13 +82,13 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
             <div className='d-flex justify-content-between profile-info'>
                 <div>
-                <h5> Johny Larsen</h5>
-                <p className='text-secondary-subtle'>johnylarsen@gmail.com</p>
-                <p className='text-primary'>Admin</p>
+                <h5> {userDetails.firstName+" "+userDetails.lastName}</h5>
+                <p className='text-secondary-subtle'>{userDetails.email}</p>
+                <p className='text-primary'>{userDetails.role}</p>
                 </div>
 
                 <div className='go-home'>
-                <button className='btn btn-primary d-flex gap-2 align-items-center'>
+                <button className='btn btn-primary d-flex gap-2 align-items-center' onClick={()=>navigate("/dashboard")}>
                     Go to home
                     <span><LuHome size={20} /></span>
                 </button>
@@ -84,7 +100,7 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>User Name</label>
-                    <input type='text' className='rounded mt-2'></input>
+                    <input type='text' className='rounded mt-2' value={userDetails.firstName+" "+userDetails.lastName}></input>
                 </div>
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
@@ -93,23 +109,23 @@ const ProfilePage = ({setIsAuthenticated}) => {
                 </div>
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
-                    <label>Gender</label>
-                    <input type='text' className='rounded mt-2'></input>
+                    <label>Company</label>
+                    <input type='text' className='rounded mt-2' value={userDetails.company}></input>
                 </div>
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>Country</label>
-                    <input type='text' className='rounded mt-2'></input>
+                    <input type='text' className='rounded mt-2' value={userDetails.country}></input>
                 </div>
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>Calling Number</label>
-                    <input type='text' className='rounded mt-2'></input>
+                    <input type='text' className='rounded mt-2' value={userDetails.phoneNumber}></input>
                 </div>
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>Whatsapp Number</label>
-                    <input type='text' className='rounded mt-2'></input>
+                    <input type='text' className='rounded mt-2' value={userDetails.whatsappNumber}></input>
                 </div>
 
                 <div className='d-flex justify-content-end mt-3'>

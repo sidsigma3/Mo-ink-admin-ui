@@ -20,6 +20,7 @@ import { saveAs } from "file-saver";
 import { Modal, Button } from "react-bootstrap";
 import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
 import ExportBtn from "../../../components/Buttons/Export/ExportBtn";
+import StatusInput from "../../../components/StatusInput/StatusInput";
 
 const AddProduct = () => {
 
@@ -1174,7 +1175,7 @@ console.log(sizeColorMap)
        
     </div>
 
-    <div className="w-100 d-flex justify-content-between mt-3">
+    <div className="w-100 d-flex justify-content-between my-4">
         <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
         <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
     </div>
@@ -1185,7 +1186,7 @@ console.log(sizeColorMap)
       <div className="right w-25 flex-grow-1">
         <div className="status-ctn p-3 gap-3 rounded">
           <h3 className="mb-2">Status</h3>
-          <StatusFilter status={status} onStatusChange={handleStatusChange}></StatusFilter>
+          <StatusInput status={status} onStatusChange={handleStatusChange}></StatusInput>
         </div>
       </div>
     </div>

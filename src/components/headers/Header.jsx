@@ -40,7 +40,7 @@ const Header = () => {
             <div className='container-fluid d-flex align-items-center px-4'>
                 <div className='d-flex align-items-center justify-content-between w-100'>
                     <div className='logo-ctn'>
-                        <Link to={'/'}><img src='./logo.png' className='logo'></img></Link>
+                        <Link to={'/dashboard'}><img src='./logo.png' className='logo'></img></Link>
                     </div>
 
                     {/* <div className='col-sm-6 col-lg-6 d-flex align-items-center'>

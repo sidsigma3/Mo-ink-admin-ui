@@ -144,6 +144,7 @@ const DiscountsPage = () => {
             <thead>
               <tr>
                 <th>Title</th>
+                <th>Start Date</th>
                 <th>Status</th>
                 <th>Method</th>
                 <th>Customer</th>
@@ -169,6 +170,9 @@ const DiscountsPage = () => {
                 </div>
                 </div>
                 
+                </td>
+                <td>
+                 {new Intl.DateTimeFormat('en-GB').format(new Date(discount.startDateTime))}
                 </td>
               <td>
                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>

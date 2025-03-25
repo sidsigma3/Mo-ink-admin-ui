@@ -41,6 +41,7 @@
         img{
             height: 100%;
             width: 100%;
+            border-radius: 2rem;
         }
     }
 
@@ -172,7 +173,11 @@
         height: 100vh;
         .signup-page-ctn{
          
-          
+            .right-cover-pic{
+                img{
+                    border-radius: 0;
+                }
+            }
 
             .left-ctn{
               
@@ -198,7 +203,7 @@
 
             .left-ctn{
               
-                padding: 3rem !important;
+                padding: 8rem 3rem !important;
 
 
             }

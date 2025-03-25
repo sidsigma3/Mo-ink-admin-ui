@@ -57,7 +57,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
         </div>
         
         <div className='left-cover-pic'>
-            <img src='login-cover-pic.png'></img>
+            <img src='login-cover-pic-2.png'></img>
             {/* <h4>Lorem ipsum dolor sit.</h4>
             <h5>Lorem ipsum dolor sit.</h5> */}
         </div>

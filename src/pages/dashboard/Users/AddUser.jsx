@@ -293,7 +293,7 @@ const AddUser = () => {
 
             </div>
 
-            <div className='d-flex justify-content-between mt-2'>
+            <div className='d-flex justify-content-between my-4'>
             <DeleteBtn clickFunction={()=>handleDelete(customer.userId)}></DeleteBtn>
             <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
             </div>

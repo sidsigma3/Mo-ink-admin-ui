@@ -198,7 +198,7 @@ const OrderTable = forwardRef(({data}, ref) => {
               <td>{order.customer.customerName}</td>
               <td>{order.variants.length}</td>
               <td>{order.totalAmount}</td>
-              <td>{order.payment.amount}</td>
+              <td>₹{order.payment.amount}</td>
               <td onClick={(e) => e.stopPropagation()}>
                 <select
                   className={order.payment.paymentStatus === "Fully Paid" ? "green" : order.payment.paymentStatus === 'Unpaid' ? "grey" :'yellow'}
