@@ -70,7 +70,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
                 {/* <h6 className='mt-3'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Recusandae minus optio voluptates!</h6> */}
 
 
-                <div className="d-flex flex-column gap-2 mt-5">
+                <div className="d-flex flex-column gap-2 mt-4">
                     <label>Username</label>
                     <input
                     className="login-input rounded-pill"
@@ -91,7 +91,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
                         />
                         <span
                             className="position-absolute end-0 translate-middle-y me-3"
-                            style={{ cursor: "pointer", top:'3.5rem' }}
+                            style={{ cursor: "pointer", top:'3rem' }}
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? <FaEyeSlash /> : <FaEye />}

@@ -18,8 +18,8 @@
 }
 
 .sideBar ul li{
-    margin-bottom: 0.65rem;
-    padding: 0.4rem 0 0.4rem 1rem;
+    margin-bottom: 0.3rem;
+    padding: 0.2rem 0 0.2rem 1rem;
     display: flex;
     justify-content: left;
     width: 100%;
@@ -29,7 +29,6 @@
     background: none;
     border: none;
     
-
 }
 
 .sideBar .icon{
@@ -41,7 +40,7 @@
 }
 
 .sideBar ul li button{
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 400;
     color:#222326;
     
@@ -59,7 +58,7 @@
 .sideBar h3{
     font-size: 1.1rem;
     padding-left: 1rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
     margin-bottom: 1.2rem;
 }
 
@@ -78,6 +77,34 @@
 
 .sideBar .selected button span{
     color: #0561FC;
+}
+
+
+@media (max-width: 1024px) {
+
+    .sideBar{
+
+    }
+
+    .sideBar ul li{
+        margin-bottom: 0.3rem;
+    }
+
+    .sideBar h3{
+        margin-top: 0.3rem;
+    }
+
+
+    .sideBar ul li{
+        padding: 0.2rem 0.5rem;
+    }
+
+    .sideBar button{
+       
+    }
+
+
+
 }
 
 
@@ -144,29 +171,3 @@
 }
 
 
-@media (max-width: 1024px) {
-
-    .sideBar{
-
-    }
-
-    .sideBar ul li{
-        margin-bottom: 1.2rem;
-    }
-
-    .sideBar h3{
-        margin-top: 3.3rem;
-    }
-
-
-    .sideBar ul li{
-        padding: 0.4rem 0.5rem;
-    }
-
-    .sideBar button{
-       
-    }
-
-
-
-}

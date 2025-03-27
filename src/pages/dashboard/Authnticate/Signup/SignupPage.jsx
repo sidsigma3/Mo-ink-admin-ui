@@ -105,7 +105,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     </div>
 
                     <div className='row g-3 mt-2'>
-                    <div className='d-flex flex-column gap-2 mt-3 flex-grow-1 col-6'>
+                    <div className='d-flex flex-column gap-2 mt-2 flex-grow-1 col-6'>
                     <label>Phone No.</label>
                     <input
                         name='phoneNumber'
@@ -116,7 +116,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     />
                     </div>
 
-                    <div className='d-flex flex-column gap-2 mt-3 flex-grow-1 col-6'>
+                    <div className='d-flex flex-column gap-2 mt-2 flex-grow-1 col-6'>
                     <label>WhatsApp No.</label>
                     <input
                         name='whatsappNumber'
@@ -129,7 +129,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     </div>
 
                     {/* Email */}
-                    <div className='d-flex flex-column gap-2 mt-3'>
+                    <div className='d-flex flex-column gap-2 mt-2'>
                     <label>Email</label>
                     <input
                         name='email'
@@ -141,7 +141,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     </div>
 
                     {/* Password */}
-                    <div className='d-flex flex-column gap-2 mt-3  position-relative'>
+                    <div className='d-flex flex-column gap-2 mt-2  position-relative'>
                     <label>Password</label>
                     <input
                         name='password'
@@ -153,7 +153,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     />
                     <span
                         className="position-absolute end-0 translate-middle-y me-3"
-                        style={{ cursor: "pointer", top:'3.5rem' }}
+                        style={{ cursor: "pointer", top:'3rem' }}
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -205,7 +205,7 @@ const SignupPage = ({ togglePage ,isLogin}) => {
                     </div> */}
 
 
-                    <div className='d-flex flex-column gap-2 mt-3'>
+                    <div className='d-flex flex-column gap-2 mt-2'>
                     <label>Adhaar No.</label>
                     <input
                         name='adharNumber'
