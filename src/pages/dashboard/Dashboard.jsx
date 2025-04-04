@@ -1,4 +1,4 @@
-import React , {useState , useEffect } from "react";
+import React , {useState , useEffect , useRef} from "react";
 import { LuCalendarSearch } from "react-icons/lu";
 import "./Dashboard.css";
 import DashboardBox from "../../components/DashboardBox/DashboardBox";
@@ -6,8 +6,22 @@ import ProductSoldGraph from "../../components/Analylitcs/Graph/ProductSoldGraph
 import Filter from "../../components/Filter/DayFilter/Filter";
 import { getAllCustomer } from "../../services/CustomerService";
 import { getAllOrders } from "../../services/OrderService";
+import { DateRangePicker } from "react-date-range";
+import { format } from "date-fns";
+import { enIN } from "date-fns/locale";
 
 const Dashboard = () => {
+
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const datePickerRef = useRef(null);
+  
 
   const [totalCustomers, setTotalCustomers] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -22,52 +36,83 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
+  const handleDateChange = (ranges) => {
+    setDateRange([ranges.selection]);
+    setShowDatePicker(false)
+  };
+
+   useEffect(() => {
+            const handleClickOutside = (event) => {
+                if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+                    setShowDatePicker(false);
+                }
+            };
+    
+            if (showDatePicker) {
+                document.addEventListener("mousedown", handleClickOutside);
+            }
+    
+            return () => {
+                document.removeEventListener("mousedown", handleClickOutside);
+            };
+        }, [showDatePicker]);
+
+
   const fetchDashboardData = async () => {
     try {
-      
-      const customerRes = await getAllCustomer()
+      const customerRes = await getAllCustomer();
       setTotalCustomers(customerRes.data.length);
 
-  
-      const orders = await getAllOrders()
-      
+      const orders = await getAllOrders();
+      const start = dateRange[0].startDate;
+      const end = dateRange[0].endDate;
+
       let revenue = 0;
       let weight = 0;
-      let toDispatch = 0
-      let toVendor = 0
-      let fromVendor = 0
-      let newOrder = 0
+      let newOrder = 0;
+      let toDispatch = 0;
+      let toVendor = 0;
+      let fromVendor = 0;
 
-      orders.forEach(order => {
-        revenue += order.totalAmount || 0;
-        weight += order.totalWeight || 0;
-        
-
-        if (order.status === 'New Order') {
-          newOrder += 1;
-        } else if (order.status === 'Send to Vendor') {
-          toVendor += 1;
-        } else if (order.status === 'Dispatch from Vendor') {
-          fromVendor += 1;
-        } else if (order.status !== 'Delivered' && order.status!=='Order Cancelled') {
-          toDispatch += 1; // This will count all non-delivered orders that don't fall into the above categories
-        }
-
+      const filteredOrders = orders.filter(order => {
+        const orderDate = new Date(order.date);
+        return orderDate >= start && orderDate <= end;
       });
 
-      console.log(toDispatch,toVendor,fromVendor,newOrder)
+      filteredOrders.forEach(order => {
+        revenue += order.totalAmount || 0;
+        weight += order.totalWeight || 0;
 
-      setNewOrder(newOrder)
-      setFromVendor(fromVendor)
-      setToVendor(toVendor)
-      setToDispatch(toDispatch)
-      setTotalOrders(orders.length);
+        switch (order.status) {
+          case "New Order":
+            newOrder += 1;
+            break;
+          case "Send to Vendor":
+            toVendor += 1;
+            break;
+          case "Dispatch from Vendor":
+            fromVendor += 1;
+            break;
+          default:
+            if (order.status !== "Delivered" && order.status !== "Order Cancelled") {
+              toDispatch += 1;
+            }
+            break;
+        }
+      });
+
+      setNewOrder(newOrder);
+      setFromVendor(fromVendor);
+      setToVendor(toVendor);
+      setToDispatch(toDispatch);
+      setTotalOrders(filteredOrders.length);
       setTotalRevenue(revenue);
       setTotalWeightSold(weight);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     }
   };
+
 
 
   const formatNumber = (num) => {
@@ -91,7 +136,25 @@ const Dashboard = () => {
                             Last 12 Months
                         </button>
                         </div> */}
-                        <Filter></Filter>
+                        {/* <Filter></Filter> */}
+
+                        <button className="border rounded bg-white p-1" onClick={() => setShowDatePicker(!showDatePicker)}>
+                          {dateRange[0].startDate && dateRange[0].endDate
+                            ? `${format(dateRange[0].startDate, "dd MMM yyyy")} - ${format(dateRange[0].endDate, "dd MMM yyyy")}`
+                            : "Select Date Range"}
+                        </button>
+
+                        {showDatePicker && (
+                          <div ref={datePickerRef} className="position-absolute" style={{ zIndex: 1000 }}>
+                            <DateRangePicker
+                              ranges={dateRange}
+                              onChange={handleDateChange}
+                              locale={enIN}
+                              moveRangeOnFirstSelection={false}
+                              editableDateInputs={true}
+                            />
+                          </div>
+                        )}
                     </div>
 
                     <div className="info-ctn row">

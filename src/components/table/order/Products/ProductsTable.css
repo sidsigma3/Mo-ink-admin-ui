@@ -16,7 +16,7 @@
   .product-table table thead {
     position: sticky;
     top: 0;
-   
+      
   }
   
   .product-table th,
@@ -26,15 +26,17 @@
   }
   
   .product-table th {
-    font-weight: 600
+    font-weight: 600;
+ 
   }
 
   .product-table table thead tr th{
     background-color: #f9fafb; ;
+    font-size: 0.8rem
   }
   
   .product-table tbody td {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
   }
   

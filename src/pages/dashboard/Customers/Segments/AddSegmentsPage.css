@@ -1,11 +1,42 @@
 .add-segments-page{
+    .top{
+        h5{
+            font-size: 1.2rem;
+        }
+    }
+
     .main{
         padding-top: 0;
 
         .left{
             width: 75%;
 
-            
+            .seg-type{
+                h5{
+                    font-size: 1.1rem;
+                }
+
+                label{
+                    font-size: 1rem;
+                }
+
+                p{
+                    font-size: 0.8rem;
+                }
+            }
+
+            .label-sec{
+                h5{
+                    font-size: 1.1rem;
+                }
+            }
+
+
+            .customer-list-ctn{
+                h5{
+                    font-size: 0.9rem;
+                }
+            }
 
             input[type=text]{
                 border: 1px solid #D1D5DB;
@@ -33,6 +64,9 @@
 
         .right{
             width: 25%;
+            h5{
+                font-size: 1.2rem;
+            }
         }
     }
 

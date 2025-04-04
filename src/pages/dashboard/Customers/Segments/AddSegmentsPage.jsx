@@ -14,8 +14,9 @@ import DeleteBtn from '../../../../components/Buttons/Delete/DeleteBtn';
 import { useSegments } from '../../../../components/Context/SegmentsContext';
 import { useLocation } from 'react-router-dom';
 import SubmitBtn from '../../../../components/Buttons/Submit/SubmitBtn';
-import { addSegment, updateSegment } from '../../../../services/SegmentService';
+import { addSegment, deleteSegment, updateSegment } from '../../../../services/SegmentService';
 import { getAllCustomer } from '../../../../services/CustomerService';
+import StatusInput from '../../../../components/StatusInput/StatusInput';
 
 const AddSegmentsPage = () => {
 
@@ -37,11 +38,11 @@ const AddSegmentsPage = () => {
           : segment?.segmentCondition 
               ? JSON.parse(segment.segmentCondition) 
               : [{ field: '', operator: '', value: '', period: '', chips: [], searchResults: [] }],
-      status: segment?.status || "Active",
+      status: segment?.segmentStatus.toLowerCase() || "Active",
   });
   
+  console.log(segmentData)
     
-    console.log(segmentData)
 
     const [showModalCustomer, setShowModalCustomer] = useState(false);
    
@@ -69,19 +70,20 @@ const AddSegmentsPage = () => {
   }, [segmentData.conditions, segmentData.segmentType]);
 
 
-    const [selectedCustomer, setSelectedCustomer] = useState(() => {
-      if (!segment?.customers) return [];
+  const [selectedCustomer, setSelectedCustomer] = useState([]);
 
-      return segment.customers.map(customer => {
-          // Find full details from the customers list
-          const fullDetails = customers.find(c => c.customerId === customer.customerId);
-          console.log(fullDetails)
-          return fullDetails || customer; // Use full details if found, otherwise fallback to existing data
+  useEffect(() => {
+    if (segment?.customers && customers.length > 0) {
+      const matchedCustomers = segment.customers.map(customer => {
+        const fullDetails = customers.find(c => c.customerId === customer.customerId);
+        return fullDetails || customer;
       });
-  });
+      setSelectedCustomer(matchedCustomers);
+    }
+  }, [segment, customers]);
 
+ 
   console.log(selectedCustomer)
-
     const handleCustomerAdd = (list) =>{
         setSelectedCustomer(list)
         
@@ -176,13 +178,13 @@ const AddSegmentsPage = () => {
             segmentTitle: segmentData.title,
             segmentType: segmentData.segmentType.toUpperCase(),
             segmentCondition,
-            status: segmentData.status,
+            segmentStatus: segmentData.status.toUpperCase(),
             customerIds: customerIds,
         };
     
         try {
             if (state?.index !== undefined) {
-                await updateSegment(segment.id, newSegment);
+                await updateSegment(segment.segmentId, newSegment);
             } else {
                 await addSegment(newSegment);
             }
@@ -201,7 +203,16 @@ const AddSegmentsPage = () => {
 
       };
       
-     
+     const handleDelete = async() =>{
+        try {
+            const id = segment.segmentId
+            await deleteSegment(id)
+            navigate('/segments'); 
+        } catch (error) {
+            
+            console.error('Error Deleting Segment:', error);
+        }
+     }
 
   return (
     <div className='add-segments-page'>
@@ -233,7 +244,7 @@ const AddSegmentsPage = () => {
                                 />
                                 <label htmlFor='label' className='fw-medium'>Label</label>
                             </div>
-                            <p className='ms-4 mt-2 text-body-tertiary'>
+                            <p className='ms-4 mt-1 text-body-tertiary'>
                                 Add customer to the segment one by one
                             </p>
                         </div>
@@ -250,7 +261,7 @@ const AddSegmentsPage = () => {
                                 />
                                 <label htmlFor='Automated' className='fw-medium'>Conditional</label>
                             </div>
-                            <p className='ms-4 mt-2 text-body-tertiary'>
+                            <p className='ms-4 mt-1 text-body-tertiary'>
                                 Existing and future customers that match the condition you set will automatically be added to this segment
                             </p>
                         </div>
@@ -272,9 +283,9 @@ const AddSegmentsPage = () => {
 
 
                 {segmentData.segmentType.toLowerCase() === "label" && (
-                    <div className='bg-white p-3 mt-2 rounded'>
+                    <div className='bg-white p-3 mt-2 rounded label-sec'>
                     <h5>Applies to</h5>
-                    <div className="d-flex gap-2 mb-3 mt-3">
+                    <div className="d-flex gap-2 mb-3 mt-3 align-items-center">
                     <SearchBox></SearchBox>
                     <div>
                     <button
@@ -325,7 +336,7 @@ const AddSegmentsPage = () => {
 
 
                 <div className="d-flex justify-content-between my-4">
-                    <DeleteBtn></DeleteBtn>
+                    <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
 
                     {state?.index === undefined &&(
                     <SubmitBtn clickFunction={handleSave} text={"Add"}></SubmitBtn>
@@ -343,7 +354,7 @@ const AddSegmentsPage = () => {
             <div className='right'>
                 <div className='bg-white p-2 rounded'>
                     <h5>Status</h5>
-                    <StatusFilter status={segmentData.status} onStatusChange={handleStatusChange}></StatusFilter>
+                    <StatusInput status={segmentData.status} onStatusChange={handleStatusChange}></StatusInput>
                 </div>
             </div>
 

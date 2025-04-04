@@ -157,20 +157,24 @@ const AddCustomerPage = () => {
     segment.segmentTitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Add segment to selected chips
-  const addSegmentAsChip = (segment) => {
-    if (!selectedSegments.some((s) => Object.keys(s)[0] === segment.segmentId.toString())) {
-      setSelectedSegments([...selectedSegments,  segment ]);
-    }
+  const [selectedValue, setSelectedValue] = useState(""); // State to reset dropdown
 
-    checkIfChanged(formData, status, searchTerm);
+  const addSegmentAsChip = (event) => {
+      const segmentTitle = event.target.value;
+      if (!segmentTitle) return; // Ignore empty selection
+
+      const selectedSegment = segments.find(seg => seg.segmentTitle === segmentTitle);
+      if (selectedSegment && !selectedSegments.includes(selectedSegment)) {
+          setSelectedSegments([...selectedSegments, selectedSegment]);
+      }
+
+      // Reset dropdown selection
+      setSelectedValue("");
   };
-  // Remove segment chip
+
   const removeSegmentChip = (index) => {
-    const updatedSelectedSegments = selectedSegments.filter((_, i) => i !== index);
-    setSelectedSegments(updatedSelectedSegments);
+      setSelectedSegments(selectedSegments.filter((_, i) => i !== index));
   };
-
   const handleStatusChange = (stat) =>{
      setStatus(stat)
      checkIfChanged(formData, stat, searchTerm);
@@ -580,8 +584,8 @@ const AddCustomerPage = () => {
                   </div>
 
                   <div>
-                      <h5>Wallet Balance</h5>
-                      <h5 className={`fs-3 mt-3 ${walletBalance > 0 ? 'text-primary' : 'text-secondary'}`}>
+                      <h5 style={{fontSize:'1.1rem'}}>Wallet Balance</h5>
+                      <h5 className={`fs-4 mt-3 ${walletBalance > 0 ? 'text-primary' : 'text-secondary'}`}>
                           ₹{walletBalance || 0}
                       </h5>
                   </div>
@@ -589,20 +593,26 @@ const AddCustomerPage = () => {
           </div>
 
 
-            <div className="bg-white p-3 rounded mt-2">
+            <div className="bg-white p-3 rounded mt-2 segment-sec">
                 <h5>Segments</h5>
                 
                 {/* Searchable input to filter segments */}
-                <input
-                    className="border border-secondary-subtle rounded p-1 w-100 mb-2"
-                    type="text"
-                    placeholder="Search Segments"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <select
+                className="border border-secondary-subtle rounded p-1 w-100 mb-2"
+                value={selectedValue}
+                onChange={addSegmentAsChip}
+            >
+                <option value="">Select a Segment</option>
+                {segments.map((segment, index) => (
+                    <option key={index} value={segment.segmentTitle}>
+                        {segment.segmentTitle}
+                    </option>
+                ))}
+            </select>
+
                 
                         
-                {searchTerm.length > 0  &&(
+                {/* {searchTerm.length > 0  &&(
                      <div className="filtered-segments">
                      {filteredSegments.map((segment, index) => (
                      <div
@@ -615,7 +625,7 @@ const AddCustomerPage = () => {
                      </div>
                      ))}
                  </div>
-                )}
+                )} */}
 
                
 
@@ -631,6 +641,7 @@ const AddCustomerPage = () => {
                         padding: '5px 10px',
                         margin: '5px',
                         borderRadius: '20px',
+                        fontSize:"0.9rem"
                         }}
                     >
                         {segment.segmentTitle}

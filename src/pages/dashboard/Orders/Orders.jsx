@@ -23,6 +23,7 @@ import { format, parseISO } from "date-fns";
 import { enIN } from "date-fns/locale";
 import "react-date-range/dist/styles.css"; // Main styles
 import "react-date-range/dist/theme/default.css"; // Theme styles
+import OrderFilter from '../../../components/Filter/OrderFilter/OrderFilter';
 
 const TabPanel = ({ children, value, index }) => {
     return value === index ? <div>{children}</div> : null;
@@ -173,7 +174,7 @@ const Orders = () => {
             <div className="date-filter position-relative">
                 <button
                     className="border rounded bg-white"
-                    onClick={() => setShowDatePicker(!showDatePicker)}
+                    onClick={() => setShowDatePicker((prev) => !prev)}
                 >
                     {dateRange[0].startDate && dateRange[0].endDate
                     ? `${format(toIST(dateRange[0].startDate), "dd MMM yyyy")} - ${format(toIST(dateRange[0].endDate), "dd MMM yyyy")}`
@@ -246,7 +247,8 @@ const Orders = () => {
                 onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
             />
           
-                <StatusFilter status={"Active"}></StatusFilter>
+                {/* <StatusFilter status={"Active"}></StatusFilter> */}
+                <OrderFilter status={"All"}></OrderFilter>
         </div>
 
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>

@@ -22,10 +22,10 @@ const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate }) => {
     }
   };
 
-  // Handle order creation
+
   const handleConfirmSelection = () => {
     const selectedProductData = products.filter((product) =>
-      selectedProducts.includes(product.productId) // Match by productId, not product object
+      selectedProducts.includes(product.productId) 
     );
     onOrderCreate(selectedProductData);
     handleClose();

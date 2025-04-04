@@ -26,9 +26,9 @@ const Products = () => {
 
     const fetchProductdData = async () => {
         try {
-            const data = await getAllProduct()
-            setProduct(data.data)
-            setFilteredData(data.data)
+            const data = await getAllProduct();
+            setProduct(data.data);
+            setFilteredData(data.data); // Default filter
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
         }
@@ -44,7 +44,6 @@ const Products = () => {
         }
       
         const filtered = product.filter((item) => {
-          if (filter === "Product Id") return item.id.toString().includes(value);
           if (filter === "Product Name") return item.productName.toLowerCase().includes(lowercasedValue);
           return true;
         });
@@ -52,6 +51,16 @@ const Products = () => {
         console.log(filtered);
         setFilteredData(filtered);
       };
+
+
+      const handleStatusChange = (status) => {
+        if (status === "All") {
+            setFilteredData(product); // Show all products
+        } else {
+            const filtered = product.filter(item => item.availableStatus === status);
+            setFilteredData(filtered);
+        }
+    };
 
   return (
     <div className='products'>
@@ -80,13 +89,13 @@ const Products = () => {
 
             <div className='w-75'>
                 <ProductFilter 
-                    filterOptions={["Product Id", "Product Name"]} 
+                    filterOptions={["Product Name"]} 
                     onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
                 />
             </div>
             
             <div className='w-25'>
-                <StatusFilter status={'Active'}></StatusFilter> 
+            <StatusFilter status="All" onStatusChange={handleStatusChange} />
             </div>
         </div>
 

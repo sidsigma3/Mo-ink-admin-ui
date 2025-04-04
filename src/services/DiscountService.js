@@ -9,7 +9,7 @@ export const getAllDiscount = async () => {
       return response.data;
       
     } catch (error) {
-      console.error('Error getting product:', error);
+      console.error('Error getting discount:', error);
       throw error;
     }
   };
@@ -20,7 +20,7 @@ export const getAllDiscount = async () => {
       const response = await axios.post(`${BASE_URL}/discount`, discountData);
       return response.data;
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error('Error adding discount:', error);
       throw error;
     }
   };
@@ -31,7 +31,18 @@ export const getAllDiscount = async () => {
       const response = await axios.put(`${BASE_URL}/discount/${discountId}`, discountData);
       return response.data;
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Error updating discount:', error);
+      throw error;
+    }
+  };
+  
+
+  export const deleteDiscount = async (discountId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/discount/${discountId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting discount:', error);
       throw error;
     }
   };

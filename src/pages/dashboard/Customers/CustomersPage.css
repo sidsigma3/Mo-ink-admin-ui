@@ -21,6 +21,7 @@
 
   .table-ctn table thead tr th{
     background-color: #f9fafb; ;
+    font-size: 0.8rem;
   }
   
   .table-ctn th,
@@ -34,7 +35,7 @@
   }
   
   .table-ctn tbody td {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
   }
   

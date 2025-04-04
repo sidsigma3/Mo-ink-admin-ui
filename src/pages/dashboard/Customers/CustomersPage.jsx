@@ -114,7 +114,7 @@ const getCustomerOrderStats = (customerId) => {
     ? new Intl.DateTimeFormat("en-GB").format(new Date(
         Math.max(...customerOrders.map(order => new Date(order.createdAt)))
       ))
-    : "N/A"; // Default if no orders
+    : "No order"; // Default if no orders
 
   return { totalOrders, lastOrderDate };
 };
@@ -188,7 +188,7 @@ const handleFilterChange = (filter, value) => {
   return (
     <div className='customer-page'>
           <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.3rem'}}>Customers</h4>
+            <h4 style={{fontSize:'1.2rem'}}>Customers</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn onClick={exportToExcel}></ExportBtn>

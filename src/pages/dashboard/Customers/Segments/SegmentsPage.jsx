@@ -21,6 +21,8 @@ const SegmentsPage = () => {
 
     const [segments,setSegments] = useState([])
     const [filteredData, setFilteredData] = useState([]);
+    const [statusFilter, setStatusFilter] = useState('Active');
+    const [filterText, setFilterText] = useState('');
     
       useEffect(() => {
           const fetchData = async () => {
@@ -138,22 +140,32 @@ const SegmentsPage = () => {
       };
 
       const handleFilterChange = (filter, value) => {
-        const lowercasedValue = value.toLowerCase();
-    
+        setFilterText(value);
+        applyFilters(value, statusFilter); // Re-apply both filters
+      };
+      
+      const handleStatusChange = (status) => {
+        setStatusFilter(status);
+        applyFilters(filterText, status); // Re-apply both filters
+      };
+      
+      const applyFilters = (text, status) => {
+        const lowercasedValue = text.toLowerCase();
+      
         const filtered = segments.filter((item) => {
-            // if (filter === "Order Id") return item.orderId.toString().includes(value);
-            if (filter === "Title") return item.segmentTitle.toLowerCase().includes(lowercasedValue);
-            return true;
+          const titleMatch = item.segmentTitle.toLowerCase().includes(lowercasedValue);
+          const statusMatch = status === 'All' || item.segmentStatus === status.toUpperCase();
+          return titleMatch && statusMatch;
         });
-    
+      
         setFilteredData(filtered);
-        };
+      };
       
 
   return (
     <div className='segments-page'>
          <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.3rem'}}>Segments</h4>
+            <h4 style={{fontSize:'1.2rem'}}>Segments</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn></ExportBtn>
@@ -176,7 +188,7 @@ const SegmentsPage = () => {
             </div>
          
             <div className='w-25'>
-                <StatusFilter status={'Active'}></StatusFilter> 
+                <StatusFilter status={'Active'} onStatusChange={handleStatusChange} ></StatusFilter> 
             </div>
         </div>
 
@@ -188,6 +200,7 @@ const SegmentsPage = () => {
                         <th>Type</th>
                         <th>Customers</th>
                         <th>Conditions</th>
+                        <th>Status</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
@@ -198,6 +211,11 @@ const SegmentsPage = () => {
                     <td>{row.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</td>
                     <td>{row.customerCount}</td>
                     <td>{formatSegmentCondition(row.segmentCondition)}</td>
+                    <td>
+                    <div style={{backgroundColor:row.segmentStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:row.segmentStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem' ,padding:"3px"}}>
+                      {row.segmentStatus}
+                      </div>
+                    </td>
                     <td>
                     <Dropdown>
                         <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>

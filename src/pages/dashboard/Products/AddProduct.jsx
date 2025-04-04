@@ -415,17 +415,18 @@ const AddProduct = () => {
 
   
   
-const handleDelete = async() =>{
-  try {
-    const productId = product.productId
-    await deleteProduct(productId)
-    navigate('/products'); // Redirect after submission
-  } catch (error) {
-    // Handle error (optional)
-    console.error('Error Deleting product:', error);
-  }
+const handleDelete = async () => {
+  const isConfirmed = window.confirm("Are you sure you want to delete this product?");
+  if (!isConfirmed) return; // Stop if the user cancels
 
-}  
+  try {
+    const productId = product.productId;
+    await deleteProduct(productId);
+    navigate('/products'); // Redirect after deletion
+  } catch (error) {
+    console.error("Error Deleting product:", error);
+  }
+};
 
 
 const [selectedFile, setSelectedFile] = useState(null);
@@ -888,7 +889,7 @@ console.log(sizeColorMap)
                         placeholder="Counter"
                       />
 
-                      <input
+                      {/* <input
                         className="flex-grow-1"
                          onClick={(e) => e.stopPropagation()}
                          onChange={(e) =>
@@ -903,7 +904,7 @@ console.log(sizeColorMap)
                       placeholder="description"
                       >
                       
-                      </input>
+                      </input> */}
 
                         <button
 

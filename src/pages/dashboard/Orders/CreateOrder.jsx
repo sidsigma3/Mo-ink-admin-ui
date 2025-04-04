@@ -40,11 +40,20 @@ const CreateOrder = () => {
     const [showModalAssign,setShowModalAssign] = useState(false)
     const [showModalInvoice,SetShowModalInvoice] =useState(false)
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [customers,setCustomer] = useState([])
+
+    // Filter customers based on search input
+    const filteredCustomers = customers.filter((customer) =>
+        customer.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.phoneNumber.includes(searchTerm)
+    );
+
     const [cart, setCart] = useState([]);
     
     const [productData,setProductData] = useState([])
 
-     const [customers,setCustomer] = useState([])
+    
     
      useEffect(() => {
             const fetchData = async () => {
@@ -366,6 +375,7 @@ const CreateOrder = () => {
       const [selectedPayment,setSelectedPayment] = useState('Select Payment Type')
       const [selectedDiscount,setSelectedDiscount] = useState('')
       const [selectedDiscountValue, setSelectedDiscountValue] = useState(null);
+      const [selectedDiscountId,setSelectedDiscountId] = useState('')
 
       const handleSelectDiscount = (discountCode) => {
         const selectedItem = discountData.find(item => item.discountCode === discountCode);
@@ -373,6 +383,7 @@ const CreateOrder = () => {
           if (selectedItem) {
             setSelectedDiscount(selectedItem.discountCode);
             setSelectedDiscountValue(selectedItem.discountValue);
+            setSelectedDiscountId(selectedItem.discountId)
           }
       }
 
@@ -441,65 +452,97 @@ const CreateOrder = () => {
 
     
  
-    const handleCreateOrder = async () => {
-      try {
-        if (!selectedCustomer?.customerId) {
-          alert("No customer selected!");
-          return;
+      const handleCreateOrder = async () => {
+        try {
+          if (!selectedCustomer?.customerId) {
+            alert("No customer selected!");
+            return;
+          }
+      
+          if (orderDetails.length === 0) {
+            alert("No items in the order!");
+            return;
+          }
+      
+          // Extract variant IDs and total quantity from orderDetails
+          const variantIds = orderDetails.flatMap(order =>
+            order.colors.map(color => color.id)
+          );
+      
+          const totalQuantity = orderDetails.flatMap(order =>
+            order.colors.map(color => Number(color.available) || 0)
+          ).reduce((sum, qty) => sum + qty, 0);
+      
+          if (variantIds.length === 0 || totalQuantity === 0) {
+            alert("No variants selected or quantity is zero!");
+            return;
+          }
+      
+          // Determine COD and Online Payment Amounts
+          let codAmount = 0;
+          let onlineAmount = 0;
+          const totalAmount = Number(calculateTotalAmount());
+      
+          if (selectedPayment === "100%") {
+            onlineAmount = totalAmount;
+          } else if (selectedPayment === "50%") {
+            onlineAmount = totalAmount * 0.5;
+            codAmount = totalAmount * 0.5;
+          } else if (selectedPayment === "30%") {
+            onlineAmount = totalAmount * 0.3;
+            codAmount = totalAmount * 0.7;
+          } else {
+            codAmount = totalAmount;
+          }
+      
+          // Ensure wallet deduction does not exceed the total amount
+          const walletUsed = Math.min(walletDeduction || 0, totalAmount);
+      
+          // Construct the order data
+          const orderData = {
+            customer: {
+              customerId: selectedCustomer.customerId
+            },
+            status: "New Order",
+            totalAmount: totalAmount,
+            discountId: selectedDiscountId || null,
+            walletAmount: walletUsed,
+            quantity: totalQuantity,
+            payment: {
+              paymentId: Date.now(),
+              totalAmount: totalAmount,
+              codAmount: codAmount,
+              onlineAmount: onlineAmount,
+              transactionId: "TXN" + Date.now(),
+              paidAmount: onlineAmount + walletUsed,
+              pendingAmount: totalAmount - (walletUsed + onlineAmount),
+              paymentStatus: walletUsed + onlineAmount >= totalAmount ? "PAID" : "PARTIALLY PAID"
+            },
+            variantIds: variantIds
+          };
+      
+          // Send order data to API
+          const response = await createOrder(orderData);
+          console.log("Order Created:", response);
+      
+          sendOrderConfirmationEmail(
+            selectedCustomer.email,
+            selectedCustomer.customerName,
+            response.orderId,
+            orderData.totalAmount
+          );
+      
+          sendWhatsAppMessage(selectedCustomer.whatsappNumber, orderData);
+      
+          alert("Order created successfully!");
+      
+        } catch (error) {
+          console.error("Error creating order:", error);
+          alert("Failed to create order. Check console for details.");
         }
+      };
+      
     
-        if (orderDetails.length === 0) {
-          alert("No items in the order!");
-          return;
-        }
-    
-        // Extract variant IDs and total quantity from orderDetails
-        const variantIds = orderDetails.flatMap(order => 
-          order.colors.map(color => color.id) // Extract variant IDs
-        );
-    
-        const totalQuantity = orderDetails.flatMap(order =>
-          order.colors.map(color => Number(color.available) || 0) // Extract available quantity
-        ).reduce((sum, qty) => sum + qty, 0);
-    
-        // Ensure we have variants
-        if (variantIds.length === 0 || totalQuantity === 0) {
-          alert("No variants selected or quantity is zero!");
-          return;
-        }
-    
-        // Construct the order data
-        const orderData = {
-          customer: {
-            customerId: selectedCustomer.customerId,
-          },
-          status: "New Order",
-          totalAmount: calculateTotalAmount(), 
-          payment: {
-            paymentId: Date.now(), // Unique timestamp-based ID
-            paymentMethod: "Unspecified",
-            amount: calculateTotalAmount(), 
-            paymentStatus: "UNPAID",
-          },
-          variantIds: variantIds,
-          quantity: totalQuantity,
-        };
-    
-        // Send order data
-        const response = await createOrder(orderData);
-        console.log("Order Created:", response);
-        sendOrderConfirmationEmail(selectedCustomer.email, selectedCustomer.customerName, response.orderId, orderData.totalAmount);
-       
-        sendWhatsAppMessage(selectedCustomer.whatsappNumber, orderData);
-
-       
-        alert("Order created successfully!");
-    
-      } catch (error) {
-        console.error("Error creating order:", error);
-        alert("Failed to create order. Check console for details.");
-      }
-    };
 
     const [discountPercentage, setDiscountPercentage] = useState(0);
     const [codPercentage, setCodPercentage] = useState(0);
@@ -612,7 +655,7 @@ const CreateOrder = () => {
         <div className='top d-flex gap-3 mb-2 mt-2' style={{cursor:'pointer'}}>
             <span onClick={() => navigate('/orders')}><IoArrowBackOutline size={25}/></span>
            { Object.keys(order).length === 0 ? (
-            <h5>Create Order</h5>
+            <h5 style={{fontSize:'1.2rem'}}>Create Order</h5>
 
            ): (
                 <div className='d-flex gap-2'>
@@ -643,7 +686,7 @@ const CreateOrder = () => {
         <div className='main-sec d-flex gap-2'>
             <div className='left col-xl-9 col-lg-12 col-md-12 col-12'>
                 <div className='products bg-white p-4 mb-3 rounded'>
-                    <h5>Order Details</h5>
+                    <h6>Order Details</h6>
                     
                     <div className='d-flex justify-content-center gap-2 mb-1 mt-3 border-bottom pb-5'>
                     {/* <SearchBox></SearchBox> */}
@@ -652,7 +695,7 @@ const CreateOrder = () => {
                       <div>
                       </div>
                     ):(
-                    <button className='btn btn-primary' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
+                    <button className='btn btn-sm btn-primary' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
                     )}
                     </div>
                     </div>
@@ -939,7 +982,7 @@ const CreateOrder = () => {
                           ) : (
                               // Show input field in edit mode
                               <input
-                                  className="w-28 border border-secondary-subtle rounded-1 ps-2"
+                                  className="border border-secondary-subtle rounded-1 ps-2 w-50"
                                   type="number"
                                   placeholder="Enter amount"
                                   value={walletDeduction}
@@ -1020,24 +1063,22 @@ const CreateOrder = () => {
                         
                         <div>
                         <h4>Customers</h4>
-                        <DropdownButton className='drop-down mb-2' id="dropdown-light-button" title="Search or add Customer">
-                        <Dropdown.Item className='d-flex align-items-center gap-3'  href="#/action-1" style={{backgroundColor:"#B9C0CD"}} onClick={() => setShowModalCustomer(true)}> 
-                                <span><IoAddCircleOutline /></span>
-                                Create New Customer
-                        </Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">
-                            <div>
-                                <h4>Cody Fisher</h4>
-                                <h5>codyFisher@gmail.com</h5>
-                            </div>
-                        </Dropdown.Item>
-                        <Dropdown.Item href="#/action-3">
-                            <div>
-                                <h4>Cody Fisher</h4>
-                                <h5>codyFisher@gmail.com</h5>
-                            </div>
-                        </Dropdown.Item>
-                        </DropdownButton>
+                        <div className="d-flex  flex-column align-items-center gap-2 mb-3">
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search Customer..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <button
+                            className="btn btn-sm btn-primary d-flex align-items-center gap-2"
+                            onClick={() => setShowModalCustomer(true)}
+                        >
+                            <IoAddCircleOutline size={20} /> Create New
+                        </button>
+                    </div>
+
 
 
                         <ModalCustomer
@@ -1050,9 +1091,9 @@ const CreateOrder = () => {
 
 
                     <div className='customer-list mt-3'>
-                        <h4>Recent Customers</h4>
+                        <h4>Customers</h4>
                         <ul>
-                        {customers.map((customer, index) => (
+                        {filteredCustomers.map((customer, index) => (
                             <li key={index} onClick={() => handleSelectCustomer(customer)} style={{ cursor: 'pointer' }}>
                             <h5>{customer.customerName}</h5>
                             <span>{customer.phoneNumber}</span>
@@ -1067,21 +1108,25 @@ const CreateOrder = () => {
                     <div className='selected-customer mt-2'>
                         <div className='d-flex justify-content-between align-items-center position-relative'>
                        
-                        <button
-                            onClick={handleDeselectCustomer}
-                            style={{
-                            background: 'transparent',
-                            border: 'none',
-                            fontSize: '1.3rem',
-                            cursor: 'pointer',
-                            position:'absolute',
-                            top:-3,
-                            right:-4
-                            }}
-                            className='cross-btn'
-                        >
-                            <RxCross2 />
-                        </button>
+
+                        { !isViewMode&& (
+                           <button
+                           onClick={handleDeselectCustomer}
+                           style={{
+                           background: 'transparent',
+                           border: 'none',
+                           fontSize: '1.3rem',
+                           cursor: 'pointer',
+                           position:'absolute',
+                           top:-3,
+                           right:-4
+                           }}
+                           className='cross-btn'
+                       >
+                           <RxCross2 />
+                       </button>
+                        )}
+                       
                         </div>
 
                         <div className='border-bottom mb-2'>

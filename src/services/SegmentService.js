@@ -27,10 +27,20 @@ export const getAllSegment = async () => {
 
   export const updateSegment = async (segmentId, segmentData) => {
     try {
-      const response = await axios.put(`${BASE_URL}/customer/${segmentId}`, segmentData);
+      const response = await axios.put(`${BASE_URL}/segment/${segmentId}`, segmentData);
       return response.data;
     } catch (error) {
       console.error('Error updating segment:', error);
+      throw error;
+    }
+  };
+
+  export const deleteSegment = async (segmentId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/segment/${segmentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting segment:', error);
       throw error;
     }
   };

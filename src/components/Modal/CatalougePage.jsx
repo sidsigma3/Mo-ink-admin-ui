@@ -210,7 +210,7 @@ const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
               </button>
             )}
             <h4 className="h6 fw-semibold mt-4">Preset Catalogue</h4>
-            <div className="container" style={{height:"26rem", overflow:"auto"}}>
+            <div className="container" style={{height:"20rem", overflow:"auto"}}>
             <div className="row g-0" style={{height:'auto'}}>
               {filteredVariants.map((item, index) => (
                 <div key={index} 

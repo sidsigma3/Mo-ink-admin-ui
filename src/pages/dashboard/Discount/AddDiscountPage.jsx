@@ -17,7 +17,7 @@ import { getAllProduct } from "../../../services/ProductService";
 import { getAllSegment } from "../../../services/SegmentService";
 import ModalSegmentList from "../../../components/Modal/ModalSegmentList";
 import { getAllCustomer } from "../../../services/CustomerService";
-import { addDiscount , updateDiscount } from "../../../services/DiscountService";
+import { addDiscount , deleteDiscount, updateDiscount } from "../../../services/DiscountService";
 import ModalProdcutSelect from "../../../components/Modal/ModalProdcutSelect";
 import StatusInput from "../../../components/StatusInput/StatusInput";
 
@@ -483,6 +483,19 @@ const handleMaxUsageChange = (field1,field2) => {
   
     }
   
+    const handleDelete = async () => {
+      const confirmed = window.confirm("Are you sure you want to delete this discount?");
+      if (!confirmed) return;
+  
+      try {
+          const id = discount.discountId;
+          await deleteDiscount(id);
+          navigate('/discounts');
+      } catch (error) {
+          console.error('Error Deleting Discount:', error);
+      }
+  };
+  
 
   return (
     <div className="add-discount">
@@ -825,7 +838,7 @@ const handleMaxUsageChange = (field1,field2) => {
           </div>
 
           <div className="d-flex justify-content-between my-4">
-            <DeleteBtn></DeleteBtn>
+            <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
 
             {state?.index === undefined &&(
             <SubmitBtn clickFunction={handleSubmit} text={"Add"}></SubmitBtn>

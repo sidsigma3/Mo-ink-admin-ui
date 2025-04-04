@@ -1,0 +1,32 @@
+.order-filter{
+    width: 2rem;
+    border-radius: 0.3rem;
+    
+}
+
+
+.dropdown button{
+    background-color: white;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.3rem;
+    color: black;
+}
+
+.order-filter .dropdown-toggle{
+    width: 10rem ;
+    font-size: 0.8rem;
+}
+
+
+.order-filter .dropdown-menu{
+    width: 10rem ;
+    font-size: 0.8rem;
+}
+
+@media(max-width:768px){
+    .order-filter{
+        width: 100%;
+        border-radius: 0.3rem;
+    }
+}
+

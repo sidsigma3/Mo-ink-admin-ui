@@ -96,6 +96,15 @@ const SideBar = () => {
 
 
 
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated"); 
+    localStorage.removeItem("userData"); 
+    // sessionStorage.removeItem("authToken");
+    navigate("/"); 
+  };
+  
+
+
   return (
     <div className='sideBar shadow'>
 
@@ -246,7 +255,7 @@ const SideBar = () => {
                     <button 
                       onClick={() => {
                         setSelected('segments');
-                        setHoverSelected('customers'); // Ensure submenu remains open when selected
+                        // setHoverSelected('customers'); 
                       }} 
                       className="d-flex gap-3" 
                       style={{ 
@@ -293,22 +302,34 @@ const SideBar = () => {
         <h3 className='hide-on-mobile'>My Team</h3>
 
         <ul className='hide-on-mobile'>
-            <div  onMouseEnter={() => setHoverSelected('customers')}  onMouseLeave={() => setHoverSelected(null)}>
+          <div  
+              onMouseEnter={() => setHoverSelected('customers')}  
+              onMouseLeave={() => {
+                if (selected !== 'segments') setHoverSelected(null); // Keep open if "segments" is selected
+              }}
+            >
             <li className={selected === 'customers' ? 'selected' : 'not-selected'}  onMouseEnter={() => setHoverSelected('customers')} >
                 <Link to={'/customers'}>
                 <button  onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={22} style={{ strokeWidth: '0.4'}}/></span>Customers</button>
                 </Link>
                 
             </li>
-
-                 {hoverSelected === 'customers' && (
-                    <div className='mt-2 ps-4 mb-2'>
-                    <Link to={'/segments'}>
-                        <button className='d-flex gap-3' style={{border:'none',background:'none' ,textDecoration:'none'}}> <span><BsArrowReturnRight /></span>Segments</button>
-                    </Link>
-                    </div>
-                   
-                )}
+            {(hoverSelected === 'customers' || selected === 'segments') && (
+                <div className={selected === 'segments' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
+                  <Link to={'/segments'}>
+                    <button 
+                      onClick={() => {
+                        setSelected('segments');
+                        setHoverSelected('customers'); // Keep submenu open
+                      }} 
+                      className='d-flex gap-3' 
+                      style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
+                    >
+                      <span><BsArrowReturnRight /></span>Segments
+                    </button>
+                  </Link>
+                </div>
+              )}
 
             </div>
 
@@ -340,8 +361,8 @@ const SideBar = () => {
                 <button  onClick={()=>setSelected('report')}><span className='icon'><GrBug size={22}/></span>Report a bug</button>
             </li>
 
-            <li>
-              <button ><span className='icon'><AiOutlineLogout size={22}/></span>Log out</button>
+            <li onClick={()=>handleLogout()}>
+              <button ><span className='icon' ><AiOutlineLogout size={22}/></span>Log out</button>
             </li>
 
 

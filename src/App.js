@@ -1,6 +1,5 @@
 import {BrowserRouter,Route,Routes,Navigate} from 'react-router-dom'
 import './App.css';
-import axios from 'axios';
 import Dashboard from './pages/dashboard/Dashboard';
 import Header from './components/headers/Header';
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -40,10 +39,6 @@ import { BulkAssignProvider } from './components/Context/BulkAssignContext';
 import VendorOrder from './pages/dashboard/Orders/Vendor Order/VendorOrder';
 import { VendorOrderProvider } from './components/Context/VendorOrderContext';
 import VendorOrderDetails from './pages/dashboard/Orders/Vendor Order/VendorOrderDetails';
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-
-const clientId = "941922273664-jj9f8lgvhca9bagn6bpprhgp56dl5osv.apps.googleusercontent.com";
-
 
 function App() {
 
@@ -69,27 +64,7 @@ function App() {
     return isAuthenticated ? children : <Navigate to="/" />;
   };
 
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/auth/user", { withCredentials: true })
-      .then((res) => setUser(res.data))
-      .catch(() => setUser(null));
-  }, []);
-
-  const handleLoginSuccess = (response) => {
-    console.log("Login Success:", response);
-    window.location.href = "http://localhost:5000/auth/google";
-  };
-
-  const handleLogout = () => {
-    axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
-    setUser(null);
-  };
-
   return (
-    <GoogleOAuthProvider clientId={clientId}>
     <BrowserRouter>
 
         <Routes>
@@ -208,7 +183,6 @@ function App() {
         </div> */}
        
     </BrowserRouter>
-    </GoogleOAuthProvider>
   );
 }
 

@@ -1,3 +1,10 @@
+.vendor-order .top{
+    h3{
+        font-size: 1.2rem;
+    }
+}
+
+
 .vendor-order table tbody td .green{
     background-color: #D1FAE5;
     border: 1px solid #6EE7B7;

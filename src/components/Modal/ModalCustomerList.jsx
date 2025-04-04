@@ -11,7 +11,7 @@ const ModalCustomerList = ({ show, handleClose ,customers,onCustomerAdd}) => {
 
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     // const [customers,setCustomer] = useState([])
-
+    
 
     // useEffect(() => {
     //   const fetchData = async () => {

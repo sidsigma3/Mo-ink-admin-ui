@@ -146,7 +146,7 @@ const DiscountsPage = () => {
                 <th>Title</th>
                 <th>Start Date</th>
                 <th>Status</th>
-                <th>Method</th>
+               
                 <th>Customer</th>
                 <th>Used</th>
                 <th style={{width:'1rem'}}></th>
@@ -179,7 +179,7 @@ const DiscountsPage = () => {
                 {discount.discountStatus}
                 </div>
               </td>
-              <td>{discount.discountMethod}</td>
+            
               <td style={{textTransform:'capitalize'}}>{discount.eligibleCustomers.length}</td>
               <td>{discount.used}</td>
               <td>

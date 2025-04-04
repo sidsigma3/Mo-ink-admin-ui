@@ -5,11 +5,11 @@ import "./ExportBtn.css"
 const ExportBtn = ({onClick}) => {
   return (
     <>
-     <button className='export-btn btn lg-btn' onClick={onClick}>
+     <button className='export-btn btn lg-btn bg-warning-subtle text-black' onClick={onClick}>
          <span> Export </span><PiExportBold size={18}/>
     </button>
 
-    <button className='export-btn btn sm-btn'>
+    <button className='export-btn btn sm-btn bg-warning-subtle text-black'>
     <PiExportBold size={23}/>
     </button>
     </>
