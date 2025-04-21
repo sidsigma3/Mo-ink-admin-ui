@@ -1,14 +1,21 @@
 .add-discount .top{
     h5{
-        font-size: 1.2rem;
+
+        font-size: 0.8rem;
     }
 }
+
+h4{
+    font-size: 1.2rem;
+}
+
 
 .add-discount .main{
     padding: 0;
 }
 
 .add-discount .main .left{
+    font-size: 0.8rem;
     width: 75%;
 }
 
@@ -31,18 +38,22 @@
     }
 
     input[type=number]{
+        font-size: 1rem;
         border: 1px solid #D1D5DB;
         border-radius: 0.3rem;
-        padding: 0.2rem 0.2rem;
+        padding: 0.2rem 0.8rem;
         height: 2.2rem;
     }
 
     h5{
-        font-size: 0.9rem;
+
+        font-size: 0.8rem;
+
     }
 
     label{
         font-size: 0.8rem;
+
     }
 
 
@@ -90,8 +101,6 @@
         border: none;
         background: none;
     }
-
-    
 }
 
 .add-discount .right{

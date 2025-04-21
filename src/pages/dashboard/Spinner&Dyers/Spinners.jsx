@@ -232,23 +232,23 @@ const Spinners = () => {
             <Table>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Location</th>
-                        <th>Tag</th>
-                        <th>Total Orders</th>
-                        <th>Last Order</th>
+                        <th style={{ verticalAlign: 'middle'}} >Name</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Location</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Tag</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Total Orders</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Last Order</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
                 <tbody>
           {filteredData.map((customer, index) => (
             <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-              <td>{customer.firstName} {customer.lastName}</td>
-              <td>{customer.city}</td>
-              <td>
+              <td style={{ verticalAlign: 'middle'}} >{customer.firstName} {customer.lastName}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.city}</td>
+              <td style={{ justifyItems: 'center', alignContent:'center'}}>
                 <div 
                 style={{
-                    padding:'0.2rem 0.5rem',
+                    padding:'4px',
                     border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem',
                     backgroundColor:customer.vendorType === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
                     borderColor:customer.vendorType === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
@@ -258,10 +258,12 @@ const Spinners = () => {
                {customer.vendorType}
                </div>
               </td>
-              <td>{customer.assignOrders || 'No order'}</td>
-              <td>{customer.lastOrder || 'No order'}</td>
+
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.assignOrders || 'No order'}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.lastOrder || 'No order'}</td>
+
               <td>
-                    <Dropdown>
+                    <Dropdown align="end" style={{ zIndex: 10 }}>
                         <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
                         <BsThreeDotsVertical />
                         </Dropdown.Toggle>

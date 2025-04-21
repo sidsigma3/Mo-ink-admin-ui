@@ -2,19 +2,21 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 0.5rem;
+    align-items: center;
 }
 
 .order .top h3{
     font-size: 1.2rem;
     margin: 0;
     text-align: center;
+    
 }
 
 
 
 .order .top .btn-ctn button{
-    height:  30px;
-    padding: 0.2rem 1rem ;
+    height:  40px;
+    padding: 0.2rem 2rem ;
     font-size: 0.8rem;
 }
 
@@ -80,7 +82,7 @@
 } */
 
 .order .order-filter-ctn{
-    width: 50%;
+    width: 35%;
 }
 
 

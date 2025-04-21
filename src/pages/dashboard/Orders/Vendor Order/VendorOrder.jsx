@@ -73,27 +73,27 @@ const VendorOrder = () => {
         <Table hover>
           <thead className="thead-dark">
             <tr>
-              <th>Order ID</th>
-              <th>Date</th>
-              <th>Order For</th>
-              <th>Vendor</th>
-              <th>Weight</th>
-              <th>Amount</th>
-              <th>Payment</th>
-              <th>P.O.</th>
+              <th>V.O ID</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Date</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Order For</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Vendor</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Weight</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Amount</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Payment</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Inovice</th>
              
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
               <tr key={order.orderId}onClick={() => handleRowClick(order.orderId)} style={{ cursor: "pointer" }}>
-                <td>{order.orderId}</td>
-                <td>{order.date}</td>
-                <td>
+                <td style={{ verticalAlign: 'middle'}}>{order.orderId}</td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.date}</td>
+                <td style={{ justifyItems: 'center', alignContent:'center'}}>
                     <div 
                     style={{
-                        padding:'0.2rem 0.4rem',
-                        border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'4rem',
+                        padding: '4px',
+                        border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem', 
                         backgroundColor:order.orderFor === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
                         borderColor:order.orderFor === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
                         color : order.orderFor === 'Spinner' ? '#1E40AF' : '#92400E' ,
@@ -102,16 +102,28 @@ const VendorOrder = () => {
                     {order.orderFor}
                 </div>
                 </td>
-                <td>{order.customer}</td>
-                <td>{order.weight}</td>
-                <td>{order.amount}</td>
-                <td>
-                    <div className={order.payment === "Paid" ? "green" : "grey"}>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer}</td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.weight}</td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.amount}</td>
+                <td style={{ justifyItems: 'center', alignContent:'center'}}>
+                    <div style={{
+                        padding: '4px',
+                        border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem', 
+                        backgroundColor:order.payment === 'Paid' ? '#D1FAE5' : '#F3F4F6',
+                        borderColor:order.payment === 'Paid' ? '#6EE7B7' : '#D1D5DB' ,
+                        color : order.payment === 'Paid' ? '#41b788' : '#3f3c3c' ,
+                    }}>
                     {order.payment}
                     </div>
+
                 </td>
-                <td>
-                   <div className='bg-secondary-subtle rounded-circle p-1 text-white w-50'><LuFileDown size={20}/></div>
+                <td  style={{ justifyItems: 'center', alignContent:'center'}}>
+                <div 
+                   className="bg-secondary-subtle rounded-circle p-1 text-white d-flex justify-content-center align-items-center"
+                     style={{ width: '40px', height: '40px' }}
+                   >
+                   <LuFileDown size={20} />
+                   </div>
                 </td>
               </tr>
             ))}

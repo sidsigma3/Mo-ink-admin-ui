@@ -3,6 +3,9 @@
     .main-sec{
         label{
             font-size: 0.8rem;
+
+            font-weight: 500;
+
         }
 
     }
@@ -20,7 +23,7 @@
     input[type=text]{
         border: 1px solid #D1D5DB;
         border-radius: 0.3rem;
-        padding: 0.2rem 0.2rem;
+        padding: 0.2rem 0.8rem;
         height: 2rem;
         margin-top: 0.5rem;
         font-size: 0.8rem;
@@ -29,7 +32,7 @@
     input[type=password]{
         border: 1px solid #D1D5DB;
         border-radius: 0.3rem;
-        padding: 0.2rem 0.2rem;
+        padding: 0.2rem 0.8rem;
         height: 2rem;
         margin-top: 0.5rem;
     }
@@ -75,6 +78,29 @@
     opacity: 0.7; /* Slightly dim the image on hover */
   }
 
+
+  .custom-toast {
+    background-color: #00b386;
+    color: white;
+    margin-top: 70px;
+    margin-right: 30px;
+    width: 320px;
+    height: 55px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: none;
+    display: flex;
+    align-items: center !important;
+    justify-content: start;
+    padding: 0 !important;
+  }
+  
+  .toast-icon {
+    font-size: 1.5rem;
+  }
+  
+
+
 @media(min-width:1440px){
     .profile-page{
 
@@ -82,6 +108,11 @@
             top: 20rem;
             left: 2rem;
         }
+        .custom-toast {
+            margin-top: 70px;
+            margin-right: 10px;
+        }
+
     }
 }
 

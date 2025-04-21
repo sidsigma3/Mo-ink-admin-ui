@@ -9,10 +9,15 @@
   .product-table table {
     width: 100%;
     background-color: white;
-    text-align: left;
+    text-align: center;
     border-collapse: collapse;
   }
   
+  .size {
+    text-align: center;
+    align-items: center;
+  }
+
   .product-table table thead {
     position: sticky;
     top: 0;

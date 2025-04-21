@@ -30,18 +30,20 @@ const OrderTable = forwardRef(({data}, ref) => {
 
   const statusOptions = [
     "New Order",
-    "Dispatch from Inventory",
-    "Send to Vendor",
-    "Dispatch from Vendor",
+    "Shipped",
+    "Manufacture",
     "Delivered",
-    "Order Cancelled",
     "Partial return",
     "Full return", 
     "Partial cancel",
     "Full cancel"
+   
   ];
 
+
+
   const paymentStatusOption = ["UNPAID", "PARTIALLY PAID", "PAID"];
+
 
   const handlePaymentStatusChange = async (orderId, newStatus) => {
     try {
@@ -121,10 +123,10 @@ const handleRowClick = (order) => {
 
   const statusClassMap = {
     "New Order": "blue",
-    Delivered: "green",
-    "Send to Vendor": "yellow",
-    "Order Cancelled": "red",
-    "In Transit": "grey",
+    "Delivered": "green",
+    "Shipped": "yellow",
+    "Cancelled": "red",
+    "Manufacture": "grey",
   };
 
   let active = 2;
@@ -183,25 +185,30 @@ const handleRowClick = (order) => {
       <Table hover>
         <thead>
           <tr>
-            <th>#POID</th>
 
-            <th>Date</th>
+            <th style={{ verticalAlign: 'middle'}} >#POID</th>
 
-            <th>Customer</th>
 
-            <th>Quantity</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Date</th>
 
-            <th>Weight</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Customer</th>
 
-            <th>Amount</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Quantity</th>
 
-            <th>Payment</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Weight</th>
 
-            <th>Order Status</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Amount</th>
 
-            <th style={{ width: "11.3rem" }}>V.O I'D</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Payment</th>
+
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Order Status</th>
+
+            <th style={{ width: "11.3rem", textAlign: "center", verticalAlign: 'middle' }}>V.O I'D</th>
+
+
             
             <th>Invoice</th>
+
           </tr>
         </thead>
 
@@ -212,16 +219,18 @@ const handleRowClick = (order) => {
               style={{ cursor: "pointer" }}
               onClick={() => handleRowClick(order)}
             >
-              <td style={{ fontWeight: 500 }}>{order.orderId}</td>
-              <td>{new Intl.DateTimeFormat('en-GB').format(new Date(order.createdAt))}</td>
-              <td>{order.customer.customerName}</td>
-              <td>{order.orderVariantResponse.length}</td>
-              <td>
+
+              <td style={{ verticalAlign: 'middle', fontWeight: 500 }}>{order.orderId}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{new Intl.DateTimeFormat('en-GB').format(new Date(order.createdAt))}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.orderVariantResponse.length}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
                 {order.orderVariantResponse.reduce((sum, variant) => sum + (Number(variant.orderWeight) || 0), 0).toFixed(2)} kg
               </td>
 
-              <td>₹{order.totalAmount.toFixed(2)}</td>
-              <td onClick={(e) => e.stopPropagation()}>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>₹{order.totalAmount}</td>
+              <td  style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
+
                 <select
                   className={
                     order.payment.paymentStatus === "PAID"
@@ -240,7 +249,7 @@ const handleRowClick = (order) => {
                   ))}
                 </select>
               </td>
-              <td onClick={(e) => e.stopPropagation()}>
+              <td   style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
               <select
                 className={statusClassMap[order.status]}
                 value={order.status}

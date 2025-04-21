@@ -1,10 +1,11 @@
 .export-btn{
-    height:  30px;
-    padding: 0.2rem 1rem ;
+    height: 40px;
+    padding: 0.2rem 2rem;
     font-size: 0.8rem;
-    /* background-color: #CDCDCD !important; */
-    /* color: white !important; */
-}
+    background-color: #ffffff !important;
+    border: 2px solid #ffdb63;
+    color: #9c7800 !important;
+  }
 
 .sm-btn{
     display: none;

@@ -43,7 +43,7 @@ const VendorOrderDetails = () => {
             </div>
 
             </div>
-          <table className="w-100 mt-2 table">
+            <table className="w-100 mt-2 table" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
             <thead>
               <tr>
                 <th>Product</th>
@@ -68,13 +68,13 @@ const VendorOrderDetails = () => {
 
         <div className='bg-white rounded  p-3 mt-2'>
         
-                    <div className='d-flex justify-content-between'>
+                    <div className='d-flex justify-content-between' style={{ fontSize: '1rem', fontWeight: 500 }}>
                             <h6>Payment</h6>
                            
                             <div className='bg-secondary-subtle rounded-circle p-2 text-white'><LuFileDown size={20}/></div>
                         </div>
         
-                    <table className="w-100 table border rounded mt-2">
+                    <table className="w-100 table border rounded mt-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
                         {/* <thead className="thead-light">
                         <tr>
                             <th>Description</th>
@@ -133,7 +133,7 @@ const VendorOrderDetails = () => {
             </div>
 
             </div>
-          <table className="w-100 mt-2 table">
+            <table className="w-100 mt-2 table" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
             <thead>
               <tr>
                 <th>Product</th>
@@ -162,13 +162,13 @@ const VendorOrderDetails = () => {
         
         
                     <div className='bg-white rounded p-3 mt-2'>
-                        <div className='d-flex justify-content-between'>
+                        <div className='d-flex justify-content-between'style={{ fontSize: '1rem', fontWeight: 500 }}>
                             <h6>Payment</h6>
                            
                             <div className='bg-secondary-subtle rounded-circle p-2 text-white'><LuFileDown size={20}/></div>
                         </div>
         
-                        <table className='w-100 table border rounded mt-2'>
+                        <table className='w-100 table border rounded mt-2' style={{ fontSize: '0.8rem', fontWeight: 500 }}>
                             
                             <tbody>
                                  <tr>

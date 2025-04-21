@@ -186,11 +186,13 @@ const DiscountsPage = () => {
             <thead>
               <tr>
                 <th>Title</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Status</th>
-                <th>Customer</th>
-                <th>Used</th>
+
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Start Date</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>End Date</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Customer</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Used</th>
+
                 <th style={{width:'1rem'}}></th>
               </tr>
             </thead>
@@ -213,28 +215,32 @@ const DiscountsPage = () => {
                 </div>
                 
                 </td>
-                <td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
                  {new Intl.DateTimeFormat('en-GB').format(new Date(discount.startDateTime))}
                 </td>
-                <td>
+
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+
                   {discount.endDateTime
                     ? new Intl.DateTimeFormat('en-GB').format(new Date(discount.endDateTime))
                     : ''}
                 </td>
-              <td>
-                <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
+
+              <td style={{ justifyItems: 'center', alignContent:'center'}}   >
+                <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
+
                 {discount.discountStatus}
                 </div>
               </td>
             
-              <td style={{textTransform:'capitalize'}}>{discount.eligibleCustomers.length}</td>
-              <td>{discount.used}</td>
-              <td>
-                    <Dropdown>
-                        <Dropdown.Toggle as="div" variant="light" id="dropdown-basic" className='border border-0'>
-                        <BsThreeDotsVertical />
-                        </Dropdown.Toggle>
-
+              <td style={{textTransform:'capitalize', textAlign: 'center', verticalAlign: 'middle'}}  >{discount.eligibleCustomers.length}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}  >{discount.used}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                   <Dropdown align="end" style={{ zIndex: 10 }}>
+                     <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0 ms-auto' style={{ marginRight: '10px'}}>
+                     <BsThreeDotsVertical />
+                     </Dropdown.Toggle>
+                   
                         <Dropdown.Menu>
                         <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
                         <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>

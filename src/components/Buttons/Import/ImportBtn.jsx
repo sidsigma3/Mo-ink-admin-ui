@@ -5,7 +5,7 @@ import "./ImportBtn.css"
 const ImportBtn = ({onClick}) => {
   return (
     <>
-     <button className='import-btn btn lg-btn' onClick={onClick}>
+     <button className='import-btn fw-medium btn lg-btn' onClick={onClick}>
          <span> Import </span><CgImport size={19}/>
     </button>
 

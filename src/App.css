@@ -53,6 +53,10 @@ html, body, #root {
 
 body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important; height: 100%;}
 
+.container-fluid {
+  overflow: visible;
+}
+
 
 .main{
   overflow: hidden;

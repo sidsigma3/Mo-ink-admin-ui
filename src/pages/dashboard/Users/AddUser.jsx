@@ -161,6 +161,7 @@ const AddUser = () => {
                          width: '5rem',
                          border: '1px solid',
                          borderRadius: '0.2rem',
+                         padding: '0.2rem 0.5rem',
                          textAlign: 'center',
                          fontSize:'0.9rem',
                          backgroundColor:

@@ -63,7 +63,7 @@ const AvgOrder = () => {
   };
 
   return (
-    <div style={{ cursor: "pointer" }} onClick={handleClick}>
+    <div style={{ cursor: "pointer", width: "300px", height: "300px"}} onClick={handleClick}>
       <GraphComponent type="line" data={lineChartData} options={chartOptions} text={"Average Order Value"} number={"₹51,580"}/>
     </div>
   );

@@ -383,7 +383,7 @@ const handleAddressTypeChange = (e) => {
           <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
             <IoArrowBackOutline size={25} />
           </span>
-          <h5>New Customer</h5>
+          <h4>New Customer</h4>
         </div>
         )}
 

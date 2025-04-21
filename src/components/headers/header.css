@@ -2,10 +2,10 @@ header{
     background-color: var(--White, #FFF);
     padding: 0.5rem 0;
     width: 100%;
-    /* position: fixed; */
-    
+    position: relative;
     z-index: 1000;
 }
+
 
 header .row{
     margin: 0;

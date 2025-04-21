@@ -240,7 +240,7 @@ const Orders = () => {
             </ul>
         </div>
 
-        <div className='order-filter-ctn d-flex gap-2 mb-2'>
+        <div className='order-filter-ctn d-flex gap-2 mb-2 w-30 mt-3'>
           
             <ProductFilter 
                 filterOptions={["Order Id", "Customer"]} 

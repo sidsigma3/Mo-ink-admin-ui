@@ -3,6 +3,7 @@ import React , {useState , useEffect } from 'react'
 import { LuHome } from "react-icons/lu";
 import { MdEmail } from "react-icons/md";
 import "./ProfilePage.css"
+import { BsCheckCircleFill } from "react-icons/bs";
 import { MdEdit } from "react-icons/md";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +20,10 @@ const ProfilePage = ({setIsAuthenticated}) => {
   const [modalShow,setModalShow] = useState('')
 
   const  [password,setPassword] = useState('')
+
+
+  const [showToast, setShowToast] = useState(false);
+
 
   const userDetails =  JSON.parse(localStorage.getItem('userData'));
 
@@ -141,6 +146,10 @@ const ProfilePage = ({setIsAuthenticated}) => {
         const response = await getUserById(userDetails.userId)
 
         localStorage.setItem("userData", JSON.stringify(response.data));
+
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 5000);
+
         
     } catch (error) {
         console.error("Error submitting user:", error);
@@ -261,16 +270,35 @@ const ProfilePage = ({setIsAuthenticated}) => {
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>Whatsapp Number</label>
                     <input type='text' name='whatsappNumber' className='rounded mt-2' value={formData.whatsappNumber} onChange={handleInputChange}></input>
+
                 </div>
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>Email</label>
                     <input type='text' name='email' className='rounded mt-2' value={formData.email} onChange={handleInputChange}></input>
+
                 </div>
 
-                <div className='d-flex justify-content-end mt-3'>
-                    <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
-                </div>
+                {/* Save Button */}
+      <div className='d-flex justify-content-end mt-3'>
+        <button className="btn btn-primary" onClick={handleSubmit}>Save Changes</button>
+      </div>
+
+      {/* Toast */}
+      {showToast && (
+  <div
+    className="position-fixed top-0 end-0 toast show custom-toast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    style={{ zIndex: 9999 }}
+  >
+    <div className="d-flex align-items-center h-100 px-3">
+    <BsCheckCircleFill className="me-2 toast-icon" />
+    <span className="fs-6 fw-medium text-center">Profile updated successfully!</span>
+    </div>
+  </div>
+)}
 
             </div>
 

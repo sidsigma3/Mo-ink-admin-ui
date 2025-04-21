@@ -5,7 +5,7 @@ import "./AddBtn.css"
 const AddBtn = ({text,clickFunction}) => {
   return (
     <>
-    <button  onClick={clickFunction} className='btn btn-primary add-btn lg-add-btn d-flex align-items-center gap-1'>
+    <button  onClick={clickFunction} className='btn btn-primary add-btn lg-add-btn d-flex fw-medium align-items-center gap-1'>
         <span>{text}</span><MdAdd size={18}/>
     </button>
 
