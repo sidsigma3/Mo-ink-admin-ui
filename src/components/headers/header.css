@@ -2,10 +2,10 @@ header{
     background-color: var(--White, #FFF);
     padding: 0.5rem 0;
     width: 100%;
-    /* position: fixed; */
-    
+    position: relative;
     z-index: 1000;
 }
+
 
 header .row{
     margin: 0;
@@ -20,7 +20,7 @@ header .profile-ctn{
 }
 
 header .profile-ctn h4{
-    font-size: 1.3rem;
+    font-size: 1rem;
     margin: 0;
 }
 

@@ -1,4 +1,4 @@
-.auth-page {
+/* .auth-page {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,10 +12,12 @@
 @media(max-width:768px){
   .auth-page{
     padding: 0;
-    /* height: 100vh; */
+  }
+} */
+    /* height: 100vh; 
   }
 
-}
+
 
 
 /* .auth-page {

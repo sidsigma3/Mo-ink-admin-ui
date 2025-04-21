@@ -221,11 +221,13 @@ const handleFilterChange = (filter, value) => {
             <Table hover>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Location</th>
-                        <th>Wallet</th>
-                        <th>Orders</th>
-                        <th>Last Order</th>
+                        <th style={{ verticalAlign: 'middle'}} >Name</th>
+                        <th style={{ verticalAlign: 'middle'}} >Email</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Location</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Wallet</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Orders</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Last Order</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Status</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
@@ -235,15 +237,21 @@ const handleFilterChange = (filter, value) => {
 
               return (
                 <tr key={index} style={{ cursor: "pointer" }} onClick={() => handleRowClick(index)}>
-                  <td>{customer.customerName}</td>
-                  <td>{customer.addresses[0]?.city || "N/A"}</td>
-                  <td style={{ color: "#3CAA82" }}>
+                  <td style={{ verticalAlign: 'middle'}} >{customer.customerName}</td>
+                  <td style={{ verticalAlign: 'middle'}} >{customer.email}</td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.addresses[0]?.city || ""}</td>
+                  <td style={{ color: "#3CAA82", textAlign: 'center', verticalAlign: 'middle' }}>
                     {walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "Loading..."}
                   </td>
-                  <td>{totalOrders}</td>
-                  <td>{lastOrderDate}</td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{totalOrders}</td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{lastOrderDate}</td>
+                  <td style={{ justifyItems: 'center', alignContent:'center'}}>
+                    <div style={{backgroundColor:customer.customerStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:customer.customerStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
+                    {customer.customerStatus}
+                    </div>
+                  </td>
                   <td>
-                    <Dropdown>
+                    <Dropdown align="end" style={{ zIndex: 10 }}>
                         <Dropdown.Toggle  variant="light" id="dropdown-basic" className='border border-0'>
                         <BsThreeDotsVertical />
                         </Dropdown.Toggle>

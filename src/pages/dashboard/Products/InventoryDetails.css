@@ -1,0 +1,144 @@
+/* Page Title */
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Dashboard Box Container */
+.info-ctn {
+  margin-bottom: 1.5rem;
+}
+
+/* Inventory Wrapper */
+.inventory-wrapper {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 1rem;
+}
+
+/* Filter Section */
+.filter-sec {
+  width: 50%;
+}
+
+/* Stock Container */
+.stock-container {
+  margin-top: 1.5rem;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  border: 1px solid #ddd;
+  border-radius: 1rem;
+  overflow-x: auto;
+  background-color: white;
+}
+
+.inventory-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.inventory-table thead {
+  background-color: #f1f1f1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Responsive Card View */
+.card-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    display: none;
+  }
+
+  .card-view {
+    display: block;
+  }
+
+  .stock-card {
+    background-color: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .stock-card-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin: 0.4rem 0;
+  }
+
+  .label {
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+/* Summary Heading Styling */
+.dashboardBox-ctn .summary-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dashboardBox-ctn .summary-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .filter-sec {
+    width: 70%;
+  }
+
+  .inventory-table {
+    min-width: 1100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-sec {
+    width: 100%;
+  }
+}
+
+/* Pagination Styling */
+.pagination-info {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.pagination li .page-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Dot Color Style */
+.color-dot {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: inline-block;
+}
+

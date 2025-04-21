@@ -11,6 +11,7 @@ import { MdOutlineDiscount } from "react-icons/md";
 import { LuHome } from "react-icons/lu";
 import { LuBox } from "react-icons/lu";
 import { LuSettings } from "react-icons/lu";
+import { LuPackage } from "react-icons/lu";
 import { GrBug } from "react-icons/gr";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { TfiMenuAlt } from "react-icons/tfi";
@@ -159,11 +160,38 @@ const SideBar = () => {
                 
             </li> */}
 
-            <li className={selected === 'products' ? 'selected' : 'not-selected'}>
-                 <Link to={'/products'}>
-                <button  onClick={()=>setSelected('products')}><span className='icon'><LuBox  size={22}/></span>Products</button>
-                </Link>
-            </li>
+            <div  
+  onMouseEnter={() => setHoverSelected('products')}  
+  onMouseLeave={() => {
+    if (selected !== 'inventory') setHoverSelected(null);
+  }}
+>
+  <li className={selected === 'products' ? 'selected' : 'not-selected'}>
+    <Link to={'/products'}>
+      <button onClick={() => setSelected('products')}>
+        <span className='icon'><LuPackage size={22} /></span>Product
+      </button>
+    </Link>
+  </li>
+
+  {(hoverSelected === 'products' || selected === 'inventory') && (
+    <div className={selected === 'inventory' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
+      <Link to={'/inventory'}>
+        <button 
+          onClick={() => {
+            setSelected('inventory');
+            setHoverSelected('products'); // Keep it open
+          }} 
+          className='d-flex gap-3' 
+          style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
+        >
+          <span><BsArrowReturnRight /></span>Inventory
+        </button>
+      </Link>
+    </div>
+  )}
+</div>
+
 
 
             <li className={selected === 'analytics' ? 'selected' : 'not-selected'}>
@@ -320,7 +348,7 @@ const SideBar = () => {
                     <button 
                       onClick={() => {
                         setSelected('segments');
-                        setHoverSelected('customers'); // Keep submenu open
+                        setHoverSelected('customers'); 
                       }} 
                       className='d-flex gap-3' 
                       style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
@@ -351,14 +379,16 @@ const SideBar = () => {
 
         
         <ul className='hide-on-mobile'>
-            <li className={selected === 'settings' ? 'selected' : 'not-selected'}>
+            {/* <li className={selected === 'settings' ? 'selected' : 'not-selected'}>
                 <Link to={'/settings'}>
                 <button  onClick={()=>setSelected('settings')}><span className='icon'><LuSettings size={22} /></span>Store settings</button>
                 </Link>
-            </li>
+            </li> */}
 
             <li>
+            <Link to={'/reportbug'}>
                 <button  onClick={()=>setSelected('report')}><span className='icon'><GrBug size={22}/></span>Report a bug</button>
+                </Link>
             </li>
 
             <li onClick={()=>handleLogout()}>

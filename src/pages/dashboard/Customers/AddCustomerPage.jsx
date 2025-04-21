@@ -24,7 +24,7 @@ const AddCustomerPage = () => {
   const { index, customers } = state || {};
   const { rows, setRows } = useSegments();
   const [errors, setErrors] = useState({});
-
+  const [selectedAddressType, setSelectedAddressType] = useState("HOME");
 
   const navigate =useNavigate()
   // const { customers ,setCustomers } = useCustomerContext();
@@ -69,45 +69,46 @@ const AddCustomerPage = () => {
       state: customer?.state || "",
       city: customer?.city || "",
       pinCode: customer?.zipcode || "",
-      password: customer?.password || "",
+      // password: customer?.password || "",
     };
   });
 
-  const [initialFormData, setInitialFormData] = useState(formData);
-  const [isChanged, setIsChanged] = useState(false);
   
   // Update initialFormData when customer changes
   useEffect(() => {
-      setFormData(prev => {
-          const nameParts = customer?.customerName?.split(" ") || [];
-          const firstName = nameParts[0] || "";
-          const lastName = nameParts.slice(1).join(" ") || "";
-          
-          const updatedForm = {
-              firstName,
-              lastName,
-              email: customer?.email || "",
-              phone: customer?.phoneNumber || "",
-              whatsapp: customer?.whatsappNumber || "",
-              company: customer?.company || "",
-              gstin: customer?.gstNumber || "",
-              chequePhoto: null,
-              address: customer?.addresses[0].customerAddress || "",
-              street: customer?.addresses[0].street || "",
-              country: customer?.addresses[0].country || "",
-              state: customer?.addresses[0].state || "",
-              city: customer?.addresses[0].city || "",
-              pinCode: customer?.addresses[0].zipcode || "",
-              password: customer?.password || "",
-          };
-          
-          setInitialFormData(updatedForm);  // Store the initial state for tracking changes
-          return updatedForm;
-      });
-  }, [customer]);
-
+    if (!customer || !selectedAddressType) return;
   
-  const [selectedSegments, setSelectedSegments] = useState(customer?.segments || []);  // State to track selected segments
+    const addressOfType = customer.addresses?.find(
+      addr => addr.addressType === selectedAddressType
+    );
+  
+    const nameParts = customer?.customerName?.split(" ") || [];
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+  
+    const updatedForm = {
+      firstName,
+      lastName,
+      email: customer?.email || "",
+      phone: customer?.phoneNumber || "",
+      whatsapp: customer?.whatsappNumber || "",
+      company: customer?.company || "",
+      gstin: customer?.gstNumber || "",
+      chequePhoto: null,
+      address: addressOfType?.customerAddress || "",
+      street: addressOfType?.street || "",
+      country: addressOfType?.country || "",
+      state: addressOfType?.state || "",
+      city: addressOfType?.city || "",
+      pinCode: addressOfType?.zipcode || "",
+      password: customer?.password || "",
+    };
+  
+    setFormData(updatedForm);
+   
+  }, [customer, selectedAddressType]);
+  
+  const [selectedSegments, setSelectedSegments] = useState(customer?.segments || []);
   const [searchTerm, setSearchTerm] = useState('');  // State for input field
 
   
@@ -137,6 +138,7 @@ const AddCustomerPage = () => {
     fetchTransactions();
   }, [customer]);
 
+  
 
   useEffect(() => {
     if (transactions?.length > 0) {
@@ -160,24 +162,31 @@ const AddCustomerPage = () => {
   const [selectedValue, setSelectedValue] = useState(""); // State to reset dropdown
 
   const addSegmentAsChip = (event) => {
-      const segmentTitle = event.target.value;
-      if (!segmentTitle) return; // Ignore empty selection
-
-      const selectedSegment = segments.find(seg => seg.segmentTitle === segmentTitle);
-      if (selectedSegment && !selectedSegments.includes(selectedSegment)) {
-          setSelectedSegments([...selectedSegments, selectedSegment]);
-      }
-
-      // Reset dropdown selection
-      setSelectedValue("");
+    const segmentTitle = event.target.value;
+    if (!segmentTitle) return;
+  
+    const selectedSegment = segments.find(seg => seg.segmentTitle === segmentTitle);
+    
+    const alreadyAdded = selectedSegments.some(
+      seg => seg.segmentTitle === selectedSegment?.segmentTitle
+    );
+  
+    if (selectedSegment && !alreadyAdded) {
+      setSelectedSegments([...selectedSegments, selectedSegment]);
+    }
+  
+    setSelectedValue("");
   };
 
-  const removeSegmentChip = (index) => {
-      setSelectedSegments(selectedSegments.filter((_, i) => i !== index));
-  };
+console.log(selectedSegments)
+  
+
+const removeSegmentChip = (index) => {
+  setSelectedSegments(selectedSegments.filter((_, i) => i !== index));
+};
+  
   const handleStatusChange = (stat) =>{
      setStatus(stat)
-     checkIfChanged(formData, stat, searchTerm);
   }
 
 
@@ -214,13 +223,22 @@ const AddCustomerPage = () => {
     }
   };
 
-  const checkIfChanged = (updatedFormData, updatedStatus, updatedSearchTerm) => {
-    const hasChanged = 
-        JSON.stringify(updatedFormData) !== JSON.stringify(initialFormData) || 
-        updatedStatus !== initialFormData.status ||
-        updatedSearchTerm !== "";
+ 
 
-    setIsChanged(hasChanged);
+const handleAddressTypeChange = (e) => {
+  const type = e.target.value;
+  setSelectedAddressType(type);
+
+  const selectedAddress = customer?.addresses?.find(addr => addr.addressType === type) || {};
+  setFormData(prev => ({
+    ...prev,
+    address: selectedAddress.customerAddress || "",
+    street: selectedAddress.street || "",
+    country: selectedAddress.country || "",
+    state: selectedAddress.state || "",
+    city: selectedAddress.city || "",
+    pinCode: selectedAddress.zipcode || "",
+  }));
 };
 
 
@@ -234,8 +252,6 @@ const AddCustomerPage = () => {
     };
 
     setFormData(updatedFormData);
-
-    checkIfChanged(updatedFormData, status, searchTerm);
    
 };
 
@@ -274,36 +290,47 @@ const AddCustomerPage = () => {
         return;
     }
 
-
-    const segmentIds = selectedSegments.map(segment => segment.segmentId);
+    const existingAddresses = [...(customer?.addresses || [])];
+    const addressIndex = existingAddresses.findIndex(
+      addr => addr.addressType === selectedAddressType
+    );
+  
+    const existingAddress = existingAddresses[addressIndex];
+    const updatedAddress = {
+      ...(existingAddress?.id ? { id: existingAddress.id } : {}),
+      customerAddress: formData.address,
+      street: formData.street,
+      city: formData.city,
+      state: formData.state,
+      country: formData.country,
+      zipcode: formData.pinCode,
+      addressType: selectedAddressType,
+    };
+  
+    if (addressIndex !== -1) {
+      existingAddresses[addressIndex] = updatedAddress;
+    } else {
+      existingAddresses.push(updatedAddress);
+    }
+  
+    const segmentIds = selectedSegments.map(segment => segment.segmentId || segment.id);
   
     const newCustomer = {
       customerName: `${formData.firstName} ${formData.lastName}`,
       phoneNumber: formData.phone,
-      whatsappNumber:formData.whatsapp,
-      gstNumber:formData.gstin,
-      zipcode:formData.pinCode,
-      customerAddress: formData.address,
-      lastOrder: "N/A",
-      customerStatus:status,
+      whatsappNumber: formData.whatsapp,
+      gstNumber: formData.gstin,
+      email: formData.email,
+      company: formData.company,
+      cancelledCheque: formData.chequePhoto || "",
+      customerStatus: status,
       segmentIds,
-      addresses: [
-        {
-            customerAddress: formData.address,
-            street: formData.street || "",
-            city: formData.city,
-            state: formData.state,
-            country: formData.country,
-            zipcode: formData.pinCode,
-            addressType: "HOME",
-        },
-       
-    ],
-      ...formData,
+      addresses: existingAddresses.slice(0, 3), // enforce max 3 types
+      customerAddress: formData.address,
+      zipcode: formData.pinCode,
+      ...(state?.index === undefined && { password: formData.password }) // only include password if creating
     };
-
-
-  
+    
     try {
       if (state?.index !== undefined) {
         // Update existing customer
@@ -323,9 +350,11 @@ const AddCustomerPage = () => {
   };
 
 
-  console.log(errors)
 
   const handleDelete = async() =>{
+    const confirmed = window.confirm("Are you sure you want to delete this Customer?");
+    if (!confirmed) return;
+
        try {
           const id = customer.customerId
           await deleteCustomer(id)
@@ -343,18 +372,18 @@ const AddCustomerPage = () => {
 
       {state?.index !== undefined ? (
           <div className='d-flex gap-3 mb-3'> 
-                    <span onClick={() => navigate("/customers")}>
+                    <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
                     <IoArrowBackOutline size={25} />
                 </span>
           <h4>{customer.customerName}</h4>
         </div>
           ):
           (
-        <div className="top d-flex gap-3 mt-2" style={{ cursor: "pointer" }}>
-          <span onClick={() => navigate("/customers")}>
+        <div className="top d-flex gap-3 mt-2" >
+          <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
             <IoArrowBackOutline size={25} />
           </span>
-          <h5>New Customer</h5>
+          <h4>New Customer</h4>
         </div>
         )}
 
@@ -424,6 +453,18 @@ const AddCustomerPage = () => {
                     <h4>Add photo of cancelled cheque</h4>
                     </div>
                     {errors.chequePhoto && <p className="text-danger">{errors.chequePhoto}</p>}
+                </div>
+
+                
+                <div className='d-flex justify-content-end'>
+                <div className="d-flex flex-column mb-1 w-25 gap-1">
+                  <label>Address Type</label>
+                  <select value={selectedAddressType} onChange={handleAddressTypeChange} className='rounded-2 p-1 border border-secondary-subtle'>
+                    <option value="HOME">Home</option>
+                    <option value="WORK">Work</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
                 </div>
 
                 <div className="col-md-12 d-flex flex-column">
@@ -546,7 +587,7 @@ const AddCustomerPage = () => {
                 
                     <div className='d-flex justify-content-between mt-4 mb-4'>
                         <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
-                        <SubmitBtn text={'Save'} clickFunction={handleSubmit} disabled={!isChanged} />
+                        <SubmitBtn text={'Save'} clickFunction={handleSubmit}/>
                     </div>
 
             </div>
@@ -593,10 +634,11 @@ const AddCustomerPage = () => {
           </div>
 
 
-            <div className="bg-white p-3 rounded mt-2 segment-sec">
+            {state?.index !== undefined && (
+                <div className="bg-white p-3 rounded mt-2 segment-sec">
                 <h5>Segments</h5>
                 
-                {/* Searchable input to filter segments */}
+             
                 <select
                 className="border border-secondary-subtle rounded p-1 w-100 mb-2"
                 value={selectedValue}
@@ -609,25 +651,7 @@ const AddCustomerPage = () => {
                     </option>
                 ))}
             </select>
-
-                
-                        
-                {/* {searchTerm.length > 0  &&(
-                     <div className="filtered-segments">
-                     {filteredSegments.map((segment, index) => (
-                     <div
-                         key={index}
-                         className="segment-item"
-                         onClick={() => addSegmentAsChip(segment)}  // Add segment as chip when clicked
-                         style={{ cursor: 'pointer', padding: '5px', border: '1px solid #ccc', margin: '5px' }}
-                     >
-                         {segment.segmentTitle}
-                     </div>
-                     ))}
-                 </div>
-                )} */}
-
-               
+ 
 
                 {/* Display selected segments as chips */}
                 <div className="chips-container mt-2">
@@ -661,6 +685,9 @@ const AddCustomerPage = () => {
                     ))}
                 </div>
                 </div>
+            )}
+
+            
 
 
 

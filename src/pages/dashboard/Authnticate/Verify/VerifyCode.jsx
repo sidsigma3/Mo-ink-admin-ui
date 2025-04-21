@@ -1,51 +1,102 @@
-import React from 'react'
+import React ,{useState, useEffect} from 'react'
+import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import "./VerifyCode.css"
 
+
 const VerifyCode = () => {
-  return (
-    <div className='verify-page'>
-        <div className='verify-page-ctn'>
 
-            <div className='logo-ctn'>
-                <img src='logo.png'></img>
-            </div>
+const [username, setUsername] = useState("");
+   
+    const navigate = useNavigate();
+
+    const [user, setUser] = useState(null);
+
+        useEffect(() => {
+            axios
+            .get("http://localhost:5000/auth/user", { withCredentials: true })
+            .then((res) => setUser(res.data))
+            .catch(() => setUser(null));
+        }, []);
+
+        const handleLoginSuccess = (response) => {
+            console.log("Login Success:", response);
+            window.location.href = "http://localhost:5000/auth/google";
+        };
+
+        const handleLogout = () => {
+            axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
+            setUser(null);
+        };
+
+    return (
+    <div className="verify-wrapper d-flex align-items-center justify-content-center px-3">
+    <div className="background-blur"
+       style={{
+       backgroundImage: "url('/bg-texture.png')",
+      }}
+      >
+      </div>
 
 
-            <div className='left-ctn'>
-            <div>
-                    <span></span>
-                    <h6>Back to login</h6>
-                </div>
-
-                <h4 className='mt-3'>Verify code</h4>
-                <h5 className='mt-3'>An authentication code has been sent to your email. </h5>
-
-
-                <div className='d-flex flex-column gap-2 mt-5'>
-                    <label>Enter code</label>
-                    <input className='login-input' placeholder='Enter valid verification code'></input>
-                </div>
-
-                <button className='btn btn-primary rounded-pill w-100 mt-4'>Verify</button>
-
-                <h5 className='mt-3'>Didn't receive a code ? <a>resend</a></h5>
-
-                <h6 className='mt-3 text-center text-body-tertiary'>Or login with</h6>
-
-                <div>
-                
-                </div>
-            </div>
-
-        <div className='right-cover-pic'>
-                <img src='signup-cover-pic.png'></img>
-                <h4>Lorem ipsum dolor sit.</h4>
-                <h5>Lorem ipsum dolor sit.</h5>
-            </div>
-        </div>
-
+    {/* Logo */}
+    <div className="position-absolute top-0 start-0 p-4 p-lg-5">
+      <img src="logo.png" alt="Logo" className="logo-img mx-auto" />
     </div>
-  )
-}
 
-export default VerifyCode
+    {/* Auth Box */}
+    <div className="verify-card bg-opacity-40 border border-3 border-white p-4 p-sm-4 rounded-5 text-white position-relative z-2">
+    <button
+        className="btn btn-link text-white fw-normal text-decoration-none p-0 mb-3"
+        onClick={() => navigate("/login")}
+      >
+        &larr; Back to Login
+      </button>
+
+     
+      <h3 className="text-start fw-bold mb-2">Verify code</h3>
+      
+
+      <p className="text-start fs-6 fw-light text-white small mb-5">
+      An authentication code has been sent to your email.
+      </p>
+
+      <form>
+        <label className="fs-6 fw-normal text-white form-label">Email Address</label>
+        <input
+          type="text"
+          placeholder="Enter your email address"
+          className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+
+<div className="d-flex justify-content-between align-items-center text-muted small mb-4">
+  <span className="fs-6 fw-normal text-white">
+    Didn’t receive the code?&nbsp;
+    <a href="/resend" className=" fw-semibold text-decoration-underline">
+      Resend
+    </a>
+  </span>
+</div>
+
+        <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium"
+        onClick={() => navigate('/resetpassword')}
+        >
+          Verify
+        </button>
+
+        <div className="text-center small fs-6 fw-normal text-white-50 my-3">Or login with</div>
+
+        <div className="d-flex justify-content-center gap-2 gap-lg-3">
+        <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
+        </div>
+      </form>
+    </div>
+    </div>
+
+);
+};
+
+export default VerifyCode;

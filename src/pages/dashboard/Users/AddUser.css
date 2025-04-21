@@ -1,4 +1,15 @@
 .add-user{
+    .top{
+        h5{
+            font-size: 1.2rem;
+        }
+    }
+
+    label{
+                font-size: 0.8rem;
+                font-weight: 500;
+            }
+
     .bottom{
 
         padding-top: 0;
@@ -10,19 +21,25 @@
                 margin: 0;
             }
 
+            label{
+                font-size: 0.8rem;
+                font-weight: 500;
+            }
+
             input[type=text]{
                 border: 1px solid #D1D5DB;
                 border-radius: 0.3rem;
-                padding: 0.2rem 0.2rem;
+                padding: 0.2rem 0.8rem;
                 height: 2rem;
                 margin-top: 0.5rem;
+                font-size: 0.8rem;
             }
 
             .media-input{
                 border: 1px dashed gainsboro;
             
                 h4{
-                    font-size: 0.9rem;
+                    font-size: 0.8rem;
                     margin-top: 1rem;
                     margin-left: -5rem;
                     color: #0561FC;
@@ -36,6 +53,12 @@
 
         .right{
             width: 25%;
+
+            h5{
+                font-size: 1rem;
+            }
+
+
         }
     }
 

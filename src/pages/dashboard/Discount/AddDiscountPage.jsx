@@ -32,6 +32,8 @@ const AddDiscountPage = () => {
 
   const discount = state?.index !== undefined ? discountData[index] : null;
 
+  const isViewMode = !!state
+
   const parseMinPurchaseRequirement = (requirementString) => {
     if (!requirementString || requirementString === "No minimum purchase requirement") {
         return { "No": "" };
@@ -69,6 +71,24 @@ const parseMinPurchaseRequirementType = (requirementString) => {
   return { type: "No", value: "" };
 };
 
+
+const parseMaxPurchaseRequirement = (requirementString) => {
+  if (!requirementString || requirementString === "No limit") {
+    return { maxUsage: { limitTotal: false, limitPerCustomer: false }, usageLimit: "" };
+  }
+
+  const limitTotalMatch = requirementString.match(/Limit number of times.*: (\d+)/);
+  if (limitTotalMatch) {
+    return { maxUsage: { limitTotal: true, limitPerCustomer: false }, usageLimit: limitTotalMatch[1] };
+  }
+
+  if (requirementString.includes("Limit to one use per customer")) {
+    return { maxUsage: { limitTotal: false, limitPerCustomer: true }, usageLimit: "" };
+  }
+
+  return { maxUsage: { limitTotal: false, limitPerCustomer: false }, usageLimit: "" };
+};
+
 const [formData, setFormData] = useState(() => {
   const parsedActiveDates = discount?.activeDates || {
     startDate: "",
@@ -95,6 +115,8 @@ const [formData, setFormData] = useState(() => {
     parsedActiveDates.hasEndDate = true;
   }
 
+  const parsedMax = parseMaxPurchaseRequirement(discount?.maxPurchaseRequirements);
+
   return {
     used: discount?.used || 0,
     discountCode: discount?.discountCode || "",   
@@ -108,11 +130,9 @@ const [formData, setFormData] = useState(() => {
     customerEligibility: discount?.customerEligibilityType
       ? { type: discount.customerEligibilityType, customers: [] }
       : { type: "All", customers: [] },
-      maxUsage: discount?.maxPurchaseRequirements ==='limitTotal'
-      ? { limitTotal: true, limitPerCustomer: false }  
-      : discount?.maxPurchaseRequirements === 'limitPerCustomer'
-      ? { limitTotal: false, limitPerCustomer: true } 
-      : { limitTotal: false, limitPerCustomer: false }, 
+
+    maxUsage: parsedMax.maxUsage,
+    usageLimit: parsedMax.usageLimit,
     
     activeDates: parsedActiveDates ,
     status: discount?.discountStatus || "Active" 
@@ -433,12 +453,15 @@ const handleMaxUsageChange = (field1,field2) => {
       minPurchaseRequirementString = `Minimum quantity required: ${formData.minPurchaseRequirement[selectedOption]}`;
     }
 
+    let maxPurchaseRequirementString = "No usage limit";
+
+    if (formData.maxUsage.limitTotal) {
+      maxPurchaseRequirementString = `Limit number of times this discount can be used in total: ${formData.usageLimit}`;
+    } else if (formData.maxUsage.limitPerCustomer) {
+      maxPurchaseRequirementString = "Limit to one use per customer";
+    }
    
-    const maxPurchaseRequirements = formData.maxUsage?.limitTotal
-    ? "limitTotal"
-    : "limitPerCustomer";
-  
-   
+
     const formatDateTime = (date, time) => {
       return date ? `${date}T${time || "00:00:00"}` : null;
     };
@@ -448,10 +471,13 @@ const handleMaxUsageChange = (field1,field2) => {
       discountCode: formData.discountCode,
       discountType: formData.discountType,
       discountValue: formData.discountValue,
+      appliesToAllCustomers: selectedOptionCustomer === "All",
+      appliesToAllProducts: productSelect.length === finalData.length,
+      productEligibilityType: productSelect.length === finalData.length ? "All" : "Specific Product",
       customerEligibilityType: selectedOptionCustomer,
       discountStatus: formData.status,
       minPurchaseRequirement: minPurchaseRequirementString,
-      maxPurchaseRequirements,
+      maxPurchaseRequirements: maxPurchaseRequirementString,
       discountMethod: selectedMethod,
       applicableProductIds: productSelect.map(p => p.productId ? Number(p.productId) : Number(p.id)), 
       applicableSegmentIds:selectedSegment.map(s =>Number(s.segmentId)),
@@ -462,6 +488,7 @@ const handleMaxUsageChange = (field1,field2) => {
         : null
       
     };
+
   
     if (state?.index !== undefined) {
       // Update existing discount
@@ -503,12 +530,13 @@ const handleMaxUsageChange = (field1,field2) => {
         <span onClick={() => navigate("/discounts")}>
           <IoArrowBackOutline size={25} />
         </span>
-        <h5>Add discount</h5>
+        <h4>Add discount</h4>
       </div>
 
       <div className="main d-flex gap-2 mt-2">
         <div className="left">
           <div className="method-sec">
+            
             {/* <h5>Method</h5> */}
             {/* <ToggleButtonGroup
               className="toggle-btn"
@@ -533,14 +561,22 @@ const handleMaxUsageChange = (field1,field2) => {
                 Automatic Discount
               </ToggleButton>
             </ToggleButtonGroup> */}
+
+
             <div className="d-flex flex-column">
-              <label>Discount code</label>
-              <input 
-              type="text"   
-              value={formData.discountCode}
-              onChange={handleDiscountCodeChange}>
-                
-              </input>
+              <h5>Discount code</h5>
+
+              {isViewMode === true ? (
+                  <h4 style={{fontSize:'1.1rem'}}>{formData.discountCode}</h4>
+              ):(
+                <input 
+                type="text"   
+                value={formData.discountCode}
+                onChange={handleDiscountCodeChange}
+                readOnly={isViewMode}
+                > 
+                </input>
+              )}
               {errors.discountCode && <p className="text-danger">{errors.discountCode}</p>}
             </div>
           </div>
@@ -590,7 +626,7 @@ const handleMaxUsageChange = (field1,field2) => {
 
             <div className="mt-2">
               <label>Applies to</label>
-              <div className="d-flex gap-2 mb-3 mt-3">
+              <div className="d-flex gap-2 mb-3 mt-3 align-items-center">
                 <SearchBox></SearchBox>
                 <div>
                   <button
@@ -690,6 +726,7 @@ const handleMaxUsageChange = (field1,field2) => {
                 // addToCart={addToCart}
                 customers = {customers}
                 onCustomerAdd={handleCustomerAdd}
+                preSelectedCustomers={customer}
                 ></ModalCustomerList>
 
 
@@ -720,7 +757,7 @@ const handleMaxUsageChange = (field1,field2) => {
                     {selectedSegment.map((item,index)=>(
                             <li id={index} className="d-flex align-items-center justify-content-between">
                                 <h5>{item.segmentTitle}</h5>
-                                 <h5>{item.segmentType}</h5>
+                                 <h5>{item.customerCount} Customers</h5>
                                  <button onClick={()=>handleDeleteSegment(index)}>
                                 <RxCross2 />
                                 </button> 
@@ -786,14 +823,38 @@ const handleMaxUsageChange = (field1,field2) => {
           <div className="min-purchase mt-2">
             <h5>Maximum discount usage</h5>
             <ul>
-              <li>
-                <input type="checkbox" checked={formData.maxUsage.limitTotal===true} onChange={()=>handleMaxUsageChange('limitTotal','limitPerCustomer')}></input>
-                <label>
-                  Limit number of times this discount can be used in total
-                </label>
+              <li className="d-flex flex-column align-items-start">
+                <div className="d-flex align-items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.maxUsage.limitTotal === true}
+                    onChange={() => handleMaxUsageChange("limitTotal", "limitPerCustomer")}
+                  />
+                  <label>Limit number of times this discount can be used in total</label>
+                </div>
+
+                {/* Show input only when limitTotal is selected */}
+                {formData.maxUsage.limitTotal && (
+                  <div className="ps-4">
+                    <input
+                      type="number"
+                      placeholder="Enter usage limit"
+                      value={formData.usageLimit}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        usageLimit: e.target.value
+                      }))}
+                    />
+                  </div>
+                )}
               </li>
+
               <li>
-                <input type="checkbox" checked={formData.maxUsage.limitPerCustomer===true}  onChange={()=>handleMaxUsageChange('limitPerCustomer','limitTotal')}></input>
+                <input
+                  type="checkbox"
+                  checked={formData.maxUsage.limitPerCustomer === true}
+                  onChange={() => handleMaxUsageChange("limitPerCustomer", "limitTotal")}
+                />
                 <label>Limit to one use per customer</label>
               </li>
             </ul>

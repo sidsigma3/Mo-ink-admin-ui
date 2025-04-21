@@ -53,7 +53,7 @@ const ProductsTable = forwardRef(({data},ref) => {
   const aggregateProductData = (productData) => {
     return productData.map((product) => {
       const groupedVariants = product.variants.reduce((acc, variant) => {
-        const { size, color, availableWeight ,id } = variant;
+        const { size, color, availableWeight ,id ,costPerKg,pricePerKg,markupPricePerKg} = variant;
   
         if (!acc[size]) {
           acc[size] = {
@@ -72,8 +72,10 @@ const ProductsTable = forwardRef(({data},ref) => {
             colorName: color.colorName,
             hexCode: color.hexCode || "#ccc",
             available:variant.availableWeight,
-            price:variant.pricePerKg,
+            pricePerKg,
             id:variant.id,
+            markupPricePerKg,
+            costPerKg,
           });
         }
         
@@ -91,7 +93,7 @@ const ProductsTable = forwardRef(({data},ref) => {
         productImage: product.productImage,
         compareAtPrice:product.productPrice?.compareAtPrice,
         costPerItemPerKg:product.productPrice?.costPerItemPerKg,
-        gstOnProduct:product.productPrice?.gstOnProduct,
+        gstOnProduct:product.gstOnProduct,
         pricePerKg:product.productPrice?.pricePerKg,
         availableStatus:product.availableStatus,
         groupedVariants: Object.values(groupedVariants),
@@ -101,7 +103,9 @@ const ProductsTable = forwardRef(({data},ref) => {
 
 
   const finalData = aggregateProductData(data)
-  
+
+
+  console.log(data)
   console.log(finalData)
 
   useImperativeHandle(ref, () => ({
@@ -136,14 +140,16 @@ const ProductsTable = forwardRef(({data},ref) => {
     <div className="product-table">
       <Table hover>
         <thead className='z-1'>
-          <tr>
-            <th>Product Name</th>
-            <th>Counter</th>
-            <th>Color Variant</th>
-            <th>Color</th>
-            <th>Available</th>
-            <th>Status</th>
-          </tr>
+        <tr>
+  <th className="text-start">Product Name</th>
+  <th>Counter</th>
+  <th>Color Variant</th>
+  <th>Color</th>
+  <th>Available</th>
+  <th>GST</th>
+  <th>Status</th>
+</tr>
+
         </thead>
         <tbody>
           {finalData.map((product, index) => (
@@ -153,14 +159,15 @@ const ProductsTable = forwardRef(({data},ref) => {
                 onClick={() => handleRowClick(index,ix)} 
                 style={{ cursor: "pointer" }}
               >
-                <td>{product.productName}</td>
-                <td>
-                  <div 
+                <td style={{ textAlign: 'start', verticalAlign: 'middle' }}>{product.productName}</td>
+                <td style={{ justifyItems: 'center', alignContent:'center'}} >
+                  <div className='size'
                     style={{
                       padding: '0.3rem 0.5rem', 
                       backgroundColor: '#EFEFEF', 
                       border: '1px solid #B9C0CD', 
                       borderRadius: '0.9rem', 
+                      justifyContent: 'center',             
                       width: '45%', 
                       textAlign: 'center'
                     }}
@@ -168,9 +175,22 @@ const ProductsTable = forwardRef(({data},ref) => {
                     {item.size}
                   </div>
                 </td>
-                <td>{item.variants.length} Variants</td>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
+  <td style={{verticalAlign: 'middle' }}>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',     // horizontal center
+      alignItems: 'center',         // vertical center
+      height: '100%',               // fills the td vertically
+      width: '100%',                // fills the td horizontally
+    }}
+  >
+    {item.variants.length}
+  </div>
+</td>
+
+                <td style={{verticalAlign: 'middle' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>
                     <div style={{ display: 'flex', marginLeft: '10px', position: 'relative' }}>
                       {item.variants.slice(0, 3).map((color, colorIndex) => (
                         <div
@@ -213,21 +233,26 @@ const ProductsTable = forwardRef(({data},ref) => {
                   </div>
                 </td>
 
-                <td>{item.totalWeight}Kgs</td>
-                <td>
-                  <div 
-                    style={{
-                      backgroundColor: product.availableStatus === 'Active' ? '#D1FAE5' : '#F3F4F6',
-                      border: '1px solid',
-                      borderColor: product.availableStatus === 'Active' ? '#6EE7B7' : '#D1D5DB',
-                      borderRadius: '0.2rem',
-                      textAlign: 'center',
-                      width: '70%',
-                    }}
-                  >
-                    {product.availableStatus}
-                  </div>
-                </td>
+                <td style={{verticalAlign: 'middle' }}>{item.totalWeight}Kgs</td>
+                <td style={{verticalAlign: 'middle' }}>{product.gstOnProduct}%</td>
+                <td style={{ justifyItems: 'center', alignContent:'center'}} >
+  <div 
+    style={{
+      color: product.availableStatus === 'Active' ? '#065F46' : '#991B1B',
+      backgroundColor: product.availableStatus === 'Active' ? '#D1FAE5' : '#FEE2E2',
+      border: '1px solid',
+      borderColor: product.availableStatus === 'Active' ? '#6EE7B7' : '#FCA5A5',
+      borderRadius: '0.2rem',
+      padding: '4px',
+      width: '6rem',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    {product.availableStatus}
+  </div>
+</td>
               </tr>
             ))
           ))}
@@ -247,7 +272,7 @@ const ProductsTable = forwardRef(({data},ref) => {
 
             <div className='d-flex justify-content-between'>
                  <h3>{product.productName}</h3>
-                 <div style={{padding:'0.3rem 0.5rem',backgroundColor:'#EFEFEF',border:'1px solid #B9C0CD' ,borderRadius:'1.2rem',width:'20%',textAlign:'center'}}>
+                 <div style={{ justifyItems: 'center', alignContent:'center'}} >
                  <p><strong></strong> {item.size}</p>
                  </div>
             </div>

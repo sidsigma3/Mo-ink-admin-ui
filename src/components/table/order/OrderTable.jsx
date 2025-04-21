@@ -25,17 +25,16 @@ const OrderTable = forwardRef(({data}, ref) => {
 
   const statusOptions = [
     "New Order",
-    "Dispatch from Inventory",
-    "Send to Vendor",
-    "Dispatch from Vendor",
+    "Shipped",
+    "Manufacture",
     "Delivered",
-    "Order Cancelled",
+    "Cancelled",
   ];
 
   const paymentStatusOption = [
     "Unpaid",
     "Partially Paid",
-    "Fully Paid"
+    "Fully Paid",
   ]
 
   const handlePaymentStatusChange = async (orderId, newStatus) => {
@@ -113,10 +112,10 @@ const OrderTable = forwardRef(({data}, ref) => {
 
   const statusClassMap = {
     "New Order": "blue",
-    Delivered: "green",
-    "Send to Vendor": "yellow",
-    "Order Cancelled": "red",
-    "In Transit": "grey",
+    "Delivered": "green",
+    "Shipped": "yellow",
+    "Cancelled": "red",
+    "Manufacture": "grey",
   };
 
   let active = 2;
@@ -140,7 +139,7 @@ const OrderTable = forwardRef(({data}, ref) => {
       "Order ID": order.orderId,
       "Date": new Intl.DateTimeFormat("en-GB").format(new Date(order.createdAt)),
       "Customer": order.customer.customerName,
-      "Quantity": order.variants.length,
+      "Quantity": order.orderVariantResponse.length,
       "Weight": order.totalAmount,
       "Amount": order.payment.amount,
       "Payment Status": order.payment.paymentStatus,
@@ -166,23 +165,24 @@ const OrderTable = forwardRef(({data}, ref) => {
       <Table hover>
         <thead>
           <tr>
-            <th>Order ID</th>
+            <th style={{ verticalAlign: 'middle'}} >#ID</th>
 
-            <th>Date</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Date</th>
 
-            <th>Customer</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Customer</th>
 
-            <th>Quantity</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Quantity</th>
 
-            <th>Weight</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Weight</th>
 
-            <th>Amount</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Amount</th>
 
-            <th>Payment</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Payment</th>
 
-            <th>Order Status</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Order Status</th>
 
-            <th style={{ width: "11.3rem" }}>V.O I'D</th>
+            <th style={{ width: "11.3rem", textAlign: "center", verticalAlign: 'middle' }}>V.O I'D</th>
+
           </tr>
         </thead>
 
@@ -193,13 +193,16 @@ const OrderTable = forwardRef(({data}, ref) => {
               style={{ cursor: "pointer" }}
               onClick={() => handleRowClick(order)}
             >
-              <td style={{ fontWeight: 500 }}>{order.orderId}</td>
-              <td>{new Intl.DateTimeFormat('en-GB').format(new Date(order.createdAt))}</td>
-              <td>{order.customer.customerName}</td>
-              <td>{order.variants.length}</td>
-              <td>{order.totalAmount}</td>
-              <td>₹{order.payment.amount}</td>
-              <td onClick={(e) => e.stopPropagation()}>
+              <td style={{ verticalAlign: 'middle', fontWeight: 500 }}>{order.orderId}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{new Intl.DateTimeFormat('en-GB').format(new Date(order.createdAt))}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.orderVariantResponse.length}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+                {order.orderVariantResponse.reduce((sum, variant) => sum + (Number(variant.orderWeight) || 0), 0).toFixed(2)} kg
+              </td>
+
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>₹{order.totalAmount}</td>
+              <td  style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
                 <select
                   className={order.payment.paymentStatus === "Fully Paid" ? "green" : order.payment.paymentStatus === 'Unpaid' ? "grey" :'yellow'}
                   value={order.payment.paymentStatus}
@@ -212,7 +215,7 @@ const OrderTable = forwardRef(({data}, ref) => {
                   ))}
                 </select>
               </td>
-              <td onClick={(e) => e.stopPropagation()}>
+              <td   style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
               <select
                 className={statusClassMap[order.status]}
                 value={order.status}
@@ -295,12 +298,12 @@ const OrderTable = forwardRef(({data}, ref) => {
                 </span>
               </p>
               <p>
-                {order.variants.length} Quantity{" "}
+                {order.orderVariantResponse.length} Quantity{" "}
                 <span>
                   <LuDot size={25} /> 
                 </span>
               </p>
-              <p>{order.totalAmount}</p>
+              <p>{order.totalAmount.toFixed(2)}</p>
             </div>
 
             <div className="d-flex justify-content-between align-items-center">

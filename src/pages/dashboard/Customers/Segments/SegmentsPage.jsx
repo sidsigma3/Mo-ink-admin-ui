@@ -70,10 +70,11 @@ const SegmentsPage = () => {
         setRows(rows.filter((_, i) => i !== index));
       };
     
-      const handleDuplicate = (index) => {
-        setRows([rows[index],...rows]);
+      const handleEdit = (index, updatedRow) => {
+        const updatedRows = [...rows]; // Create a copy of the rows array
+        updatedRows[index] = updatedRow; // Update the specific row at the given index
+        setRows(updatedRows); // Set the updated rows state
       };
-
 
       const formatConditions = (conditions, customer) => {
         if (customer && customer.length > 0) {
@@ -195,35 +196,36 @@ const SegmentsPage = () => {
         <div className='table-ctn'>
             <Table>
                 <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Customers</th>
-                        <th>Conditions</th>
-                        <th>Status</th>
-                        <th style={{width:'1rem'}}></th>
-                    </tr>
+                <tr>
+                     <th>Title</th>
+                     <th style={{ textAlign: 'center' }}>Type</th>
+                     <th style={{ textAlign: 'center' }}>Customers</th>
+                     <th style={{ textAlign: 'center' }}>Conditions</th>
+                     <th style={{ textAlign: 'center' }}>Status</th>
+                     <th style={{ textAlign: 'center'}}> </th> {/* Actions column, e.g., Edit/Delete */}
+                </tr>
                 </thead>
                 <tbody>
                 {filteredData.map((row, index) => (
                     <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-                    <td>{row.segmentTitle}</td>
-                    <td>{row.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</td>
-                    <td>{row.customerCount}</td>
-                    <td>{formatSegmentCondition(row.segmentCondition)}</td>
-                    <td>
-                    <div style={{backgroundColor:row.segmentStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:row.segmentStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem' ,padding:"3px"}}>
+                    <td style={{ verticalAlign: 'middle'}} >{row.segmentTitle}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{row.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{row.customerCount}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{formatSegmentCondition(row.segmentCondition)}</td>
+                    <td style={{ justifyItems: 'center', alignContent:'center'}}  >
+                    <div style={{color: row.segmentStatus.toLowerCase() === 'Active' ? '#065F46' : '#991B1B', backgroundColor: row.segmentStatus.toLowerCase() === 'Active' ? '#D1FAE5' : '#FEE2E2', border: '1px solid', borderColor: row.segmentStatus.toLowerCase() === 'Active' ? '#6EE7B7' : '#FCA5A5', borderRadius: '0.2rem', textAlign:'center',width:'6rem' ,padding: '4px',}}>
                       {row.segmentStatus}
                       </div>
                     </td>
-                    <td>
-                    <Dropdown>
-                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                    
+                        <Dropdown align="end" style={{ zIndex: 10 }}>
+                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0 ms-auto' style={{ marginRight: '10px'}}>
                         <BsThreeDotsVertical />
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleEdit(index)}>Edit</Dropdown.Item>
                         <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>

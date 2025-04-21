@@ -1,11 +1,11 @@
 import React ,{useState , useEffect} from 'react'
-import "./LoginPage.css"
-import ToggleBtn from '../../../../components/Buttons/ToggleButton/ToggleBtn'
-import { useNavigate } from 'react-router-dom'
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { loginUser } from '../../../../services/LoginService'
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+
+import "./LoginPage.css";
 
 const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
 
@@ -49,81 +49,97 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
         };
 
   return (
-    <div className='login-page'>
-    <div className='login-page-ctn'>
+    <div className="login-wrapper d-flex align-items-center justify-content-center px-3">
+      <div className="background-blur"
+       style={{
+       backgroundImage: "url('/bg-texture.png')",
+      }}
+      >
+      </div>
 
-        <div className='logo-ctn'>
-            <img src='logo.png'></img>
-        </div>
-        
-        <div className='left-cover-pic'>
-            <img src='login-cover-pic-2.png'></img>
-            {/* <h4>Lorem ipsum dolor sit.</h4>
-            <h5>Lorem ipsum dolor sit.</h5> */}
-        </div>
+      {/* Logo */}
+      <div className="position-absolute top-0 start-0 p-4 p-lg-5"
+      >
+        <img src="logo.png" alt="Logo" className="logo-img mx-auto" />
+      </div>
 
-        <div className='right-ctn'>
-            <h6 className='welcome'>Welcome to Moink & dyes </h6>
-               <ToggleBtn click={togglePage} status={isLogin}></ToggleBtn>
-                
+      {/* Auth Box */}
+      <div className="login-card bg-opacity-40 border border-3 p-4 p-sm-4 rounded-5 text-white position-relative z-2">
+       
+       
+        <h3 className="text-center fw-bold mb-4">Welcome Team!</h3>
 
-                {/* <h6 className='mt-3'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Recusandae minus optio voluptates!</h6> */}
-
-
-                <div className="d-flex flex-column gap-2 mt-4">
-                    <label>Username</label>
-                    <input
-                    className="login-input rounded-pill"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    />
-                </div>
-
-                <div className="d-flex flex-column gap-2 mt-4 position-relative">
-                    <label>Password</label>
-                    <input
-                            type={showPassword ? "text" : "password"}
-                            className="login-input w-100"
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <span
-                            className="position-absolute end-0 translate-middle-y me-3"
-                            style={{ cursor: "pointer", top:'3rem' }}
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                        </span>
-                </div>
-
-
-                <div className='d-flex justify-content-between mt-3'>
-                    <div className='d-flex gap-2'>
-                        <input type='checkbox'></input>
-                        <label> Remember me</label>
-                    </div>
-                
-                    <a href="/forgotPassword">Forgot password?</a>
-                
-                </div>
-
-
-                <button  className='btn btn-primary rounded-pill w-100 mt-5'  onClick={handleLogin}>Login</button>
-
-                <h6 className='mt-3 text-center text-body-tertiary'>Or login with</h6>
-
-                
-                <div className='mt-4'>
-                <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
-                </div>
-                
+        <div className="toggle d-flex justify-content-center mb-4 bg-white rounded-pill overflow-hidden mx-auto toggle-btns">
+          <button className="btn btn-purple text-white fw-medium w-50 rounded-pill">
+            Login
+          </button>
+          <button
+            className="btn text-purple fw-medium w-50 rounded-pill"
+            onClick={togglePage}
+          >
+            Register
+          </button>
         </div>
 
+        <p className="text-center fs-6 fw-light text-white small mb-4 px-2">
+        Reconnect with the pulse of Mo Ink and Dyes. Your dashboard is ready log in and lead every step from cone to customer.
+        </p>
+
+        <form onSubmit={handleLogin}>
+          <label className="fs-6 fw-normal text-white form-label">Email id or Phone no</label>
+          <input
+            type="text"
+            placeholder="Enter your username"
+            className="fs-6 fw-light form-control mb-3 rounded-pill px-4"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+
+          <label className="fs-6 fw-normal text-white form-label">Password</label>
+          <div className="position-relative mb-2">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              className="fs-6 fw-light form-control rounded-pill px-4 pe-5"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
+          {error && <p className="text-danger small">{error}</p>}
+
+          <div className="d-flex justify-content-between align-items-center text-muted small mb-4">
+            <label className=" fs-6 fw-normal text-white form-check-label">
+              <input type="checkbox" className="form-check-input me-2" />
+              Remember me
+            </label>
+            <a href="/forgotPassword" className="fs-6 fw-normal text-white text-decoration-none">
+              Forgot Password?
+            </a>
+          </div>
+
+          <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium"
+          onClick={() => navigate('/home')}
+          >
+            Login
+          </button>
+
+          <div className="text-center small fs-6 fw-normal text-white-50 my-3">Or login with</div>
+
+          <div className="d-flex justify-content-center gap-2 gap-lg-3">
+          <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
+          </div>
+        </form>
+      </div>
     </div>
-    </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;

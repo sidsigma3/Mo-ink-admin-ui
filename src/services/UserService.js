@@ -11,7 +11,17 @@ export const getAllUser = async () => {
       return response.data;
       
     } catch (error) {
-      console.error('Error getting product:', error);
+      console.error('Error getting User:', error);
+      throw error;
+    }
+  };
+
+  export const getUserById = async (id) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/user/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting User:', error);
       throw error;
     }
   };
@@ -21,7 +31,7 @@ export const getAllUser = async () => {
       const response = await axios.post(`${BASE_URL}/user`, userData);
       return response.data;
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error('Error adding User:', error);
       throw error;
     }
   };
@@ -32,7 +42,7 @@ export const getAllUser = async () => {
       const response = await axios.put(`${BASE_URL}/user/${userId}`, userData);
       return response.data;
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Error updating User:', error);
       throw error;
     }
   };
@@ -43,7 +53,7 @@ export const getAllUser = async () => {
       const response = await axios.delete(`${BASE_URL}/user/${userId}`);
       return response.data;
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Error updating User:', error);
       throw error;
     }
   };

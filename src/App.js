@@ -39,6 +39,10 @@ import { BulkAssignProvider } from './components/Context/BulkAssignContext';
 import VendorOrder from './pages/dashboard/Orders/Vendor Order/VendorOrder';
 import { VendorOrderProvider } from './components/Context/VendorOrderContext';
 import VendorOrderDetails from './pages/dashboard/Orders/Vendor Order/VendorOrderDetails';
+import Inventory from './pages/dashboard/Products/Inventory';
+import InventoryDetails from './pages/dashboard/Products/InventoryDetails';
+import ReportBug from './pages/dashboard/Report Bug/ReportBug';
+import NotificationPage from './pages/dashboard/Notification Page/NotificationPage';
 
 function App() {
 
@@ -116,6 +120,13 @@ function App() {
                                       <Route path='/profile' element={<ProfilePage setIsAuthenticated={setIsAuthenticated}></ProfilePage>}></Route>
                                       <Route path='/vendor-order' element={<VendorOrder></VendorOrder>}></Route>
                                       <Route path="/vendor-order-details/:orderId" element={<VendorOrderDetails></VendorOrderDetails>} />
+                                      <Route path="/inventory" element={<Inventory></Inventory>} />
+                                      <Route path="/inventorydetails" element={<InventoryDetails></InventoryDetails>} />
+                                      <Route path="/reportbug" element={<ReportBug></ReportBug>} />
+                                      <Route path="/notificationpage" element={<NotificationPage></NotificationPage> } />
+                                    
+                              
+                              
                                     </Routes>
                                       </VendorOrderProvider>
                                     </BulkAssignProvider>

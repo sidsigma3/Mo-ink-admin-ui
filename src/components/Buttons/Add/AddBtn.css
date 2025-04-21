@@ -1,8 +1,12 @@
 .add-btn{
-    height: 30px;
-    padding: 0.2rem 1rem;
+    height: 40px;
+    padding: 0.2rem 2rem;
     font-size: 0.8rem;
-}
+    font-weight: 400;
+    background-color: #0D6EFD !important;
+    /* border: 2px solid #0D6EFD; */
+    color: #ffffff !important;
+  }
 
 .lg-add-btn{
     display: grid;

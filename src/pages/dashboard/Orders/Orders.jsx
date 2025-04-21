@@ -79,7 +79,7 @@ const Orders = () => {
           data.forEach(order => {
             revenue += order.totalAmount || 0;
             weight += order.totalWeight || 0;
-            quantity += order.variants.length || 0
+            quantity += order.orderVariantResponse.length || 0
           });
     
           setTotalOrders(data.length);
@@ -240,7 +240,7 @@ const Orders = () => {
             </ul>
         </div>
 
-        <div className='order-filter-ctn d-flex gap-2 mb-2'>
+        <div className='order-filter-ctn d-flex gap-2 mb-2 w-30 mt-3'>
           
             <ProductFilter 
                 filterOptions={["Order Id", "Customer"]} 

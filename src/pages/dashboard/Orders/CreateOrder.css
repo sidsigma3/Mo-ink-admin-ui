@@ -107,7 +107,10 @@
 }
 
 
-
+.create-order .order-detail table thead tr{
+    font-size: 0.8rem;
+    font-weight: 500;
+}
 
 
 @media (max-width: 1024px) {

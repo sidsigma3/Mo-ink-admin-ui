@@ -20,6 +20,11 @@ const DiscountsPage = () => {
 
   const navigate = useNavigate ()
   
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
 
   const [discountData , setDiscountData] = useState([])
   const [filteredData, setFilteredData] = useState([]);
@@ -65,16 +70,53 @@ const DiscountsPage = () => {
 
 
   const handleFilterChange = (filter, value) => {
-    const lowercasedValue = value.toLowerCase();
+    if (filter === "Discount Code") {
+      setSearchTerm(value);
+      applyCombinedFilter(value, selectedStatus, startDate, endDate);
+    } else if (filter === "Start Date") {
+      setStartDate(value);
+      applyCombinedFilter(searchTerm, selectedStatus, value, endDate);
+    } else if (filter === "End Date") {
+      setEndDate(value);
+      applyCombinedFilter(searchTerm, selectedStatus, startDate, value);
+    }
+  };
+  
+  
+  const handleStatusChange = (status) => {
+    setSelectedStatus(status);
+    applyCombinedFilter(searchTerm, status, startDate, endDate);
+  };
+  
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+    applyCombinedFilter(searchTerm, selectedStatus, date, endDate);
+  };
+  
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+    applyCombinedFilter(searchTerm, selectedStatus, startDate, date);
+  };
 
+  const applyCombinedFilter = (searchValue, status, start, end) => {
+    const lowercasedSearch = searchValue?.toLowerCase?.() || "";
+  
     const filtered = discountData.filter((item) => {
-        // if (filter === "Order Id") return item.orderId.toString().includes(value);
-        if (filter === "Discount Code") return item.discountCode.toLowerCase().includes(lowercasedValue);
-        return true;
+      const matchesSearch = item.discountCode.toLowerCase().includes(lowercasedSearch);
+      const matchesStatus = status === 'All' || item.discountStatus === status;
+  
+      const itemStartDate = item.startDateTime ? new Date(item.startDateTime) : null;
+      const itemEndDate = item.endDateTime ? new Date(item.endDateTime) : null;
+  
+      const matchesStartDate = !start || (itemStartDate && itemStartDate >= new Date(start));
+      const matchesEndDate = !end || (itemEndDate && itemEndDate <= new Date(end));
+  
+      return matchesSearch && matchesStatus && matchesStartDate && matchesEndDate;
     });
-
+  
     setFilteredData(filtered);
-    };
+  };
+  
 
     const exportToExcel = (discounts) => {
       if (!discounts || !discounts.length) {
@@ -114,7 +156,7 @@ const DiscountsPage = () => {
   return (
     <div className='discounts'>
         <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.3rem'}}>Discounts</h4>
+            <h4 style={{fontSize:'1.2rem'}}>Discounts</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn onClick={() => exportToExcel(filteredData)}></ExportBtn>
@@ -128,13 +170,13 @@ const DiscountsPage = () => {
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
               <ProductFilter 
-                  filterOptions={["Discount Code"]} 
+                  filterOptions={["Discount Code", "Start Date", "End Date"]}
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
          
             <div className='w-25'>
-                <StatusFilter status={'Active'}></StatusFilter> 
+                <StatusFilter status={'All'} onStatusChange={handleStatusChange}></StatusFilter> 
             </div>
         </div>
 
@@ -144,11 +186,11 @@ const DiscountsPage = () => {
             <thead>
               <tr>
                 <th>Title</th>
-                <th>Start Date</th>
-                <th>Status</th>
-               
-                <th>Customer</th>
-                <th>Used</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Start Date</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>End Date</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Customer</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Used</th>
                 <th style={{width:'1rem'}}></th>
               </tr>
             </thead>
@@ -171,23 +213,28 @@ const DiscountsPage = () => {
                 </div>
                 
                 </td>
-                <td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
                  {new Intl.DateTimeFormat('en-GB').format(new Date(discount.startDateTime))}
                 </td>
-              <td>
-                <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+                  {discount.endDateTime
+                    ? new Intl.DateTimeFormat('en-GB').format(new Date(discount.endDateTime))
+                    : ''}
+                </td>
+              <td style={{ justifyItems: 'center', alignContent:'center'}}   >
+                <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
                 {discount.discountStatus}
                 </div>
               </td>
             
-              <td style={{textTransform:'capitalize'}}>{discount.eligibleCustomers.length}</td>
-              <td>{discount.used}</td>
-              <td>
-                    <Dropdown>
-                        <Dropdown.Toggle as="div" variant="light" id="dropdown-basic" className='border border-0'>
-                        <BsThreeDotsVertical />
-                        </Dropdown.Toggle>
-
+              <td style={{textTransform:'capitalize', textAlign: 'center', verticalAlign: 'middle'}}  >{discount.eligibleCustomers.length}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}  >{discount.used}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                   <Dropdown align="end" style={{ zIndex: 10 }}>
+                     <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0 ms-auto' style={{ marginRight: '10px'}}>
+                     <BsThreeDotsVertical />
+                     </Dropdown.Toggle>
+                   
                         <Dropdown.Menu>
                         <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
                         <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>

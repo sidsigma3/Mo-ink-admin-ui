@@ -64,6 +64,7 @@ const UserPage = () => {
       const filtered = users.filter((item) => {
           // if (filter === "Order Id") return item.orderId.toString().includes(value);
           if (filter === "Name") return item.firstName.toLowerCase().includes(lowercasedValue);
+          if (filter === "Role") return item.role.toLowerCase().includes(lowercasedValue);
           return true;
       });
   
@@ -74,7 +75,7 @@ const UserPage = () => {
   return (
     <div className='user-page'>
          <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.3rem'}}>Users</h4>
+            <h4 style={{fontSize:'1.2rem'}}>Users</h4>
 
             <div className='d-flex gap-2'>
                 {/* <ExportBtn></ExportBtn> */}
@@ -89,27 +90,27 @@ const UserPage = () => {
 
 
         <div className='d-flex gap-2 filter-sec'>
-            <div className='w-100'>
+            <div className='w-75'>
             <ProductFilter 
-                  filterOptions={["Name"]} 
+                  filterOptions={["Name","Role"]} 
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
          
-            {/* <div className='w-25'>
+            <div className='w-25'>
                 <StatusFilter status={'Active'}></StatusFilter> 
-            </div> */}
+            </div>
         </div>
 
         <div className='table-ctn'>
             <Table>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Joined On</th>
+                        <th style={{ verticalAlign: 'middle'}} >Name</th>
+                        <th style={{ verticalAlign: 'middle'}} >Email</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Role</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Joined On</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
@@ -118,13 +119,13 @@ const UserPage = () => {
                         <tr key={index}  
                         onClick={() => handleRowClick(index)}
                          >
-                        <td>{user.firstName +" "+user.lastName}</td>
-                        <td>{user.email}</td>
-                        <td>
+                        <td style={{ verticalAlign: 'middle'}} >{user.firstName +" "+user.lastName}</td>
+                        <td style={{ verticalAlign: 'middle'}} >{user.email}</td>
+                        <td style={{ justifyItems: 'center', alignContent:'center'}}>
                         <div
                             style={{
-                                width: '5rem',
-                                padding: '0.1rem 0.5rem',
+                                width: '6rem',
+                                padding: '4px',
                                 border: '1px solid',
                                 borderRadius: '0.2rem',
                                 textAlign: 'center',
@@ -158,14 +159,14 @@ const UserPage = () => {
                              user.role}
                         </div>
                         </td>
-                        <td>
-                        <div style={{backgroundColor:user.userStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:user.userStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'5rem',padding:'0'}}>
+                        <td style={{ justifyItems: 'center', alignContent:'center'}}>
+                        <div style={{backgroundColor:user.userStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:user.userStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
                         {user.userStatus}
                         </div>
                         </td>
-                        <td>{new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}</td>
                         <td>
-                        <Dropdown>
+                        <Dropdown align="end" style={{ zIndex: 10 }}>
                             <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
                             <BsThreeDotsVertical />
                             </Dropdown.Toggle>
