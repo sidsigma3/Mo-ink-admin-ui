@@ -21,7 +21,9 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
   const  [password,setPassword] = useState('')
 
+
   const [showToast, setShowToast] = useState(false);
+
 
   const userDetails =  JSON.parse(localStorage.getItem('userData'));
 
@@ -144,8 +146,10 @@ const ProfilePage = ({setIsAuthenticated}) => {
         const response = await getUserById(userDetails.userId)
 
         localStorage.setItem("userData", JSON.stringify(response.data));
+
         setShowToast(true);
         setTimeout(() => setShowToast(false), 5000);
+
         
     } catch (error) {
         console.error("Error submitting user:", error);
@@ -266,11 +270,13 @@ const ProfilePage = ({setIsAuthenticated}) => {
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>Whatsapp Number</label>
                     <input type='text' name='whatsappNumber' className='rounded mt-2' value={formData.whatsappNumber} onChange={handleInputChange}></input>
+
                 </div>
 
                 <div className='col-lg-6 d-flex flex-column mt-2'>
                     <label>Email</label>
                     <input type='text' name='email' className='rounded mt-2' value={formData.email} onChange={handleInputChange}></input>
+
                 </div>
 
                 {/* Save Button */}

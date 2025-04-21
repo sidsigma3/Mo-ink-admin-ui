@@ -24,11 +24,14 @@ const Header = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
+
     const userDetails = JSON.parse(localStorage.getItem('userData'));
+
 
     const handleClick = (event) => {
         navigate('/profile');
     };
+
 
     return (
         <>

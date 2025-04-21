@@ -258,8 +258,10 @@ const Spinners = () => {
                {customer.vendorType}
                </div>
               </td>
+
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.assignOrders || 'No order'}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.lastOrder || 'No order'}</td>
+
               <td>
                     <Dropdown align="end" style={{ zIndex: 10 }}>
                         <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>

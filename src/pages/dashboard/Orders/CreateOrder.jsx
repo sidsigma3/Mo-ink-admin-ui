@@ -1,4 +1,4 @@
-import React , {useState , useEffect , useMemo} from 'react'
+import React , {useState , useEffect , useMemo , useRef , forwardRef , useImperativeHandle} from 'react'
 import SearchBox from '../../../components/SearchBox/SearchBox'
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate ,useLocation } from 'react-router-dom';
@@ -21,13 +21,16 @@ import { getAllDiscount } from '../../../services/DiscountService';
 import { createOrder } from '../../../services/OrderService';
 import emailjs from 'emailjs-com';
 import ReactWhatsapp from 'react-whatsapp';
+import html2pdf from 'html2pdf.js';
+import { emailInvoice } from '../../../services/InvoiceServices';
 
-const CreateOrder = () => {
+
+const CreateOrder = forwardRef(({ orderData }, ref) => {
    
 
     const navigate = useNavigate();
 
-   
+    const invoiceRef = useRef(null);
 
     const {state} = useLocation()
 
@@ -45,9 +48,10 @@ const CreateOrder = () => {
 
     // Filter customers based on search input
     const filteredCustomers = customers.filter((customer) =>
-        customer.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.phoneNumber.includes(searchTerm)
+      (customer?.customerName?.toLowerCase()?.includes(searchTerm.toLowerCase()) || 
+       customer?.phoneNumber?.includes(searchTerm))
     );
+    
 
     const [cart, setCart] = useState([]);
     
@@ -131,7 +135,7 @@ const CreateOrder = () => {
                   // Accumulate availableWeight for this size
                   acc[size].totalWeight += Number(availableWeight);
 
-                  console.log(acc)
+
             
                   return acc;
                 }, {});
@@ -162,17 +166,20 @@ const CreateOrder = () => {
     }, [productData]);
     
 
-    console.log(finalData)
   
     const handleReceiveOrder = (order) => {
       console.log(order)
+
+
       setOrderDetails(order);
     };
 
     const [selectedCustomer, setSelectedCustomer] = useState(order.customer || null);
 
     const handleAddCustomer = (newCustomer) => {
-    setCustomer((prevCustomers) => [newCustomer ,...prevCustomers]);
+    // setCustomer((prevCustomers) => [newCustomer ,...prevCustomers]);
+      setSelectedCustomer(newCustomer)
+      console.log(newCustomer)
     };
 
     const handleSelectCustomer = (customer) => {
@@ -241,35 +248,33 @@ const CreateOrder = () => {
       
       
       
-      const transformOrderToProductDetails = (order,finalData) => {
+
+      const transformOrderToProductDetails = (order, finalData) => {
         if (!order || !order.orderVariantResponse) return [];
       
-       
-        console.log(order)
-        // Group variants by size
         const groupedVariants = {};
-
- 
+      
         order.orderVariantResponse.forEach((variant) => {
-          const { size, color, availableWeight, pricePerKg, id , orderWeight , variantType , productId } = variant;
-
+          const { size, color, availableWeight, pricePerKg, id, orderWeight, variantType, productId } = variant;
+      
           const product = finalData.find(p => p.productId === productId);
-          // if (!product) return;
+          if (!product) return;
+      
+          // Unique key by productId and size to avoid merging same-size variants from different products
+          const key = `${productId}-${size}`;
+      
+          if (!groupedVariants[key]) {
+            groupedVariants[key] = {
+              productId: productId,
+              productName: product?.productName,
 
-        
-          
-
-          if (!groupedVariants[size]) {
-            groupedVariants[size] = {
-              productId: order.orderId, // Assuming orderId is the productId
-              productName:product?.productName, // Placeholder, ideally fetched from DB or API
               size: size,
               colors: [],
               variant: {
                 id: id,
                 size: size,
                 variants: [],
-                totalWeight: 0, // Will be calculated
+                totalWeight: 0,
               },
               product: {
                 productId: product?.productId,
@@ -298,23 +303,22 @@ const CreateOrder = () => {
             type: variantType
           };
       
-          groupedVariants[size].colors.push(colorDetails);
-          groupedVariants[size].variant.variants.push(colorDetails);
-          groupedVariants[size].variant.totalWeight += parseFloat(availableWeight);
+          groupedVariants[key].colors.push(colorDetails);
+          groupedVariants[key].variant.variants.push(colorDetails);
+          groupedVariants[key].variant.totalWeight += parseFloat(availableWeight);
         });
       
-        // Convert grouped object into array and fill groupedVariants in product
         const productDetailsArray = Object.values(groupedVariants);
 
       
-
         productDetailsArray.forEach((item) => {
           item.product.groupedVariants = [item.variant];
         });
+      
 
-       
         return productDetailsArray;
       };
+      
             
       const [orderDetails, setOrderDetails] = useState([]);
 
@@ -322,9 +326,10 @@ const CreateOrder = () => {
         if (order && order.orderVariantResponse && finalData?.length > 0) {
           const details = transformOrderToProductDetails(order, finalData);
           setOrderDetails(details);
-          // console.log("🟢 Order Details set:", details);
+       
         } else {
-          // console.log("⚠️ Waiting for order or finalData...");
+          console.log("Waiting for order or finalData...");
+
         }
       }, [order, finalData]);
 
@@ -353,7 +358,9 @@ const CreateOrder = () => {
 
    
     const [walletBalances, setWalletBalances] = useState(0);
-    const [walletDeduction, setWalletDeduction] = useState(order?.walletAmount);
+
+    const [walletDeduction, setWalletDeduction] = useState(order?.walletAmount || 0);
+
 
     useEffect(() => {
       const fetchWallets = async () => {
@@ -436,10 +443,19 @@ const CreateOrder = () => {
       
     };
 
-    const calculateGrandTotals = (orderDetails = [], paymentDiscount = 0, couponDiscount = 0) => {
+
+    const calculateGrandTotals = (
+      orderDetails = [],
+      paymentDiscount = 0,
+      couponDiscount = 0,
+      selectedDiscountData = {}
+    ) => {
       let baseTotal = 0;
       let totalDiscount = 0;
       let totalGst = 0;
+      let totalPaymentTypeDiscount = 0;
+      let totalCouponTypeDiscount = 0
+
     
       for (const order of orderDetails) {
         if (!order || !Array.isArray(order.colors) || !order.variant?.variants) continue;
@@ -462,13 +478,42 @@ const CreateOrder = () => {
           const gstRate = order.product?.gstOnProduct || 0;
     
           const rawTotal = weight * price;
-          const discount = rawTotal * (paymentDiscount + couponDiscount) / 100;
-          const discountedTotal = rawTotal - discount;
-          const gstAmount = rawTotal * gstRate / 100;
+
+
+          console.log(order)
+
+          console.log(order.productId)
     
+          
+          console.log(selectedDiscountData)
+
+          // 👇 Check if coupon discount is applicable to this product
+          const isCouponApplicable = selectedDiscountData?.applicableProducts?.some(
+            product => product.id === order.productId
+          );
+
+          
+          
+          const appliedCouponDiscount = isCouponApplicable ? couponDiscount : 0;
+          const totalDiscountPercent = Number(paymentDiscount) + Number(appliedCouponDiscount);
+
+         console.log(paymentDiscount,appliedCouponDiscount)
+
+          const  discountByCoupon = rawTotal * Number(appliedCouponDiscount)/100
+          const  discountByPaymment = rawTotal * Number(paymentDiscount)/100
+
+          const discount = rawTotal * totalDiscountPercent / 100;
+          const discountedTotal = rawTotal - discount;
+          const gstAmount = discountedTotal * gstRate / 100;
+    
+
+          totalCouponTypeDiscount +=discountByCoupon;
+          totalPaymentTypeDiscount += discountByPaymment;
           baseTotal += rawTotal;
           totalDiscount += discount;
           totalGst += gstAmount;
+           console.log(totalDiscount)
+
         }
       }
     
@@ -478,12 +523,17 @@ const CreateOrder = () => {
         finalTotal: baseTotal - totalDiscount,
         cgst: totalGst / 2,
         sgst: totalGst / 2,
+        totalCouponTypeDiscount,
+        totalPaymentTypeDiscount,
       };
     };
     
     
+
+    
       
       const [selectedPayment,setSelectedPayment] = useState('Select Payment Type')
+      const [selectedDiscountData,setSelectedDiscountedData] = useState()
       const [selectedDiscount,setSelectedDiscount] = useState('')
       const [selectedDiscountValue, setSelectedDiscountValue] = useState(null);
       const [selectedDiscountId,setSelectedDiscountId] = useState('')
@@ -493,6 +543,9 @@ const CreateOrder = () => {
           const selectedItem = discountData.find(item => item.discountId === order.discountId);
       
           if (selectedItem) {
+
+            setSelectedDiscountedData(selectedItem)
+
             setSelectedDiscount(selectedItem.discountCode);
             setSelectedDiscountValue(selectedItem.discountValue);
             setSelectedDiscountId(selectedItem.discountId);
@@ -504,6 +557,7 @@ const CreateOrder = () => {
         const selectedItem = discountData.find(item => item.discountCode === discountCode);
           
           if (selectedItem) {
+            setSelectedDiscountedData(selectedItem)
             setSelectedDiscount(selectedItem.discountCode);
             setSelectedDiscountValue(selectedItem.discountValue);
             setSelectedDiscountId(selectedItem.discountId)
@@ -575,76 +629,81 @@ const CreateOrder = () => {
 
     
  
-      const handleCreateOrder = async () => {
-        try {
-          if (!selectedCustomer?.customerId) {
-            alert("No customer selected!");
-            return;
-          }
-      
-          if (orderDetails.length === 0) {
-            alert("No items in the order!");
-            return;
-          }
-      
-          // Build orderVariants array
-          const orderVariants = orderDetails.flatMap(order =>
-            order.colors
-              .filter(color => color.id && color.weight > 0)
-              .map(color => ({
-                variantId: color.id,
-                orderWeight: Number(color.weight),
-                variantType: color.type || "Cone"  // Default to "Cone" if not set
-              }))
-          );
-      
-          const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
-          const totalAmount = Number(calculateTotalAmount());
-      
-          if (orderVariants.length === 0 || totalQuantity === 0) {
-            alert("No valid variants or zero weight!");
-            return;
-          }
-      
-          const walletUsed = Math.min(walletDeduction || 0, totalAmount);
-      
-          const orderData = {
-            customer: {
-              customerId: selectedCustomer.customerId
-            },
-            status: "New Order",
-            totalAmount: netPayablePrice, // Includes GST, handling, platform, after discounts
-            discountId: selectedDiscountId || null,
-            walletAmount: walletUsed,
-            quantity: totalQuantity,
-            payment: {
-              paymentId: Date.now(),
-              totalAmount: netPayablePrice,
-              codAmount: codAmt.toFixed(2),
-              onlineAmount: onlineAmt.toFixed(2),
-              transactionId: "TXN" + Date.now(),
-              paidAmount: walletUsed,
-              pendingAmount: (netPayablePrice - walletUsed).toFixed(2),
-              paymentStatus: walletUsed >= netPayablePrice ? "PAID" : "PARTIALLY PAID"
-            },
-            paymentTypeDiscount: selectedPayment || "",
-            orderVariants
-          };
-          
-      
-          // Send to backend
-          const response = await createOrder(orderData);
-          console.log("Order Created:", response);
-      
-         
-      
-          alert("Order created successfully!");
-          navigate('/orders');
-        } catch (error) {
-          console.error("Error creating order:", error);
-          alert("Failed to create order. Check console for details.");
-        }
+
+  const handleCreateOrder = async () => {
+    try {
+      if (!selectedCustomer) {
+        alert("No customer selected!");
+        return;
+      }
+  
+      if (orderDetails.length === 0) {
+        alert("No items in the order!");
+        return;
+      }
+  
+      const orderVariants = orderDetails.flatMap(order =>
+        order.colors
+          .filter(color => color.id && color.weight > 0)
+          .map(color => ({
+            variantId: color.id,
+            orderWeight: Number(color.weight),
+            variantType: color.type || "Cone"
+          }))
+      );
+  
+      const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
+      const totalAmount = Number(calculateTotalAmount());
+  
+      if (orderVariants.length === 0 || totalQuantity === 0) {
+        alert("No valid variants or zero weight!");
+        return;
+      }
+  
+      const walletUsed = Math.min(walletDeduction || 0, totalAmount);
+  
+      const formattedCustomer = {
+        customerId: selectedCustomer.customerId,
+        addressId: selectedAddress.id,
       };
+      
+      const orderData = {
+        customer: formattedCustomer,
+        status: "New Order",
+        totalAmount: toPay,
+        discountId: selectedDiscountId || null,
+        walletAmount: walletUsed,
+        quantity: totalQuantity,
+        paymentTypeDiscount: selectedPayment || "",
+        payment: {
+          paymentId: Date.now(),
+          totalAmount: toPay,
+          codAmount: codAmt.toFixed(2),
+          onlineAmount: onlineAmt.toFixed(2),
+          transactionId: "TXN" + Date.now(),
+          paidAmount: onlineAmt.toFixed(2),
+          pendingAmount: (codAmt).toFixed(2),
+          paymentStatus: onlineAmt >= toPay ? "PAID" : "PARTIALLY PAID",
+          totalDiscount:grandTotals.totalDiscount,
+          totalSgst:grandTotals.sgst.toFixed(2),
+          totalCgst:grandTotals.cgst.toFixed(2)
+
+        },
+        orderVariants
+      };
+  
+      const response = await createOrder(orderData);
+      console.log("Order Created:", response);
+  
+      alert("Order created successfully!");
+      navigate('/orders');
+    } catch (error) {
+      console.error("Error creating order:", error);
+      alert("Failed to create order. Check console for details.");
+    }
+  };
+  
+
     
 
     const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -689,66 +748,98 @@ const CreateOrder = () => {
     const netPayable = (totalAfterDiscount - walletDeduction).toFixed(2);
     
     
-    const calculatePriceBreakdown = (order, colorObj, selectedDiscount = 0, paymentDiscount = 0) => {
+
+    const calculatePriceBreakdown = (
+      order,
+      colorObj,
+      selectedDiscount = 0,
+      paymentDiscount = 0,
+      selectedDiscountData = null // Pass full selected discount object
+    ) => {
       if (!order || !order.variant || !order.variant.variants || !colorObj) {
-          return { baseTotal: 0, gstAmount: 0, discountAmount: 0, finalTotal: 0, gstRate: 0 };
+        return {
+          baseTotal: 0,
+          gstAmount: 0,
+          discountAmount: 0,
+          finalTotal: 0,
+          gstRate: 0,
+          discountPercent: 0,
+        };
+
       }
-  
+
+      console.log(colorObj)
+    
       const colorHex = typeof colorObj === "string"
-          ? colorObj.trim().toLowerCase()
-          : colorObj.hexCode?.trim().toLowerCase() || "";
-  
+
+        ? colorObj.trim().toLowerCase()
+        : colorObj.hexCode?.trim().toLowerCase() || "";
+    
+
       const matchingItem = order.variant.variants.find(item =>
-          item.hexCode?.trim().toLowerCase() === colorHex
+        item.hexCode?.trim().toLowerCase() === colorHex
       );
-  
+
+    
       const weight = colorObj.weight || 0;
-      const price = matchingItem?.price || 0;
-  
+      const price = colorObj?.price || 0;
+      // const price = matchingItem?.price || 0;
+    
+
       const baseTotal = weight * price;
       const gstRate = order.product?.gstOnProduct || 0;
       const gstAmount = (baseTotal * gstRate) / 100;
-  
+
+      console.log(baseTotal)
+    
       const totalBeforeDiscount = baseTotal + gstAmount;
-  
-      // Total discount = selected + payment-based
-      const totalDiscountPercent = Number(selectedDiscount) + Number(paymentDiscount);
-
-      console.log(totalDiscountPercent)
-
-      const discount = baseTotal * (totalDiscountPercent/100)
-
-      const discountAmount = (totalBeforeDiscount * totalDiscountPercent) / 100;
-  
-      // const finalTotal = totalBeforeDiscount - discountAmount;
-
-     
-      console.log(discount)
-  
+    
+      // Check if the selected discount is applicable to this product
+      let productDiscountPercent = 0;
+    
+      if (selectedDiscountData && Array.isArray(selectedDiscountData.applicableProducts)) {
+        const isApplicable = selectedDiscountData.applicableProducts.some(
+          (p) => p.id === order.productId
+        );
+    
+        if (isApplicable) {
+          productDiscountPercent = Number(selectedDiscountValue); // Apply only if product is included
+        }
+      }
+    
+      const productDiscount = productDiscountPercent;
+      const paymentDiscountValue = Number(paymentDiscount);
+      
+      const combinedDiscountPercent = productDiscount + paymentDiscountValue - (productDiscount * paymentDiscountValue) / 100;
+      
+      const discount = baseTotal * (combinedDiscountPercent / 100);
       const finalTotal = baseTotal - discount;
-
+    
       return {
-          baseTotal: isNaN(baseTotal) ? 0 : baseTotal,
-          gstAmount: isNaN(gstAmount) ? 0 : gstAmount,
-          discountAmount: isNaN(discountAmount) ? 0 : discountAmount,
-          finalTotal: isNaN(finalTotal) ? 0 : finalTotal,
-          gstRate: isNaN(gstRate) ? 0 : gstRate,
-          discountPercent: totalDiscountPercent
+        baseTotal: isNaN(baseTotal) ? 0 : baseTotal,
+        gstAmount: isNaN(gstAmount) ? 0 : gstAmount,
+        discountAmount: isNaN(discount) ? 0 : discount,
+        finalTotal: isNaN(finalTotal) ? 0 : finalTotal,
+        gstRate: isNaN(gstRate) ? 0 : gstRate,
+        discountPercent: combinedDiscountPercent,
+        isProductDiscountApplied: productDiscountPercent > 0
+
       };
-  };
+    };
+    
   
   
 
   const paymentDescriptions = {
     "100%": "100% Online Payment",
-    "75%": "75% Online + 25% COD",
     "50%": "50% Online + 50% COD",
+    "30%": "30% Online + 70% COD",
     "25%": "25% Online + 75% COD",
     "0%": "0% Online + 100% COD",
   };
 
   const [selectedAddress, setSelectedAddress] = useState(
-    selectedCustomer?.addresses?.[0] || {}
+    order?.address || {}
   );
 
 
@@ -762,29 +853,38 @@ const CreateOrder = () => {
   };
 
   const calculateShippingCost = (orderDetails, selectedCustomer) => {
-    if (!selectedCustomer?.address) return 0;
+    console.log(selectedCustomer)
+
+  
+    if (!selectedAddress?.state) return 0;
   
     const selectedAddress = selectedCustomer.address.find(addr => addr.isSelected);
     if (!selectedAddress?.state) return 0;
   
     const customerState = selectedAddress.state.toLowerCase();
-    const ratePerKg = customerState === "odisha" ? 5 : 12;
+    const ratePerKg = customerState === "odisha" ? 3 : 5;
   
     const totalWeight = orderDetails.reduce((acc, item) => {
-      const colorWeight = item.colors.reduce((sum, color) => sum + (color.weight || 0), 0);
+
+      const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
+
       return acc + colorWeight;
     }, 0);
   
-    return (totalWeight * ratePerKg).toFixed(2);
+    console.log(totalWeight)
+    
+  
+    return Number((totalWeight * ratePerKg).toFixed(2));
+
   };
   
 
-  console.log()
 
   const grandTotals = calculateGrandTotals(
     orderDetails,
     Number(discountPercentage),
-    Number(selectedDiscountValue || 0)
+    Number(selectedDiscountValue || 0),
+    selectedDiscountData
   );
   
   
@@ -798,14 +898,55 @@ const CreateOrder = () => {
     handlingCharges +
     platformFee;
 
+  console.log(netPayablePrice)
+
   const toPay = netPayablePrice - walletDeduction;
 
-const codAmt = (toPay * codPercentage) / 100;
-const onlineAmt = (toPay * onlinePercentage) / 100;
+  const codAmt = (toPay * codPercentage) / 100;
+  const onlineAmt = (toPay * onlinePercentage) / 100;
 
+
+  const currentCustomerId = selectedCustomer?.customerId;
+
+const filteredDiscounts = discountData.filter((discount) => {
+  const isActive = discount.discountStatus?.toUpperCase().trim() === "ACTIVE";
+
+  const matchedCustomer = discount.eligibleCustomers.find(
+    (customer) => customer.customerId == currentCustomerId // use loose check
+  );
+
+
+  return isActive && !!matchedCustomer;
+});
+
+const handleDeleteColor = (productId, size, colorIndexToDelete) => {
+  const updatedOrderDetails = orderDetails.map(order => {
+    if (order.productId === productId && order.size === size) {
+      const updatedColors = order.colors.filter((_, idx) => idx !== colorIndexToDelete);
+      return {
+        ...order,
+        colors: updatedColors
+      };
+    }
+    return order;
+  }).filter(order => order.colors.length > 0); // Optional: remove order if no colors left
+
+  setOrderDetails(updatedOrderDetails);
+};
+
+
+
+const sendInvoice = async(orderId) =>{
+    const result = await emailInvoice(orderId);
+      if (!result.success) {
+        alert("Failed to download invoice.");
+      }
+      alert("Invoice sent successfully")
+}
 
 console.log(orderDetails)
   
+
   console.log(selectedAddress)
 
 
@@ -876,6 +1017,8 @@ console.log(orderDetails)
                                     <th className='fw-medium'>Total</th>
                                     <th className='fw-medium'>CGST</th>
                                     <th className='fw-medium'>SGST</th>
+
+                                    <th className='fw-medium'></th> 
                                     {/* <th className='fw-medium' style={{textAlign:"center"}}>GST</th> */}
                                     {/* <th className='fw-medium' style={{textAlign:"end"}}>Total</th> */}
                                 </tr>
@@ -956,7 +1099,9 @@ console.log(orderDetails)
                                                   disabled={isViewMode}
                                                 >
                                                   <option value="Cone">Cone</option>
-                                                  <option value="Hanks">Hanks</option>
+
+                                                  <option value="Hank">Hank</option>
+
                                                 </select>
                                                  )
                                               ))}
@@ -967,12 +1112,12 @@ console.log(orderDetails)
                                           <td style={{ width: '8rem' }}>
                                             <div className="d-flex flex-column">
                                                 {order.colors.map((colorObj, colorIndex) => (
-                                                    isViewMode ? (
-                                                        // Show plain text in view mode
-                                                        <span key={colorIndex} className="mb-1 p-1 w-75">
-                                                            {colorObj.weight || 'N/A'}
-                                                        </span>
-                                                    ) : (
+                                                    // isViewMode ? (
+                                                    //     // Show plain text in view mode
+                                                    //     <span key={colorIndex} className="mb-1 p-1 w-75">
+                                                    //         {colorObj.weight || 'N/A'}
+                                                    //     </span>
+                                                    // ) : (
                                                         // Show input field in edit mode
                                                         <input
                                                             key={colorIndex}
@@ -982,9 +1127,9 @@ console.log(orderDetails)
                                                             className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
                                                             value={colorObj.weight || ''} 
                                                             onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
-                                                            disabled={isViewMode}
+                                                            // disabled={isViewMode}
                                                         />
-                                                    )
+                                                    // )
                                                 ))}
                                             </div>
                                         </td>
@@ -993,13 +1138,26 @@ console.log(orderDetails)
                                           <td colSpan="5">
                                               <div className="d-flex flex-column gap-3">
                                               {order.colors.map((colorObj, colorIndex) => {
-                                                    const { baseTotal, gstAmount, finalTotal, gstRate } = calculatePriceBreakdown(order, colorObj ,selectedDiscountValue, discountPercentage);
+
+                                                    const { 
+                                                      baseTotal,
+                                                      gstAmount,
+                                                      finalTotal,
+                                                      gstRate,
+                                                      discountPercent,
+                                                      isProductDiscountApplied
+                                                     } = calculatePriceBreakdown(order, colorObj ,selectedDiscountValue, discountPercentage , selectedDiscountData);
+
 
                                                     return (
                                                         <div key={colorIndex} className="d-flex justify-content-between">
                                                             <span>₹{baseTotal.toFixed(2)}</span>
                                                             {/* <span>₹{gstAmount.toFixed(2)} ({gstRate}%)</span> */}
-                                                            <span>{Number(selectedDiscountValue)+Number(discountPercentage)}%</span>
+
+                                                            <span>
+                                                              {discountPercent.toFixed(2)}
+                                                            </span>
+
                                                             {/* <span>{gstRate}%</span> */}
                                                             <span>₹{finalTotal.toFixed(2)}</span>
                                                             <span>{gstRate/2}%</span>
@@ -1009,6 +1167,34 @@ console.log(orderDetails)
                                                 })}
                                               </div>
                                           </td>
+
+                                          <div className='d-flex flex-column gap-3'>
+                                          {order.colors.map((colorObj, colorIndex) => (
+                                          <div key={colorIndex} className="d-flex align-items-center justify-content-between">
+                                      
+                                          {!isViewMode && (
+                                            <button
+                                              className="ms-2"
+                                              onClick={() => handleDeleteColor(order.productId, order.size, colorIndex)}
+                                              title="Remove color"
+                                              style={{
+                                                border:'none',
+                                                background:'transparent',
+                                                color:'red'
+                                              }}
+                                            >
+                                              <RxCross2/>
+                                            </button>
+                                          )}
+                                        </div>
+                                          ))}
+
+                                      
+                                          </div>
+
+                                        
+
+
                                           
                                       </tr>
                                   );
@@ -1037,10 +1223,10 @@ console.log(orderDetails)
 
 
 
-                <div className='payment bg-white p-4 rounded'>
+                <div className='payment bg-white p-4 rounded' id="invoice-to-download" ref={invoiceRef}>
                     <h4>Payment</h4>
 
-                    <div  className='container border p-3 rounded mb-3'>
+                    <div  className='container border p-3 rounded mb-3' >
                     {/* <table className="table">
                     <tbody>
                       
@@ -1124,7 +1310,8 @@ console.log(orderDetails)
                     </tr>
 
                    
-                    <tr className='border-bottom '>
+
+                    <tr className='border-bottom'>
                       <td>
                         <div>
                           <p>Total Discount</p>
@@ -1135,7 +1322,15 @@ console.log(orderDetails)
 
                       <td>
                       <div>
-                        <p>{(Number(discountPercentage) + Number(selectedDiscountValue || 0)).toFixed(1)}%</p>
+
+                      <p>
+                          {(
+                            Number(discountPercentage) +
+                            Number(selectedDiscountValue || 0) -
+                            (Number(discountPercentage) * Number(selectedDiscountValue || 0)) / 100
+                          ).toFixed(2)}%
+                        </p>
+
                         <p>{discountPercentage}%</p>
                         <p className="text-gray-400">{selectedDiscountValue || 0}%</p>
                       </div>
@@ -1147,10 +1342,12 @@ console.log(orderDetails)
                             ₹{grandTotals.totalDiscount.toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
-                            ₹{((grandTotals.baseTotal * discountPercentage) / 100).toFixed(0)}
+
+                            ₹{(grandTotals.totalPaymentTypeDiscount).toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
-                            ₹{((grandTotals.baseTotal * selectedDiscountValue) / 100).toFixed(0)}
+                            ₹{grandTotals.totalCouponTypeDiscount.toFixed(0)}
+
                           </p>
                         </div>
                       </td>
@@ -1204,13 +1401,15 @@ console.log(orderDetails)
                       <td className="pb-3 pt-2">Wallet</td>
                       <td className="pb-3 pt-2">{walletBalances.toFixed(2)}</td>
                       <td style={{ textAlign: "end" }} className="pb-3 pt-2">
-                      ₹{isViewMode ? (
+
+                      ₹ {isViewMode ? (
+
                               // Show plain text in view mode
                               <span>{walletDeduction ? `${walletDeduction}` : "0"}</span>
                           ) : (
                               // Show input field in edit mode
                               <input
-                                  className="border border-secondary-subtle rounded-1 ps-2 w-50"
+                                  className="border border-secondary-subtle rounded-1 ps-2 text-end p-1"
                                   type="number"
                                   placeholder="Enter amount"
                                   value={walletDeduction}
@@ -1271,7 +1470,8 @@ console.log(orderDetails)
 
                         <div className='d-flex justify-content-end w-100'>
                             { isViewMode === true ? (
-                                <Button className='btn-sm' onClick={()=>SetShowModalInvoice(true)}>Send Invoice</Button>
+
+                                <Button className='btn-sm' onClick={()=>sendInvoice(order.orderId)}>Send Invoice</Button>
      
                             ):
                             (
@@ -1293,8 +1493,18 @@ console.log(orderDetails)
                     {!selectedCustomer && (
                         
                         <div>
-                        <h4>Customers</h4>
-                        <div className="d-flex  align-items-center gap-2 mb-3">
+
+                            <div className="d-flex  align-items-center gap-2 mb-3 justify-content-between">
+                              <h4>Customers</h4>
+                              {/* <button
+                                  className="btn btn-sm btn-primary d-flex align-items-center gap-2"
+                                  onClick={() => setShowModalCustomer(true)}
+                              >
+                                  <IoAddCircleOutline size={20} /> 
+                              </button> */}
+
+                            </div>
+                      
                         <input
                             type="text"
                             className="form-control"
@@ -1302,14 +1512,8 @@ console.log(orderDetails)
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button
-                            className="btn btn-sm btn-primary d-flex align-items-center gap-2"
-                            onClick={() => setShowModalCustomer(true)}
-                        >
-                            <IoAddCircleOutline size={20} /> 
-                        </button>
-                    </div>
 
+                       
 
 
                         <ModalCustomer
@@ -1375,7 +1579,9 @@ console.log(orderDetails)
                         </div>
                         <div>
                         <h4 className='d-flex justify-content-between'>
-                          Billing Address
+
+                          Shipping Address
+
 
                           {isViewMode === true ? (
                             <div className='border rounded p-2'>
@@ -1438,7 +1644,8 @@ console.log(orderDetails)
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="w-100">
-                {discountData.map((item, index) => (
+
+                {filteredDiscounts.map((item, index) => (
                   <Dropdown.Item key={index} eventKey={item.discountCode} >
                     <div>
                       <strong>{item.discountCode}</strong> {/* Heading */}
@@ -1528,5 +1735,6 @@ console.log(orderDetails)
     </div>
   )
 }
+)
 
 export default CreateOrder

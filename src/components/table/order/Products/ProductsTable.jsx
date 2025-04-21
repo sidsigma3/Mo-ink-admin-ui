@@ -140,15 +140,16 @@ const ProductsTable = forwardRef(({data},ref) => {
     <div className="product-table">
       <Table hover>
         <thead className='z-1'>
-        <tr>
-  <th className="text-start">Product Name</th>
-  <th>Counter</th>
-  <th>Color Variant</th>
-  <th>Color</th>
-  <th>Available</th>
-  <th>GST</th>
-  <th>Status</th>
-</tr>
+
+          <tr>
+            <th>Product Name</th>
+            <th>Counter</th>
+            <th>Color Variant</th>
+            <th>Color</th>
+            <th>Available</th>
+            <th>GST</th>
+            <th>Status</th>
+          </tr>
 
         </thead>
         <tbody>
@@ -175,6 +176,7 @@ const ProductsTable = forwardRef(({data},ref) => {
                     {item.size}
                   </div>
                 </td>
+
   <td style={{verticalAlign: 'middle' }}>
   <div
     style={{
@@ -191,6 +193,7 @@ const ProductsTable = forwardRef(({data},ref) => {
 
                 <td style={{verticalAlign: 'middle' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>
+
                     <div style={{ display: 'flex', marginLeft: '10px', position: 'relative' }}>
                       {item.variants.slice(0, 3).map((color, colorIndex) => (
                         <div
@@ -253,6 +256,7 @@ const ProductsTable = forwardRef(({data},ref) => {
     {product.availableStatus}
   </div>
 </td>
+
               </tr>
             ))
           ))}

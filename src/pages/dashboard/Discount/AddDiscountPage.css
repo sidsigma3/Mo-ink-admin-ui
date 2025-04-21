@@ -1,5 +1,6 @@
 .add-discount .top{
     h5{
+
         font-size: 0.8rem;
     }
 }
@@ -7,6 +8,7 @@
 h4{
     font-size: 1.2rem;
 }
+
 
 .add-discount .main{
     padding: 0;
@@ -44,12 +46,14 @@ h4{
     }
 
     h5{
+
         font-size: 0.8rem;
+
     }
 
     label{
         font-size: 0.8rem;
-        
+
     }
 
 

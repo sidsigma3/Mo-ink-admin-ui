@@ -40,6 +40,8 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
 
  
   const handleColorSelection = (colorHex, colorName) => {
+    console.log(colorHex,colorName)
+
     if (!currentVariant) return;
 
     setSelectedColors((prev) => ({
@@ -53,6 +55,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
     setShowCatalogue(false); 
   };
 
+  console.log(selectedColors)
   
   const handleOrderCreation = () => {
     const order = Object.entries(selectedColors).flatMap(([variantId, sizes]) =>
