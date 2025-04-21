@@ -1,4 +1,4 @@
-import React, { useState , useEffect ,forwardRef ,useImperativeHandle } from "react";
+import React, { useState , useEffect ,forwardRef, useRef ,useImperativeHandle } from "react";
 import "./OrderTable.css";
 import { useOrderContext } from "../../Context/OrderContext";
 import { useNavigate } from "react-router-dom";
@@ -10,10 +10,15 @@ import ModalAssign from "../../Modal/ModalAssign";
 import { getAllOrders } from "../../../services/OrderService";
 import { updateOrder } from "../../../services/OrderService";
 import * as XLSX from "xlsx";
+import CreateOrder from "../../../pages/dashboard/Orders/CreateOrder";
+import { FiDownload } from "react-icons/fi";
+import { downloadInvoice } from "../../../services/InvoiceServices";
 
 const OrderTable = forwardRef(({data}, ref) => {
  
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
+  const createOrderRef = useRef(null);
 
   useEffect(() => {
     setOrders(data || []);
@@ -30,13 +35,13 @@ const OrderTable = forwardRef(({data}, ref) => {
     "Dispatch from Vendor",
     "Delivered",
     "Order Cancelled",
+    "Partial return",
+    "Full return", 
+    "Partial cancel",
+    "Full cancel"
   ];
 
-  const paymentStatusOption = [
-    "Unpaid",
-    "Partially Paid",
-    "Fully Paid"
-  ]
+  const paymentStatusOption = ["UNPAID", "PARTIALLY PAID", "PAID"];
 
   const handlePaymentStatusChange = async (orderId, newStatus) => {
     try {
@@ -59,7 +64,7 @@ const OrderTable = forwardRef(({data}, ref) => {
 
         // Send update request to backend
         await updateOrder(orderId, updatedOrderData);
-        // fetchOrders(); // Refresh order list
+        fetchOrders(); // Refresh order list
 
         alert("Payment status updated successfully.");
     } catch (error) {
@@ -73,18 +78,20 @@ const OrderTable = forwardRef(({data}, ref) => {
         // Fetch the existing order details before updating
         const existingOrder = orders.find(order => order.orderId === orderId);
 
+        console.log(existingOrder)
+
         if (!existingOrder) {
             console.error("Order not found.");
             return;
         }
 
         const updatedOrderData = {
-            ...existingOrder, // Keep all existing fields
-            status: newStatus, // Update only status
+            ...existingOrder, 
+            status: newStatus, 
         };
 
         await updateOrder(orderId, updatedOrderData);
-        // fetchOrders();
+        fetchOrders();
 
       alert("Order status updated successfully.");
     } catch (error) {
@@ -94,22 +101,23 @@ const OrderTable = forwardRef(({data}, ref) => {
 
 
 
-// const fetchOrders = async () => {
-//   try {
-//       const data = await getAllOrders();
-//       setOrders(data);
-//   } catch (error) {
-//       console.error("Failed to fetch orders", error);
-//   }
-// };
+const fetchOrders = async () => {
+  try {
+      const data = await getAllOrders();
+      setOrders(data);
+  } catch (error) {
+      console.error("Failed to fetch orders", error);
+  }
+};
 
-// useEffect(() => {
-//   fetchOrders();
-// }, []);
+useEffect(() => {
+  fetchOrders();
+}, []);
 
-  const handleRowClick = (order) => {
-    navigate("/create-order", { state: { order } });
-  };
+const handleRowClick = (order) => {
+  navigate("/create-order", { state: { order, triggerDownload: true } });
+};
+
 
   const statusClassMap = {
     "New Order": "blue",
@@ -140,7 +148,7 @@ const OrderTable = forwardRef(({data}, ref) => {
       "Order ID": order.orderId,
       "Date": new Intl.DateTimeFormat("en-GB").format(new Date(order.createdAt)),
       "Customer": order.customer.customerName,
-      "Quantity": order.variants.length,
+      "Quantity": order.orderVariantResponse.length,
       "Weight": order.totalAmount,
       "Amount": order.payment.amount,
       "Payment Status": order.payment.paymentStatus,
@@ -161,12 +169,21 @@ const OrderTable = forwardRef(({data}, ref) => {
     exportOrders,
   }));
 
+  const handleDownloadInvoice = async(orderId) => {
+    const result = await downloadInvoice(orderId);
+    if (!result.success) {
+      alert("Failed to download invoice.");
+    }
+  };
+
+
+
   return (
     <div className="order-table table-ctn-order">
       <Table hover>
         <thead>
           <tr>
-            <th>Order ID</th>
+            <th>#POID</th>
 
             <th>Date</th>
 
@@ -183,6 +200,8 @@ const OrderTable = forwardRef(({data}, ref) => {
             <th>Order Status</th>
 
             <th style={{ width: "11.3rem" }}>V.O I'D</th>
+            
+            <th>Invoice</th>
           </tr>
         </thead>
 
@@ -196,12 +215,21 @@ const OrderTable = forwardRef(({data}, ref) => {
               <td style={{ fontWeight: 500 }}>{order.orderId}</td>
               <td>{new Intl.DateTimeFormat('en-GB').format(new Date(order.createdAt))}</td>
               <td>{order.customer.customerName}</td>
-              <td>{order.variants.length}</td>
-              <td>{order.totalAmount}</td>
-              <td>₹{order.payment.amount}</td>
+              <td>{order.orderVariantResponse.length}</td>
+              <td>
+                {order.orderVariantResponse.reduce((sum, variant) => sum + (Number(variant.orderWeight) || 0), 0).toFixed(2)} kg
+              </td>
+
+              <td>₹{order.totalAmount.toFixed(2)}</td>
               <td onClick={(e) => e.stopPropagation()}>
                 <select
-                  className={order.payment.paymentStatus === "Fully Paid" ? "green" : order.payment.paymentStatus === 'Unpaid' ? "grey" :'yellow'}
+                  className={
+                    order.payment.paymentStatus === "PAID"
+                      ? "green"
+                      : order.payment.paymentStatus === "UNPAID"
+                      ? "grey"
+                      : "yellow"
+                  }
                   value={order.payment.paymentStatus}
                   onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
                 >
@@ -242,6 +270,17 @@ const OrderTable = forwardRef(({data}, ref) => {
                   )}
                 </div>
               </td>
+              <td>
+                <button
+                className="border-0 btn"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevents triggering row click
+                    handleDownloadInvoice(order.orderId);
+                  }}
+                >
+                 <FiDownload size={20}/>
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -255,6 +294,12 @@ const OrderTable = forwardRef(({data}, ref) => {
         show={showModalAssign}
         handleClose={() => setShowModalAssign(false)}
       ></ModalAssign>
+
+        {selectedOrder && (
+          <div style={{ display: "none" }}>
+            <CreateOrder ref={createOrderRef} orderData={selectedOrder} />
+          </div>
+        )}
 
       <div className="order-cards">
         {orders.map((order) => (
@@ -295,12 +340,12 @@ const OrderTable = forwardRef(({data}, ref) => {
                 </span>
               </p>
               <p>
-                {order.variants.length} Quantity{" "}
+                {order.orderVariantResponse.length} Quantity{" "}
                 <span>
                   <LuDot size={25} /> 
                 </span>
               </p>
-              <p>{order.totalAmount}</p>
+              <p>{order.totalAmount.toFixed(2)}</p>
             </div>
 
             <div className="d-flex justify-content-between align-items-center">
@@ -312,7 +357,7 @@ const OrderTable = forwardRef(({data}, ref) => {
                   {order.status}
                 </h5>
                 <select
-                  className={`dropdown-select ${statusClassMap[order.status]}`}
+                  className="dropdown-select" // ⛔ removed color class here
                   value={order.status}
                   onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
                 >
@@ -325,28 +370,25 @@ const OrderTable = forwardRef(({data}, ref) => {
               </div>
 
               <div className="dropdown-wrapper" onClick={(e) => e.stopPropagation()}>
-                <h5 
+                {/* Payment Status Display */}
+                <h5
                   className={
-                    order.payment.paymentStatus === "Fully Paid" 
-                      ? "green" 
-                      : order.payment.paymentStatus === "Unpaid"
-                      ? "grey" 
+                    order.payment.paymentStatus === "PAID"
+                      ? "green"
+                      : order.payment.paymentStatus === "UNPAID"
+                      ? "grey"
                       : "yellow"
                   }
                   onClick={(e) => e.stopPropagation()}
                 >
                   {order.payment.paymentStatus}
                 </h5>
+
+                {/* Payment Status Dropdown */}
                 <select
-                  className={`dropdown-select ${
-                    order.payment.paymentStatus === "Fully Paid"
-                      ? "green"
-                      : order.payment.paymentStatus === "Unpaid"
-                      ? "grey"
-                      : "yellow"
-                  }`}
+                  className="dropdown-select"
                   value={order.payment.paymentStatus}
-                  onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
+                  onChange={(e) => handlePaymentStatusChange(order.orderDetailId, e.target.value)}
                 >
                   {paymentStatusOption.map((status) => (
                     <option key={status} value={status}>
@@ -355,6 +397,7 @@ const OrderTable = forwardRef(({data}, ref) => {
                   ))}
                 </select>
               </div>
+
 
               <div className="manufacturer">
                 {order.manufacturer ? (

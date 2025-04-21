@@ -34,3 +34,13 @@ export const getAllVendors = async () => {
       throw error;
     }
   };
+
+  export const deleteVendor = async (vendorId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/vendor/${vendorId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting vendors:', error);
+      throw error;
+    }
+  };

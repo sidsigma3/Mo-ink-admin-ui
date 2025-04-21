@@ -1,23 +1,24 @@
 import React ,{useState} from 'react'
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useLocation, useNavigate } from 'react-router-dom';
-import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/StatusFilter';
-import { useSpinnerDyers } from '../../../components/Context/SpinnersAndDyersContext';
 import "./AddUser.css"
 import { Dropdown } from 'react-bootstrap';
 import { FiShoppingCart } from "react-icons/fi";
 import { addUser, updateUser , deleteUser} from '../../../services/UserService';
 import DeleteBtn from '../../../components/Buttons/Delete/DeleteBtn';
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
+import StatusInput from '../../../components/StatusInput/StatusInput';
 
 const AddUser = () => {
 
     const {state} = useLocation()
     const { index, users} = state || {};
     const navigate = useNavigate()
-    const {data,setData} = useSpinnerDyers ()
+   
 
     const customer = state?.index !== undefined ? users[index] : null;
+
+    const isViewMode = !!state
     
     const [formData, setFormData] = useState({
         firstName: customer?.firstName || "",
@@ -25,9 +26,8 @@ const AddUser = () => {
         whatsapp: customer?.whatsappNumber || "",
         phone: customer?.phoneNumber || "",
         email: customer?.email || "",
-        password: customer?.password || "",
         company: customer?.company || "",
-        gstin: customer?.gstin || "",
+        adharNumber: customer?.adharNumber || "",
         chequePhoto: null,
         address: customer?.userAddress || "",
         apartment: customer?.street || "",
@@ -35,7 +35,7 @@ const AddUser = () => {
         state: customer?.state || "",
         city: customer?.city || "",
         pinCode: customer?.zipcode || "",
-        status:customer?.userStatus || "ACTIVE",
+        status:customer?.userStatus.toLowerCase() || "ACTIVE",
         role:customer?.role || 'SALES',
       });
     
@@ -61,6 +61,8 @@ const AddUser = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        console.log('hello')
     
         let validationErrors = {};
     
@@ -75,29 +77,34 @@ const AddUser = () => {
         if (!/^\d{10}$/.test(formData.whatsapp)) validationErrors.whatsapp = "WhatsApp number must be 10 digits";
         if (!formData.pinCode.trim()) validationErrors.pinCode = "PIN Code is required";
         if (!/^\d{6}$/.test(formData.pinCode)) validationErrors.pinCode = "PIN Code must be 6 digits";
-        if (!formData.password.trim()) validationErrors.password = "Password is required";
+        // if (!formData.password.trim()) validationErrors.password = "Password is required";
         if (!formData.company.trim()) validationErrors.company = "Comapany is required";
         if (!formData.address.trim()) validationErrors.address = "Address is required";
-        if (!formData.gstin.trim()) validationErrors.gstin = "Addhar is required";
+        if (!formData.adharNumber.trim()) validationErrors.adharNumber = "Addhar is required";
         if (!formData.country.trim()) validationErrors.country = "Country is required";
         if (!formData.state.trim()) validationErrors.state = "State is required";
         if (!formData.city.trim()) validationErrors.city = "City is required";
         if (!formData.apartment.trim()) validationErrors.apartment = "Street/Apartment is required";
+
+        console.log(validationErrors)
     
         // If errors exist, stop submission
         if (Object.keys(validationErrors).length > 0) {
             setFormErrors(validationErrors);
             return;
         }
+
+    
     
         const newUser = {
             firstName: formData.firstName,
             lastName: formData.lastName,
             email: formData.email,
             whatsappNumber: formData.whatsapp,
+            adharNumber:formData.adharNumber,
             phoneNumber: formData.phone,
             userAddress: formData.address, // Fixed duplicate key issue
-            userStatus: formData.status,
+            userStatus: formData.status.toUpperCase(),
             zipcode: formData.pinCode,
             street: formData.apartment,
             ...formData,
@@ -105,7 +112,18 @@ const AddUser = () => {
     
         try {
             if (state?.index !== undefined) {
-                await updateUser(customer?.id, newUser);
+                await updateUser(customer?.userId, newUser);
+                const localUser = JSON.parse(localStorage.getItem("userData"));
+
+                if (localUser?.userId === customer?.userId) {
+                    const updatedUser = {
+                        ...localUser,
+                        ...newUser,
+                        userId: localUser.userId, // Make sure to preserve the userId
+                    };
+
+                    localStorage.setItem("userData", JSON.stringify(updatedUser));
+                }
             } else {
                 await addUser(newUser);
             }
@@ -137,14 +155,14 @@ const AddUser = () => {
                  <span onClick={() => navigate("/users")}>
                  <IoArrowBackOutline size={25} />
                  </span>
-             <h4>{formData.firstName + " "+formData.lastName}</h4>
+             <h4 style={{fontSize:'1.2rem'}}>{formData.firstName + " "+formData.lastName}</h4>
              <div
                      style={{
                          width: '5rem',
-                         padding: '0.2rem 0.4rem',
                          border: '1px solid',
                          borderRadius: '0.2rem',
                          textAlign: 'center',
+                         fontSize:'0.9rem',
                          backgroundColor:
                              formData.role.toLowerCase() === 'owner'
                              ? '#FEDBDC'
@@ -220,11 +238,13 @@ const AddUser = () => {
                 {formErrors.email && <div className="invalid-feedback d-block">{formErrors.email}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
-                <label>Password</label>
-                <input type="text" name="password" value={formData.password} onChange={handleChange} />
-                {formErrors.password && <div className="invalid-feedback d-block">{formErrors.password}</div>}
-            </div>
+            {!isViewMode &&(
+                 <div className="col-md-6 d-flex flex-column">
+                 <label>Password</label>
+                 <input type="text" name="password" value={formData.password} onChange={handleChange} />
+                 {formErrors.password && <div className="invalid-feedback d-block">{formErrors.password}</div>}
+             </div>
+            )}
 
             <div className="col-md-6 d-flex flex-column">
                 <label>Company</label>
@@ -235,14 +255,14 @@ const AddUser = () => {
             <div className="col-md-6 d-flex flex-column">
                 <label>Adhaar No.</label>
                 <input
-                className="fs-6 ps-2"
+                className="ps-2"
                 type="text"
-                name="gstin"
-                value={formData.gstin}
+                name="adharNumber"
+                value={formData.adharNumber}
                 placeholder="Add Adhaar No. to authenticate"
                 onChange={handleChange}
                 />
-                {formErrors.gstin && <div className="invalid-feedback d-block">{formErrors.gstin}</div>}
+                {formErrors.adharNumber && <div className="invalid-feedback d-block">{formErrors.adharNumber}</div>}
             </div>
 
             <div className="media-input-ctn mt-5 p-2 col-md-12">
@@ -294,7 +314,11 @@ const AddUser = () => {
             </div>
 
             <div className='d-flex justify-content-between my-4'>
-            <DeleteBtn clickFunction={()=>handleDelete(customer.userId)}></DeleteBtn>
+            {customer?.role?.toUpperCase() !== "ADMIN" && (
+                <DeleteBtn clickFunction={() => handleDelete(customer.userId)} />
+            )}
+
+           
             <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
             </div>
     
@@ -304,7 +328,11 @@ const AddUser = () => {
         <div className='right'>
             <div className='bg-white p-3 rounded'>
                 <h5 className='mb-3'>Status</h5>
-                <StatusFilter status={'Active'} ></StatusFilter>
+
+                <StatusInput status={formData.status} 
+                onStatusChange={(newStatus) =>
+                setFormData((prev) => ({ ...prev, status: newStatus }))
+                }></StatusInput>
             </div>
 
         <div className='bg-white p-3 rounded mt-2'>

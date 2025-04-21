@@ -25,6 +25,9 @@ const Header = () => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
+
+    const userDetails =  JSON.parse(localStorage.getItem('userData'));
+
     const handleClick = (event) => {
         navigate('/profile')
 
@@ -62,8 +65,8 @@ const Header = () => {
                         <button className='d-flex myAcc align-items-center gap-2 w-100 justify-content-center' onClick={handleClick} > <img src='./profile-pic.png'></img>
                         
                         <div className='profile-ctn'>
-                            <h4>Johny Larsen</h4>
-                            <p>Admin</p>
+                            <h4>{userDetails.firstName} {" "} {userDetails.lastName}</h4>
+                            <p>{userDetails.role.toLowerCase()}</p>
                         </div>
 
                         </button>

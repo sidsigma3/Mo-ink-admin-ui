@@ -22,6 +22,7 @@
 
   .discount-table-ctn table thead tr th{
     background-color: #f9fafb; ;
+    font-size: 0.8rem;
   }
   
   .discount-table-ctn th,
@@ -35,8 +36,12 @@
   }
   
   .discount-table-ctn tbody td {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
+
+    h5{
+      font-size: 1rem;
+    }
   }
   
   .discount-table-ctn  .data-cards {

@@ -33,52 +33,60 @@ const AddProduct = () => {
 
   const product = (typeof index === 'number' && finalData) ? finalData[index] : null;
 
+  
+  
  
   const transformProductData = (product) => {
+    if (!product || !product.groupedVariants) return { variants: [], sizeColorMap: [] };
+  
     const groupedVariants = product.groupedVariants;
   
-    // Extract sizes
+    // Extract unique sizes
     const sizes = groupedVariants.map((group) => ({
       value: group.size,
     }));
   
     // Extract unique colors
     const uniqueColors = [];
+    const colorHexMap = new Map(); // To avoid duplicates
     groupedVariants.forEach((group) => {
       group.variants.forEach((variant) => {
-        if (
-          !uniqueColors.some((color) => color.value === variant.colorName)
-        ) {
-          uniqueColors.push({
+        const hexKey = variant.hexCode?.toLowerCase();
+        if (hexKey && !colorHexMap.has(hexKey)) {
+          colorHexMap.set(hexKey, {
             value: variant.colorName,
             color: variant.colorName,
             hex: variant.hexCode,
-            id:variant.id,
+            id: variant.id, // Include ID if available
           });
         }
       });
     });
   
-    // Generate `sizeColorMap`
+    console.log(groupedVariants)
+
+    // Build sizeColorMap
     const sizeColorMap = groupedVariants.map((group) => ({
       size: group.size,
       colors: group.variants.map((variant) => ({
-        name: variant.colorName,
+        color: variant.colorName,
         hex: variant.hexCode,
-        available:variant.available,
-        price:variant.price,
-        id:variant.id,
+        available: variant.available,
+        price: variant.pricePerKg,
+        id: variant.id,
+        costPerKg: variant.costPerKg,
+        markupPricePerKg: variant.markupPricePerKg,
       })),
     }));
   
-    // Combine into `variants`
     const variants = [
-      { name: "Size", values: sizes },
-      { name: "Color", values: uniqueColors },
+      { name: "size", values: sizes },
+      { name: "color", values: [...colorHexMap.values()] },
     ];
   
     return { variants, sizeColorMap };
   };
+  
 
 
 
@@ -136,9 +144,9 @@ const AddProduct = () => {
 
     if (!formData.productName.trim()) validationErrors.productName = "Product name is required.";
     if (!formData.description.trim()) validationErrors.description = "Description is required.";
-    if (!formData.pricePerKg || formData.pricePerKg <= 0) validationErrors.pricePerKg = "Valid price per Kg is required.";
-    if (!formData.costPerItem || formData.costPerItem <= 0) validationErrors.costPerItem = "Valid cost per item is required.";
-    if (!formData.compareAtPrice || formData.compareAtPrice <= 0) validationErrors.compareAtPrice = "Valid Compare at price is required.";
+    // if (!formData.pricePerKg || formData.pricePerKg <= 0) validationErrors.pricePerKg = "Valid price per Kg is required.";
+    // if (!formData.costPerItem || formData.costPerItem <= 0) validationErrors.costPerItem = "Valid cost per item is required.";
+    // if (!formData.compareAtPrice || formData.compareAtPrice <= 0) validationErrors.compareAtPrice = "Valid Compare at price is required.";
     // if (!formData.media) validationErrors.media = "Please upload a product image or media.";
     if (!formData.gst || formData.gst < 0) validationErrors.gst = "Valid GST value is required.";
     if (variants.length<2) validationErrors.variants = "At (Size & Color) variant is required.";
@@ -150,19 +158,25 @@ const AddProduct = () => {
         return;
     }
 
+    console.log(product)
+
     const plainTextDescription = formData.description.replace(/<\/?[^>]+(>|$)/g, "");
     // Create variants with calculated prices and availability
-    const newVariants = sizeColorMap.map(({ size, colors }) => {
+
+    const newVariants = sizeColorMap.flatMap(({ size, colors }) => {
       return colors.map((color) => ({
-        id:color.id || null ,
         size,
-        color: {id:color.id || null , colorName: color.color , hexCode:color.hex },
-        availableWeight: Number(color.available), // Assuming 'available' corresponds to weight
-        pricePerKg: Number(color.price), // Use the price from each color variant
+        color: {
+          colorName: color.color,
+          hexCode: color.hex,
+        },
+        availableWeight: Number(color.available),
+        pricePerKg: Number(color.price),
+        costPerKg: Number(color.costPerKg || 0),
+        markupPricePerKg: Number(color.markupPricePerKg || 0),
       }));
     });
-
-    // Calculate average price across all variants
+    
     const averagePrice = sizeColorMap.reduce(
       (acc, { colors }) => {
         const total = colors.reduce((sum, color) => sum + Number(color.price), 0);
@@ -170,43 +184,87 @@ const AddProduct = () => {
       },
       0
     ) / sizeColorMap.reduce((count, { colors }) => count + colors.length, 0);
-
-    // Prepare formatted data for the product
+    
     const formattedData = {
       title: formData.productName,
-      price: averagePrice.toFixed(2),
       description: plainTextDescription,
       media: [formData.media] || ['localhost:8080/api/img'],
-      availableStatus:status,
+      availableStatus: status,
       productType: {
         productName: formData.productName,
         description: formData.description,
       },
-      productPrice:{
-        pricePerKg: formData.pricePerKg,
-        compareAtPrice: formData.compareAtPrice,
-        costPerItemPerKg: formData.costPerItem,
-        gstOnProduct:formData.gst,
-      },
-      variants: newVariants.flat(),
+      gstOnProduct: Number(formData.gst),
+      variants: [],
+      deletedVariantIds: [],
     };
-
+    
     try {
       if (state?.index !== undefined) {
-        // Update existing product
-        const productId = product.productId; // Assuming 'id' is the product ID
+        const productId = product.productId;
+        const originalGrouped = product.groupedVariants || [];
+    
+        const changedVariants = [];
+        const newVariantIds = new Set();
+        const existingVariantIds = new Set();
+    
+        // Track existing variant IDs from original product
+        originalGrouped.forEach(group =>
+          group.variants.forEach(variant => existingVariantIds.add(variant.id))
+        );
+    
+        // Detect changed and track new variant IDs
+        newVariants.forEach((newVar) => {
+          if (newVar.id) newVariantIds.add(newVar.id);
+    
+          const matchSizeGroup = originalGrouped.find(g => g.size === newVar.size);
+          const matchColor = matchSizeGroup?.variants.find(
+            old => old.colorName === newVar.color.colorName &&
+                   old.hexCode.toLowerCase() === newVar.color.hexCode.toLowerCase()
+          );
+          
+    
+          if (!matchColor ||
+            matchColor.available !== newVar.availableWeight ||
+            matchColor.pricePerKg !== newVar.pricePerKg ||
+            matchColor.costPerKg !== newVar.costPerKg ||
+            matchColor.markupPricePerKg !== newVar.markupPricePerKg ||
+            matchColor.hexCode !== newVar.color.hexCode
+          ) {
+            changedVariants.push(newVar);
+          }
+        });
+    
+        // Determine deleted variant IDs
+        const deletedIds = [];
+
+        originalGrouped.forEach(group => {
+          group.variants.forEach(variant => {
+            const stillExists = newVariants.some(newVar =>
+              newVar.size === group.size &&
+              newVar.color.hexCode.toLowerCase() === variant.hexCode.toLowerCase()
+            );
+        
+            if (!stillExists) {
+              deletedIds.push(variant.id); // only push if it's actually not found
+            }
+          });
+        });
+    
+        formattedData.variants = changedVariants;
+        formattedData.deletedVariantIds = deletedIds;
+    
         await updateProduct(productId, formattedData);
       } else {
-        // Add new product
+        formattedData.variants = newVariants;
         await addProduct(formattedData);
       }
-
-      navigate('/products'); // Redirect after submission
+    
+      navigate('/products');
     } catch (error) {
-      // Handle error (optional)
       console.error('Error submitting product:', error);
     }
-  };
+  }
 
   
   const [variants, setVariants] = useState(product?.variants || []);
@@ -347,6 +405,16 @@ const AddProduct = () => {
     const prices = colors.map((color) => Number(color.price) || 0).filter((price) => price > 0);
     return prices.length > 0 ? (prices.reduce((sum, price) => sum + price, 0) / prices.length).toFixed(2) : "";
   };
+
+  const calculateAverageCostPerKg = (colors) => {
+    const values = colors.map((c) => Number(c.costPerKg) || 0).filter((v) => v > 0);
+    return values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : "";
+  };
+
+  const calculateAverageMarkupPrice = (colors) => {
+    const values = colors.map((c) => Number(c.markupPricePerKg) || 0).filter((v) => v > 0);
+    return values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : "";
+  };
   
   
   const updateColorField = (sizeIndex, colorIndex, field, value) => {
@@ -373,7 +441,6 @@ const AddProduct = () => {
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
-  
   };
 
   const handleDeleteVariant = (variantIndex, valueIndex,e) => {
@@ -394,7 +461,7 @@ const AddProduct = () => {
 
   const handleAddColor = (sizeIndex) => {
   const newColor = {
-    name: "New Color",  // Default name
+    color: "New Color",  // Default name
     hex: "#FFFFFF",     // Default hex color
     available: "",      // Default availability
     price: "",          // Default price per kg
@@ -499,7 +566,7 @@ const handleUpload = () => {
 };
 
 const parseSizeColorData = (data) => {
-  const sizeColorMap = new Map(); // Stores size as key and unique colors as values
+  const sizeColorMap = new Map();
 
   data.forEach((row) => {
     const size = row.Size ? String(row.Size).trim() : null;
@@ -507,53 +574,49 @@ const parseSizeColorData = (data) => {
     const hexCode = row.HexCode ? row.HexCode.trim().toLowerCase() : null;
     const available = row.Availability ? Number(row.Availability) : 0;
     const price = row.PricePerKg ? Number(row.PricePerKg) : 0;
+    const costPerKg = row.costPerKg ? Number(row.costPerKg) : 0;
+    const markupPricePerKg = row.markupPricePerKg ? Number(row.markupPricePerKg) : 0;
 
     if (size && colorName && hexCode) {
       if (!sizeColorMap.has(size)) {
-        sizeColorMap.set(size, new Map()); // Each size has its own color map
+        sizeColorMap.set(size, new Map());
       }
-      
-      // Add color only if it's unique for this size
+
       if (!sizeColorMap.get(size).has(hexCode)) {
         sizeColorMap.get(size).set(hexCode, {
           color: colorName,
           hex: hexCode,
           available,
           price,
+          costPerKg,
+          markupPricePerKg
         });
       }
     }
   });
 
-  // Convert map to array format
-  const sizeArray = [...sizeColorMap.keys()].map((size) => ({
-    value: size,
-  }));
+  const sizeArray = [...sizeColorMap.keys()].map((size) => ({ value: size }));
 
   const formattedSizeColorMap = [...sizeColorMap.entries()].map(([size, colorMap]) => ({
     size: size,
     colors: [...colorMap.values()],
   }));
 
-  console.log("Extracted Sizes:", sizeArray);
-
   console.log("Extracted Size-Color Map:", formattedSizeColorMap);
-  
 
   setVariants([
     { name: "size", values: sizeArray },
-    { 
-      name: "color", 
+    {
+      name: "color",
       values: Array.from(
         new Map(
           formattedSizeColorMap
             .flatMap((entry) => entry.colors)
-            .map((color) => [color.hex, color]) 
+            .map((color) => [color.hex, color])
         ).values()
       ),
     },
   ]);
-  
 
   setTimeout(() => {
     setSizeColorMap(formattedSizeColorMap);
@@ -570,13 +633,16 @@ const handleExport = () => {
   const exportData = [];
   
   sizeColorMap.forEach(({ size, colors }) => {
-      colors.forEach(({ name, hex, available, price }) => {
+      colors.forEach(({ color, hex, available, price ,markupPricePerKg ,  costPerKg}) => {
           exportData.push({
               Size: size,
-              Color: name,
+              Color: color,
               HexCode: hex,
               Availability: available,
-              PricePerKg: price
+              PricePerKg: price,
+              markupPricePerKg:markupPricePerKg,
+              costPerKg:costPerKg,
+
           });
       });
   });
@@ -595,9 +661,9 @@ const handleExport = () => {
 };
 
 
+
+
 console.log(sizeColorMap)
-
-
 
   return (
 
@@ -655,9 +721,9 @@ console.log(sizeColorMap)
         </div>
 
         <div className="pricing-ctn mt-2 p-3 rounded">
-          <h3 className="mb-3">Pricing</h3>
+          <h3 className="mb-3">GST</h3>
           <div className="row">
-            <div className="d-flex flex-column col">
+            {/* <div className="d-flex flex-column col">
               <label>Price/Kg</label>
               <input 
                  type="number"
@@ -692,7 +758,7 @@ console.log(sizeColorMap)
                >
               </input>
               {errors.costPerItem && <p className="text-danger">{errors.costPerItem}</p>}
-            </div>
+            </div> */}
 
             {/* <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
               <label>Margin</label>
@@ -706,7 +772,7 @@ console.log(sizeColorMap)
 
 
             <div className="d-flex flex-column flex-grow-1 col-lg-3 col-sm-6">
-              <label>GST(%) on this product</label>
+             
               <input 
               type="number"
               name="gst"
@@ -777,14 +843,14 @@ console.log(sizeColorMap)
               padding: "10px",
               borderRadius: "5px",
             }}
-            onClick={() => toggleExpand(variantIndex)}
+            // onClick={() => toggleExpand(variantIndex)}
           >
             <div className="d-flex justify-content-between w-100">
             <h4>
               {variant.name || "New Variant"} 
             </h4>
 
-            <button className="delete-btn p-2" onClick={() => removeVariant(variantIndex)}> <MdDeleteOutline  size={20}/></button>
+            {/* <button className="delete-btn p-2" onClick={() => removeVariant(variantIndex)}> <MdDeleteOutline  size={20}/></button> */}
             </div>
             <div>
             {variant.name.toLowerCase() === "size" && (
@@ -846,7 +912,9 @@ console.log(sizeColorMap)
 
           {/* Collapsible Content */}
           {expandedVariant === variantIndex && (
-            <div className="size-sec mt-2"  onClick={() => toggleExpand(variantIndex)} >
+            <div className="size-sec mt-2"  
+            onClick={() => toggleExpand(variantIndex)} 
+            >
                 <div>
                 <label>Variant Name:</label>
                 </div>
@@ -1010,7 +1078,7 @@ console.log(sizeColorMap)
       ))}
 
 
-                    {variants.length > 0 && (
+                    {/* {variants.length > 0 && (
                       <div>
                           {sizeColorError && <p className="text-danger">{sizeColorError}</p>}
                         <div className="d-flex justify-content-end">
@@ -1028,7 +1096,7 @@ console.log(sizeColorMap)
                         </button>
                         </div>
                         </div>
-                    )}
+                    )} */}
         
 
                 {Object.keys(sizeColorMap).length > 0 && (
@@ -1039,7 +1107,9 @@ console.log(sizeColorMap)
                     <th>Counter</th>
                     <th>Variants</th>
                     <th>Available (Kg)</th>
+                    <th>Cost/Kg</th>
                     <th>Price/Kg</th>
+                    <th>Markup Price/Kg</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -1068,7 +1138,25 @@ console.log(sizeColorMap)
                         type="text"
                         onClick={(e) => e.stopPropagation()}
                         placeholder="Price/Kg"
+                        value={calculateAverageCostPerKg(entry.colors)}
+                        readOnly
+                        />
+                    </td>
+                    <td>
+                        <input
+                        type="text"
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Price/Kg"
                         value={calculateAveragePrice(entry.colors)}
+                        readOnly
+                        />
+                    </td>
+                    <td>
+                        <input
+                        type="text"
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Price/Kg"
+                        value={calculateAverageMarkupPrice(entry.colors)}
                         readOnly
                         />
                     </td>
@@ -1123,9 +1211,9 @@ console.log(sizeColorMap)
                               <input 
                                className="w-75"
                                type="text"
-                               value={color.color || color.name}
+                               value={color.color }
                                onChange={(e) =>
-                               handleVariantValueChangeTable(sizeIndex, colorIndex, "name", e.target.value)
+                               handleVariantValueChangeTable(sizeIndex, colorIndex, "color", e.target.value)
                                }
                                placeholder="name"
                               ></input>
@@ -1142,6 +1230,16 @@ console.log(sizeColorMap)
                             />
                         </td>
                         <td>
+                          <input
+                            type="number"
+                            value={color.costPerKg || ""}
+                            onChange={(e) =>
+                              updateColorField(sizeIndex, colorIndex, "costPerKg", e.target.value)
+                            }
+                            placeholder="Cost/Kg"
+                          />
+                        </td>
+                        <td>
                             <input
                             type="number"
                             value={color.price || ""}
@@ -1151,6 +1249,17 @@ console.log(sizeColorMap)
                             placeholder="Price/Kg"
                             />
                         </td>
+                        <td>
+                          <input
+                            type="number"
+                            value={color.markupPricePerKg || ""}
+                            onChange={(e) =>
+                              updateColorField(sizeIndex, colorIndex, "markupPricePerKg", e.target.value)
+                            }
+                            placeholder="Markup/Kg"
+                          />
+                        </td>
+
                         <td>
                             <button
                             onClick={() => removeColorField(sizeIndex, colorIndex)}
@@ -1177,10 +1286,12 @@ console.log(sizeColorMap)
     </div>
 
     <div className="w-100 d-flex justify-content-between my-4">
-        <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
+      {state?.index!== undefined && (
+          <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
+      )}
+        
         <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
     </div>
-
 
       </div>
 

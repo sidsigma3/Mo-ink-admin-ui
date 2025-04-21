@@ -40,6 +40,8 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
 
  
   const handleColorSelection = (colorHex, colorName) => {
+    console.log(colorHex,colorName)
+
     if (!currentVariant) return;
 
     setSelectedColors((prev) => ({
@@ -53,38 +55,39 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
     setShowCatalogue(false); 
   };
 
+  console.log(selectedColors)
   
   const handleOrderCreation = () => {
-    const order = Object.keys(selectedSize) 
-      .flatMap((variantId) =>
-        Object.keys(selectedSize[variantId]) 
-          .filter((size) => selectedSize[variantId][size]) 
-          .map((size) => {
-           
-            const product = products.find((p) =>
-              p.groupedVariants?.some((v) => v.variants.some((variant) => variant.id === Number(variantId)))
-            );
+    const order = Object.entries(selectedColors).flatMap(([variantId, sizes]) =>
+      Object.entries(sizes).flatMap(([size, colorData]) => {
+        const product = products.find((p) =>
+          p.groupedVariants?.some((v) =>
+            v.variants?.some((variant) => variant.id === Number(variantId))
+          )
+        );
   
-         
-            if (!product) return null;
+        if (!product) return [];
   
-          
-            const variant = product.groupedVariants?.find((v) => v.size === size);
+        const variant = product.groupedVariants?.find((v) =>
+          v.variants?.some((v) => v.id === Number(variantId))
+        );
   
-      
-            const selectedVariant = variant?.variants?.find((v) => v.id === Number(variantId));
+        const selectedVariant = variant?.variants?.find((v) => v.id === Number(variantId));
   
-            return {
-              productId: product.productId, 
-              productName:product.productName,
+        return colorData.colorHex.length > 0
+          ? [{
+              productId: product.productId,
+              productName: product.productName,
               size,
-              colors: selectedColors[variantId]?.[size]?.colorHex || [], 
+              colors: colorData.colorHex,
               variant,
-              product
-            };
-          })
-      ) 
-      .filter((item) => item !== null && item.colors.length > 0); 
+              product,              
+              gstOnProduct:product.gstOnProduct,
+
+            }]
+          : [];
+      })
+    );
   
     onOrderCreate(order);
     handleClose();
@@ -121,13 +124,14 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                       className="size-section mb-3 d-flex justify-content-between"
                     >
                       <div className="d-flex align-items-center gap-5">
-                        <button
+                        <div
                           key={variant.id}
-                          onClick={() => sizeSelectHandler(variant.id, variant.size)}
-                          className={selectedSize[variant.id]?.[variant.size] ? 'selected' : 'not-selected'}
+                          style={{fontSize:'0.8rem'}}
+                          // onClick={() => sizeSelectHandler(variant.id, variant.size)}
+                          className='rounded-pill border bg-secondary-subtle px-3 py-1'
                         >
                           Size: {variant.size}
-                        </button>
+                        </div>
                       </div>
 
                   

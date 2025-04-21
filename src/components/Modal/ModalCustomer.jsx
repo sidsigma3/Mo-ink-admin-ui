@@ -2,13 +2,14 @@ import { Input  } from '@mui/material';
 import React ,{useState} from 'react'
 import { Modal, Button, Dropdown, ModalHeader, ModalTitle, ModalBody, ModalFooter  } from "react-bootstrap";
 import "./ModalCustomer.css"
+import { Password } from '@mui/icons-material';
 
 const ModalCustomer = ({ show, handleClose,onSubmit}) => {
      
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
-        language: "",
+        whatsapp: "",
         phone: "",
         email: "",
         company: "",
@@ -42,14 +43,33 @@ const ModalCustomer = ({ show, handleClose,onSubmit}) => {
     // Handle form submission
     const handleSubmit = () => {
         const customerData = {
-            name: `${formData.firstName} ${formData.lastName}`,
-            contact: formData.phone,
-            address: `${formData.address}, ${formData.apartment}, ${formData.city}, ${formData.state}, ${formData.country} - ${formData.pinCode}`,
+          customerName: `${formData.firstName} ${formData.lastName}`,
+          whatsappNumber: formData.whatsapp,
+          phoneNumber: formData.phone,
+          password:formData.password,
+          email: formData.email,
+          company: formData.company,
+          gstNumber: formData.gstin,
+          cancelledCheque: formData.chequePhoto,
+          panNumber:formData.panNumber,
+          addresses: [
+            {
+              customerAddress:formData.address,
+              addressType: "HOME",
+              street: formData.apartment,
+              country: formData.country,
+              state: formData.state,
+              city: formData.city,
+              zipcode: formData.pinCode,
+            },
+          ],
+          customerStatus: "ACTIVE",
         };
-
-        onSubmit(customerData); // Send to parent component
+      
+        onSubmit(customerData); // Send to parent
         handleClose(); // Close modal
-    };
+      };
+      
 
   return (
    <Modal className='modal-customer' show={show} onHide={handleClose} centered>
@@ -70,18 +90,23 @@ const ModalCustomer = ({ show, handleClose,onSubmit}) => {
                     </div>
 
                     <div className="col-md-6">
-                        <label>Language</label>
-                        <input type="text" name="language" value={formData.language} onChange={handleChange} className="form-control" />
+                        <label>Whatsapp No.</label>
+                        <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} className="form-control" />
                     </div>
 
                     <div className="col-md-6">
-                        <label>Phone No.</label>
+                        <label>Calling No.</label>
                         <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="form-control" />
                     </div>
 
-                    <div className="col-md-12">
+                    <div className="col-md-6">
                         <label>Email</label>
                         <input type="text" name="email" value={formData.email} onChange={handleChange} className="form-control" />
+                    </div>
+
+                    <div className="col-md-6">
+                        <label>Password</label>
+                        <input type="text" name="password" value={formData.password} onChange={handleChange} className="form-control" />
                     </div>
 
                     <div className="col-md-6">

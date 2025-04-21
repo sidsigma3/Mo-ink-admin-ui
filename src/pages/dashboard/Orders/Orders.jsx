@@ -79,7 +79,7 @@ const Orders = () => {
           data.forEach(order => {
             revenue += order.totalAmount || 0;
             weight += order.totalWeight || 0;
-            quantity += order.variants.length || 0
+            quantity += order.orderVariantResponse.length || 0
           });
     
           setTotalOrders(data.length);

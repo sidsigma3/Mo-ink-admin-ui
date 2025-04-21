@@ -222,10 +222,12 @@ const handleFilterChange = (filter, value) => {
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Email</th>
                         <th>Location</th>
                         <th>Wallet</th>
                         <th>Orders</th>
                         <th>Last Order</th>
+                        <th>Status</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
@@ -236,12 +238,18 @@ const handleFilterChange = (filter, value) => {
               return (
                 <tr key={index} style={{ cursor: "pointer" }} onClick={() => handleRowClick(index)}>
                   <td>{customer.customerName}</td>
-                  <td>{customer.addresses[0]?.city || "N/A"}</td>
+                  <td>{customer.email}</td>
+                  <td>{customer.addresses[0]?.city || ""}</td>
                   <td style={{ color: "#3CAA82" }}>
                     {walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "Loading..."}
                   </td>
                   <td>{totalOrders}</td>
                   <td>{lastOrderDate}</td>
+                  <td>
+                    <div style={{backgroundColor:customer.customerStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:customer.customerStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem' ,padding:"3px"}}>
+                    {customer.customerStatus}
+                    </div>
+                  </td>
                   <td>
                     <Dropdown>
                         <Dropdown.Toggle  variant="light" id="dropdown-basic" className='border border-0'>

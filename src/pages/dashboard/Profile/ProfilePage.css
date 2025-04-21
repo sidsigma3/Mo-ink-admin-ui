@@ -1,5 +1,13 @@
 .profile-page{
 
+    .main-sec{
+        label{
+            font-size: 0.8rem;
+        }
+
+    }
+
+
     .avatar{
         top: 12rem;
         left: 2rem;
@@ -15,6 +23,7 @@
         padding: 0.2rem 0.2rem;
         height: 2rem;
         margin-top: 0.5rem;
+        font-size: 0.8rem;
     }
 
     input[type=password]{

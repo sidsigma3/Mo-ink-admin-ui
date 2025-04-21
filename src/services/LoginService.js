@@ -8,8 +8,10 @@ const API_URL =  BASE_URL + "/user/login";
 export const loginUser = async (userEmailId, password) => {
   try {
     const response = await axios.post(API_URL, { userEmailId, password });
+    console.log(response)
 
     if (response.data.status === "SUCCESS") {
+
       return {
         success: true,
         data: response.data.data,
