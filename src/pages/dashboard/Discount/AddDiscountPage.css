@@ -1,3 +1,9 @@
+.add-discount .top{
+    h5{
+        font-size: 1.2rem;
+    }
+}
+
 .add-discount .main{
     padding: 0;
 }
@@ -32,7 +38,11 @@
     }
 
     h5{
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+
+    label{
+        font-size: 0.8rem;
     }
 
 

@@ -64,6 +64,7 @@ const UserPage = () => {
       const filtered = users.filter((item) => {
           // if (filter === "Order Id") return item.orderId.toString().includes(value);
           if (filter === "Name") return item.firstName.toLowerCase().includes(lowercasedValue);
+          if (filter === "Role") return item.role.toLowerCase().includes(lowercasedValue);
           return true;
       });
   
@@ -74,7 +75,7 @@ const UserPage = () => {
   return (
     <div className='user-page'>
          <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.3rem'}}>Users</h4>
+            <h4 style={{fontSize:'1.2rem'}}>Users</h4>
 
             <div className='d-flex gap-2'>
                 {/* <ExportBtn></ExportBtn> */}
@@ -89,16 +90,16 @@ const UserPage = () => {
 
 
         <div className='d-flex gap-2 filter-sec'>
-            <div className='w-100'>
+            <div className='w-75'>
             <ProductFilter 
-                  filterOptions={["Name"]} 
+                  filterOptions={["Name","Role"]} 
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
          
-            {/* <div className='w-25'>
+            <div className='w-25'>
                 <StatusFilter status={'Active'}></StatusFilter> 
-            </div> */}
+            </div>
         </div>
 
         <div className='table-ctn'>

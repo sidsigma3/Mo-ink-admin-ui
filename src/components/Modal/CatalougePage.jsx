@@ -29,6 +29,7 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
     if (selectedColors.length > 0) {
       onColorSelect(selectedColors);
     }
+    console.log(selectedColors)
     onClose();
   };
 
@@ -46,69 +47,129 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
   // };
 
   const handleSaveColor = () => {
-    if (newColor.colorName && newColor.hexCode) {
-    setTempCustomColors((prev) => [...prev, newColor]);
-    setNewColor({ colorName: "", hexCode: "" }); 
+    const { colorName, hexCode } = newColor;
+  
+    if (colorName && hexCode) {
+      const colorWithDetails = {
+        colorName,
+        hexCode,
+        price: 150, // fixed value
+        available: 100, // fixed value
+        costPerKg: 200,
+        markupPricePerKg: 200,
+      };
+  
+      setTempCustomColors((prev) => [...prev, colorWithDetails]);
+      setNewColor({ colorName: "", hexCode: "" });
+    } else {
+      alert("Please enter both color name and hex code");
     }
-};
+  };
+  
 
 
-const handleAddColor = async () => {
-  if (tempCustomColors.length === 0) {
-    alert("Please select at least one color before adding.");
-    return;
-  }
-
-  const confirmAdd = window.confirm("Are you sure you want to add these colors as new variants?");
-  if (!confirmAdd) return;
-
-  try {
-    // Fetch the existing product details
-    const response = await getProductById(id);
-    const productData = response.data;
-
-    // Extract unique sizes from existing variants
-    const uniqueSizes = [...new Set(productData.variants.map(variant => variant.size))];
-
-    // Create new variants by combining new colors with existing sizes
-    const newVariants = tempCustomColors.flatMap((color) =>
-      uniqueSizes.map((size) => ({
-        color: {
-          colorName: color.colorName,
-          hexCode: color.hexCode,
+  const handleAddColor = async () => {
+    if (tempCustomColors.length === 0) {
+      alert("Please select at least one color before adding.");
+      return;
+    }
+  
+    const confirmAdd = window.confirm("Are you sure you want to add these colors as new variants?");
+    if (!confirmAdd) return;
+  
+    try {
+      const response = await getProductById(id);
+      const productData = response.data;
+      const uniqueSizes = [...new Set(productData.variants.map(v => v.size))];
+  
+      const newVariants = tempCustomColors.flatMap((color) =>
+        uniqueSizes.map((size) => ({
+          size,
+          color: {
+            colorName: color.colorName,
+            hexCode: color.hexCode,
+          },
+          availableWeight: 100,
+          pricePerKg: 150,
+          costPerKg: 200,
+          markupPricePerKg: 250,
+        }))
+      );
+  
+      const originalGrouped = productData.groupedVariants || [];
+      const isNewVariant = (variant) => {
+        const group = originalGrouped.find(g => g.size === variant.size);
+        return !group?.variants.some(
+          existing =>
+            existing.colorName.toLowerCase() === variant.color.colorName.toLowerCase() &&
+            existing.hexCode.toLowerCase() === variant.color.hexCode.toLowerCase()
+        );
+      };
+  
+      const filteredNewVariants = newVariants.filter(isNewVariant);
+      if (filteredNewVariants.length === 0) {
+        alert("All selected variants already exist.");
+        return;
+      }
+  
+      const formattedData = {
+        title: productData.productName,
+        description: productData.productDescription,
+        media: productData.productImage || [],
+        availableStatus: productData.availableStatus,
+        gstOnProduct: Number(productData.gstOnProduct || 0),
+        productType: productData.productTypes || {
+          productName: productData.productName,
+          description: productData.productDescription,
         },
-        size, // Assign existing sizes
-        availableWeight: "100", // Default weight
-        pricePerKg: 150, // Default price
-      }))
+        variants: filteredNewVariants,
+        deletedVariantIds: [],
+      };
+  
+      await updateProduct(id, formattedData);
+
+// ✅ Refetch product with updated variants
+const updatedProductRes = await getProductById(id);
+const updatedVariants = updatedProductRes.data.variants || [];
+
+// ✅ Build a Set to track added hex codes
+const seenHexCodes = new Set();
+const updatedColorsWithIds = [];
+
+updatedVariants.forEach(variant => {
+  const hexCode = variant.color.hexCode.toLowerCase();
+
+  if (!seenHexCodes.has(hexCode)) {
+    const match = tempCustomColors.find(
+      temp =>
+        temp.colorName.toLowerCase() === variant.color.colorName.toLowerCase() &&
+        temp.hexCode.toLowerCase() === variant.color.hexCode.toLowerCase()
     );
 
-    // Append new variants to the product
-    const { productTypes, ...cleanedProductData } = productData; // Remove productTypes
+    if (match) {
+      updatedColorsWithIds.push({
+        ...match,
+        id: variant.id, // ✅ now storing variant id instead of color id
+      });
 
-    const updatedProductData = {
-      ...cleanedProductData,
-      productType: productData.productTypes,
-      variants: [...productData.variants, ...newVariants],
-    };
-
-    console.log(updatedProductData)
-
-    // Send update request to API
-    await updateProduct(id, updatedProductData);
-
-    // Update local state
-    setCustomColors((prev) => [...prev, ...tempCustomColors]);
-    setTempCustomColors([]); // Clear temporary colors
-    setIsAddingColor(false); // Switch back to catalog view
-
-    alert("New color variants added successfully!");
-   
-  } catch (error) {
-    console.error("Error adding color variant:", error);
-    alert("Failed to add color variant. Please try again.");
+      seenHexCodes.add(hexCode);
+    }
   }
-};
+});
+
+// ✅ Add to selected customColors
+setCustomColors((prev) => [...prev, ...updatedColorsWithIds]);
+setTempCustomColors([]);
+setIsAddingColor(false);
+alert("New color variants added successfully!");
+
+  
+    } catch (error) {
+      console.error("Error adding color variant:", error);
+      alert("Failed to add color variant. Please try again.");
+    }
+  };
+  
 
 const handleSearchColor = (e) =>{
   setSearchColor(e.target.value.toLowerCase());
@@ -121,6 +182,9 @@ const filteredVariants = variant.variants.filter((item) =>
 
 const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
 
+
+  console.log(customColors)
+  console.log(tempCustomColors)
 
   return (
     <div className="text-center" >

@@ -53,7 +53,7 @@ const ProductsTable = forwardRef(({data},ref) => {
   const aggregateProductData = (productData) => {
     return productData.map((product) => {
       const groupedVariants = product.variants.reduce((acc, variant) => {
-        const { size, color, availableWeight ,id } = variant;
+        const { size, color, availableWeight ,id ,costPerKg,pricePerKg,markupPricePerKg} = variant;
   
         if (!acc[size]) {
           acc[size] = {
@@ -72,8 +72,10 @@ const ProductsTable = forwardRef(({data},ref) => {
             colorName: color.colorName,
             hexCode: color.hexCode || "#ccc",
             available:variant.availableWeight,
-            price:variant.pricePerKg,
+            pricePerKg,
             id:variant.id,
+            markupPricePerKg,
+            costPerKg,
           });
         }
         
@@ -91,7 +93,7 @@ const ProductsTable = forwardRef(({data},ref) => {
         productImage: product.productImage,
         compareAtPrice:product.productPrice?.compareAtPrice,
         costPerItemPerKg:product.productPrice?.costPerItemPerKg,
-        gstOnProduct:product.productPrice?.gstOnProduct,
+        gstOnProduct:product.gstOnProduct,
         pricePerKg:product.productPrice?.pricePerKg,
         availableStatus:product.availableStatus,
         groupedVariants: Object.values(groupedVariants),
@@ -101,7 +103,9 @@ const ProductsTable = forwardRef(({data},ref) => {
 
 
   const finalData = aggregateProductData(data)
-  
+
+
+  console.log(data)
   console.log(finalData)
 
   useImperativeHandle(ref, () => ({
@@ -142,6 +146,7 @@ const ProductsTable = forwardRef(({data},ref) => {
             <th>Color Variant</th>
             <th>Color</th>
             <th>Available</th>
+            <th>GST</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -168,7 +173,7 @@ const ProductsTable = forwardRef(({data},ref) => {
                     {item.size}
                   </div>
                 </td>
-                <td>{item.variants.length} Variants</td>
+                <td>{item.variants.length}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ display: 'flex', marginLeft: '10px', position: 'relative' }}>
@@ -214,6 +219,7 @@ const ProductsTable = forwardRef(({data},ref) => {
                 </td>
 
                 <td>{item.totalWeight}Kgs</td>
+                <td>{product.gstOnProduct}%</td>
                 <td>
                   <div 
                     style={{

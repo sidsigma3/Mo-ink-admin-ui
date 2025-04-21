@@ -10,7 +10,8 @@ import "./AddSpinners.css"
 import { useSpinnerDyers } from '../../../components/Context/SpinnersAndDyersContext';
 import { RiFilePaper2Line } from "react-icons/ri";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
-import { addVendor, updateVendor } from '../../../services/VendorsService';
+import { addVendor, deleteVendor, updateVendor } from '../../../services/VendorsService';
+import StatusInput from '../../../components/StatusInput/StatusInput';
 
 const AddSpinners = () => {
   
@@ -23,9 +24,9 @@ const AddSpinners = () => {
 
   const [manageWallet,setManageWallet] = useState(false)
 
-  const [status,setStatus] = useState(customer?.status || 'Active')
+  const [status,setStatus] = useState(customer?.status.toLowerCase() || 'Active')
 
-  const [tag,setTag] = useState (customer?.tag || 'Spinner')  
+  const [tag,setTag] = useState (customer?.vendorType.toLowerCase() || 'Spinner')  
                                                    
   const [formData, setFormData] = useState({
     firstName: customer?.firstName || "",
@@ -151,7 +152,19 @@ const handleTag = (value) =>{
     setTag(value)
 }
 
+  const handleDelete = async() =>{
+    const confirmed = window.confirm("Are you sure you want to delete this Account?");
+    if (!confirmed) return;
 
+        try {
+            const id = customer.vendorId
+            await deleteVendor(id)
+            navigate('/spinners-and-dyers'); 
+        } catch (error) {
+            
+            console.error('Error Deleting Segment:', error);
+        }
+     }
 
   
     return (
@@ -207,7 +220,7 @@ const handleTag = (value) =>{
     <div className="col-md-6 d-flex flex-column">
         <label>GSTIN No.</label>
         <input
-        className="fs-6 ps-2"
+        className="ps-2"
         type="text"
         name="gstin"
         value={formData.gstin}
@@ -281,7 +294,7 @@ const handleTag = (value) =>{
 
 
         <div className='d-flex justify-content-between my-4'>
-            <DeleteBtn></DeleteBtn>
+            <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
             <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
         </div>
 
@@ -291,7 +304,8 @@ const handleTag = (value) =>{
     <div className='right'>
         <div className='bg-white p-3 rounded'>
             <h5 className='mb-3'>Status</h5>
-            <StatusFilter status={status} onStatusChange={handleStatusChange}></StatusFilter>
+    
+            <StatusInput status={status} onStatusChange={handleStatusChange}></StatusInput>
         </div>
 
         <div className='bg-white p-3 rounded mt-2'>

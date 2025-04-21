@@ -25,6 +25,12 @@
                 }
             }
 
+            .title-sec{
+                h5{
+                    font-size: 1.1rem;
+                }
+            }
+
             .label-sec{
                 h5{
                     font-size: 1.1rem;
@@ -65,7 +71,7 @@
         .right{
             width: 25%;
             h5{
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
         }
     }

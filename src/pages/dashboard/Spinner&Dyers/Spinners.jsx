@@ -185,7 +185,7 @@ const Spinners = () => {
   return (
     <div className='spinner-page'>
          <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.3rem'}}>Spinners & Dyers</h4>
+            <h4 style={{fontSize:'1.2rem'}}>Spinners & Dyers</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn onClick={handleExportExcel}></ExportBtn>
@@ -258,8 +258,8 @@ const Spinners = () => {
                {customer.vendorType}
                </div>
               </td>
-              <td>{customer.assignOrders || 0}</td>
-              <td>{customer.lastOrder}</td>
+              <td>{customer.assignOrders || 'No order'}</td>
+              <td>{customer.lastOrder || 'No order'}</td>
               <td>
                     <Dropdown>
                         <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>

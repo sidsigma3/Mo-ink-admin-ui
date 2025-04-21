@@ -320,7 +320,7 @@ const SideBar = () => {
                     <button 
                       onClick={() => {
                         setSelected('segments');
-                        setHoverSelected('customers'); // Keep submenu open
+                        setHoverSelected('customers'); 
                       }} 
                       className='d-flex gap-3' 
                       style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
@@ -351,11 +351,11 @@ const SideBar = () => {
 
         
         <ul className='hide-on-mobile'>
-            <li className={selected === 'settings' ? 'selected' : 'not-selected'}>
+            {/* <li className={selected === 'settings' ? 'selected' : 'not-selected'}>
                 <Link to={'/settings'}>
                 <button  onClick={()=>setSelected('settings')}><span className='icon'><LuSettings size={22} /></span>Store settings</button>
                 </Link>
-            </li>
+            </li> */}
 
             <li>
                 <button  onClick={()=>setSelected('report')}><span className='icon'><GrBug size={22}/></span>Report a bug</button>

@@ -204,6 +204,9 @@ const AddSegmentsPage = () => {
       };
       
      const handleDelete = async() =>{
+        const confirmed = window.confirm("Are you sure you want to delete this Segment?");
+        if (!confirmed) return;
+
         try {
             const id = segment.segmentId
             await deleteSegment(id)
@@ -226,7 +229,7 @@ const AddSegmentsPage = () => {
         <div className='main d-flex gap-3'>
             <div className='left'>
                     <div className='title-sec bg-white p-3 d-flex flex-column rounded'>
-                        <label>Title</label>
+                        <h5>Title</h5>
                         <input type="text" value={segmentData.title} onChange={handleTitleChange} />
                         {errors.title && <p className="text-danger">{errors.title}</p>}
                     </div>
@@ -278,7 +281,7 @@ const AddSegmentsPage = () => {
                     // addToCart={addToCart}
                     customers = {customers}
                     onCustomerAdd={handleCustomerAdd}
-                   
+                    preSelectedCustomers={selectedCustomer} 
                 ></ModalCustomerList>
 
 
