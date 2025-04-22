@@ -94,6 +94,34 @@
     padding: 4px;
 }
 
+.order-table table tbody td .orange {
+    background-color: #FFEDD5;
+    border: 1px solid #FDBA74;
+    color: #C2410C;
+    border-radius: 0.3rem;
+    width: 8rem;
+    padding: 4px;
+  }
+  
+  .order-table table tbody td .purple {
+    background-color: #EDE9FE;
+    border: 1px solid #C4B5FD;
+    color: #7C3AED;
+    border-radius: 0.3rem;
+    width: 8rem;
+    padding: 4px;
+  }
+  
+  .order-table table tbody td .muted-clay {
+    background-color: #f3e2d2;
+    border: 1px solid #C9A48E;
+    color: #7A5A45;
+    border-radius: 0.3rem;
+    width: 8rem;
+    padding: 4px;
+  }
+  
+
 .order-table table tbody td button{
     height: 30%;
     width: 90%;
@@ -291,6 +319,28 @@
         color: #be5757;
         border-radius: 0.3rem;
     }
+
+    .order-table .order-cards .order-card .orange {
+        background-color: #FFEDD5;
+        border: 1px solid #FDBA74;
+        color: #C2410C;
+        border-radius: 0.3rem;
+      }
+      
+      .order-table .order-cards .order-card .purple {
+        background-color: #EDE9FE;
+        border: 1px solid #C4B5FD;
+        color: #7C3AED;
+        border-radius: 0.3rem;
+      }
+      
+      .order-table .order-cards .order-card .muted-clay {
+        background-color: #f3e2d2;
+        border: 1px solid #C9A48E;
+        color: #7A5A45;
+        border-radius: 0.3rem;
+      }
+      
 
     .order-table .pagination{
         display: none;

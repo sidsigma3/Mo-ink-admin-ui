@@ -20,11 +20,14 @@ const OrderFilter = ({ status ,onStatusChange }) => {
       <Dropdown.Menu>
       <Dropdown.Item eventKey="All">All</Dropdown.Item>
         <Dropdown.Item eventKey="New Order">New Order</Dropdown.Item>
-        <Dropdown.Item eventKey="Dispatch from Inventory">Dispatch from Inventory</Dropdown.Item>
-        <Dropdown.Item eventKey="Send to Vendor">Send to Vendor</Dropdown.Item>
-        <Dropdown.Item eventKey="Dispatch from Vendor">Dispatch from Vendor</Dropdown.Item>
+        <Dropdown.Item eventKey="Shipped">Shipped</Dropdown.Item>
+        <Dropdown.Item eventKey="Manufacture">Manufacture</Dropdown.Item>
         <Dropdown.Item eventKey="Delivered">Delivered</Dropdown.Item>
-        <Dropdown.Item eventKey="Order Cancelled">Order Cancelled</Dropdown.Item>
+        <Dropdown.Item eventKey="Partial Return">Partial Return</Dropdown.Item>
+        <Dropdown.Item eventKey="Full Return">Full Return</Dropdown.Item>
+        <Dropdown.Item eventKey="Partial Cancel">Partial Cancel</Dropdown.Item>
+        <Dropdown.Item eventKey="Full Cancel">Full Cancel</Dropdown.Item>
+
       </Dropdown.Menu>
     </Dropdown>
   );
