@@ -95,6 +95,17 @@
       border-radius: 0.5rem;
       border: 1px solid #ddd;
     }
+
+    .wallet-balance-cell {
+      padding: 0.2rem 0.6rem;
+      background-color: rgb(209, 250, 229);
+      border: 1px solid rgb(110, 231, 183);
+      border-radius: 0.2rem;
+      text-align: center;
+      width: 6rem;
+      height: 2rem;
+      color: rgb(0, 166, 94);
+  }
   
     .table-ctn .data-card h3 {
       margin: 0 0 0.5rem;

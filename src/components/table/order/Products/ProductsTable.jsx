@@ -142,7 +142,7 @@ const ProductsTable = forwardRef(({data},ref) => {
         <thead className='z-1'>
 
           <tr>
-            <th>Product Name</th>
+            <th style={{ textAlign: 'start', verticalAlign: 'middle'}}>Product Name</th>
             <th>Counter</th>
             <th>Color Variant</th>
             <th>Color</th>

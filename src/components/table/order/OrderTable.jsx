@@ -122,11 +122,14 @@ const handleRowClick = (order) => {
 
 
   const statusClassMap = {
-    "New Order": "blue",
-    "Delivered": "green",
-    "Shipped": "yellow",
-    "Cancelled": "red",
-    "Manufacture": "grey",
+  "New Order": "blue",
+  "Shipped": "yellow",
+  "Manufacture": "grey",
+  "Delivered": "green",
+  "Partial return": "purple",
+  "Full return": "orange",
+  "Partial cancel": "muted-clay",
+  "Full cancel": "red"
   };
 
   let active = 2;
@@ -205,9 +208,7 @@ const handleRowClick = (order) => {
 
             <th style={{ width: "11.3rem", textAlign: "center", verticalAlign: 'middle' }}>V.O I'D</th>
 
-
-            
-            <th>Invoice</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Invoice</th>
 
           </tr>
         </thead>

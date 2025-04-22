@@ -243,7 +243,7 @@ const handleFilterChange = (filter, value) => {
                   <td style={{ verticalAlign: 'middle'}} >{customer.customerName}</td>
                   <td style={{ verticalAlign: 'middle'}} >{customer.email}</td>
                   <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.addresses[0]?.city || ""}</td>
-                  <td style={{ color: "#3CAA82", textAlign: 'center', verticalAlign: 'middle' }}>
+                  <td  className="wallet-balance-cell" style={{ color: "#3CAA82", textAlign: 'center', verticalAlign: 'middle' }}>
 
                     {walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "Loading..."}
                   </td>
@@ -251,11 +251,6 @@ const handleFilterChange = (filter, value) => {
                   <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{lastOrderDate}</td>
                   <td style={{ justifyItems: 'center', alignContent:'center'}}>
                     <div style={{backgroundColor:customer.customerStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:customer.customerStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
-                    {customer.customerStatus}
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{backgroundColor:customer.customerStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:customer.customerStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem' ,padding:"3px"}}>
                     {customer.customerStatus}
                     </div>
                   </td>
