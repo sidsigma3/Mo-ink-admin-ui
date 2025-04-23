@@ -235,7 +235,7 @@ const handleRowClick = (order) => {
                 {order.orderVariantResponse.reduce((sum, variant) => sum + (Number(variant.orderWeight) || 0), 0).toFixed(2)} kg
               </td>
 
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>₹{order.totalAmount}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>₹{order.totalAmount.toFixed(1)}</td>
               <td  style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
 
                 <select
