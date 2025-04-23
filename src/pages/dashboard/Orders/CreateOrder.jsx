@@ -135,7 +135,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
                   // Accumulate availableWeight for this size
                   acc[size].totalWeight += Number(availableWeight);
 
-
+                  
             
                   return acc;
                 }, {});
@@ -165,11 +165,9 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       return aggregateProductData(productData);
     }, [productData]);
     
-
   
     const handleReceiveOrder = (order) => {
       console.log(order)
-
 
       setOrderDetails(order);
     };
@@ -248,7 +246,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       
       
       
-
       const transformOrderToProductDetails = (order, finalData) => {
         if (!order || !order.orderVariantResponse) return [];
       
@@ -267,7 +264,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
             groupedVariants[key] = {
               productId: productId,
               productName: product?.productName,
-
               size: size,
               colors: [],
               variant: {
@@ -288,10 +284,8 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
                 availableStatus: product?.availableStatus,
                 groupedVariants: [],
               },
-            };  
+            };
           }
-
-  
       
           const colorDetails = {
             colorName: color.colorName,
@@ -309,13 +303,11 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
         });
       
         const productDetailsArray = Object.values(groupedVariants);
-
       
         productDetailsArray.forEach((item) => {
           item.product.groupedVariants = [item.variant];
         });
       
-
         return productDetailsArray;
       };
       
@@ -329,7 +321,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
        
         } else {
           console.log("Waiting for order or finalData...");
-
         }
       }, [order, finalData]);
 
@@ -358,9 +349,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 
    
     const [walletBalances, setWalletBalances] = useState(0);
-
     const [walletDeduction, setWalletDeduction] = useState(order?.walletAmount || 0);
-
 
     useEffect(() => {
       const fetchWallets = async () => {
@@ -443,7 +432,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       
     };
 
-
     const calculateGrandTotals = (
       orderDetails = [],
       paymentDiscount = 0,
@@ -455,7 +443,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       let totalGst = 0;
       let totalPaymentTypeDiscount = 0;
       let totalCouponTypeDiscount = 0
-
     
       for (const order of orderDetails) {
         if (!order || !Array.isArray(order.colors) || !order.variant?.variants) continue;
@@ -478,7 +465,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
           const gstRate = order.product?.gstOnProduct || 0;
     
           const rawTotal = weight * price;
-
 
           console.log(order)
 
@@ -513,7 +499,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
           totalDiscount += discount;
           totalGst += gstAmount;
            console.log(totalDiscount)
-
         }
       }
     
@@ -529,7 +514,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     };
     
     
-
     
       
       const [selectedPayment,setSelectedPayment] = useState('Select Payment Type')
@@ -543,9 +527,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
           const selectedItem = discountData.find(item => item.discountId === order.discountId);
       
           if (selectedItem) {
-
             setSelectedDiscountedData(selectedItem)
-
             setSelectedDiscount(selectedItem.discountCode);
             setSelectedDiscountValue(selectedItem.discountValue);
             setSelectedDiscountId(selectedItem.discountId);
@@ -629,7 +611,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 
     
  
-
   const handleCreateOrder = async () => {
     try {
       if (!selectedCustomer) {
@@ -703,7 +684,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     }
   };
   
-
     
 
     const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -748,7 +728,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const netPayable = (totalAfterDiscount - walletDeduction).toFixed(2);
     
     
-
     const calculatePriceBreakdown = (
       order,
       colorObj,
@@ -765,21 +744,17 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
           gstRate: 0,
           discountPercent: 0,
         };
-
       }
 
       console.log(colorObj)
     
       const colorHex = typeof colorObj === "string"
-
         ? colorObj.trim().toLowerCase()
         : colorObj.hexCode?.trim().toLowerCase() || "";
     
-
       const matchingItem = order.variant.variants.find(item =>
         item.hexCode?.trim().toLowerCase() === colorHex
       );
-
     
       const weight = colorObj.weight || 0;
       const price = colorObj?.price || 0;
@@ -823,11 +798,9 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
         gstRate: isNaN(gstRate) ? 0 : gstRate,
         discountPercent: combinedDiscountPercent,
         isProductDiscountApplied: productDiscountPercent > 0
-
       };
     };
     
-  
   
 
   const paymentDescriptions = {
@@ -857,16 +830,13 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     console.log(selectedCustomer)
 
     if (!selectedAddress?.state) return 0;
-    const selectedAddress = selectedCustomer.address.find(addr => addr.isSelected);
-    if (!selectedAddress?.state) return 0;
-  
-    const customerState = selectedAddress?.state.toLowerCase();
+ 
+    const customerState = selectedAddress.state.toLowerCase();
+
     const ratePerKg = customerState === "odisha" ? 3 : 5;
   
     const totalWeight = orderDetails.reduce((acc, item) => {
-
       const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
-
       return acc + colorWeight;
     }, 0);
   
@@ -878,6 +848,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
   };
   
 
+ 
 
   const grandTotals = calculateGrandTotals(
     orderDetails,
@@ -945,7 +916,6 @@ const sendInvoice = async(orderId) =>{
 
 console.log(orderDetails)
   
-
   console.log(selectedAddress)
 
 
@@ -1016,8 +986,8 @@ console.log(orderDetails)
                                     <th className='fw-medium'>Total</th>
                                     <th className='fw-medium'>CGST</th>
                                     <th className='fw-medium'>SGST</th>
-
                                     <th className='fw-medium'></th> 
+
                                     {/* <th className='fw-medium' style={{textAlign:"center"}}>GST</th> */}
                                     {/* <th className='fw-medium' style={{textAlign:"end"}}>Total</th> */}
                                 </tr>
@@ -1098,9 +1068,7 @@ console.log(orderDetails)
                                                   disabled={isViewMode}
                                                 >
                                                   <option value="Cone">Cone</option>
-
                                                   <option value="Hank">Hank</option>
-
                                                 </select>
                                                  )
                                               ))}
@@ -1126,7 +1094,7 @@ console.log(orderDetails)
                                                             className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
                                                             value={colorObj.weight || ''} 
                                                             onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
-                                                            // disabled={isViewMode}
+                                                             // disabled={isViewMode}
                                                         />
                                                     // )
                                                 ))}
@@ -1137,7 +1105,6 @@ console.log(orderDetails)
                                           <td colSpan="5">
                                               <div className="d-flex flex-column gap-3">
                                               {order.colors.map((colorObj, colorIndex) => {
-
                                                     const { 
                                                       baseTotal,
                                                       gstAmount,
@@ -1147,16 +1114,13 @@ console.log(orderDetails)
                                                       isProductDiscountApplied
                                                      } = calculatePriceBreakdown(order, colorObj ,selectedDiscountValue, discountPercentage , selectedDiscountData);
 
-
                                                     return (
                                                         <div key={colorIndex} className="d-flex justify-content-between">
                                                             <span>₹{baseTotal.toFixed(2)}</span>
                                                             {/* <span>₹{gstAmount.toFixed(2)} ({gstRate}%)</span> */}
-
                                                             <span>
                                                               {discountPercent.toFixed(2)}
                                                             </span>
-
                                                             {/* <span>{gstRate}%</span> */}
                                                             <span>₹{finalTotal.toFixed(2)}</span>
                                                             <span>{gstRate/2}%</span>
@@ -1166,7 +1130,6 @@ console.log(orderDetails)
                                                 })}
                                               </div>
                                           </td>
-
                                           <div className='d-flex flex-column gap-3'>
                                           {order.colors.map((colorObj, colorIndex) => (
                                           <div key={colorIndex} className="d-flex align-items-center justify-content-between">
@@ -1192,7 +1155,6 @@ console.log(orderDetails)
                                           </div>
 
                                         
-
 
                                           
                                       </tr>
@@ -1309,19 +1271,17 @@ console.log(orderDetails)
                     </tr>
 
                    
-
                     <tr className='border-bottom'>
                       <td>
                         <div>
                           <p>Total Discount</p>
-                          <p className="text-gray-50 ps-3">By Payment Type</p>
-                          <p className="text-gray-50 ps-3">By Coupon Code</p> 
+                          <p className="text-gray-400 ps-3">By Payment Type</p>
+                          <p className="text-gray-400 ps-3">By Coupon Code</p>
                         </div>
                       </td>
 
                       <td>
                       <div>
-
                       <p>
                           {(
                             Number(discountPercentage) +
@@ -1329,7 +1289,6 @@ console.log(orderDetails)
                             (Number(discountPercentage) * Number(selectedDiscountValue || 0)) / 100
                           ).toFixed(2)}%
                         </p>
-
                         <p>{discountPercentage}%</p>
                         <p className="text-gray-400">{selectedDiscountValue || 0}%</p>
                       </div>
@@ -1341,12 +1300,10 @@ console.log(orderDetails)
                             ₹{grandTotals.totalDiscount.toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
-
                             ₹{(grandTotals.totalPaymentTypeDiscount).toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
                             ₹{grandTotals.totalCouponTypeDiscount.toFixed(0)}
-
                           </p>
                         </div>
                       </td>
@@ -1400,9 +1357,7 @@ console.log(orderDetails)
                       <td className="pb-3 pt-2">Wallet</td>
                       <td className="pb-3 pt-2">{walletBalances.toFixed(2)}</td>
                       <td style={{ textAlign: "end" }} className="pb-3 pt-2">
-
                       ₹ {isViewMode ? (
-
                               // Show plain text in view mode
                               <span>{walletDeduction ? `${walletDeduction}` : "0"}</span>
                           ) : (
@@ -1469,7 +1424,6 @@ console.log(orderDetails)
 
                         <div className='d-flex justify-content-end w-100'>
                             { isViewMode === true ? (
-
                                 <Button className='btn-sm' onClick={()=>sendInvoice(order.orderId)}>Send Invoice</Button>
      
                             ):
@@ -1492,7 +1446,6 @@ console.log(orderDetails)
                     {!selectedCustomer && (
                         
                         <div>
-
                             <div className="d-flex  align-items-center gap-2 mb-3 justify-content-between">
                               <h4>Customers</h4>
                               {/* <button
@@ -1511,9 +1464,7 @@ console.log(orderDetails)
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-
                        
-
 
                         <ModalCustomer
                         show={showModalCustomer}
@@ -1578,9 +1529,7 @@ console.log(orderDetails)
                         </div>
                         <div>
                         <h4 className='d-flex justify-content-between'>
-
                           Shipping Address
-
 
                           {isViewMode === true ? (
                             <div className='border rounded p-2'>
@@ -1643,7 +1592,6 @@ console.log(orderDetails)
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="w-100">
-
                 {filteredDiscounts.map((item, index) => (
                   <Dropdown.Item key={index} eventKey={item.discountCode} >
                     <div>
