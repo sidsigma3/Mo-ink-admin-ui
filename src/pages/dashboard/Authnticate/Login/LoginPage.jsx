@@ -29,24 +29,24 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
       };
 
 
-      const [user, setUser] = useState(null);
+      // const [user, setUser] = useState(null);
 
-        useEffect(() => {
-            axios
-            .get("http://localhost:5000/auth/user", { withCredentials: true })
-            .then((res) => setUser(res.data))
-            .catch(() => setUser(null));
-        }, []);
+      //   useEffect(() => {
+      //       axios
+      //       .get("http://localhost:5000/auth/user", { withCredentials: true })
+      //       .then((res) => setUser(res.data))
+      //       .catch(() => setUser(null));
+      //   }, []);
 
         const handleLoginSuccess = (response) => {
             console.log("Login Success:", response);
             window.location.href = "http://localhost:5000/auth/google";
         };
 
-        const handleLogout = () => {
-            axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
-            setUser(null);
-        };
+      //   const handleLogout = () => {
+      //       axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
+      //       setUser(null);
+      //   };
 
   return (
     <div className="login-wrapper d-flex align-items-center justify-content-center px-3">
@@ -85,7 +85,12 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
         Reconnect with the pulse of Mo Ink and Dyes. Your dashboard is ready log in and lead every step from cone to customer.
         </p>
 
-        <form onSubmit={handleLogin}>
+        <form 
+         onSubmit={(e) => {
+          e.preventDefault(); 
+          handleLogin();    
+        }}
+        >
           <label className="fs-6 fw-normal text-white form-label">Email id or Phone no</label>
           <input
             type="text"
@@ -126,7 +131,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
           </div>
 
           <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium"
-          onClick={() => navigate('/home')}
+          onClick={() => handleLogin}
           >
             Login
           </button>

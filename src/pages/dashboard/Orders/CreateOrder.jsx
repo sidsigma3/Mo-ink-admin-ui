@@ -439,7 +439,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       selectedDiscountData = {}
     ) => {
       let baseTotal = 0;
-      let totalDiscount = 0;
       let totalGst = 0;
       let totalPaymentTypeDiscount = 0;
       let totalCouponTypeDiscount = 0
@@ -481,7 +480,10 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
           
           
           const appliedCouponDiscount = isCouponApplicable ? couponDiscount : 0;
-          const totalDiscountPercent = Number(paymentDiscount) + Number(appliedCouponDiscount);
+          const totalDiscountPercent = 
+                Number(paymentDiscount) + Number(appliedCouponDiscount) - 
+                (Number(paymentDiscount) * Number(appliedCouponDiscount)) / 100;
+
 
          console.log(paymentDiscount,appliedCouponDiscount)
 
@@ -496,16 +498,16 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
           totalCouponTypeDiscount +=discountByCoupon;
           totalPaymentTypeDiscount += discountByPaymment;
           baseTotal += rawTotal;
-          totalDiscount += discount;
+        
           totalGst += gstAmount;
-           console.log(totalDiscount)
+           
         }
       }
     
       return {
         baseTotal,
-        totalDiscount,
-        finalTotal: baseTotal - totalDiscount,
+        totalDiscount: totalCouponTypeDiscount + totalPaymentTypeDiscount,
+        finalTotal: baseTotal - totalCouponTypeDiscount + totalPaymentTypeDiscount,
         cgst: totalGst / 2,
         sgst: totalGst / 2,
         totalCouponTypeDiscount,
@@ -763,11 +765,8 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 
       const baseTotal = weight * price;
       const gstRate = order.product?.gstOnProduct || 0;
-      const gstAmount = (baseTotal * gstRate) / 100;
+      // const gstAmount = (baseTotal * gstRate) / 100;
 
-      console.log(baseTotal)
-    
-      const totalBeforeDiscount = baseTotal + gstAmount;
     
       // Check if the selected discount is applicable to this product
       let productDiscountPercent = 0;
@@ -788,6 +787,10 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       const combinedDiscountPercent = productDiscount + paymentDiscountValue - (productDiscount * paymentDiscountValue) / 100;
       
       const discount = baseTotal * (combinedDiscountPercent / 100);
+
+      const discountedBase = baseTotal - discount;
+      const gstAmount = (discountedBase * gstRate) / 100;
+
       const finalTotal = baseTotal - discount;
     
       return {
@@ -846,9 +849,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 
   };
   
-
- 
-
   const grandTotals = calculateGrandTotals(
     orderDetails,
     Number(discountPercentage),
@@ -861,7 +861,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
   const platformFee = 49;
 
   const netPayablePrice =
-    grandTotals.finalTotal +
+    grandTotals.baseTotal - grandTotals.totalDiscount +
     grandTotals.cgst +
     grandTotals.sgst +
     handlingCharges +
