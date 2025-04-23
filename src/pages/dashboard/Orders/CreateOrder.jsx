@@ -853,15 +853,14 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
   };
 
   const calculateShippingCost = (orderDetails, selectedCustomer) => {
+
     console.log(selectedCustomer)
 
-  
     if (!selectedAddress?.state) return 0;
-  
     const selectedAddress = selectedCustomer.address.find(addr => addr.isSelected);
     if (!selectedAddress?.state) return 0;
   
-    const customerState = selectedAddress.state.toLowerCase();
+    const customerState = selectedAddress?.state.toLowerCase();
     const ratePerKg = customerState === "odisha" ? 3 : 5;
   
     const totalWeight = orderDetails.reduce((acc, item) => {

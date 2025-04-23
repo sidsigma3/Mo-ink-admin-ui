@@ -13,6 +13,7 @@ import * as XLSX from "xlsx";
 import CreateOrder from "../../../pages/dashboard/Orders/CreateOrder";
 import { FiDownload } from "react-icons/fi";
 import { downloadInvoice } from "../../../services/InvoiceServices";
+import { FiAlertCircle } from "react-icons/fi";
 
 const OrderTable = forwardRef(({data}, ref) => {
  
@@ -116,6 +117,8 @@ useEffect(() => {
   fetchOrders();
 }, []);
 
+
+
 const handleRowClick = (order) => {
   navigate("/create-order", { state: { order, triggerDownload: true } });
 };
@@ -210,6 +213,9 @@ const handleRowClick = (order) => {
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Invoice</th>
 
+            <th></th>
+            
+
           </tr>
         </thead>
 
@@ -291,6 +297,25 @@ const handleRowClick = (order) => {
                  <FiDownload size={20}/>
                 </button>
               </td>
+
+              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+  {/* {order.hasReturnRequest && ( */}
+  <button
+      className="alert-icon-btn"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      title="Return requested for this order"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <div className="alert-icon-circle">
+        <FiAlertCircle size={16} color="red" />
+      </div>
+    </button>
+  {/* )} */}
+</td>
+
             </tr>
           ))}
         </tbody>
@@ -423,6 +448,7 @@ const handleRowClick = (order) => {
                   </div>
                 )}
               </div>
+
             </div>
           </div>
         ))}
