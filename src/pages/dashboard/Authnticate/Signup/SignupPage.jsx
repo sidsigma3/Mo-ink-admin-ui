@@ -56,7 +56,8 @@ const SignupPage = ({ togglePage, isLogin }) => {
       if (response) {
         alert('Signup successful!');
         e.target.reset();
-        sendEmail(signupData.email, signupData.firstName);
+        togglePage()
+        // sendEmail(signupData.email, signupData.firstName);
       }
     } catch (error) {
       console.error('Signup Error:', error);
@@ -168,6 +169,7 @@ const SignupPage = ({ togglePage, isLogin }) => {
             <label className="fs-6 fw-normal text-white form-label">Password</label>
                       <div className="position-relative mb-2">
                         <input
+                          name='password'
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter your password"
                           className="fs-6 fw-light form-control rounded-pill px-4 pe-5"
@@ -189,7 +191,7 @@ const SignupPage = ({ togglePage, isLogin }) => {
             <div className="col-md">
               <label className="fs-6 fw-normal text-white form-label">Company</label>
               <input
-                name="firstName"
+                name="company"
                 type="text"
                 placeholder="Enter your Company"
                 className="fs-6 fw-light form-control rounded-pill px-4"
@@ -199,7 +201,7 @@ const SignupPage = ({ togglePage, isLogin }) => {
             <div className="col-md">
               <label className="fs-6 fw-normal text-white form-label">Aadhar No.</label>
               <input
-                name="lastName"
+                name="adharNumber"
                 type="text"
                 placeholder="Enter valid Aadhar No."
                 className="fs-6 fw-light form-control rounded-pill px-4"
@@ -209,7 +211,7 @@ const SignupPage = ({ togglePage, isLogin }) => {
           </div>
 
           <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium mt-3"
-          onClick={() => navigate('/login')}
+          onClick={() => handleSignup}
           >
             Resgister
           </button>
