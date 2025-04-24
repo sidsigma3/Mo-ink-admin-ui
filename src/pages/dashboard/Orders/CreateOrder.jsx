@@ -58,10 +58,11 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 
     const statusOptions = [
       "New Order",
-      "Shipped",
+      "Cancel",
+      "Confirmed",
       "Manufactured",
+      "shipped",
       "Delivered",
-      "Cancelled",
       "Returned",
       // "Partial return",
       // "Partial cancel",
@@ -707,9 +708,14 @@ useEffect(() => {
   
       const walletUsed = Math.min(walletDeduction || 0, totalAmount);
   
+      const billingAddress = selectedCustomer.addresses?.find(
+        (addr) => addr.addressType === "HOME"
+      );
+      
       const formattedCustomer = {
         customerId: selectedCustomer.customerId,
-        addressId: selectedAddress.id,
+        billingAddressId: billingAddress?.id || null,
+        shippingAddressId: selectedAddress?.id || null,
       };
       
       const orderData = {
@@ -891,26 +897,48 @@ useEffect(() => {
   };
 
   const calculateShippingCost = (orderDetails, selectedCustomer) => {
-
-    console.log(selectedCustomer)
-
-    if (!selectedAddress?.state) return 0;
- 
-    const customerState = selectedAddress.state.toLowerCase();
-
-    const ratePerKg = customerState === "odisha" ? 3 : 5;
+    let state = "";
+  
+    if (isViewMode) {
+      const parts = order.shippingAddress?.split(",") || [];
+      if (parts.length >= 3) {
+        state = parts[parts.length - 3]?.trim().toLowerCase(); // "Odisha" etc.
+      }
+    } else {
+      state = selectedAddress.state.toLowerCase();
+    }
+  
+    if (!state) return 0;
+  
+    const ratePerKg = state === "odisha" ? 3 : 5;
   
     const totalWeight = orderDetails.reduce((acc, item) => {
       const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
       return acc + colorWeight;
     }, 0);
   
-    console.log(totalWeight)
+    return Number((totalWeight * ratePerKg).toFixed(2));
+  };
+
+  // const calculateShippingCost = (orderDetails, selectedCustomer) => {
+
+  //   if (!selectedAddress?.state) return 0;
+ 
+  //   const customerState = selectedAddress.state.toLowerCase();
+
+  //   const ratePerKg = customerState === "odisha" ? 3 : 5;
+  
+  //   const totalWeight = orderDetails.reduce((acc, item) => {
+  //     const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
+  //     return acc + colorWeight;
+  //   }, 0);
+  
+  //   console.log(totalWeight)
     
   
-    return Number((totalWeight * ratePerKg).toFixed(2));
+  //   return Number((totalWeight * ratePerKg).toFixed(2));
 
-  };
+  // };
   
   const grandTotals = calculateGrandTotals(
     orderDetails,
@@ -1194,54 +1222,54 @@ console.log(orderDetails)
                                               </div>
                                           </td>
 
-                                          <td
-  style={{ justifyItems: 'center', alignContent:'center'}} 
-  onClick={(e) => e.stopPropagation()}
->
-  <div className='d-flex flex-column gap-3'>
-    {order.colors.map((colorObj, colorIndex) => (
-      <div key={colorIndex} className="d-flex align-items-center justify-content-between">
-        <select
-          className={statusClassMap[order.status] || "default-status-class"}
-          value={order.status}
-          onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
-        >
-          {statusOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-      </div>
-    ))}
-  </div>
-</td>
+                                        <td
+                                            style={{ justifyItems: 'center', alignContent:'center'}} 
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <div className='d-flex flex-column gap-3'>
+                                              {order.colors.map((colorObj, colorIndex) => (
+                                                <div key={colorIndex} className="d-flex align-items-center justify-content-between">
+                                                  <select
+                                                    className={statusClassMap[order.status] || "default-status-class"}
+                                                    value={order.status}
+                                                    onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
+                                                  >
+                                                    {statusOptions.map((status) => (
+                                                      <option key={status} value={status}>
+                                                        {status}
+                                                      </option>
+                                                    ))}
+                                                  </select>
+                                                </div>
+                                              ))}
+                                            </div>
+                                        </td>
 
 
-            <td style={{ justifyItems: 'center', alignContent:'center'}} >
-  <div className='d-flex flex-column gap-3'>
-    {order.colors.map((colorObj, colorIndex) => (
-      <div key={colorIndex} className="d-flex align-items-center justify-content-between">
-        {/* You can display color info here if needed */}
-        {/* {order.hasReturnRequest && ( */}
-          <button
-            className="alert-icon-btn"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Return requested for this order"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <div className="alert-icon-circle">
-              <FiAlertCircle size={16} color="red" />
-            </div>
-          </button>
-        {/* )} */}
-      </div>
-    ))}
-  </div>
-</td>
+                                <td style={{ justifyItems: 'center', alignContent:'center'}} >
+                                      <div className='d-flex flex-column gap-3'>
+                                        {order.colors.map((colorObj, colorIndex) => (
+                                          <div key={colorIndex} className="d-flex align-items-center justify-content-between">
+                                            {/* You can display color info here if needed */}
+                                            {/* {order.hasReturnRequest && ( */}
+                                              <button
+                                                className="alert-icon-btn"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Return requested for this order"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                }}
+                                              >
+                                                <div className="alert-icon-circle">
+                                                  <FiAlertCircle size={16} color="red" />
+                                                </div>
+                                              </button>
+                                            {/* )} */}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </td>
 
                                           <div className='d-flex flex-column gap-3'>
                                           {order.colors.map((colorObj, colorIndex) => (
@@ -1297,255 +1325,261 @@ console.log(orderDetails)
 
                 <div className='right col-xl-12 col-lg-12 col-md-12'>
                 <div className='ctn mb-3'>
-  {!selectedCustomer && (
-    <div>
-      <div className="d-flex align-items-center gap-2 mb-3 justify-content-between">
-        <h4>Customers</h4>
-        {/* 
-        <button
-          className="btn btn-sm btn-primary d-flex align-items-center gap-2"
-          onClick={() => setShowModalCustomer(true)}
-        >
-          <IoAddCircleOutline size={20} /> 
-        </button> 
-        */}
-      </div>
+                  {!selectedCustomer && (
+                    <div>
+                      <div className="d-flex align-items-center gap-2 mb-3 justify-content-between">
+                        <h4>Customers</h4>
+                        {/* 
+                        <button
+                          className="btn btn-sm btn-primary d-flex align-items-center gap-2"
+                          onClick={() => setShowModalCustomer(true)}
+                        >
+                          <IoAddCircleOutline size={20} /> 
+                        </button> 
+                        */}
+                      </div>
 
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Search Customer..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search Customer..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
 
-      <ModalCustomer
-        show={showModalCustomer}
-        handleClose={() => setShowModalCustomer(false)}
-        onSubmit={handleAddCustomer}
-      />
+                      <ModalCustomer
+                        show={showModalCustomer}
+                        handleClose={() => setShowModalCustomer(false)}
+                        onSubmit={handleAddCustomer}
+                      />
 
-      {searchTerm.trim() !== "" && filteredCustomers.length > 0 && (
-        <div className="customer-list mt-3">
-          <h4>Results</h4>
-          <ul>
-            {filteredCustomers.map((customer, index) => (
-              <li
-                key={index}
-                onClick={() => handleSelectCustomer(customer)}
-                style={{ cursor: 'pointer' }}
-              >
-                <h5>{customer.customerName}</h5>
-                <span>{customer.phoneNumber}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  )}
+                      {searchTerm.trim() !== "" && filteredCustomers.length > 0 && (
+                        <div className="customer-list mt-3">
+                          <h4>Results</h4>
+                          <ul>
+                            {filteredCustomers.map((customer, index) => (
+                              <li
+                                key={index}
+                                onClick={() => handleSelectCustomer(customer)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <h5>{customer.customerName}</h5>
+                                <span>{customer.phoneNumber}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-  {selectedCustomer && (
-    <div className='selected-customer mt-2'>
-      <div className='d-flex flex-column flex-md-row justify-content-between align-items-start position-relative gap-3'>
+                {selectedCustomer && (
+                  <div className='selected-customer mt-2'>
+                    <div className='d-flex flex-column flex-md-row justify-content-between align-items-start position-relative gap-3'>
 
-        {/* Dropdown + RxCross Button Row */}
-        <div className='position-absolute' style={{ top: 0, right: 0, zIndex: 2 }}>
-          <div className='d-flex align-items-center gap-2'>
+                      {/* Dropdown + RxCross Button Row */}
+                      <div className='position-absolute' style={{ top: 0, right: 0, zIndex: 2 }}>
+                        <div className='d-flex align-items-center gap-2'>
 
-            {/* Address Dropdown */}
-            {!isViewMode && (
-              <Dropdown onSelect={handleSelectAddress} style={{ width: "8.5rem" }}>
-                <Dropdown.Toggle variant="light" id="dropdown-basic" className='w-100'>
-                  {selectedAddress.addressType || "Select Address"}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {selectedCustomer.addresses.map((address, index) => (
-                    <Dropdown.Item key={index} eventKey={address.addressType}>
-                      {address.addressType}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
-            )}
+                          {/* Address Dropdown */}
+                          {!isViewMode && (
+                            <Dropdown onSelect={handleSelectAddress} style={{ width: "8.5rem" }}>
+                              <Dropdown.Toggle variant="light" id="dropdown-basic" className='w-100'>
+                                {selectedAddress.addressType || "Select Address"}
+                              </Dropdown.Toggle>
+                              <Dropdown.Menu>
+                                {selectedCustomer.addresses.map((address, index) => (
+                                  <Dropdown.Item key={index} eventKey={address.addressType}>
+                                    {address.addressType}
+                                  </Dropdown.Item>
+                                ))}
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          )}
 
-            {/* RxCross Close Button */}
-            {!isViewMode && (
-              <button
-                onClick={handleDeselectCustomer}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  fontSize: '1.3rem',
-                  cursor: 'pointer'
-                }}
-                className='cross-btn'
-              >
-                <RxCross2 />
-              </button>
-            )}
-          </div>
-        </div>
+                          {/* RxCross Close Button */}
+                          {!isViewMode && (
+                            <button
+                              onClick={handleDeselectCustomer}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                fontSize: '1.3rem',
+                                cursor: 'pointer'
+                              }}
+                              className='cross-btn'
+                            >
+                              <RxCross2 />
+                            </button>
+                          )}
+                        </div>
+                      </div>
 
-        {/* Customer Info */}
-        <div className="flex-grow-1">
-          <div className='mb-2'>
-            <h4>Customer</h4>
-            <p>{selectedCustomer.customerName}</p>
-          </div>
-        </div>
+                      {/* Customer Info */}
+                      <div className="flex-grow-1">
+                        <div className='mb-2'>
+                          <h4>Customer</h4>
+                          <p>{selectedCustomer.customerName}</p>
+                        </div>
+                      </div>
 
-        {/* Contact Info */}
-        <div className="flex-grow-1">
-          <div className='mb-2'>
-            <h4 className='d-flex justify-content-between'>Contact Information</h4>
-            <p>{selectedCustomer.email}</p>
-            <p>{selectedCustomer.phoneNumber}</p>
-          </div>
-        </div>
+                      {/* Contact Info */}
+                      <div className="flex-grow-1">
+                        <div className='mb-2'>
+                          <h4 className='d-flex justify-content-between'>Contact Information</h4>
+                          <p>{selectedCustomer.email}</p>
+                          <p>{selectedCustomer.phoneNumber}</p>
+                        </div>
+                      </div>
 
-        {/* Shipping Address */}
-        <div className="flex-grow-1">
-          <h4>Shipping Address</h4>
-          <p>{selectedAddress.street}</p>
-          <p>{selectedAddress.city}, {selectedAddress.state} - {selectedAddress.zipCode}</p>
-        </div>
-      </div>
-    </div>
-  )}
-</div>
-</div>
+                      {/* Shipping Address */}
+                      <div className="flex-grow-1">
+                        <h4>Shipping Address</h4>
+                        {isViewMode ? (
+                          <p className="text-gray-600 whitespace-pre-line">{order.shippingAddress}</p>
+                        ) : (
+                          <>
+                            <p>{selectedAddress?.street}</p>
+                            <p>{selectedAddress?.city}, {selectedAddress?.state} - {selectedAddress?.zipCode}</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              </div>
 
             
-<div className="row mb-3 g-3">
-  <div className="col-12 col-md-6">
-    <div className="ctn bg-white rounded p-3">
-      <h5>Discounts</h5>
+        <div className="row mb-3 g-3">
+          <div className="col-12 col-md-6">
+            <div className="ctn bg-white rounded p-3">
+              <h5>Discounts</h5>
 
-      {isViewMode === true ? (
-        <div>
-          <h4>
-            {selectedDiscount
-              ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
-              : "Select Discount"}
-          </h4>
-        </div>
-      ) : (
-        <Dropdown
-          onSelect={handleSelectDiscount}
-          size="sm"
-          className="status mt-2"
-        >
-          <Dropdown.Toggle
-            variant="light"
-            id="dropdown-basic"
-            className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
-          >
-            <p className="m-0 text-primary">
-              {selectedDiscount
-                ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
-                : "Select Discount"}
-            </p>
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu className="w-75">
-            {filteredDiscounts.map((item, index) => (
-              <Dropdown.Item key={index} eventKey={item.discountCode}>
+              {isViewMode === true ? (
                 <div>
-                  <strong>{item.discountCode}</strong>
-                  <br />
-                  <small>
-                    {item.discountValue}% off on{" "}
-                    {item.applicableProducts[0]?.productName || "this product"}
-                  </small>
+                  <h4>
+                    {selectedDiscount
+                      ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
+                      : "Select Discount"}
+                  </h4>
                 </div>
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
-      )}
-    </div>
-  </div>
+              ) : (
+                <Dropdown
+                  onSelect={handleSelectDiscount}
+                  size="sm"
+                  className="status mt-2"
+                >
+                  <Dropdown.Toggle
+                    variant="light"
+                    id="dropdown-basic"
+                    className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
+                  >
+                    <p className="m-0 text-primary">
+                      {selectedDiscount
+                        ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
+                        : "Select Discount"}
+                    </p>
+                  </Dropdown.Toggle>
 
-  <div className="col-12 col-md-6">
-    <div className="ctn bg-white rounded p-3">
-      <h5>Payment Type</h5>
+                  <Dropdown.Menu className="w-75">
+                    {filteredDiscounts.map((item, index) => (
+                      <Dropdown.Item key={index} eventKey={item.discountCode}>
+                        <div>
+                          <strong>{item.discountCode}</strong>
+                          <br />
+                          <small>
+                            {item.discountValue}% off on{" "}
+                            {item.applicableProducts[0]?.productName || "this product"}
+                          </small>
+                        </div>
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
+            </div>
+          </div>
 
-      {isViewMode === true ? (
-        <div>
-          <h4>{paymentDescriptions[selectedPayment]}</h4>
-        </div>
-      ) : (
-        <Dropdown
-          onSelect={handleSelectPayment}
-          size="sm"
-          className="status mt-2"
-        >
-          <Dropdown.Toggle
-            variant="light"
-            id="dropdown-basic"
-            className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
-          >
-            <p className="m-0 text-primary">
-              {paymentDescriptions[selectedPayment] || "Select Payment Type"}
-            </p>
-          </Dropdown.Toggle>
+              <div className="col-12 col-md-6">
+                <div className="ctn bg-white rounded p-3">
+                  <h5>Payment Type</h5>
 
-          <Dropdown.Menu className="w-75">
-            <Dropdown.Item eventKey={"100%"}>
-              <div className="p-2 border-bottom">
-                <h6 className="text-md font-normal">
-                  <span className="text-primary">100%</span> Online Payment
-                </h6>
-                <h6>1.50% discount will be applied.</h6>
+                  {isViewMode === true ? (
+                    <div>
+                      <h4>{paymentDescriptions[selectedPayment]}</h4>
+                    </div>
+                  ) : (
+                    <Dropdown
+                      onSelect={handleSelectPayment}
+                      size="sm"
+                      className="status mt-2"
+                    >
+                      <Dropdown.Toggle
+                        variant="light"
+                        id="dropdown-basic"
+                        className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
+                      >
+                        <p className="m-0 text-primary">
+                          {paymentDescriptions[selectedPayment] || "Select Payment Type"}
+                        </p>
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu className="w-75">
+                        <Dropdown.Item eventKey={"100%"}>
+                          <div className="p-2 border-bottom">
+                            <h6 className="text-md font-normal">
+                              <span className="text-primary">100%</span> Online Payment
+                            </h6>
+                            <h6>1.50% discount will be applied.</h6>
+                          </div>
+                        </Dropdown.Item>
+
+                        <Dropdown.Item eventKey={"50%"}>
+                          <div className="p-2 border-bottom">
+                            <h6 className="text-md font-normal">
+                              <span className="text-primary">50%</span> Online +{" "}
+                              <span className="text-primary">50%</span> COD
+                            </h6>
+                            <h6>0.50% discount will be applied.</h6>
+                          </div>
+                        </Dropdown.Item>
+
+                        <Dropdown.Item eventKey={"30%"}>
+                          <div className="p-2 border-bottom">
+                            <h6 className="text-md font-normal">
+                              <span className="text-primary">30%</span> Online +{" "}
+                              <span className="text-primary">70%</span> COD
+                            </h6>
+                            <h6>0.30% discount will be applied.</h6>
+                          </div>
+                        </Dropdown.Item>
+
+                        <Dropdown.Item eventKey={"25%"}>
+                          <div className="p-2 border-bottom">
+                            <h6 className="text-md font-normal">
+                              <span className="text-primary">25%</span> Online +{" "}
+                              <span className="text-primary">75%</span> COD
+                            </h6>
+                            <h6>0.50% discount will be applied.</h6>
+                          </div>
+                        </Dropdown.Item>
+
+                        <Dropdown.Item eventKey={"0%"}>
+                          <div className="p-2 border-bottom">
+                            <h6 className="text-md font-normal">
+                              <span className="text-primary">0%</span> Online +{" "}
+                              <span className="text-primary">100%</span> COD
+                            </h6>
+                            <h6>No discount will be applied.</h6>
+                          </div>
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  )}
+                </div>
               </div>
-            </Dropdown.Item>
-
-            <Dropdown.Item eventKey={"50%"}>
-              <div className="p-2 border-bottom">
-                <h6 className="text-md font-normal">
-                  <span className="text-primary">50%</span> Online +{" "}
-                  <span className="text-primary">50%</span> COD
-                </h6>
-                <h6>0.50% discount will be applied.</h6>
-              </div>
-            </Dropdown.Item>
-
-            <Dropdown.Item eventKey={"30%"}>
-              <div className="p-2 border-bottom">
-                <h6 className="text-md font-normal">
-                  <span className="text-primary">30%</span> Online +{" "}
-                  <span className="text-primary">70%</span> COD
-                </h6>
-                <h6>0.30% discount will be applied.</h6>
-              </div>
-            </Dropdown.Item>
-
-            <Dropdown.Item eventKey={"25%"}>
-              <div className="p-2 border-bottom">
-                <h6 className="text-md font-normal">
-                  <span className="text-primary">25%</span> Online +{" "}
-                  <span className="text-primary">75%</span> COD
-                </h6>
-                <h6>0.50% discount will be applied.</h6>
-              </div>
-            </Dropdown.Item>
-
-            <Dropdown.Item eventKey={"0%"}>
-              <div className="p-2 border-bottom">
-                <h6 className="text-md font-normal">
-                  <span className="text-primary">0%</span> Online +{" "}
-                  <span className="text-primary">100%</span> COD
-                </h6>
-                <h6>No discount will be applied.</h6>
-              </div>
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      )}
-    </div>
-  </div>
-</div>
+            </div>
 
 
           
