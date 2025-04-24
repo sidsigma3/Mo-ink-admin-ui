@@ -30,11 +30,11 @@ const OrderTable = forwardRef(({data}, ref) => {
   const navigate = useNavigate();
 
   const statusOptions = [
-    "New Order",
-    "Shipped",
+    "Confirmed",
+    "Cancel",
     "Manufactured",
+    "shipped",
     "Delivered",
-    "Cancelled",
     "Returned",
     // "Partial return",
     // "Partial cancel",
