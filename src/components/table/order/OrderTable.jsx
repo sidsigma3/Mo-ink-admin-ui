@@ -32,18 +32,18 @@ const OrderTable = forwardRef(({data}, ref) => {
   const statusOptions = [
     "New Order",
     "Shipped",
-    "Manufacture",
+    "Manufactured",
     "Delivered",
-    "Partial return",
-    "Full return", 
-    "Partial cancel",
-    "Full cancel"
+    "Cancelled",
+    "Returned",
+    // "Partial return",
+    // "Partial cancel",
    
   ];
 
 
 
-  const paymentStatusOption = ["UNPAID", "PARTIALLY PAID", "PAID"];
+  const paymentStatusOption = ["Unpaid", "Partially Paid", "Paid"];
 
 
   const handlePaymentStatusChange = async (orderId, newStatus) => {
@@ -127,12 +127,13 @@ const handleRowClick = (order) => {
   const statusClassMap = {
   "New Order": "blue",
   "Shipped": "yellow",
-  "Manufacture": "grey",
+  "Manufactured": "purple",
   "Delivered": "green",
-  "Partial return": "purple",
-  "Full return": "orange",
-  "Partial cancel": "muted-clay",
-  "Full cancel": "red"
+  "Cancelled": "red",
+  "Returned": "grey",
+  // "Partial return": "purple",
+  // "Partial cancel": "muted-clay",
+  
   };
 
   let active = 2;
@@ -240,11 +241,13 @@ const handleRowClick = (order) => {
 
                 <select
                   className={
-                    order.payment.paymentStatus === "PAID"
-                      ? "green"
-                      : order.payment.paymentStatus === "UNPAID"
-                      ? "grey"
-                      : "yellow"
+                    order.payment.paymentStatus === "Paid"
+    ? "green"
+    : order.payment.paymentStatus === "Partially Paid"
+    ? "purple"
+    : order.payment.paymentStatus === "Unpaid"
+    ? "yellow"
+    : "defaultColor"
                   }
                   value={order.payment.paymentStatus}
                   onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
