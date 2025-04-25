@@ -17,6 +17,8 @@ import { MdAdd } from "react-icons/md";
 import { addCustomer,updateCustomer , deleteCustomer , addMoneyToWallet ,subtractMoneyFromWallet , getWalletTransactions } from '../../../services/CustomerService';
 import { getAllSegment } from '../../../services/SegmentService';
 import StatusInput from '../../../components/StatusInput/StatusInput';
+import { FiDownload } from "react-icons/fi";
+
 
 const AddCustomerPage = () => {
 
@@ -550,24 +552,38 @@ const handleAddressTypeChange = (e) => {
                     <thead>
                       <tr>
                         <th>Source</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                        <th>Date</th>
+                        <th className=" text-center">Invoice No.</th>
+                        <th className=" text-center">Type</th>
+                        <th className=" text-center">Amount</th>
+                        <th className=" text-center">Date</th>
+                        <th className=" text-center">Credit Note</th>
                       </tr>
                     </thead>
                     <tbody>
                       {transactions.slice().reverse().map((item, ix) => (
                         <tr key={ix}>
                           <td>{item.source}</td>
-                          <td
+                          <td className=" text-center">INV-87565</td>
+                          <td className=" text-center"
                             style={{
                               color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000",
                             }}
                           >
                             {item.type}
                           </td>
-                          <td>₹{item.amount.toFixed(2)}</td>
-                          <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+                          <td className=" text-center">₹{item.amount.toFixed(2)}</td>
+                          <td className=" text-center">{new Date(item.createdAt).toLocaleDateString()}</td>
+                          <td className=" text-center pr-4">
+                   <button
+                  className="border-0 btn p-0"
+                    // onClick={(e) => {
+                    //   e.stopPropagation(); // Prevents triggering row click
+                    //   handleDownloadInvoice(order.orderId);
+                    // }}
+                  >
+                   <FiDownload size={20}/>
+                  </button>
+</td>
                         </tr>
                       ))}
                     </tbody>
