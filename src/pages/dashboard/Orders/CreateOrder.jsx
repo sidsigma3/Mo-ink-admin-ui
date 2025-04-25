@@ -905,7 +905,7 @@ useEffect(() => {
         state = parts[parts.length - 3]?.trim().toLowerCase(); // "Odisha" etc.
       }
     } else {
-      state = selectedAddress.state.toLowerCase();
+      state = selectedAddress?.state?.toLowerCase();
     }
   
     if (!state) return 0;
