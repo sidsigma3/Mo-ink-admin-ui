@@ -242,12 +242,12 @@ const handleRowClick = (order) => {
                 <select
                   className={
                     order.payment.paymentStatus === "Paid"
-    ? "green"
-    : order.payment.paymentStatus === "Partially Paid"
-    ? "purple"
-    : order.payment.paymentStatus === "Unpaid"
-    ? "yellow"
-    : "defaultColor"
+                    ? "green"
+                    : order.payment.paymentStatus === "Partially Paid"
+                    ? "purple"
+                    : order.payment.paymentStatus === "Unpaid"
+                    ? "yellow"
+                    : "defaultColor"
                   }
                   value={order.payment.paymentStatus}
                   onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
@@ -260,17 +260,9 @@ const handleRowClick = (order) => {
                 </select>
               </td>
               <td   style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
-              <select
-                className={statusClassMap[order.status]}
-                value={order.status}
-                onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
+                  <div className={statusClassMap[order.status]}>
+                    {order.status}
+                  </div>
             </td>
               <td>
                 <div className="manufacturer">

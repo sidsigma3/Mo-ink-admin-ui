@@ -15,6 +15,18 @@ export const getAllCustomer = async () => {
     }
   };
 
+  export const getCustomerById = async (customerId) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/customer/${customerId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting product:', error);
+      throw error;
+    }
+  };
+  
+
+
   export const addCustomer = async (productData) => {
     try {
       const response = await axios.post(`${BASE_URL}/customer`, productData);
