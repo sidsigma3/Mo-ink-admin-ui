@@ -18,7 +18,7 @@ import { updateOrder } from "../../../services/OrderService";
 import { useCustomerContext } from '../../../components/Context/CustomerContext';
 import { getAllProduct } from '../../../services/ProductService';
 import { getAllCustomer , getWalletTransactions} from '../../../services/CustomerService';
-import { getAllOrders } from '../../../services/OrderService';
+import { getAllOrders , updateOrderVariantStatuses , updateOrderVariants} from '../../../services/OrderService';
 import { Segment } from '@mui/icons-material';
 import { getAllDiscount } from '../../../services/DiscountService';
 import { createOrder } from '../../../services/OrderService';
@@ -28,6 +28,21 @@ import html2pdf from 'html2pdf.js';
 import { FiAlertCircle } from "react-icons/fi";
 import { emailInvoice } from '../../../services/InvoiceServices';
 
+
+
+
+// Optional: style mapping
+export const statusClassMap = {
+  NEW: "text-primary",
+  CONFIRMED: "text-info",
+  MANUFACTURING: "text-warning",
+  SHIPPED: "text-secondary",
+  DELIVERED: "text-success",
+  CANCELLED: "text-danger",
+  RETURN_REQUESTED: "text-warning",
+  RETURN_REJECTED: "text-muted",
+  RETURNED: "text-success",
+};
 
 const CreateOrder = forwardRef(({ orderData }, ref) => {
    
@@ -46,9 +61,10 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [showModalCustomer,setShowModalCustomer] =useState(false)
     const [showModalAssign,setShowModalAssign] = useState(false)
     const [showModalInvoice,SetShowModalInvoice] =useState(false)
-
+    const [weightChanged, setWeightChanged] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [customers,setCustomer] = useState([])
+    const [openDropdown,setOpenDropdown] = useState(null)
 
     // Filter customers based on search input
     const filteredCustomers = customers.filter((customer) =>
@@ -57,44 +73,56 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     );
 
     const statusOptions = [
-      "New Order",
-      "Cancel",
-      "Confirmed",
-      "Manufactured",
-      "shipped",
-      "Delivered",
-      "Returned",
-      // "Partial return",
-      // "Partial cancel",
-     
+      { value: "NEW", label: "New Order" },
+      { value: "CANCELLED", label: "Cancelled" },
+      { value: "CONFIRMED", label: "Confirmed" },
+      { value: "MANUFACTURING", label: "Manufactured" },
+      { value: "SHIPPED", label: "Shipped" },
+      { value: "DELIVERED", label: "Delivered" },
+      // { value: "RETURNED", label: "Returned" },
+      // { value: "RETURN_REQUESTED", label: "Return Requested" },
+      // { value: "RETURN_REJECTED", label: "Return Rejected" },
     ];
+    
+    const statusFlow = [
+      "NEW",
+      "CONFIRMED",
+      "MANUFACTURING",
+      "SHIPPED",
+      "DELIVERED",
+      // "RETURN_REQUESTED",
+      // "RETURN_REJECTED",
+      // "RETURNED",
+      "CANCELLED",
+    ];
+    
   
     
-const handleStatusChange = async (orderId, newStatus) => {
-    try {
-        // Fetch the existing order details before updating
-        const existingOrder = orders.find(order => order.orderId === orderId);
+// const handleStatusChange = async (orderId, newStatus) => {
+//     try {
+//         // Fetch the existing order details before updating
+//         const existingOrder = orders.find(order => order.orderId === orderId);
 
-        console.log(existingOrder)
+//         console.log(existingOrder)
 
-        if (!existingOrder) {
-            console.error("Order not found.");
-            return;
-        }
+//         if (!existingOrder) {
+//             console.error("Order not found.");
+//             return;
+//         }
 
-        const updatedOrderData = {
-            ...existingOrder, 
-            status: newStatus, 
-        };
+//         const updatedOrderData = {
+//             ...existingOrder, 
+//             status: newStatus, 
+//         };
 
-        await updateOrder(orderId, updatedOrderData);
-        fetchOrders();
+//         await updateOrder(orderId, updatedOrderData);
+//         fetchOrders();
 
-      alert("Order status updated successfully.");
-    } catch (error) {
-        console.error("Failed to update order status:", error);
-    }
-};
+//       alert("Order status updated successfully.");
+//     } catch (error) {
+//         console.error("Failed to update order status:", error);
+//     }
+// };
 
 
 const [orders, setOrders] = useState([]);
@@ -269,24 +297,22 @@ useEffect(() => {
 
 
       const handleWeightChange = (productId, size, colorIndex, weight) => {
+        setWeightChanged(true);
         setOrderDetails(prevOrderDetails =>
           prevOrderDetails.map(order => {
             if (order.productId === productId && order.size === size) {
-              const updatedColors = order.colors.map((color, index) =>
-                index === colorIndex
-                  ? typeof color === "string"
-                    ? {
-                        hexCode: color.trim(),
-                        weight,
-                        type: "Cone" // <-- Add default type if missing
-                      }
-                    : {
-                        ...color,
-                        weight,
-                        type: color.type || "Cone" // <-- Add if not present
-                      }
-                  : color
-              );
+              const updatedColors = order.colors.map((color, index) => {
+                if (index === colorIndex) {
+                  const updatedWeight = parseFloat(weight || 0);
+                  return {
+                    ...color,
+                    weight: updatedWeight,
+                    type: color.type || "Cone",
+                    weightChanged: true
+                  };
+                }
+                return color;
+              });
       
               return { ...order, colors: updatedColors };
             }
@@ -312,12 +338,19 @@ useEffect(() => {
         const groupedVariants = {};
       
         order.orderVariantResponse.forEach((variant) => {
-          const { size, color, availableWeight, pricePerKg, id, orderWeight, variantType, productId } = variant;
+          const {
+            size,
+            color,
+            orderVariantId,
+            orderWeight,
+            variantType,
+            productId,
+            status,
+          } = variant;
       
           const product = finalData.find(p => p.productId === productId);
           if (!product) return;
       
-          // Unique key by productId and size to avoid merging same-size variants from different products
           const key = `${productId}-${size}`;
       
           if (!groupedVariants[key]) {
@@ -327,7 +360,7 @@ useEffect(() => {
               size: size,
               colors: [],
               variant: {
-                id: id,
+                id: orderVariantId,
                 size: size,
                 variants: [],
                 totalWeight: 0,
@@ -347,19 +380,26 @@ useEffect(() => {
             };
           }
       
+          // Find color details in product groupedVariants to fetch pricePerKg & availableWeight
+          const sizeGroup = product.groupedVariants?.find(gv => gv.size === size);
+          const matchingColor = sizeGroup?.variants?.find(c => c.hexCode?.toLowerCase() === color.hexCode?.toLowerCase());
+      
           const colorDetails = {
             colorName: color.colorName,
             hexCode: color.hexCode,
-            available: availableWeight,
-            price: pricePerKg,
-            id: id,
+            available: matchingColor?.available || 0,
+            price: matchingColor?.price || 0,
+            id: color.id,
             weight: orderWeight,
-            type: variantType
+            type: variantType,
+            status,
+            orderVariantId,
+            orderId:order.orderId
           };
       
           groupedVariants[key].colors.push(colorDetails);
           groupedVariants[key].variant.variants.push(colorDetails);
-          groupedVariants[key].variant.totalWeight += parseFloat(availableWeight);
+          groupedVariants[key].variant.totalWeight += parseFloat(orderWeight || 0);
         });
       
         const productDetailsArray = Object.values(groupedVariants);
@@ -674,7 +714,8 @@ useEffect(() => {
   //         window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
   //     };
 
-    
+  
+
  
   const handleCreateOrder = async () => {
     try {
@@ -688,15 +729,46 @@ useEffect(() => {
         return;
       }
   
+      const isOdisha = selectedAddress?.state?.toLowerCase() === "odisha";
+
       const orderVariants = orderDetails.flatMap(order =>
         order.colors
           .filter(color => color.id && color.weight > 0)
-          .map(color => ({
-            variantId: color.id,
-            orderWeight: Number(color.weight),
-            variantType: color.type || "Cone"
-          }))
+          .map(color => {
+            const breakdown = calculatePriceBreakdown(
+              order,
+              color,
+              selectedDiscountValue,
+              discountPercentage,
+              selectedDiscountData
+            );
+      
+          
+            const gstRate = breakdown.gstRate || 0;
+            const gstAmount = breakdown.gstAmount || 0;
+      
+            const weight = Number(color.weight);
+            const proportionalHandlingCharge = totalWeight > 0
+              ? Number(((weight / totalWeight) * handlingCharges ).toFixed(2))
+              : 0;
+      
+            return {
+              variantId: color.id,
+              orderWeight: weight,
+              variantType: color.type || "Cone",
+              orderVariantCgst: isOdisha ? (gstAmount / 2 ).toFixed(1): 0,
+              orderVariantSgst: isOdisha ? (gstAmount / 2 ).toFixed(1): 0,
+              orderVariantIgst: isOdisha ? 0 : gstAmount.toFixed(1),
+              orderVariantDiscount: breakdown.discountAmount.toFixed(1) || 0,
+              orderVariantHandlingCharges: proportionalHandlingCharge,
+              orderVariantTotalAmount: (breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(1),
+              status: "NEW",
+              statusReason: null,
+              statusRemark: null,
+            };
+          })
       );
+      
   
       const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
       const totalAmount = Number(calculateTotalAmount());
@@ -720,7 +792,7 @@ useEffect(() => {
       
       const orderData = {
         customer: formattedCustomer,
-        status: "New Order",
+        status: "NEW",
         totalAmount: toPay,
         discountId: selectedDiscountId || null,
         walletAmount: walletUsed,
@@ -734,15 +806,17 @@ useEffect(() => {
           transactionId: "TXN" + Date.now(),
           paidAmount: onlineAmt.toFixed(2),
           pendingAmount: (codAmt).toFixed(2),
-          paymentStatus: onlineAmt >= toPay ? "PAID" : "PARTIALLY PAID",
+          paymentStatus: "UNPAID",
           totalDiscount:grandTotals.totalDiscount,
-          totalSgst:grandTotals.sgst.toFixed(2),
-          totalCgst:grandTotals.cgst.toFixed(2)
-
+          totalSgst: isOdisha ? grandTotals.sgst.toFixed(2) : "0.00",
+          totalCgst: isOdisha ? grandTotals.cgst.toFixed(2) : "0.00",
+          totalIgst: isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(2)
+          
         },
         orderVariants
       };
   
+      console.log(orderData)
       const response = await createOrder(orderData);
       console.log("Order Created:", response);
   
@@ -939,6 +1013,12 @@ useEffect(() => {
   //   return Number((totalWeight * ratePerKg).toFixed(2));
 
   // };
+
+  const totalWeight = orderDetails.reduce((acc, item) => {
+    const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
+    return acc + colorWeight;
+  }, 0);
+  
   
   const grandTotals = calculateGrandTotals(
     orderDetails,
@@ -1004,8 +1084,146 @@ const sendInvoice = async(orderId) =>{
       alert("Invoice sent successfully")
 }
 
-console.log(orderDetails)
-  
+
+const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
+  const confirmed = window.confirm(`Are you sure you want to change the status to "${newStatus}"?`);
+  if (!confirmed) return;
+
+  try {
+    await updateOrderVariantStatuses(orderId, [
+      {
+        orderVariantId,
+        status: newStatus,
+        reason: "Updated by admin",
+        remark: "Changed from UI",
+      },
+    ]);
+    alert("Status updated successfully!");
+
+    setOrderDetails((prev) =>
+      prev.map((item) => ({
+        ...item,
+        colors: item.colors.map((color) =>
+          color.orderVariantId === orderVariantId
+            ? {
+                ...color,
+                status: newStatus,
+                previousStatus: newStatus === "RETURN_REQUESTED" ? color.status : undefined,
+              }
+            : color
+        ),
+        variant: {
+          ...item.variant,
+          variants: item.variant.variants.map((color) =>
+            color.orderVariantId === orderVariantId
+              ? {
+                  ...color,
+                  status: newStatus,
+                  previousStatus: newStatus === "RETURN_REQUESTED" ? color.status : undefined,
+                }
+              : color
+          ),
+        },
+      }))
+    );
+    
+    
+
+  } catch (err) {
+    alert("Failed to update status");
+    console.error(err);
+  }
+};
+
+
+const getStateFromBillingAddress = (billingAddress) => {
+  try {
+    const beforePin = billingAddress.split("PIN:")[0];
+    const parts = beforePin.split(",").map(p => p.trim()).filter(Boolean);
+    const state = parts[parts.length - 1]?.toLowerCase(); // Safely get last non-empty entry
+    return state;
+  } catch (err) {
+    console.error("Failed to parse billing address:", err);
+    return "";
+  }
+};
+
+
+const handleOrderChange = async () => {
+  const payload = [];
+
+  for (const orders of orderDetails) {
+    for (const color of orders.colors) {
+      if (color.status === "SHIPPED" || !color.weightChanged) continue; // skip unchanged or shipped
+
+      const orderWeight = parseFloat(color.weight || 0);
+      const pricePerKg = color.price || 0;
+      const baseAmount = orderWeight * pricePerKg;
+
+      // Get discount percent
+      let productDiscountPercent = 0;
+      if (selectedDiscountData?.applicableProducts?.some(p => p.id === orders.productId)) {
+        productDiscountPercent = Number(selectedDiscountValue) || 0;
+      }
+      const paymentDiscountValue = Number(discountPercentage) || 0;
+      const combinedDiscountPercent = productDiscountPercent + paymentDiscountValue - (productDiscountPercent * paymentDiscountValue) / 100;
+
+      const discount = (baseAmount * combinedDiscountPercent) / 100;
+      
+      const stateForShipping = getStateFromBillingAddress(order.shippingAddress);
+      const ratePerKg = stateForShipping === "odisha" ? 3 : 5;
+      const handling = orderWeight * ratePerKg;
+
+      const taxableAmount = baseAmount - discount + handling;
+
+      const gst = orders.product?.gstOnProduct || 0;
+      const state = getStateFromBillingAddress(order.billingAddress);
+
+      console.log(gst)
+
+      let cgst = 0, sgst = 0, igst = 0;
+
+      if (state === "odisha") {
+        cgst = (gst / 2 / 100) * taxableAmount;
+        sgst = (gst / 2 / 100) * taxableAmount;
+      } else {
+        igst = (gst / 100) * taxableAmount;
+      }
+
+      const total = taxableAmount + cgst + sgst + igst;
+
+      payload.push({
+        orderVariantId: color.orderVariantId,
+        orderWeight,
+        orderVariantCgst: Number(cgst.toFixed(2)),
+        orderVariantSgst: Number(sgst.toFixed(2)),
+        orderVariantIgst: Number(igst.toFixed(2)),
+        orderVariantDiscount: Number(discount.toFixed(2)),
+        orderVariantHandlingCharges: Number(handling.toFixed(2)),
+        orderVariantTotalAmount: Number(total.toFixed(2))
+      });
+    }
+  }
+
+  try {
+    if (payload.length === 0) {
+      alert("No changes to update.");
+      return;
+    }
+
+    console.log(payload);
+    await updateOrderVariants(order.orderId, payload);
+    alert("Order updated successfully!");
+    setWeightChanged(false); 
+  } catch (err) {
+    console.error(err);
+    alert("Failed to update order");
+  }
+};
+
+
+
+  console.log(orderDetails)  
   console.log(selectedAddress)
 
 
@@ -1076,9 +1294,13 @@ console.log(orderDetails)
                                     <th className='fw-medium'>Total</th>
                                     <th className='fw-medium'>CGST</th>
                                     <th className='fw-medium'>SGST</th>
+                                    {isViewMode && (
                                     <th  style={{ textAlign: 'center', verticalAlign: 'middle'}}   className='fw-medium'>Status</th>
-                                    <th className='fw-medium'></th> 
-
+                                    )}
+                                     {isViewMode && (
+                                    <th className='fw-medium'></th>
+                                     )} 
+                                    <th></th>
                                     {/* <th className='fw-medium' style={{textAlign:"center"}}>GST</th> */}
                                     {/* <th className='fw-medium' style={{textAlign:"end"}}>Total</th> */}
                                 </tr>
@@ -1178,15 +1400,17 @@ console.log(orderDetails)
                                                     // ) : (
                                                         // Show input field in edit mode
                                                         <input
-                                                            key={colorIndex}
-                                                            type="number"
-                                                            style={{ border: '1px solid' }}
-                                                            placeholder="Weight"
-                                                            className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
-                                                            value={colorObj.weight || ''} 
-                                                            onChange={(e) => handleWeightChange(order.productId, order.size, colorIndex, e.target.value)}
-                                                             // disabled={isViewMode}
-                                                        />
+                                                        key={colorIndex}
+                                                        type="number"
+                                                        style={{ border: '1px solid' }}
+                                                        placeholder="Weight"
+                                                        className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
+                                                        value={colorObj.weight || ''}
+                                                        onChange={(e) =>
+                                                          handleWeightChange(order.productId, order.size, colorIndex, e.target.value)
+                                                        }
+                                                        disabled={["SHIPPED", "CANCELLED", "DELIVERED", "RETURN_REQUESTED", "RETURNED", "RETURN_REJECTED"].includes(colorObj.status)}
+                                                      />
                                                     // )
                                                 ))}
                                             </div>
@@ -1194,7 +1418,7 @@ console.log(orderDetails)
 
                                           {/* Price Calculation */}
                                           <td colSpan="5">
-                                              <div className="d-flex flex-column gap-3">
+                                              <div className="">
                                               {order.colors.map((colorObj, colorIndex) => {
                                                     const { 
                                                       baseTotal,
@@ -1222,54 +1446,135 @@ console.log(orderDetails)
                                               </div>
                                           </td>
 
-                                        <td
-                                            style={{ justifyItems: 'center', alignContent:'center'}} 
-                                            onClick={(e) => e.stopPropagation()}
-                                          >
-                                            <div className='d-flex flex-column gap-3'>
-                                              {order.colors.map((colorObj, colorIndex) => (
-                                                <div key={colorIndex} className="d-flex align-items-center justify-content-between">
-                                                  <select
-                                                    className={statusClassMap[order.status] || "default-status-class"}
-                                                    value={order.status}
-                                                    onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
+                                          {isViewMode && (
+                                          <td>
+                                            <div className="d-flex flex-column gap-3">
+                                              {order.colors.map((colorObj, colorIndex) => {
+                                                const currentStatus = colorObj.status;
+                                                const currentIndex = statusFlow.indexOf(currentStatus);
+                                                const isFinalStatus = ["DELIVERED", "RETURNED", "CANCELLED"].includes(currentStatus);
+
+                                                return (
+                                                  <div
+                                                    key={colorIndex}
+                                                    className="d-flex align-items-center justify-content-center"
                                                   >
-                                                    {statusOptions.map((status) => (
-                                                      <option key={status} value={status}>
-                                                        {status}
-                                                      </option>
-                                                    ))}
-                                                  </select>
-                                                </div>
-                                              ))}
+                                                    {/*  Show plain text for RETURNED or RETURN_REJECTED */}
+                                                    {["RETURNED", "RETURN_REJECTED"].includes(currentStatus) ? (
+                                                      <span className="badge bg-warning text-uppercase">
+                                                        {currentStatus.replace("_", " ")}
+                                                      </span>
+                                                    ) : (
+                                                      <select
+                                                        value={
+                                                          currentStatus === "RETURN_REQUESTED"
+                                                            ? colorObj.previousStatus || "DELIVERED"
+                                                            : currentStatus
+                                                        }
+                                                        disabled={
+                                                          isFinalStatus || currentStatus === "RETURN_REQUESTED"
+                                                        }
+                                                        onChange={(e) => {
+                                                          const selectedStatus = e.target.value;
+                                                          const confirmChange = window.confirm(`Change status to ${selectedStatus}?`);
+                                                          if (confirmChange) {
+                                                            handleStatusChange(colorObj.orderId, colorObj.orderVariantId, selectedStatus);
+                                                          }
+                                                        }}
+                                                      >
+                                                        {statusOptions.map(({ value, label }) => {
+                                                          const optionIndex = statusFlow.indexOf(value);
+                                                          let shouldDisable = false;
+
+                                                          if (isFinalStatus) {
+                                                            shouldDisable = true;
+                                                          } else if (currentStatus === "RETURN_REQUESTED") {
+                                                            shouldDisable = true;
+                                                          } else if (currentStatus === "NEW") {
+                                                            shouldDisable = !["CONFIRMED", "CANCELLED"].includes(value);
+                                                          } else if (currentStatus === "CONFIRMED") {
+                                                            shouldDisable = optionIndex < currentIndex || value === "CANCELLED";
+                                                          } else {
+                                                            shouldDisable = value === "CANCELLED" || optionIndex < currentIndex;
+                                                          }
+
+                                                          // Never render RETURNED/RETURN_REJECTED/RETURN_REQUESTED unless actual status
+                                                          const shouldRender =
+                                                            ["RETURNED", "RETURN_REJECTED"].includes(currentStatus)
+                                                              ? value === currentStatus
+                                                              : !["RETURNED", "RETURN_REJECTED", "RETURN_REQUESTED"].includes(value);
+
+                                                          return (
+                                                            shouldRender && (
+                                                              <option key={value} value={value} disabled={shouldDisable}>
+                                                                {label}
+                                                              </option>
+                                                            )
+                                                          );
+                                                        })}
+                                                      </select>
+                                                    )}
+                                                  </div>
+                                                );
+                                              })}
                                             </div>
-                                        </td>
+                                          </td>
+                                        )}
 
 
-                                <td style={{ justifyItems: 'center', alignContent:'center'}} >
-                                      <div className='d-flex flex-column gap-3'>
-                                        {order.colors.map((colorObj, colorIndex) => (
-                                          <div key={colorIndex} className="d-flex align-items-center justify-content-between">
-                                            {/* You can display color info here if needed */}
-                                            {/* {order.hasReturnRequest && ( */}
-                                              <button
-                                                className="alert-icon-btn"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="Return requested for this order"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                }}
-                                              >
-                                                <div className="alert-icon-circle">
-                                                  <FiAlertCircle size={16} color="red" />
+
+
+
+                                    {isViewMode && (
+                                      <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+                                        <div className='d-flex flex-column gap-3'>
+                                          {order.colors.map((colorObj, colorIndex) => (
+                                            <div key={colorIndex} className="d-flex align-items-center justify-content-between position-relative">
+                                              {colorObj.status === "RETURN_REQUESTED" && (
+                                                <div className="position-relative">
+                                                  <button
+                                                    className="alert-icon-btn"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Return requested for this variant"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      const key = colorObj.orderVariantId;
+                                                      setOpenDropdown(openDropdown === key ? null : key);
+                                                    }}
+                                                    
+                                                  >
+                                                    <div className="alert-icon-circle">
+                                                      <FiAlertCircle size={16} color="red" />
+                                                    </div>
+                                                  </button>
+
+                                                  {openDropdown === colorObj.orderVariantId && (
+                                                    <div className="position-absolute bg-white border rounded p-2 shadow-sm" style={{ zIndex: 10 }}>
+                                                      <button
+                                                        className="btn btn-sm btn-outline-success mb-1 w-100"
+                                                        onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURNED")}
+                                                      >
+                                                        Mark as Returned
+                                                      </button>
+                                                      <button
+                                                        className="btn btn-sm btn-outline-danger w-100"
+                                                        onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURN_REJECTED")}
+                                                      >
+                                                        Reject Return
+                                                      </button>
+                                                    </div>
+                                                  )}
+
                                                 </div>
-                                              </button>
-                                            {/* )} */}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </td>
+                                              )}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </td>
+                                    )}
+
+
 
                                           <div className='d-flex flex-column gap-3'>
                                           {order.colors.map((colorObj, colorIndex) => (
@@ -1432,6 +1737,15 @@ console.log(orderDetails)
                         </div>
                       </div>
 
+
+                        {isViewMode && (
+                            <div className="flex-grow-1">
+                            <h4>Billing Address</h4>
+                              <p className="text-gray-600 whitespace-pre-line">{order.shippingAddress}</p>
+                          </div>
+                        )}
+                    
+
                       {/* Shipping Address */}
                       <div className="flex-grow-1">
                         <h4>Shipping Address</h4>
@@ -1454,15 +1768,15 @@ console.log(orderDetails)
         <div className="row mb-3 g-3">
           <div className="col-12 col-md-6">
             <div className="ctn bg-white rounded p-3">
-              <h5>Discounts</h5>
+              <h5 style={{fontSize:'1rem'}}>Discounts</h5>
 
               {isViewMode === true ? (
                 <div>
-                  <h4>
+                  <p>
                     {selectedDiscount
                       ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
                       : "Select Discount"}
-                  </h4>
+                  </p>
                 </div>
               ) : (
                 <Dropdown
@@ -1503,11 +1817,11 @@ console.log(orderDetails)
 
               <div className="col-12 col-md-6">
                 <div className="ctn bg-white rounded p-3">
-                  <h5>Payment Type</h5>
+                  <h5 style={{fontSize:'1rem'}}>Payment Type</h5>
 
                   {isViewMode === true ? (
                     <div>
-                      <h4>{paymentDescriptions[selectedPayment]}</h4>
+                      <p>{paymentDescriptions[selectedPayment]}</p>
                     </div>
                   ) : (
                     <Dropdown
@@ -1821,21 +2135,20 @@ console.log(orderDetails)
                     </ReactWhatsapp> */}
 
 
-                    {orderDetails.length > 0 &&(
-                        
-
-                        <div className='d-flex justify-content-end w-100'>
-                            { isViewMode === true ? (
-                                <Button className='btn-sm' onClick={()=>sendInvoice(order.orderId)}>Send Invoice</Button>
-     
-                            ):
-                            (
-                                <Button className='btn-sm' onClick={handleCreateOrder}>Create Order</Button>
-                            )
-                            }
-                       
-                        </div>
+                    {orderDetails.length > 0 && (
+                      <div className='d-flex justify-content-end w-100'>
+                        {isViewMode ? (
+                          weightChanged ? (
+                            <Button className='btn-sm' onClick={handleOrderChange}>Save Changes</Button>
+                          ) : (
+                            <Button className='btn-sm' onClick={() => sendInvoice(order.orderId)}>Send Invoice</Button>
+                          )
+                        ) : (
+                          <Button className='btn-sm' onClick={handleCreateOrder}>Create Order</Button>
+                        )}
+                      </div>
                     )}
+
                    
 
                 </div>
