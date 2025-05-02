@@ -250,18 +250,18 @@ const Orders = () => {
                 {/* <StatusFilter status={"Active"}></StatusFilter> */}
                 <OrderFilter status={"All"}></OrderFilter>
         </div>
-
+{/* 
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" >
-            <Tab className="text-capitalize" label="Order Dashboard" />
+        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" > */}
+            {/* <Tab className="text-capitalize" label="Order Dashboard" /> */}
             {/* <Tab className="text-capitalize" label="Bulk Assign" />
             <Tab className="text-capitalize" label="Order Cart" /> */}
-            </Tabs>
-        </Box>
+            {/* </Tabs> */}
+        {/* </Box> */}
 
         {/* Tab Panels */}
         <TabPanel value={value} index={0}>
-            <div className="order-table-ctn">
+            <div className="order-table-ctn mt-4">
             <OrderTable ref={orderTableRef} data={filteredData}/>
             </div>
         </TabPanel>

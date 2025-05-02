@@ -6,6 +6,8 @@ import StatusFilter from '../../../../components/Filter/DayFilter/StatusFilter/S
 import { useVendorOrderContext } from '../../../../components/Context/VendorOrderContext'
 import { LuFileDown } from "react-icons/lu";
 import { Table } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
+import AddBtn from '../../../../components/Buttons/Add/AddBtn'
 import "./VendorOrder.css"
 import { useNavigate } from 'react-router-dom'
 
@@ -52,6 +54,12 @@ const VendorOrder = () => {
                 <ExportBtn></ExportBtn>
 
                 <ImportBtn></ImportBtn>
+
+                <Link to={'/BulkAssignPage'}>
+                                    <AddBtn
+                                        text={"Order to vendor"}
+                                    ></AddBtn>
+                                </Link>
 
                
             </div>

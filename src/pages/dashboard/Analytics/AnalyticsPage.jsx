@@ -265,7 +265,7 @@ const AnalyticsPage = () => {
 
         <div >
     
-      <div className="row">
+      <div className="row g-3 mt-2">
         {/* <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
           <GraphComponent type="line" data={lineChartData} options={chartOptions} />
         </div>

@@ -1,0 +1,41 @@
+.online-store-card {
+    background-color: #ffffffde;
+    width: 100%;
+    max-width: 500px;
+    border: thin solid #e3e3e3;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  
+  .online-store-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .online-store-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .online-store-graph {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    min-height: 250px;
+    max-height: 300px;
+  }
+  
+  @media (max-width: 768px) {
+    .online-store-card {
+      max-width: 100%;
+    }
+  
+    /* .online-store-graph {
+      height: 30vh;
+      min-height: 200px;
+    } */
+  }
+  

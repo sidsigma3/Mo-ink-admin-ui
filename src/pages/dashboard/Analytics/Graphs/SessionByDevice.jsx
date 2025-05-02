@@ -1,6 +1,7 @@
 import React from "react";
 import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
 import { useNavigate } from "react-router-dom";
+import "./SessionByDevice.css";
 
 const SessionByDevice = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const SessionByDevice = () => {
 
   const chartOptions = {
     responsive: true,
-    cutout:80,
+    cutout: 80,
     maintainAspectRatio: false,
     plugins: {
       legend: { position: "bottom" },
@@ -84,14 +85,17 @@ const SessionByDevice = () => {
   ];
 
   return (
-    <div style={{ cursor: "pointer" }} onClick={handleClick}>
-      <GraphComponent
-        type="doughnut"
-        data={doughnutChartData}
-        options={chartOptions}
-        plugins={[centerTextPlugin]} // Pass the plugin here
-        text={"Session by device type"}
-      />
+    <div className="session-device-card  p-3" onClick={handleClick}>
+      <h4>Session by Device Type</h4>
+      <div className="session-device-graph">
+        <GraphComponent
+          type="doughnut"
+          data={doughnutChartData}
+          options={chartOptions}
+          plugins={[centerTextPlugin]} // Pass the plugin here
+          text={"Session by device type"}
+        />
+      </div>
     </div>
   );
 };
