@@ -245,7 +245,7 @@ const handleFilterChange = (filter, value) => {
                   <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.addresses[0]?.city || ""}</td>
                   <td  className="wallet-balance-cell" style={{ color: "#3CAA82", textAlign: 'center', verticalAlign: 'middle' }}>
 
-                    {walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "Loading..."}
+                    {walletBalances[customer.customerId] !== undefined ? (walletBalances[customer.customerId]).toFixed(0) : "Loading..."}
                   </td>
                   <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{totalOrders}</td>
                   <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{lastOrderDate}</td>

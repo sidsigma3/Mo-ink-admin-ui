@@ -293,23 +293,24 @@ const handleRowClick = (order) => {
                 </button>
               </td>
 
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
-  {/* {order.hasReturnRequest && ( */}
-  <button
-      className="alert-icon-btn"
-      data-bs-toggle="tooltip"
-      data-bs-placement="top"
-      title="Return requested for this order"
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
-      <div className="alert-icon-circle">
-        <FiAlertCircle size={16} color="red" />
-      </div>
-    </button>
-  {/* )} */}
-</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                {order.orderVariantResponse?.some(variant => variant.status === 'RETURN_REQUESTED') && (
+                  <button
+                    className="alert-icon-btn"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Return requested for this order"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevents row click
+                    }}
+                  >
+                    <div className="alert-icon-circle">
+                      <FiAlertCircle size={16} color="red" />
+                    </div>
+                  </button>
+                )}
+              </td>
+
 
             </tr>
           ))}
