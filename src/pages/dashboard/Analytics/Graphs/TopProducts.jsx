@@ -1,85 +1,84 @@
-import React from 'react'
-import GraphComponent from '../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
+import "./TopProducts.css";
 
 const TopProducts = () => {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate()
+  const horizontalBarChartData = {
+    labels: ["Cotton Yarn", "Linen Yarn", "Viscose Yarn", "Nylon Yarn", "Silk Yarn"],
+    datasets: [
+      {
+        label: "Sales",
+        data: [9000, 7000, 6000, 5500, 3000],
+        barThickness: 25,
+        borderRadius: 7,
+        backgroundColor: ["#0561FC"],
+      },
+    ],
+  };
 
-    const horizontalBarChartData = {
-        labels: ["Cotton Yarn", "Linen Yarn", "Viscose Yarn","Nylon Yarn","Silk Yarn"],
-        datasets: [
-          {
-            label: "Sales",
-            data: [9000, 7000, 6000,5500,3000],
-            barThickness: 25,
-            borderRadius:7,
-            backgroundColor: [
-              "#0561FC",
-            ],
-          
-          },
-        ],
-      };
-      
-      const horizontalBarChartOptions = {
-        responsive: true,
-        maintainAspectRatio:false,
-        indexAxis: "y",  // Make the bar chart horizontal
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: false,
-            text: "Top Products",
-          },
-        },
-        scales: {
-          x: {
-            grid:{display:false},
-            beginAtZero: true, // Start the x-axis at 0
-          },
-          y: {
-            grid:{display:false},
-            beginAtZero: true, // Start the y-axis at 0
-          },
-        },
-      };
+  const horizontalBarChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: "y",
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        grid: { display: false },
+      },
+      y: {
+        beginAtZero: true,
+        grid: { display: false },
+      },
+    },
+  };
 
-   
+  const tableHeaders = ["Product", "Sales"];
+  const tableRows = [
+    ["Cotton Yarn", 9000],
+    ["Linen Yarn", 7000],
+    ["Viscose Yarn", 6000],
+    ["Nylon Yarn", 5500],
+    ["Silk Yarn", 3000],
+  ];
 
-    
-    const handleClick = () => {
-        navigate("/graph-details", {
-            state: {
-            type: "bar",
-            data: horizontalBarChartData,
-            options: horizontalBarChartOptions,
-            tableHeaders,
-            tableRows,
-            text:'Top Products'
-            },
-        });
-    };
-
-
-    const tableHeaders = ["Month", "Orders"];
-    const tableRows = [
-      ["cotton Yarn", 30],
-      ["Linen Yarn", 50],
-      ["Viscose Yarn", 40],
-      ["Nylon Yarn", 70],
-      ["Silk Yarn", 60],
-    ];
-
-
+  const handleClick = () => {
+    navigate("/graph-details", {
+      state: {
+        type: "bar",
+        data: horizontalBarChartData,
+        options: horizontalBarChartOptions,
+        tableHeaders,
+        tableRows,
+        text: "Top Products",
+      },
+    });
+  };
 
   return (
-    <div style={{ cursor: "pointer" }} onClick={handleClick}>
-      <GraphComponent type="bar" data={horizontalBarChartData} options={horizontalBarChartOptions} text={"Top Products"} number={""}/>
+    <div className="top-products-card p-3" onClick={handleClick}>
+      <h4>Top Products</h4>
+      <h3>Cotton Yarn</h3>
+      <div className="top-products-graph">
+        <GraphComponent
+          type="bar"
+          data={horizontalBarChartData}
+          options={horizontalBarChartOptions}
+          text={"Top Products"}
+        />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default TopProducts
+export default TopProducts;
