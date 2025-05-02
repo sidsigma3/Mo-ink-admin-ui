@@ -18,7 +18,7 @@ import { addCustomer,updateCustomer , deleteCustomer , addMoneyToWallet ,subtrac
 import { getAllSegment } from '../../../services/SegmentService';
 import StatusInput from '../../../components/StatusInput/StatusInput';
 import { FiDownload } from "react-icons/fi";
-
+import { downloadCreditReceipt } from '../../../services/InvoiceServices';
 
 const AddCustomerPage = () => {
 
@@ -351,6 +351,30 @@ const handleAddressTypeChange = (e) => {
     }
   };
 
+  const handleDownloadCreditReceipt = async (source) => {
+    const isCancellation = source.toLowerCase().includes("cancellation");
+    const isReturn = source.toLowerCase().includes("return");
+  
+    // Extract order ID (last number in the string)
+    const match = source.match(/order:\s*(\d+)/i);
+    const orderId = match ? match[1] : null;
+  
+    if (!orderId || (!isCancellation && !isReturn)) {
+      console.error("Invalid source format:", source);
+      return;
+    }
+  
+    const type = isCancellation ? "CANCELLED" : "RETURNED";
+  
+    console.log(type,orderId)
+    try {
+      await downloadCreditReceipt(orderId, type);
+    } catch (error) {
+      console.error("Failed to download credit receipt:", error);
+    }
+  };
+  
+
 
 
   const handleDelete = async() =>{
@@ -571,19 +595,19 @@ const handleAddressTypeChange = (e) => {
                           >
                             {item.type}
                           </td>
-                          <td className=" text-center">₹{item.amount.toFixed(2)}</td>
+                          <td className=" text-center">₹{item.amount.toFixed(0)}</td>
                           <td className=" text-center">{new Date(item.createdAt).toLocaleDateString()}</td>
                           <td className=" text-center pr-4">
                    <button
                   className="border-0 btn p-0"
-                    // onClick={(e) => {
-                    //   e.stopPropagation(); // Prevents triggering row click
-                    //   handleDownloadInvoice(order.orderId);
-                    // }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownloadCreditReceipt(item.source);
+                  }}
                   >
                    <FiDownload size={20}/>
                   </button>
-</td>
+                  </td>
                         </tr>
                       ))}
                     </tbody>
@@ -643,7 +667,7 @@ const handleAddressTypeChange = (e) => {
                   <div>
                       <h5 style={{fontSize:'1.1rem'}}>Wallet Balance</h5>
                       <h5 className={`fs-4 mt-3 ${walletBalance > 0 ? 'text-primary' : 'text-secondary'}`}>
-                          ₹{walletBalance || 0}
+                          ₹{walletBalance?.toFixed(0) || 0}
                       </h5>
                   </div>
               </div>
