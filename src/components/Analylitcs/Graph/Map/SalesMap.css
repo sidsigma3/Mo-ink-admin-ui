@@ -2,8 +2,8 @@
   background-color: #fff;
   border-radius: 10px;
   border: thin solid #e3e3e3;
-  min-height: 398px;
-  max-height: 350px;
+  max-width: 350px;
+  max-height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

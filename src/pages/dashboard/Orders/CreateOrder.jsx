@@ -1098,6 +1098,7 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
         remark: "Changed from UI",
       },
     ]);
+
    
     setOrderDetails((prev) =>
       prev.map((item) => ({
@@ -1475,7 +1476,9 @@ const handleOrderChange = async () => {
                                                         }
                                                         onChange={(e) => {
                                                           const selectedStatus = e.target.value;
+
                                                             handleStatusChange(colorObj.orderId, colorObj.orderVariantId, selectedStatus);
+
                                                         }}
                                                       >
                                                         {statusOptions.map(({ value, label }) => {
@@ -1551,13 +1554,17 @@ const handleOrderChange = async () => {
                                                         className="btn btn-sm btn-outline-success mb-1 w-100"
                                                         onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURNED")}
                                                       >
+
                                                         Return Approve
+
                                                       </button>
                                                       <button
                                                         className="btn btn-sm btn-outline-danger w-100"
                                                         onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURN_REJECTED")}
                                                       >
+
                                                         Return Reject 
+
                                                       </button>
                                                     </div>
                                                   )}
