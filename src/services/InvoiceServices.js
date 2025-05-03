@@ -53,3 +53,43 @@ export const emailInvoice = async (orderId) => {
     };
   }
 };
+
+
+export const emailCreditReceipt = async (orderId, type) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/credit-receipt/email/${orderId}/${type}`);
+    return { success: true, message: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data || "Failed to email credit receipt.",
+    };
+  }
+};
+
+
+export const downloadCreditReceipt = async (orderId, type) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/credit-receipt/download/${orderId}/${type}`, {
+      responseType: 'blob',
+    });
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `credit_receipt_${orderId}_${type}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data || "Failed to download credit receipt.",
+    };
+  }
+};

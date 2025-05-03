@@ -1098,8 +1098,8 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
         remark: "Changed from UI",
       },
     ]);
-    alert("Status updated successfully!");
 
+   
     setOrderDetails((prev) =>
       prev.map((item) => ({
         ...item,
@@ -1476,10 +1476,9 @@ const handleOrderChange = async () => {
                                                         }
                                                         onChange={(e) => {
                                                           const selectedStatus = e.target.value;
-                                                          const confirmChange = window.confirm(`Change status to ${selectedStatus}?`);
-                                                          if (confirmChange) {
+
                                                             handleStatusChange(colorObj.orderId, colorObj.orderVariantId, selectedStatus);
-                                                          }
+
                                                         }}
                                                       >
                                                         {statusOptions.map(({ value, label }) => {
@@ -1555,13 +1554,17 @@ const handleOrderChange = async () => {
                                                         className="btn btn-sm btn-outline-success mb-1 w-100"
                                                         onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURNED")}
                                                       >
-                                                        Mark as Returned
+
+                                                        Return Approve
+
                                                       </button>
                                                       <button
                                                         className="btn btn-sm btn-outline-danger w-100"
                                                         onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURN_REJECTED")}
                                                       >
-                                                        Reject Return
+
+                                                        Return Reject 
+
                                                       </button>
                                                     </div>
                                                   )}
@@ -1904,78 +1907,6 @@ const handleOrderChange = async () => {
                     <h4>Payment</h4>
 
                     <div  className='container border p-3 rounded mb-3' >
-                    {/* <table className="table">
-                    <tbody>
-                      
-                        <tr>
-                            <td>Subtotal</td>
-                            <td>{orderDetails.reduce((acc, item) => acc + (item.colors.length || 0), 0)} items</td>
-                            <td>₹{calculateGrandTotal(orderDetails).toFixed(2)}</td>
-                        </tr>
-
-                      
-                        <tr>
-                            <td>Wallet Balance</td>
-                            <td>₹{walletBalances.toFixed(2)}</td>
-                            <td>
-                                <input 
-                                    className="rounded border w-50 border-secondary-subtle mb-2 p-1"
-                                    type="number"
-                                    placeholder="Enter amount"
-                                    value={walletDeduction}
-                                    onChange={(e) => handleWalletDeductionChange(e.target.value)}
-                                    min="0"
-                                    max={walletBalances}
-                                />
-                            </td>
-                        </tr>
-
-                      
-                        <tr>
-                            <td>Discount</td>
-                            <td >
-                                {selectedDiscount && discountData.length > 0 ? (
-                                    discountData.map((discount) =>
-                                        discount.discountCode === selectedDiscount ? (
-                                            discount.discountType === "Percentage"
-                                                ? `${discount.discountValue}%`
-                                                : `₹${discount.discountValue.toFixed(2)}`
-                                        ) : null
-                                    )
-                                ) : (
-                                    "--"
-                                )}
-                            </td>
-                            <td>
-                                {selectedDiscount && discountData.length > 0 ? (
-                                    discountData.map((discount) =>
-                                        discount.discountCode === selectedDiscount ? (
-                                            discount.discountType === "Percentage"
-                                                ? `₹${((calculateGrandTotal(orderDetails) * discount.discountValue) / 100).toFixed(2)}`
-                                                : `₹${discount.discountValue.toFixed(2)}`
-                                        ) : null
-                                    )
-                                ) : (
-                                    "₹0.00"
-                                )}
-                            </td>
-                        </tr>
-
-                      
-                        <tr>
-                            <td>Shipping Charge</td>
-                            <td>5%</td>
-                            <td>₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td>
-                        </tr>
-
-                       
-                        <tr>
-                            <td><strong>Total</strong></td>
-                            <td></td>
-                            <td colSpan="2"><strong>₹{calculateTotalAmount()}</strong></td>
-                        </tr>
-                    </tbody>
-                </table> */}
 
                 <table className="w-100 rounded mt-2 font-semibold">
                   <tbody>

@@ -104,4 +104,6 @@ const TopSellingColor = () => {
   );
 };
 
+
 export default TopSellingColor;
+

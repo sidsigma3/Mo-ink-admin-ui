@@ -1,8 +1,10 @@
 .session-device-card {
     background-color: #ffffffde;
     width: 100%;
+
     max-height: 348px;
     max-width: 360px;     
+
     border: thin solid #e3e3e3;
     border-radius: 10px;
     transition: all 0.3s ease;
