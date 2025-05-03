@@ -104,7 +104,7 @@ const TopSalesExecutiveChart = () => {
   }, [chartData, chartOptions]);
 
   return (
-    <div style={{ width: "100%", height: "300px" }}>
+    <div style={{ width: "100%", height: "250px" }}>
       <canvas ref={chartRef}></canvas>
     </div>
   );

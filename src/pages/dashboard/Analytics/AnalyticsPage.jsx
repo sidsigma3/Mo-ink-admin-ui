@@ -289,47 +289,47 @@ const AnalyticsPage = () => {
           <GraphComponent type="bar" data={chartDataTopColor} options={chartOptionsTopColor} />
         </div> */}
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
           <TotalSales/>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
           <TotalOrders></TotalOrders>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
            <AvgOrder></AvgOrder>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
            <TopProducts></TopProducts>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
            <TopSellingCounter></TopSellingCounter>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
            <TopSellingColor></TopSellingColor>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
            <OnlineStoreConversionRate></OnlineStoreConversionRate>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
           <OnlineStoreSession></OnlineStoreSession>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
            <SessionByDevice></SessionByDevice>
         </div>
 
-        <div className='col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3'>
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
             <SalesMap></SalesMap>
         </div>
 
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
           <TopCustomers></TopCustomers>
         </div>
 

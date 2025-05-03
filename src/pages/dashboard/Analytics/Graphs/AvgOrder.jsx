@@ -1,16 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
+import './AvgOrder.css';
 
 const AvgOrder = () => {
   const navigate = useNavigate();
-
-  const createGradient = (ctx, chartArea) => {
-    const gradient = ctx.createLinearGradient(0, 0, 0, chartArea.bottom);
-    gradient.addColorStop(0, "rgba(5, 97, 252, 0.8)");
-    gradient.addColorStop(1, "rgba(5, 97, 252, 0)");
-    return gradient;
-  };
 
   const lineChartData = {
     labels: ["January", "February", "March", "April", "May"],
@@ -19,7 +13,7 @@ const AvgOrder = () => {
         label: "Avg Order",
         data: [30000, 50000, 40000, 70000, 60000],
         borderColor: "#0561FC",
-        backgroundColor: "rgba(5, 97, 252, 0.2)", // Simplified background
+        backgroundColor: "rgba(5, 97, 252, 0.2)",
         fill: true,
         tension: 0.4,
       },
@@ -35,11 +29,10 @@ const AvgOrder = () => {
     },
     plugins: {
       legend: { display: false },
-      title: { display: false, text: "Avg Order Value" },
+      title: { display: false },
     },
   };
 
-  // Table data
   const tableHeaders = ["Month", "Sales"];
   const tableRows = [
     ["January", 30],
@@ -57,14 +50,24 @@ const AvgOrder = () => {
         options: chartOptions,
         tableHeaders,
         tableRows,
-        text:'Avg Order Value'
+        text: "Avg Order Value",
       },
     });
   };
 
   return (
-    <div style={{ cursor: "pointer", width: "300px", height: "300px"}} onClick={handleClick}>
-      <GraphComponent type="line" data={lineChartData} options={chartOptions} text={"Average Order Value"} number={"₹51,580"}/>
+    <div className="avg-order-card " onClick={handleClick}>
+      <h4>Average Order Value</h4>
+      <h3>₹16,213.00</h3>
+      <div className="avg-order-graph">
+        <GraphComponent
+          type="line"
+          data={lineChartData}
+          options={chartOptions}
+          text="Average Order Value"
+          number="₹51,580"
+        />
+      </div>
     </div>
   );
 };
