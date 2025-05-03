@@ -74,4 +74,6 @@ const TopSellingCounter = () => {
   );
 };
 
+
 export default TopSellingCounter;
+

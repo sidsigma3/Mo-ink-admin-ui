@@ -76,4 +76,6 @@ const TotalOrders = () => {
   );
 };
 
+
 export default TotalOrders;
+

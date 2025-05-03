@@ -1,8 +1,10 @@
 .online-store-card {
     background-color: #ffffffde;
     width: 100%;
-    max-width: 350px;
-    max-height: 400px;    
+
+    max-height: 348px;
+    max-width: 360px;     
+
     border: thin solid #e3e3e3;
     border-radius: 10px;
     transition: all 0.3s ease;

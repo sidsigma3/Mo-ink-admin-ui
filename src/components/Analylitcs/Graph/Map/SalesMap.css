@@ -1,77 +1,80 @@
 .sales-map {
-  background-color: #fff;
-  border-radius: 10px;
-  border: thin solid #e3e3e3;
-  max-width: 350px;
-  max-height: 400px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: default;
-  transition: box-shadow 0.3s ease;
-}
 
-.sales-map:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.map-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.sales-map h4 {
-  font-size: 1rem !important;
-  color: #333;
-}
-
-.sales-map h3 {
-  font-size: 1.3rem ;
-  font-weight: 600;
-  color: #0561FC;
-}
-
-.map-container {
-  flex-grow: 1;
-  height: 100%;
-  min-height: 200px;
-}
-
-  .sales-map svg {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100%;
+    background-color: #fff;
+    border-radius: 10px;
+    border: thin solid #e3e3e3;
+    max-height: 348px;
+    max-width: 360px;  
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: default;
+    transition: box-shadow 0.3s ease;
   }
   
-  .sales-map svg g {
-    width: 100%;
+  .sales-map:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   }
   
-  /* Responsive behavior */
-  @media (max-width: 768px) {
-    .sales-map h4 {
-      font-size: 1rem;
-    }
-  
-    .sales-map h3 {
-      font-size: 1.3rem;
-    }
+  .map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
   }
   
-  @media (max-width: 480px) {
-    .sales-map {
-      padding: 1rem;
-      border-radius: 8px;
-    }
-  
-    .sales-map h4 {
-      font-size: 1rem;
-    }
-  
-    .sales-map h3 {
-      font-size: 1.3rem;
-    }
+  .sales-map h4 {
+    font-size: 1rem !important;
+    color: #333;
   }
   
+  .sales-map h3 {
+    font-size: 1.3rem ;
+    font-weight: 600;
+    color: #0561FC;
+  }
+  
+  .map-container {
+    flex-grow: 1;
+    height: 100%;
+    min-height: 200px;
+  }
+  
+    .sales-map svg {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100%;
+    }
+    
+    .sales-map svg g {
+      width: 100%;
+    }
+    
+    /* Responsive behavior */
+    @media (max-width: 768px) {
+      .sales-map h4 {
+        font-size: 1rem;
+      }
+    
+      .sales-map h3 {
+        font-size: 1.3rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .sales-map {
+        padding: 1rem;
+        border-radius: 8px;
+      }
+    
+      .sales-map h4 {
+        font-size: 1rem;
+      }
+    
+      .sales-map h3 {
+        font-size: 1.3rem;
+      }
+    }
+    
+
+ 
