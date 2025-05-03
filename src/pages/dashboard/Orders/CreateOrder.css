@@ -1,6 +1,19 @@
 .create-order .main-sec .payment h4{
     font-size: 1rem;
 }
+.create-order .order-detail{
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.create-order .selected-customer {
+    font-size: 1rem;
+    /* font-weight: 500; */
+}
+
+
+
+
 .create-order .main-sec .payment h5{
     font-size: 0.9rem;
 }
@@ -11,6 +24,7 @@
 
 .create-order .main-sec .order-detail .head h4{
     font-size: 1rem;
+
 }
 
 
@@ -60,7 +74,7 @@
     justify-content: center;
 }
 
-.create-order .top .green{
+.create-order.green{
     background-color: #D1FAE5;
     border: 1px solid #6EE7B7;
     color: #41b788;
@@ -68,7 +82,7 @@
     width: 6rem;
 }
 
-.create-order .top .grey{
+.create-order .grey{
     background-color: #F3F4F6;
     border: 1px solid #D1D5DB;
     color: rgb(63, 60, 60);
@@ -76,7 +90,15 @@
     width: 6rem;
 }
 
-.create-order .top .blue{
+.create-order .disabled{
+    background-color: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    color: rgb(63, 60, 60);
+    border-radius: 0.3rem;
+    width: 6rem;
+}
+
+.create-order .blue{
     background-color: #DBEAFE;
     border: 1px solid #5d91cb;
     color: #5c9de8;
@@ -84,16 +106,17 @@
     width: 6rem;
 }
 
-.create-order .top .yellow{
+.create-order .yellow{
     background-color: #FEF3C7;
     border: 1px solid #FCD34D;
     color: #8e741d;
     border-radius: 0.3rem;
     width: 6rem;
+    text-align: center;
 }
 
 
-.create-order .top .red{
+.create-order .red{
     background-color: #FEE2E2;
     border: 1px solid #FCA5A5;
     color: #be5757;
@@ -113,6 +136,8 @@
     font-weight: 500;
 
 }
+
+
 
 
 @media (max-width: 1024px) {

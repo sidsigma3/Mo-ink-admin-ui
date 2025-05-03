@@ -31,6 +31,7 @@ import { emailInvoice } from '../../../services/InvoiceServices';
 
 
 
+
 // Optional: style mapping
 export const statusClassMap = {
   NEW: "text-primary",
@@ -1284,16 +1285,16 @@ const handleOrderChange = async () => {
                             <thead>
                                 <tr>
                                     <th className='fw-medium'>Product</th>
-                                    <th className='fw-medium'>Counter</th>
-                                    <th className='fw-medium'>Color</th>
-                                    <th className='fw-medium'>Name</th>
-                                    <th className='fw-medium'>Type</th>
-                                    <th className='fw-medium'>Weight (Kgs)</th>
-                                    <th className='fw-medium'>Cost</th>
-                                    <th className='fw-medium'>Discount</th>
-                                    <th className='fw-medium'>Total</th>
-                                    <th className='fw-medium'>CGST</th>
-                                    <th className='fw-medium'>SGST</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Counter</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Color</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Name</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Type</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Weight (Kgs)</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Cost</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Discount</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Total</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>CGST</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>SGST</th>
                                     {isViewMode && (
                                     <th  style={{ textAlign: 'center', verticalAlign: 'middle'}}   className='fw-medium'>Status</th>
                                     )}
@@ -1319,10 +1320,11 @@ const handleOrderChange = async () => {
                                           <td>{order.productName}</td>
 
                                           {/* Size */}
-                                          <td>
+                                          <td style={{ textAlign: 'center'}}>
                                               <div className="badge fw-normal" style={{
                                                   width: '70%',
-                                                  padding: '0.3rem 0.6rem',
+                                                  fontSize: '1rem',
+                                                  padding: '0.5rem 0.6rem',
                                                   borderRadius: '1rem',
                                                   backgroundColor: '#EFEFEF',
                                                   border: '1px solid #B9C0CD',
@@ -1334,7 +1336,7 @@ const handleOrderChange = async () => {
                                           </td>
 
                                           {/* Colors Column */}
-                                          <td>
+                                          <td  style={{ justifyItems: 'center'}}>
                                               <div className="d-flex flex-column gap-1">
                                                   {order.colors.map((colorObj, colorIndex) => (
                                                       <div
@@ -1352,7 +1354,7 @@ const handleOrderChange = async () => {
                                               </div>
                                           </td>
 
-                                          <td>
+                                          <td style={{ textAlign: 'center'}}>
                                               <div className="d-flex flex-column gap-3">
                                                   {order.colors.map((colorObj, colorIndex) => (
                                                       <div
@@ -1362,12 +1364,12 @@ const handleOrderChange = async () => {
                                               </div>
                                           </td>
 
-                                          <td>
-                                          <div className="d-flex flex-column gap-2">
+                                          <td  style={{ justifyItems: 'center'}}>
+                                          <div className="d-flex flex-column gap-3">
                                               {order.colors.map((colorObj, colorIndex) => (
                                                  isViewMode ? (
                                                   // Show plain text in view mode
-                                                  <span key={colorIndex} className="mb-1 p-1 w-75">
+                                                  <span key={colorIndex} className=" w-75">
                                                       {colorObj.type || 'N/A'}
                                                   </span>
                                                  ):(
@@ -1390,8 +1392,8 @@ const handleOrderChange = async () => {
 
                                           {/* Weight Inputs Column */}
                                           <td style={{ width: '8rem' }}>
-                                            <div className="d-flex flex-column">
-                                                {order.colors.map((colorObj, colorIndex) => (
+                                          <div className="d-flex flex-column align-items-center">
+                                          {order.colors.map((colorObj, colorIndex) => (
                                                     // isViewMode ? (
                                                     //     // Show plain text in view mode
                                                     //     <span key={colorIndex} className="mb-1 p-1 w-75">
@@ -1404,7 +1406,7 @@ const handleOrderChange = async () => {
                                                         type="number"
                                                         style={{ border: '1px solid' }}
                                                         placeholder="Weight"
-                                                        className="rounded border-secondary-subtle mb-1 p-1 weight-input w-75"
+                                                        className="rounded border-secondary-subtle weight-input ps-2 mb-3 w-75"
                                                         value={colorObj.weight || ''}
                                                         onChange={(e) =>
                                                           handleWeightChange(order.productId, order.size, colorIndex, e.target.value)
@@ -1417,7 +1419,7 @@ const handleOrderChange = async () => {
                                         </td>
 
                                           {/* Price Calculation */}
-                                          <td colSpan="5">
+                                          <td style={{ textAlign: 'center'}} colSpan="5">
                                               <div className="">
                                               {order.colors.map((colorObj, colorIndex) => {
                                                     const { 
@@ -1430,7 +1432,7 @@ const handleOrderChange = async () => {
                                                      } = calculatePriceBreakdown(order, colorObj ,selectedDiscountValue, discountPercentage , selectedDiscountData);
 
                                                     return (
-                                                        <div key={colorIndex} className="d-flex justify-content-between">
+                                                        <div key={colorIndex} className="d-flex justify-content-between mb-3">
                                                             <span>₹{baseTotal.toFixed(2)}</span>
                                                             {/* <span>₹{gstAmount.toFixed(2)} ({gstRate}%)</span> */}
                                                             <span>
@@ -1461,7 +1463,7 @@ const handleOrderChange = async () => {
                                                   >
                                                     {/*  Show plain text for RETURNED or RETURN_REJECTED */}
                                                     {["RETURNED", "RETURN_REJECTED"].includes(currentStatus) ? (
-                                                      <span className="badge bg-warning text-uppercase">
+                                                      <span className="yellow text-capitalize">
                                                         {currentStatus.replace("_", " ")}
                                                       </span>
                                                     ) : (
@@ -1912,7 +1914,7 @@ const handleOrderChange = async () => {
                   <tbody>
                    
                     <tr>
-                      <td>Total Cost</td>
+                      <td className=" fw-medium ">Total Cost</td>
                       <td>{orderDetails.reduce((acc, item) => acc + (item.colors.length || 0), 0)} items</td>
                       <td style={{ textAlign: "end" }}>₹{calculateGrandTotal(orderDetails).toFixed(0)}</td>
                     </tr>
@@ -1921,9 +1923,9 @@ const handleOrderChange = async () => {
                     <tr className='border-bottom'>
                       <td>
                         <div>
-                          <p>Total Discount</p>
-                          <p className="text-gray-400 ps-3">By Payment Type</p>
-                          <p className="text-gray-400 ps-3">By Coupon Code</p>
+                          <p className=" fw-medium pt-2">Total Discount</p>
+                          <p className="text-black-50  fw-medium  ps-5" >By Payment Type</p>
+                          <p className="text-black-50 fw-medium pb-2 ps-5">By Coupon Code</p>
                         </div>
                       </td>
 
@@ -1957,19 +1959,19 @@ const handleOrderChange = async () => {
                     </tr>
 
                     <tr>
-                      <td>Final Cost</td>
+                      <td className=" fw-medium pt-4">Final Cost</td>
                         <td></td>
                         <td className="text-end">₹{grandTotals.baseTotal-grandTotals.totalDiscount.toFixed(0)}</td>
                     </tr>
 
                     <tr>
-                      <td>CGST</td>
+                      <td className=" fw-medium pt-2">CGST</td>
                         <td></td>
                         <td className="text-end">₹{grandTotals.cgst.toFixed(0)}</td>
                     </tr>
 
                     <tr>
-                      <td>SGST</td>
+                      <td className=" fw-medium pt-2">SGST</td>
                         <td></td>
                         <td className="text-end">₹{grandTotals.sgst.toFixed(0)}</td>
                     </tr>
@@ -1977,7 +1979,7 @@ const handleOrderChange = async () => {
 
                    
                     <tr>
-                      <td className="pb-3">Handling Charges</td>
+                      <td className=" fw-medium pt-2">Handling Charges</td>
                       <td></td>
                       {/* <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td> */}
                       <td className="text-end">₹{calculateShippingCost(orderDetails, selectedCustomer)}</td>
@@ -1985,7 +1987,7 @@ const handleOrderChange = async () => {
 
 
                     <tr className="border-bottom">
-                      <td className="pb-3">Platform Fee</td>
+                      <td className="fw-medium pt-2 pb-4">Platform Fee</td>
                       <td></td>
                       {/* <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td> */}
                       {/* <td className="text-end">₹{calculateGrandTotal(orderDetails).toFixed(2)-((calculateGrandTotal(orderDetails) * (discountPercentage + (Number(selectedDiscountValue) || 0))) / 100)+49}</td> */}
@@ -1993,7 +1995,7 @@ const handleOrderChange = async () => {
                     </tr>
                   
                     <tr>
-                      <td className='pt-3'>Net Pay</td>
+                      <td className='fw-medium pt-4 pt-2'>Net Pay</td>
                       <td ></td>
                       <td className='text-end'>₹{(netPayablePrice).toFixed(0)}</td>
                       {/* <td className="text-end pt-3">₹{calculateTotalAmount()}</td> */}
@@ -2001,7 +2003,7 @@ const handleOrderChange = async () => {
 
 
                     <tr className="border-bottom">
-                      <td className="pb-3 pt-2">Wallet</td>
+                      <td className="fw-medium pt-2 pb-4 ">Wallet</td>
                       <td className="pb-3 pt-2">{walletBalances.toFixed(2)}</td>
                       <td style={{ textAlign: "end" }} className="pb-3 pt-2">
                       ₹ {isViewMode ? (
@@ -2025,20 +2027,20 @@ const handleOrderChange = async () => {
 
                   
                     <tr className="border-bottom">
-                      <td className="pb-3 pt-2">To Pay</td>
+                      <td className=" fw-medium py-4">To Pay</td>
                       <td></td>
                       <td className='text-end'>₹{(toPay).toFixed(0)}</td>
                       {/* <td className="text-end pb-3 pt-2">₹{netPayable}</td> */}
                     </tr>
 
                     <tr>
-                      <td>Advance Paid</td>
+                      <td className="fw-medium pt-4 ">Advance Paid</td>
                       <td>{onlinePercentage}%</td>
                       <td className="text-end">₹{((toPay * onlinePercentage) / 100).toFixed(0)}</td>
                     </tr>
 
                     <tr>
-                      <td className="pt-2">Balance Due</td>
+                      <td className="fw-medium py-2">Balance Due</td>
                       <td className="pt-2">{codPercentage}%</td>
                       <td className="text-end pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td>
                     </tr>
