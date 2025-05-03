@@ -1924,7 +1924,7 @@ const handleOrderChange = async () => {
                       <td>
                         <div>
                           <p className=" fw-medium pt-2">Total Discount</p>
-                          <p className="text-black-50  fw-medium  ps-5" >By Payment Type</p>
+                          <p className="text-black-50  fw-medium my-2 ps-5" >By Payment Type</p>
                           <p className="text-black-50 fw-medium pb-2 ps-5">By Coupon Code</p>
                         </div>
                       </td>

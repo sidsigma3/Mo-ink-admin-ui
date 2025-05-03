@@ -15,7 +15,7 @@ const ModalCancelOrder = ({ isOpen, onCancel, onConfirm }) => {
         </div>
         <h2 className="modal-title">Cancel this order?</h2>
         <p className="modal-message">
-          This order will be permanently canceled and the customer will be notified. This cannot be undone.
+          This item will be permanently canceled and the customer will be notified. This cannot be undone.
         </p>
         <div className="modal-actions">
           <button className="bttn bttn-danger" onClick={onConfirm}>
