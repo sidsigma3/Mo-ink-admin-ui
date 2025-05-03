@@ -18,11 +18,11 @@ const ModalConfirmOrder = ({ isOpen, onCancel, onConfirm }) => {
           This order will be processed and the customer will be notified. Are you sure you want to proceed?
         </p>
         <div className="modal-actions">
-          <button className="bttn bttn-success" onClick={onConfirm}>
-            Confirm Order
-          </button>
           <button className="bttn bttn-outline" onClick={onCancel}>
             Cancel
+          </button>
+          <button className="bttn bttn-success" onClick={onConfirm}>
+            Confirm Order
           </button>
         </div>
       </div>

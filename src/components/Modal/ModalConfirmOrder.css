@@ -79,6 +79,7 @@
   border: none;
 }
 
+
 .bttn-success {
   background: #2e7d32;
   color: #fff;
@@ -88,14 +89,14 @@
   background: #27692b;
 }
 
-.btn-outline {
-  background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
+.bttn-outline {
+  background: #ebebeb;
+  color: #414141;
+  /* border: 1px solid #ccc; */
 }
 
 .bttn-outline:hover {
-  background: #f0f0f0;
+  background: #a1a1a1;
 }
 
 @media screen and (max-width: 480px) {
