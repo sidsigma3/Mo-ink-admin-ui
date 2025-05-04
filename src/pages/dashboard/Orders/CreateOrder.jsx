@@ -508,6 +508,8 @@ useEffect(() => {
         const orderTotal = order.colors.reduce((total, colorObj) => {
           if (!colorObj) return total; // Skip invalid color objects
     
+          if (colorObj.status === 'CANCELLED') return total
+
           const colorHex = typeof colorObj === "string"
             ? colorObj.trim().toLowerCase()
             : colorObj.hexCode?.trim().toLowerCase();
@@ -550,6 +552,9 @@ useEffect(() => {
         if (!order || !Array.isArray(order.colors) || !order.variant?.variants) continue;
     
         for (const colorObj of order.colors) {
+          if (colorObj.status === 'CANCELLED'){
+            continue
+          }            
           const colorHex = typeof colorObj === "string"
             ? colorObj.trim().toLowerCase()
             : colorObj.hexCode?.trim().toLowerCase();
@@ -587,22 +592,27 @@ useEffect(() => {
                 Number(paymentDiscount) + Number(appliedCouponDiscount) - 
                 (Number(paymentDiscount) * Number(appliedCouponDiscount)) / 100;
 
-
-         console.log(paymentDiscount,appliedCouponDiscount)
-
-          const  discountByCoupon = rawTotal * Number(appliedCouponDiscount)/100
-          const  discountByPaymment = rawTotal * Number(paymentDiscount)/100
+          const couponDiscountPercent = Number(appliedCouponDiscount);
+          const paymentDiscountPercent = Number(paymentDiscount);
+          
+          const couponDiscounts = rawTotal * couponDiscountPercent / 100;
+          const subtotalAfterCoupon = rawTotal - couponDiscounts;
+          
+          const paymentDiscounts = subtotalAfterCoupon * paymentDiscountPercent / 100;
+          const finalTotal = subtotalAfterCoupon - paymentDiscounts;
 
           const discount = rawTotal * totalDiscountPercent / 100;
           const discountedTotal = rawTotal - discount;
           const gstAmount = discountedTotal * gstRate / 100;
     
 
-          totalCouponTypeDiscount +=discountByCoupon;
-          totalPaymentTypeDiscount += discountByPaymment;
+          totalCouponTypeDiscount +=couponDiscounts;
+          totalPaymentTypeDiscount += paymentDiscounts;
           baseTotal += rawTotal;
         
           totalGst += gstAmount;
+          console.log(totalCouponTypeDiscount,totalPaymentTypeDiscount)
+          console.log(rawTotal,totalDiscountPercent,discount,discountedTotal,gstRate,gstAmount)
            
         }
       }
@@ -729,7 +739,8 @@ useEffect(() => {
         return;
       }
   
-      const isOdisha = selectedAddress?.state?.toLowerCase() === "odisha";
+      const homeAddress = selectedCustomer?.addresses?.find(addr => addr.addressType === "HOME");
+      const isOdisha = homeAddress?.state?.toLowerCase() === "odisha";
 
       const orderVariants = orderDetails.flatMap(order =>
         order.colors
@@ -987,13 +998,19 @@ useEffect(() => {
     const ratePerKg = state === "odisha" ? 3 : 5;
   
     const totalWeight = orderDetails.reduce((acc, item) => {
-      const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
+      const validColors = item.colors?.filter(color => color.status !== 'CANCELLED') || [];
+  
+      const colorWeight = validColors.reduce(
+        (sum, color) => sum + (Number(color.weight) || 0),
+        0
+      );
+  
       return acc + colorWeight;
     }, 0);
   
     return Number((totalWeight * ratePerKg).toFixed(2));
   };
-
+  
   // const calculateShippingCost = (orderDetails, selectedCustomer) => {
 
   //   if (!selectedAddress?.state) return 0;
@@ -1174,7 +1191,7 @@ const handleOrderChange = async () => {
       const ratePerKg = stateForShipping === "odisha" ? 3 : 5;
       const handling = orderWeight * ratePerKg;
 
-      const taxableAmount = baseAmount - discount + handling;
+      const taxableAmount = baseAmount - discount ;
 
       const gst = orders.product?.gstOnProduct || 0;
       const state = getStateFromBillingAddress(order.billingAddress);
@@ -1190,7 +1207,7 @@ const handleOrderChange = async () => {
         igst = (gst / 100) * taxableAmount;
       }
 
-      const total = taxableAmount + cgst + sgst + igst;
+      const total = taxableAmount + cgst + sgst + igst + handling;
 
       payload.push({
         orderVariantId: color.orderVariantId,
@@ -1221,6 +1238,12 @@ const handleOrderChange = async () => {
   }
 };
 
+
+const billingAddress = order?.billingAddress 
+? getStateFromBillingAddress(order.shippingAddress)
+: selectedCustomer?.addresses?.find((addr) => addr.addressType === "HOME").state.toLowerCase();
+
+const isOdisha = billingAddress === "odisha";
 
 
   console.log(orderDetails)  
@@ -1913,7 +1936,14 @@ const handleOrderChange = async () => {
                    
                     <tr>
                       <td>Total Cost</td>
-                      <td>{orderDetails.reduce((acc, item) => acc + (item.colors.length || 0), 0)} items</td>
+                      <td>
+                        {
+                          orderDetails.reduce((acc, item) => {
+                            const validColors = item.colors?.filter(color => color.status !== 'CANCELLED') || [];
+                            return acc + validColors.length;
+                          }, 0)
+                        } items
+                      </td>
                       <td style={{ textAlign: "end" }}>₹{calculateGrandTotal(orderDetails).toFixed(0)}</td>
                     </tr>
 
@@ -1962,17 +1992,29 @@ const handleOrderChange = async () => {
                         <td className="text-end">₹{grandTotals.baseTotal-grandTotals.totalDiscount.toFixed(0)}</td>
                     </tr>
 
-                    <tr>
-                      <td>CGST</td>
-                        <td></td>
-                        <td className="text-end">₹{grandTotals.cgst.toFixed(0)}</td>
-                    </tr>
+                    {
+                      isOdisha ? (
+                        <>
+                          <tr>
+                            <td>CGST</td>
+                            <td></td>
+                            <td className="text-end">₹{grandTotals.cgst.toFixed(0)}</td>
+                          </tr>
+                          <tr>
+                            <td>SGST</td>
+                            <td></td>
+                            <td className="text-end">₹{grandTotals.sgst.toFixed(0)}</td>
+                          </tr>
+                        </>
+                      ) : (
+                        <tr>
+                          <td>IGST</td>
+                          <td></td>
+                          <td className="text-end">₹{(grandTotals.cgst + grandTotals.sgst).toFixed(0)}</td>
+                        </tr>
+                      )
+                    }
 
-                    <tr>
-                      <td>SGST</td>
-                        <td></td>
-                        <td className="text-end">₹{grandTotals.sgst.toFixed(0)}</td>
-                    </tr>
                     
 
                    

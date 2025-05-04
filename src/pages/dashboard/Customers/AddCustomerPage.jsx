@@ -576,7 +576,7 @@ const handleAddressTypeChange = (e) => {
                     <thead>
                       <tr>
                         <th>Source</th>
-                        <th className=" text-center">Invoice No.</th>
+                        {/* <th className=" text-center">Invoice No.</th> */}
                         <th className=" text-center">Type</th>
                         <th className=" text-center">Amount</th>
                         <th className=" text-center">Date</th>
@@ -587,7 +587,7 @@ const handleAddressTypeChange = (e) => {
                       {transactions.slice().reverse().map((item, ix) => (
                         <tr key={ix}>
                           <td>{item.source}</td>
-                          <td className=" text-center">INV-87565</td>
+                          {/* <td className=" text-center">INV-87565</td> */}
                           <td className=" text-center"
                             style={{
                               color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000",
@@ -597,17 +597,19 @@ const handleAddressTypeChange = (e) => {
                           </td>
                           <td className=" text-center">₹{item.amount.toFixed(0)}</td>
                           <td className=" text-center">{new Date(item.createdAt).toLocaleDateString()}</td>
+                          {(item.source?.includes("Refund for cancellation") || item.source?.includes("Refund for return")) && (
                           <td className=" text-center pr-4">
-                   <button
-                  className="border-0 btn p-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDownloadCreditReceipt(item.source);
-                  }}
-                  >
-                   <FiDownload size={20}/>
-                  </button>
-                  </td>
+                            <button
+                            className="btn p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownloadCreditReceipt(item.source);
+                            }}
+                            >
+                            <FiDownload size={20}/>
+                            </button>
+                          </td>
+                           )}
                         </tr>
                       ))}
                     </tbody>
