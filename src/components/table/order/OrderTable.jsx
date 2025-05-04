@@ -259,7 +259,7 @@ const handleRowClick = (order) => {
                     ? "purple"
                     : order.payment.paymentStatus === "Unpaid"
                     ? "yellow"
-                    : "defaultColor"
+                    : "yellow"
                   }
                   value={order.payment.paymentStatus}
                   onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
