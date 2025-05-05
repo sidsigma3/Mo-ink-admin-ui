@@ -113,17 +113,17 @@ const SideBar = () => {
         <ul className='on-mobile'>
             <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
                 <Link to={'/dashboard'}>
-                <button onClick={()=>setSelected('dashboard')}><span className='icon'><LuHome size={22} /></span>Home</button>
+                <button onClick={()=>setSelected('dashboard')}><span className='icon'><LuHome size={22} /></span>Dashboard</button>
                 </Link>
             </li>
 
 
-            <div  
+            {/* <div  
                 onMouseEnter={() => setHoverSelected('orders')}  
                 onMouseLeave={() => {
                   if (selected !== 'vendors') setHoverSelected(null);
                 }}
-              >
+              > */}
                 <li className={selected === 'orders' ? 'selected' : 'not-selected'}>
                   <Link to={'/orders'}>
                     <button onClick={() => setSelected('orders')}>
@@ -132,6 +132,14 @@ const SideBar = () => {
                   </Link>
                 </li>
 
+                <li className={selected === 'vendors' ? 'selected' : 'not-selected'}>
+                  <Link to={'/vendor-order'}>
+                    <button onClick={() => setSelected('vendors')}>
+                      <span className='icon'><LuShoppingCart size={22} /></span>Vendor Orders
+                    </button>
+                  </Link>
+                </li>
+{/* 
                 {(hoverSelected === 'orders' || selected === 'vendors') && (
                   <div className={selected === 'vendors' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
                     <Link to={'/vendor-order'}>
@@ -148,7 +156,7 @@ const SideBar = () => {
                     </Link>
                   </div>
                 )}
-              </div>
+              </div> */}
 
             {/* <li className={selected === 'profile' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
                
@@ -160,12 +168,14 @@ const SideBar = () => {
                 
             </li> */}
 
-            <div  
+            {/* <div  
   onMouseEnter={() => setHoverSelected('products')}  
   onMouseLeave={() => {
     if (selected !== 'inventory') setHoverSelected(null);
   }}
->
+> */}
+
+
   <li className={selected === 'products' ? 'selected' : 'not-selected'}>
     <Link to={'/products'}>
       <button onClick={() => setSelected('products')}>
@@ -174,7 +184,16 @@ const SideBar = () => {
     </Link>
   </li>
 
-  {(hoverSelected === 'products' || selected === 'inventory') && (
+  <li className={selected === 'inventory' ? 'selected' : 'not-selected'}>
+    <Link to={'/inventory'}>
+      <button onClick={() => setSelected('inventory')}>
+        <span className='icon'><LuPackage size={22} /></span>Inventory
+      </button>
+    </Link>
+  </li>
+
+
+  {/* {(hoverSelected === 'products' || selected === 'inventory') && (
     <div className={selected === 'inventory' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
       <Link to={'/inventory'}>
         <button 
@@ -190,7 +209,7 @@ const SideBar = () => {
       </Link>
     </div>
   )}
-</div>
+</div> */}
 
 
 
@@ -326,8 +345,6 @@ const SideBar = () => {
                 </Link>
             </li>
         </ul>
-
-        <h3 className='hide-on-mobile'>My Team</h3>
 
         <ul className='hide-on-mobile'>
           <div  

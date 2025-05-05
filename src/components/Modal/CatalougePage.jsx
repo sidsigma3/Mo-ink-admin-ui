@@ -246,7 +246,7 @@ const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
               </button>
             )}
             </div>
-            <div className="d-flex flex-wrap gap-2 mt-3">
+            <div className="d-flex flex-wrap gap-3 mt-3">
               {customColors.map((item, index) => (
                <div key={index}
                className={`col-4 border rounded p-2 ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
@@ -274,11 +274,11 @@ const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
               </button>
             )}
             <h4 className="h6 fw-semibold mt-4">Preset Catalogue</h4>
-            <div className="container" style={{height:"20rem", overflow:"auto"}}>
-            <div className="row g-0" style={{height:'auto'}}>
-              {filteredVariants.map((item, index) => (
+            <div className="container" style={{height:"16rem", overflow:"auto"}}>
+            <div className="d-flex justify-content-start flex-wrap gap-3" style={{ height: 'auto' }}>
+            {filteredVariants.map((item, index) => (
                 <div key={index} 
-                    className={`col-3 col-sm-3 col-md-3 col-lg-2 border rounded p-2   ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
+                    className={`col-3 col-sm-3 col-md-3 col-lg-3 mr-2 border rounded p-2   ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
                     onClick={() => handleColorClick(item)}
                     style={{ 
                       cursor: "pointer", 
