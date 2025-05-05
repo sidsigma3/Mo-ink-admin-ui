@@ -145,6 +145,7 @@ const SideBar = () => {
                     <Link to={'/vendor-order'}>
                       <button 
                         onClick={() => {
+                        
                           setSelected('vendors');
                           setHoverSelected('orders'); // Keep it open
                         }} 
