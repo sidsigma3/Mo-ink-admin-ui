@@ -125,10 +125,10 @@ const handleRowClick = (order) => {
 
 
   const statusClassMap = {
-  "New Order": "blue",
-  "Shipped": "yellow",
+  "NEW": "blue",
+  "SHIPPED": "yellow",
   "Manufactured": "purple",
-  "Delivered": "green",
+  "DELIVERED": "green",
   "Cancelled": "red",
   "Returned": "grey",
   // "Partial return": "purple",
@@ -185,6 +185,18 @@ const handleRowClick = (order) => {
     }
   };
 
+
+  const statusOption = {
+    NEW: "New Order" ,
+    CANCELLED: "Cancelled",
+    CONFIRMED: "Confirmed",
+    MANUFACTURING: "Manufactured",
+    SHIPPED: "Shipped",
+    DELIVERED: "Delivered",
+    RETURNED: "Returned",
+    RETURN_REQUESTED: "Return Requested",
+    RETURN_REJECTED: "Return Rejected",
+  };
 
 
   return (
@@ -259,9 +271,9 @@ const handleRowClick = (order) => {
                   ))}
                 </select>
               </td>
-              <td   style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
+              <td  style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
                   <div className={statusClassMap[order.status]}>
-                    {order.status}
+                    {statusOption[order.status]}
                   </div>
             </td>
               <td>
