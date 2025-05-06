@@ -59,16 +59,16 @@ const Inventory = () => {
 
 
   const inventoryData = [
-    { product: 'Cotton Yarn', counter: '2/80', color: 'yellow' },
-    { product: 'Polyester Yarn', counter: '2/80', color: 'red' },
-    { product: 'Polyester Yarn', counter: '2/80', color: 'blue' },
-    { product: 'Polyester Yarn', counter: '2/80', color: 'black' },
-    { product: 'Polyester Yarn', counter: '2/80', color: 'green' },
-    { product: 'Silk Yarn', counter: '2/80', color: 'orange' },
-    { product: 'Silk Yarn', counter: '2/80', color: 'pink' },
-    { product: 'Silk Yarn', counter: '2/80', color: 'teal' },
-    { product: 'Silk Yarn', counter: '2/80', color: 'grey' },
-    { product: 'Silk Yarn', counter: '2/80', color: 'violet' },
+    { product: 'Cotton Yarn', counter: '2/80', type: 'Cone', color: 'yellow' },
+    { product: 'Polyester Yarn', counter: '2/80', type: 'Hank', color: 'red' },
+    { product: 'Polyester Yarn', counter: '2/80', type: 'cone', color: 'blue' },
+    { product: 'Polyester Yarn', counter: '2/80', type: 'Cone', color: 'black' },
+    { product: 'Polyester Yarn', counter: '2/80', type: 'Hank', color: 'green' },
+    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'orange' },
+    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'pink' },
+    { product: 'Silk Yarn', counter: '2/80', type: 'Cone', color: 'teal' },
+    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'grey' },
+    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'violet' },
   ];
 
   const renderColorDot = (color) => (
@@ -133,6 +133,7 @@ const Inventory = () => {
         <tr>
           <th className="text-start py-3">Product</th>
           <th className="py-3">Counter</th>
+          <th className="py-3">Type</th>
           <th className="py-3">Color</th>
           <th className="py-3">From Vendor</th>
           <th className="py-3">Customer Order</th>
@@ -144,6 +145,7 @@ const Inventory = () => {
           <tr key={index}>
             <td className="fw-medium text-start pl-3">{item.product}</td>
             <td>{item.counter}</td>
+            <td>{item.type}</td>
             <td>{renderColorDot(item.color)}</td>
             <td>150 Kgs</td>
             <td>150 Kgs</td>
