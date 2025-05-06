@@ -55,8 +55,12 @@ const InventoryDetails = () => {
   <BsDot size="1.8rem" color="#6c757d" /> 
   <span className="badge bg-light px-1 py-1"style={{ fontSize: '1.2rem', color: 'black', fontWeight: 500 }}>2/80</span>
   <BsDot size="1.8rem" color="#6c757d" />
+  <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>Hank</h5>
+  <BsDot size="1.8rem" color="#6c757d" />
   <span className="rounded-circle d-inline-block"style={{ width: 25, height: 25, backgroundColor: '#ffc107' }}></span>
   <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>Yellow</h5>
+
+
 </div>
 
 <div className="stock-container">

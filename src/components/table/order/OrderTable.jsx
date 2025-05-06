@@ -156,7 +156,7 @@ const handleRowClick = (order) => {
 
     const formattedData = orders.map((order) => ({
       "Order ID": order.orderId,
-      "Date": new Intl.DateTimeFormat("en-GB").format(new Date(order.createdAt)),
+      "Date": new Intl.DateTimeFormat("en-IN").format(new Date(order.createdAt)),
       "Customer": order.customer.customerName,
       "Quantity": order.orderVariantResponse.length,
       "Weight": order.totalAmount,
@@ -268,15 +268,25 @@ const handleRowClick = (order) => {
         </thead>
 
         <tbody>
-          {orders.map((order) => (
-            <tr
-              key={order.orderId}
-              style={{ cursor: "pointer" }}
-              onClick={() => handleRowClick(order)}
-            >
+        {[...orders]
+       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+       .map((order) => (
+    <tr
+      key={order.orderId}
+      style={{ cursor: "pointer" }}
+      onClick={() => handleRowClick(order)}
+    >
 
               <td style={{ verticalAlign: 'middle', fontWeight: 500 }}>{order.orderId}</td>
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{new Intl.DateTimeFormat('en-GB').format(new Date(order.createdAt))}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                        {new Date(order.createdAt).toLocaleString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                         }).replace(',', '')}
+              </td>              
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.orderVariantResponse.length}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
@@ -335,9 +345,8 @@ const handleRowClick = (order) => {
                 </select>
               </td>
 
+              <td   style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
 
-
-              <td  style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
                   <div className={statusClassMap[order.status]}>
                     {statusOption[order.status]}
                   </div>

@@ -1,6 +1,9 @@
 import React, { useState ,useRef ,useEffect } from 'react'
 import "./SideBar.css"
 import { CiHome } from "react-icons/ci";
+import { TbBuildingFactory } from "react-icons/tb";
+import { TbClipboardList } from "react-icons/tb";
+
 import { LuShoppingCart } from "react-icons/lu";
 import { BsBox2 } from "react-icons/bs";
 import { GoGraph } from "react-icons/go";
@@ -135,7 +138,7 @@ const SideBar = () => {
                 <li className={selected === 'vendors' ? 'selected' : 'not-selected'}>
                   <Link to={'/vendor-order'}>
                     <button onClick={() => setSelected('vendors')}>
-                      <span className='icon'><LuShoppingCart size={22} /></span>Vendor Orders
+                      <span className='icon'><TbBuildingFactory size={24} /></span>Vendor Orders
                     </button>
                   </Link>
                 </li>
@@ -145,6 +148,7 @@ const SideBar = () => {
                     <Link to={'/vendor-order'}>
                       <button 
                         onClick={() => {
+                        
                           setSelected('vendors');
                           setHoverSelected('orders'); // Keep it open
                         }} 
@@ -187,7 +191,7 @@ const SideBar = () => {
   <li className={selected === 'inventory' ? 'selected' : 'not-selected'}>
     <Link to={'/inventory'}>
       <button onClick={() => setSelected('inventory')}>
-        <span className='icon'><LuPackage size={22} /></span>Inventory
+        <span className='icon'><TbClipboardList size={24} /></span>Inventory
       </button>
     </Link>
   </li>
