@@ -14,12 +14,25 @@ import CreateOrder from "../../../pages/dashboard/Orders/CreateOrder";
 import { FiDownload } from "react-icons/fi";
 import { downloadInvoice } from "../../../services/InvoiceServices";
 import { FiAlertCircle } from "react-icons/fi";
+import { updateOrderPaymentStatuses } from "../../../services/OrderService";
+import ModalPaid from "../../Modal/ModalPaid";
+import ModalUnpaid from "../../Modal/ModalUnpaid";
+import ModalPartiallypaid from "../../Modal/ModalPartiallypaid";
 
 const OrderTable = forwardRef(({data}, ref) => {
  
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
   const createOrderRef = useRef(null);
+
+  const [modalData, setModalData] = useState({
+    isOpen: false,
+    type: null, // 'order' or 'payment'
+    status: null,
+    orderId: null,
+    variantId: null,
+  });
+  
 
   useEffect(() => {
     setOrders(data || []);
@@ -46,34 +59,22 @@ const OrderTable = forwardRef(({data}, ref) => {
   const paymentStatusOption = ["Unpaid", "Partially Paid", "Paid"];
 
 
-  const handlePaymentStatusChange = async (orderId, newStatus) => {
-    try {
-        // Find the existing order details
-        const existingOrder = orders.find(order => order.orderId === orderId);
-
-        if (!existingOrder) {
-            console.error("Order not found.");
-            return;
-        }
-
-        // Prepare updated order data with new payment status
-        const updatedOrderData = {
-            ...existingOrder,
-            payment: {
-                ...existingOrder.payment,
-                paymentStatus: newStatus, // Update payment status
-            },
-        };
-
-        // Send update request to backend
-        await updateOrder(orderId, updatedOrderData);
-        fetchOrders(); // Refresh order list
-
-        alert("Payment status updated successfully.");
-    } catch (error) {
-        console.error("Failed to update payment status:", error);
-    }
-};
+  const handlePaymentStatusChange = (orderId, newStatus) => {
+    setOrders(prev =>
+      prev.map(order =>
+        order.orderId === orderId
+          ? {
+              ...order,
+              payment: {
+                ...order.payment,
+                paymentStatus: newStatus,
+              },
+            }
+          : order
+      )
+    );
+  };
+  
 
 
   const handleStatusChange = async (orderId, newStatus) => {
@@ -127,12 +128,12 @@ const handleRowClick = (order) => {
   const statusClassMap = {
   "NEW": "blue",
   "SHIPPED": "yellow",
-  "Manufactured": "purple",
+  "MANUFACTURING": "purple",
   "DELIVERED": "green",
-  "Cancelled": "red",
+  "CANCELLED": "red",
   "Returned": "grey",
-  // "Partial return": "purple",
-  // "Partial cancel": "muted-clay",
+  "RETURNED": "purple",
+  "CONFIRMED": "muted-clay",
   
   };
 
@@ -198,6 +199,40 @@ const handleRowClick = (order) => {
     RETURN_REJECTED: "Return Rejected",
   };
 
+  const renderModal = () => {
+    if (!modalData.isOpen) return null;
+  
+    const commonProps = {
+      isOpen: true,
+      onCancel: () => setModalData({ isOpen: false, type: null, status: null, orderId: null, variantId: null }),
+      onConfirm: async () => {
+        if (modalData.type === "payment") {
+          try {
+            await updateOrderPaymentStatuses(modalData.orderId, {
+              paymentStatus: modalData.status,
+            });
+            handlePaymentStatusChange(modalData.orderId, modalData.status);
+          } catch (err) {
+            console.error("Failed to update payment status:", err);
+          }
+        }
+        setModalData({ isOpen: false, type: null, status: null, orderId: null, variantId: null });
+      },
+    };
+  
+    // Render payment status modals
+    switch (modalData.status) {
+      case "FULLY_PAID":
+        return <ModalPaid {...commonProps} />;
+      case "PARTIALLY_PAID":
+        return <ModalPartiallypaid {...commonProps} />;
+      case "UNPAID":
+        return <ModalUnpaid {...commonProps} />;
+      default:
+        return null;
+    }
+  };
+  
 
   return (
     <div className="order-table table-ctn-order">
@@ -259,29 +294,59 @@ const handleRowClick = (order) => {
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>₹{order.totalAmount.toFixed(1)}</td>
-              <td  style={{ textAlign: 'center', verticalAlign: 'middle'}} onClick={(e) => e.stopPropagation()}>
-
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>
                 <select
                   className={
-                    order.payment.paymentStatus === "Paid"
-                    ? "green"
-                    : order.payment.paymentStatus === "Partially Paid"
-                    ? "purple"
-                    : order.payment.paymentStatus === "Unpaid"
-                    ? "yellow"
-                    : "yellow"
+                    order.payment.paymentStatus === "FULLY_PAID"
+                      ? "green"
+                      : order.payment.paymentStatus === "PARTIALLY_PAID"
+                      ? "purple"
+                      : "yellow"
                   }
                   value={order.payment.paymentStatus}
-                  onChange={(e) => handlePaymentStatusChange(order.orderId, e.target.value)}
+                  onChange={async (e) => {
+                    const newStatus = e.target.value;
+                    setModalData({
+                      isOpen: true,
+                      type: 'payment',
+                      status: newStatus,
+                      orderId: order.orderId,
+                    });
+
+                    try {
+                      await updateOrderPaymentStatuses(order.orderId, {
+                        paymentStatus: newStatus,
+                      });
+
+                      // ✅ Update local state to reflect changes immediately
+                      handlePaymentStatusChange(order.orderId, newStatus); 
+                    } catch (error) {
+                      console.error("Failed to update payment status:", error);
+                    }
+                  }}
                 >
-                  {paymentStatusOption.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
+                  {[
+                    { label: "Unpaid", value: "UNPAID" },
+                    { label: "Partially Paid", value: "PARTIALLY_PAID" },
+                    { label: "Paid", value: "FULLY_PAID" },
+                  ].map(({ label, value }) => {
+                    const current = order.payment.paymentStatus;
+
+                    const isDisabled =
+                      (current === "PARTIALLY_PAID" && value === "UNPAID") ||
+                      (current === "FULLY_PAID" && (value === "UNPAID" || value === "PARTIALLY_PAID"));
+
+                    return (
+                      <option key={value} value={value} disabled={isDisabled}>
+                        {label}
+                      </option>
+                    );
+                  })}
                 </select>
               </td>
+
               <td   style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
+
                   <div className={statusClassMap[order.status]}>
                     {statusOption[order.status]}
                   </div>
@@ -316,7 +381,9 @@ const handleRowClick = (order) => {
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                {order.orderVariantResponse?.some(variant => variant.status === 'RETURN_REQUESTED') && (
+                {order.orderVariantResponse?.some(variant => 
+                 ["RETURN_REQUESTED", "RETURNED"].includes(variant.status)
+              ) && (
                   <button
                     className="alert-icon-btn"
                     data-bs-toggle="tooltip"
@@ -338,6 +405,8 @@ const handleRowClick = (order) => {
           ))}
         </tbody>
       </Table>
+      {renderModal()}
+
 
       <div className="d-flex justify-content-end mt-2 pagination">
         <Pagination>{items}</Pagination>

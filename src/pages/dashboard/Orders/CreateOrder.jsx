@@ -27,9 +27,11 @@ import ReactWhatsapp from 'react-whatsapp';
 import html2pdf from 'html2pdf.js';
 import { FiAlertCircle } from "react-icons/fi";
 import { emailInvoice } from '../../../services/InvoiceServices';
-
-
-
+import ModalCancelOrder from '../../../components/Modal/ModalCancelOrder';
+import ModalConfirmOrder from '../../../components/Modal/ModalConfirmOrder';
+import ModalManufactureOrder from '../../../components/Modal/ModalManufactureOrder';
+import ModalShipOrder from '../../../components/Modal/ModalShipOrder';
+import ModalDeliverOrder from '../../../components/Modal/ModalDeliverOrder';
 
 
 // Optional: style mapping
@@ -73,6 +75,13 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
        customer?.phoneNumber?.includes(searchTerm))
     );
 
+    const [modalData, setModalData] = useState({
+      isOpen: false,
+      orderId: null,
+      variantId: null,
+      status: null,
+    });
+
     const statusOptions = [
       { value: "NEW", label: "New Order" },
       { value: "CANCELLED", label: "Cancelled" },
@@ -80,7 +89,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       { value: "MANUFACTURING", label: "Manufactured" },
       { value: "SHIPPED", label: "Shipped" },
       { value: "DELIVERED", label: "Delivered" },
-      // { value: "RETURNED", label: "Returned" },
+      { value: "RETURNED", label: "Returned" },
       // { value: "RETURN_REQUESTED", label: "Return Requested" },
       // { value: "RETURN_REJECTED", label: "Return Rejected" },
     ];
@@ -438,14 +447,14 @@ useEffect(() => {
       
 
       const statusClassMap = {
-        "New Order": "blue",
-        "Shipped": "yellow",
-        "Manufactured": "purple",
-        "Delivered": "green",
-        "Cancelled": "red",
+        "NEW": "blue",
+        "SHIPPED": "yellow",
+        "MANUFACTURING": "purple",
+        "DELIVERED": "green",
+        "CANCELLED": "red",
         "Returned": "grey",
-        // "Partial return": "purple",
-        // "Partial cancel": "muted-clay",
+        "RETURNED": "purple",
+        "CONFIRMED": "muted-clay",
         
         };
 
@@ -1104,9 +1113,6 @@ const sendInvoice = async(orderId) =>{
 
 
 const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
-  const confirmed = window.confirm(`Are you sure you want to change the status to "${newStatus}"?`);
-  if (!confirmed) return;
-
   try {
     await updateOrderVariantStatuses(orderId, [
       {
@@ -1117,7 +1123,6 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
       },
     ]);
 
-   
     setOrderDetails((prev) =>
       prev.map((item) => ({
         ...item,
@@ -1126,7 +1131,8 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
             ? {
                 ...color,
                 status: newStatus,
-                previousStatus: newStatus === "RETURN_REQUESTED" ? color.status : undefined,
+                previousStatus:
+                  newStatus === "RETURN_REQUESTED" ? color.status : undefined,
               }
             : color
         ),
@@ -1137,16 +1143,14 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
               ? {
                   ...color,
                   status: newStatus,
-                  previousStatus: newStatus === "RETURN_REQUESTED" ? color.status : undefined,
+                  previousStatus:
+                    newStatus === "RETURN_REQUESTED" ? color.status : undefined,
                 }
               : color
           ),
         },
       }))
     );
-    
-    
-
   } catch (err) {
     alert("Failed to update status");
     console.error(err);
@@ -1247,6 +1251,37 @@ const billingAddress = order?.billingAddress
 const isOdisha = billingAddress === "odisha";
 
 
+const renderModal = () => {
+  if (!modalData.isOpen) return null;
+
+  const modalProps = {
+    isOpen: modalData.isOpen,
+    onCancel: () =>
+      setModalData({ isOpen: false, orderId: null, variantId: null, status: null }),
+    onConfirm: () => {
+      handleStatusChange(modalData.orderId, modalData.variantId, modalData.status);
+      setModalData({ isOpen: false, orderId: null, variantId: null, status: null });
+    },
+  };
+
+  switch (modalData.status) {
+    case "CONFIRMED":
+      return <ModalConfirmOrder {...modalProps} />;
+    case "MANUFACTURING":
+      return <ModalManufactureOrder {...modalProps} />;
+    case "SHIPPED":
+      return <ModalShipOrder {...modalProps} />;
+    case "DELIVERED":
+      return <ModalDeliverOrder {...modalProps} />;
+    case "CANCELLED":
+      return <ModalCancelOrder {...modalProps} />;
+    default:
+      return null;
+  }
+};
+
+
+
   console.log(orderDetails)  
   console.log(selectedAddress)
 
@@ -1299,6 +1334,7 @@ const isOdisha = billingAddress === "odisha";
                     <button className='btn btn-sm btn-primary' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
                     )}
                     </div>
+                    {renderModal()}
                     </div>
                     {orderDetails.length > 0 && (
                         <div className="order-detail">
@@ -1472,78 +1508,87 @@ const isOdisha = billingAddress === "odisha";
                                           </td>
 
                                           {isViewMode && (
-                                          <td>
-                                            <div className="d-flex flex-column gap-3">
-                                              {order.colors.map((colorObj, colorIndex) => {
-                                                const currentStatus = colorObj.status;
-                                                const currentIndex = statusFlow.indexOf(currentStatus);
-                                                const isFinalStatus = ["DELIVERED", "RETURNED", "CANCELLED"].includes(currentStatus);
+                                        <td>
+                                          <div className="d-flex flex-column gap-3">
+                                            {order.colors.map((colorObj, colorIndex) => {
+                                              const currentStatus = colorObj.status;
+                                              const currentIndex = statusFlow.indexOf(currentStatus);
+                                              const isFinalStatus = ["DELIVERED", "RETURNED", "CANCELLED"].includes(
+                                                currentStatus
+                                              );
 
-                                                return (
-                                                  <div
-                                                    key={colorIndex}
-                                                    className="d-flex align-items-center justify-content-center"
-                                                  >
-                                                    {/*  Show plain text for RETURNED or RETURN_REJECTED */}
-                                                    {["RETURNED", "RETURN_REJECTED"].includes(currentStatus) ? (
-                                                      <span className="yellow text-capitalize">
+                                              return (
+                                                <div
+                                                  key={colorIndex}
+                                                  className="d-flex align-items-center justify-content-center"
+                                                >
+                                                  {["RETURNED", "RETURN_REJECTED"].includes(currentStatus) ? (
+                                                   <div className={`${statusClassMap[currentStatus] || ''} text-capitalize`}>
                                                         {currentStatus.replace("_", " ")}
-                                                      </span>
-                                                    ) : (
-                                                      <select
-                                                        value={
-                                                          currentStatus === "RETURN_REQUESTED"
-                                                            ? colorObj.previousStatus || "DELIVERED"
-                                                            : currentStatus
+                                                     </div>
+                                                  ) : (
+                                                    <select
+                                                      value={
+                                                        currentStatus === "RETURN_REQUESTED"
+                                                          ? colorObj.previousStatus || "DELIVERED"
+                                                          : currentStatus
+                                                      }
+                                                      disabled={isFinalStatus || currentStatus === "RETURN_REQUESTED"}
+                                                      onChange={(e) => {
+                                                        const selectedStatus = e.target.value;
+                                                        setModalData({
+                                                          isOpen: true,
+                                                          orderId: colorObj.orderId,
+                                                          variantId: colorObj.orderVariantId,
+                                                          status: selectedStatus,
+                                                        });
+                                                      }}
+                                                      className={`${statusClassMap[currentStatus] || ''} text-capitalize`}
+                                                    >
+                                                      {statusOptions.map(({ value, label }) => {
+                                                        const optionIndex = statusFlow.indexOf(value);
+                                                        let shouldDisable = false;
+
+                                                        if (isFinalStatus) {
+                                                          shouldDisable = true;
+                                                        } else if (currentStatus === "RETURN_REQUESTED") {
+                                                          shouldDisable = true;
+                                                        } else if (currentStatus === "NEW") {
+                                                          shouldDisable = !["CONFIRMED", "CANCELLED"].includes(value);
+                                                        } else if (currentStatus === "CONFIRMED") {
+                                                          shouldDisable =
+                                                            optionIndex < currentIndex || value === "CANCELLED";
+                                                        } else {
+                                                          shouldDisable =
+                                                            value === "CANCELLED" || optionIndex < currentIndex;
                                                         }
-                                                        disabled={
-                                                          isFinalStatus || currentStatus === "RETURN_REQUESTED"
-                                                        }
-                                                        onChange={(e) => {
-                                                          const selectedStatus = e.target.value;
 
-                                                            handleStatusChange(colorObj.orderId, colorObj.orderVariantId, selectedStatus);
+                                                        const shouldRender = ["RETURNED", "RETURN_REJECTED"].includes(
+                                                          currentStatus
+                                                        )
+                                                          ? value === currentStatus
+                                                          : !["RETURNED", "RETURN_REJECTED", "RETURN_REQUESTED"].includes(
+                                                              value
+                                                            );
 
-                                                        }}
-                                                      >
-                                                        {statusOptions.map(({ value, label }) => {
-                                                          const optionIndex = statusFlow.indexOf(value);
-                                                          let shouldDisable = false;
-
-                                                          if (isFinalStatus) {
-                                                            shouldDisable = true;
-                                                          } else if (currentStatus === "RETURN_REQUESTED") {
-                                                            shouldDisable = true;
-                                                          } else if (currentStatus === "NEW") {
-                                                            shouldDisable = !["CONFIRMED", "CANCELLED"].includes(value);
-                                                          } else if (currentStatus === "CONFIRMED") {
-                                                            shouldDisable = optionIndex < currentIndex || value === "CANCELLED";
-                                                          } else {
-                                                            shouldDisable = value === "CANCELLED" || optionIndex < currentIndex;
-                                                          }
-
-                                                          // Never render RETURNED/RETURN_REJECTED/RETURN_REQUESTED unless actual status
-                                                          const shouldRender =
-                                                            ["RETURNED", "RETURN_REJECTED"].includes(currentStatus)
-                                                              ? value === currentStatus
-                                                              : !["RETURNED", "RETURN_REJECTED", "RETURN_REQUESTED"].includes(value);
-
-                                                          return (
-                                                            shouldRender && (
-                                                              <option key={value} value={value} disabled={shouldDisable}>
-                                                                {label}
-                                                              </option>
-                                                            )
-                                                          );
-                                                        })}
-                                                      </select>
-                                                    )}
-                                                  </div>
-                                                );
-                                              })}
-                                            </div>
-                                          </td>
-                                        )}
+                                                        return (
+                                                          shouldRender && (
+                                                            <option key={value} value={value} disabled={shouldDisable}>
+                                                              {label}
+                                                            </option>
+                                                          )
+                                                        );
+                                                      })}
+                                                    </select>
+                                                  )}
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        </td>
+                                        
+                                      )}
+                                    
 
 
 
@@ -2082,13 +2127,25 @@ const isOdisha = billingAddress === "odisha";
                     <tr>
                       <td className="fw-medium pt-4 ">Advance Paid</td>
                       <td>{onlinePercentage}%</td>
-                      <td className="text-end">₹{((toPay * onlinePercentage) / 100).toFixed(0)}</td>
+                      {isViewMode === true ? (
+                         <td className="text-end">₹{order?.payment.onlineAmount.toFixed(0)}</td>
+                      ):(
+                        <td className="text-end">₹{((toPay * onlinePercentage) / 100).toFixed(0)}</td>
+                      )}
+                    
                     </tr>
 
                     <tr>
                       <td className="fw-medium py-2">Balance Due</td>
                       <td className="pt-2">{codPercentage}%</td>
-                      <td className="text-end pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td>
+
+                      {isViewMode === true ? (
+                          <td className="text-end">₹{order?.payment.codAmount.toFixed(0)-order?.payment.totalAdjustedAmount.toFixed(0)}</td>
+                        ):(
+                          <td className="text-end pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td>
+                        )
+                      }
+                     
                     </tr>
 
                    
