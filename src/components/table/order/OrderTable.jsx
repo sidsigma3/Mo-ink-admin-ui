@@ -18,6 +18,8 @@ import { updateOrderPaymentStatuses } from "../../../services/OrderService";
 import ModalPaid from "../../Modal/ModalPaid";
 import ModalUnpaid from "../../Modal/ModalUnpaid";
 import ModalPartiallypaid from "../../Modal/ModalPartiallypaid";
+import moment from 'moment-timezone';
+
 
 const OrderTable = forwardRef(({data}, ref) => {
  
@@ -154,16 +156,38 @@ const handleRowClick = (order) => {
       return;
     }
 
-    const formattedData = orders.map((order) => ({
-      "Order ID": order.orderId,
-      "Date": new Intl.DateTimeFormat("en-IN").format(new Date(order.createdAt)),
-      "Customer": order.customer.customerName,
-      "Quantity": order.orderVariantResponse.length,
-      "Weight": order.totalAmount,
-      "Amount": order.payment.amount,
-      "Payment Status": order.payment.paymentStatus,
-      "Order Status": order.status,
-    }));
+    const formattedData = orders.map((order) => {
+      const rawDate = order.createdAt;
+      const istDate = moment.utc(rawDate).tz("Asia/Kolkata").format("D MMM YYYY, h:mm A");
+    
+    
+      return {
+        "Order ID": order.orderId,
+        "Date": istDate,
+        "Customer": order.customer.customerName,
+        "Quantity": order.orderVariantResponse.length,
+        "Weight": order.totalAmount,
+        "Amount": order.payment.amount,
+        "Payment Status": order.payment.paymentStatus,
+        "Order Status": order.status,
+      };
+    });
+  
+    
+    console.log(formattedData);
+    
+
+
+    // const formattedData = orders.map((order) => ({
+    //   "Order ID": order.orderId,
+    //   "Date": new Intl.DateTimeFormat("en-IN").format(new Date(order.createdAt)),
+    //   "Customer": order.customer.customerName,
+    //   "Quantity": order.orderVariantResponse.length,
+    //   "Weight": order.totalAmount,
+    //   "Amount": order.payment.amount,
+    //   "Payment Status": order.payment.paymentStatus,
+    //   "Order Status": order.status,
+    // }));
 
     // Convert JSON to Sheet
     const worksheet = XLSX.utils.json_to_sheet(formattedData);
@@ -279,14 +303,16 @@ const handleRowClick = (order) => {
 
               <td style={{ verticalAlign: 'middle', fontWeight: 500 }}>{order.orderId}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                        {new Date(order.createdAt).toLocaleString('en-IN', {
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                         }).replace(',', '')}
-              </td>              
+  {new Date(order.createdAt).toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata',
+  })}
+</td>
+
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.orderVariantResponse.length}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
