@@ -24,24 +24,30 @@ const ReportBug = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const formData = {
       user_email: email,
       bug_type: selectedBug,
       priority: selectedPriority,
       description: description,
-      attachment: file ? file.name : 'No file attached', 
+      attachment: file ? file.name : 'No file attached',
     };
-
-    // Send the email via EmailJS
+  
     emailjs
-      .send('service_hmdvy1a', 'template_zuxwz8b', formData, 'xSdlnpzRkYS5A05r6')
+      .send('service_hmdvy1a', 'template_4tvas4g', formData, 'xSdlnpzRkYS5A05r6') // public key
       .then(
         (response) => {
-          alert('Bug report submitted successfully!');
+          alert('✅ Bug report submitted successfully!');
+          // Reset form after success
+          setEmail('');
+          setDescription('');
+          setSelectedBug('Visual/Aesthetic Issue');
+          setSelectedPriority('Medium Priority');
+          setFile(null);
         },
         (error) => {
-          alert('Failed to submit the bug report. Please try again later.');
+          alert('❌ Failed to submit the bug report. Please try again later.');
+          console.error('EmailJS error:', error);
         }
       );
   };

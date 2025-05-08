@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { getProductById , updateProduct } from "../../services/ProductService";
+import ModalAddColor from "./ModalAddColor";
 
 
 
@@ -13,6 +14,7 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
   const [tempCustomColors, setTempCustomColors] = useState([]);
   const [searchColor,setSearchColor] = useState('')
   const [selectedColors, setSelectedColors] = useState([]); 
+  const [showAddColorModal, setShowAddColorModal] = useState(false);
 
   const handleColorClick = (color) => {
     setSelectedColors((prevColors) => {
@@ -74,8 +76,7 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
       return;
     }
   
-    const confirmAdd = window.confirm("Are you sure you want to add these colors as new variants?");
-    if (!confirmAdd) return;
+    console.log("Colors added:", tempCustomColors);
   
     try {
       const response = await getProductById(id);
@@ -161,7 +162,7 @@ updatedVariants.forEach(variant => {
 setCustomColors((prev) => [...prev, ...updatedColorsWithIds]);
 setTempCustomColors([]);
 setIsAddingColor(false);
-alert("New color variants added successfully!");
+// alert("New color variants added successfully!");
 
   
     } catch (error) {
@@ -306,8 +307,18 @@ const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
         {isAddingColor ? (
           <div className="d-flex justify-content-between w-100">
            <button className="btn btn-outline-secondary" onClick={() => setIsAddingColor(false)}>VIEW CATALOGUE</button>
-           <button className="btn btn-outline-primary" onClick={isAddingColor ? handleAddColor : () => setIsAddingColor(true)}>{isAddingColor ? "ADD COLOR" : "ADD COLOR"}</button>
-          </div>
+           <button
+        className="btn btn-outline-primary"
+        onClick={() => {
+          if (isAddingColor) {
+            setShowAddColorModal(true); // Show the modal when adding color
+          } else {
+            setIsAddingColor(true); // Switch to adding color mode
+          }
+        }}
+      >
+        ADD COLOR
+      </button>          </div>
           ):(
           <div className="d-flex justify-content-between w-100">
           <button className="btn btn-outline-secondary" onClick={onClose}>Cancel</button>
@@ -316,6 +327,15 @@ const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
         )
         
       }
+
+      <ModalAddColor
+        isOpen={showAddColorModal} // Show modal based on state
+        onCancel={() => setShowAddColorModal(false)} // Close the modal when cancelled
+        onConfirm={() => {
+          handleAddColor(); // Add the color
+          setShowAddColorModal(false); // Close the modal after confirming
+        }}
+      />
        
       </div>
     </div>

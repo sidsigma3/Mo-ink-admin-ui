@@ -44,6 +44,8 @@ const Orders = () => {
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [totalWeightSold, setTotalWeightSold] = useState(0);
     const [totalQuantity,setTotalQuantity] =useState(0)
+    const [totalReceivedAmount, setTotalReceivedAmount] = useState(0);
+
 
     const [dateRange, setDateRange] = useState([
         {
@@ -71,6 +73,7 @@ const Orders = () => {
           let revenue = 0;
           let weight = 0;
           let quantity = 0;
+          let received = 0; 
 
           const data = await getAllOrders()
           setOrdersData(data)
@@ -80,12 +83,14 @@ const Orders = () => {
             revenue += order.totalAmount || 0;
             weight += order.totalWeight || 0;
             quantity += order.orderVariantResponse.length || 0
+            received += order.amountReceived || 0; 
           });
     
           setTotalOrders(data.length);
           setTotalRevenue(revenue);
           setTotalWeightSold(weight);
-          setTotalQuantity(quantity)
+          setTotalQuantity(quantity);
+          setTotalReceivedAmount(received);
         } catch (error) {
           console.error("Error fetching dashboard data:", error);
         }
@@ -225,6 +230,11 @@ const Orders = () => {
 
                 <li className='col-lg col-md-4 col-sm-6 col-6'>
                 <DashboardBox heading={'Ordered Amount'} number={'₹ '+formatNumber(totalRevenue)} />
+                  
+                </li>
+
+                <li className='col-lg col-md-4 col-sm-6 col-6'>
+                <DashboardBox heading={'Received Amount'} number={'₹ ' + formatNumber(totalReceivedAmount)} />
                   
                 </li>
 

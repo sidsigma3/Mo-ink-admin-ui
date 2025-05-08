@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Table } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn'
 import DashboardBox from "../../../components/DashboardBox/DashboardBox";
 import ProductFilter from '../../../components/Filter/DayFilter/ProductFilter/ProductFilter';
@@ -18,6 +19,13 @@ const Inventory = () => {
            fetchProductdData();
      }, []);
  
+
+     const navigate = useNavigate();
+
+  const handleRowClick = (item) => {
+    navigate('/inventorydetails', { state: { item } });
+  };
+
  
      const fetchProductdData = async () => {
          try {
@@ -141,18 +149,22 @@ const Inventory = () => {
         </tr>
       </thead>
       <tbody>
-        {inventoryData.map((item, index) => (
-          <tr key={index}>
-            <td className="fw-medium text-start pl-3">{item.product}</td>
-            <td>{item.counter}</td>
-            <td>{item.type}</td>
-            <td>{renderColorDot(item.color)}</td>
-            <td>150 Kgs</td>
-            <td>150 Kgs</td>
-            <td>150 Kgs</td>
-          </tr>
-        ))}
-      </tbody>
+      {inventoryData.map((item, index) => (
+        <tr 
+          key={index} 
+  onClick={() => navigate('/inventorydetails', { state: { item } })} 
+  style={{ cursor: 'pointer' }}
+>
+          <td className="fw-medium text-start pl-3">{item.product}</td>
+          <td>{item.counter}</td>
+          <td>{item.type}</td>
+          <td>{renderColorDot(item.color)}</td>
+          <td>150 Kgs</td>
+          <td>150 Kgs</td>
+          <td>150 Kgs</td>
+        </tr>
+      ))}
+    </tbody>
     </Table>
   </div>
 
