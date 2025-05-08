@@ -19,6 +19,7 @@ import { getAllSegment } from '../../../services/SegmentService';
 import StatusInput from '../../../components/StatusInput/StatusInput';
 import { FiDownload } from "react-icons/fi";
 import { downloadCreditReceipt } from '../../../services/InvoiceServices';
+import SelectState from '../../../components/SelectState/SelectState';
 
 const AddCustomerPage = () => {
 
@@ -513,7 +514,7 @@ const handleAddressTypeChange = (e) => {
 
                 <div className="col-md-6 d-flex flex-column">
                     <label>State</label>
-                    <input type="text" name="state" value={formData.state} onChange={handleChange} />
+                    <SelectState value={formData.state} onChange={handleChange} />
                     {errors.state && <p className="text-danger">{errors.state}</p>}
                 </div>
 
