@@ -53,7 +53,7 @@ const ProductsTable = forwardRef(({data},ref) => {
   const aggregateProductData = (productData) => {
     return productData.map((product) => {
       const groupedVariants = product.variants.reduce((acc, variant) => {
-        const { size, color, availableWeight ,id ,costPerKg,pricePerKg,markupPricePerKg} = variant;
+        const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType } = variant;
   
         if (!acc[size]) {
           acc[size] = {
@@ -63,44 +63,49 @@ const ProductsTable = forwardRef(({data},ref) => {
             totalWeight: 0,
           };
         }
-
-        
   
-        // Add unique colors for this size
-        if (!acc[size].variants.some((v) => v.colorName === color.colorName)) {
-          acc[size].variants.push({
+        const hex = color.hexCode?.toLowerCase() || "#ccc";
+        const colorKey = `${color.colorName}-${hex}`;
+  
+        let colorGroup = acc[size].variants.find((v) => `${v.colorName}-${v.hexCode?.toLowerCase()}` === colorKey);
+  
+        if (!colorGroup) {
+          colorGroup = {
             colorName: color.colorName,
-            hexCode: color.hexCode || "#ccc",
-            available:variant.availableWeight,
-            pricePerKg,
-            id:variant.id,
-            markupPricePerKg,
-            costPerKg,
-          });
+            hexCode: hex,
+            variants: [],
+          };
+          acc[size].variants.push(colorGroup);
         }
-        
-        // Accumulate availableWeight for this size
+  
+        colorGroup.variants.push({
+          variantType: variantType?.toLowerCase() || "unknown",
+          available: availableWeight,
+          price: pricePerKg,
+          id,
+          markupPricePerKg,
+        });
+  
         acc[size].totalWeight += Number(availableWeight);
   
         return acc;
       }, {});
   
-      // Return the aggregated product with grouped variants
       return {
         productId: product.id,
         productName: product.productName,
         productDescription: product.productDescription,
         productImage: product.productImage,
-        compareAtPrice:product.productPrice?.compareAtPrice,
-        costPerItemPerKg:product.productPrice?.costPerItemPerKg,
-        gstOnProduct:product.gstOnProduct,
-        pricePerKg:product.productPrice?.pricePerKg,
-        availableStatus:product.availableStatus,
+        compareAtPrice: product.productPrice?.compareAtPrice,
+        costPerItemPerKg: product.productPrice?.costPerItemPerKg,
+        gstOnProduct: product.gstOnProduct,
+        pricePerKg: product.productPrice?.pricePerKg,
+        availableStatus: product.availableStatus,
         groupedVariants: Object.values(groupedVariants),
       };
     });
   };
-
+  
 
   const finalData = aggregateProductData(data)
 

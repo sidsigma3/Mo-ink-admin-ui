@@ -32,7 +32,7 @@ import ModalConfirmOrder from '../../../components/Modal/ModalConfirmOrder';
 import ModalManufactureOrder from '../../../components/Modal/ModalManufactureOrder';
 import ModalShipOrder from '../../../components/Modal/ModalShipOrder';
 import ModalDeliverOrder from '../../../components/Modal/ModalDeliverOrder';
-
+import ModalReturnOrder from '../../../components/Modal/ModalReturnOrder';
 
 // Optional: style mapping
 export const statusClassMap = {
@@ -69,6 +69,10 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [customers,setCustomer] = useState([])
     const [openDropdown,setOpenDropdown] = useState(null)
 
+    const [selectedVariantForModal, setSelectedVariantForModal] = useState(null);
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+
+
     // Filter customers based on search input
     const filteredCustomers = customers.filter((customer) =>
       (customer?.customerName?.toLowerCase()?.includes(searchTerm.toLowerCase()) || 
@@ -82,6 +86,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       status: null,
     });
 
+
     const statusOptions = [
       { value: "NEW", label: "New Order" },
       { value: "CANCELLED", label: "Cancelled" },
@@ -90,8 +95,8 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       { value: "SHIPPED", label: "Shipped" },
       { value: "DELIVERED", label: "Delivered" },
       { value: "RETURNED", label: "Returned" },
-      // { value: "RETURN_REQUESTED", label: "Return Requested" },
-      // { value: "RETURN_REJECTED", label: "Return Rejected" },
+      { value: "RETURN_REQUESTED", label: "Return Requested" },
+      { value: "RETURN_REJECTED", label: "Return Rejected" },
     ];
     
     const statusFlow = [
@@ -204,10 +209,8 @@ useEffect(() => {
             const aggregateProductData = (productData) => {
               return productData.map((product) => {
                 const groupedVariants = product.variants.reduce((acc, variant) => {
-                  const { size, color, availableWeight ,id } = variant;
+                  const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType } = variant;
             
-                 
-
                   if (!acc[size]) {
                     acc[size] = {
                       id,
@@ -216,46 +219,48 @@ useEffect(() => {
                       totalWeight: 0,
                     };
                   }
-          
-                  
             
-                  // Add unique colors for this size
-                  if (!acc[size].variants.some((v) => v.colorName === color.colorName)) {
-                    acc[size].variants.push({
+                  const hex = color.hexCode?.toLowerCase() || "#ccc";
+                  const colorKey = `${color.colorName}-${hex}`;
+            
+                  let colorGroup = acc[size].variants.find((v) => `${v.colorName}-${v.hexCode?.toLowerCase()}` === colorKey);
+            
+                  if (!colorGroup) {
+                    colorGroup = {
                       colorName: color.colorName,
-                      hexCode: color.hexCode || "#ccc",
-                      available:variant.availableWeight,
-                      price:variant.pricePerKg,
-                      id:variant.id,
-                    });
+                      hexCode: hex,
+                      variants: [],
+                    };
+                    acc[size].variants.push(colorGroup);
                   }
-                  
-                  // Accumulate availableWeight for this size
+            
+                  colorGroup.variants.push({
+                    variantType: variantType?.toLowerCase() || "unknown",
+                    available: availableWeight,
+                    price: pricePerKg,
+                    id,
+                    markupPricePerKg,
+                  });
+            
                   acc[size].totalWeight += Number(availableWeight);
-
-                  
             
                   return acc;
                 }, {});
             
-                // Return the aggregated product with grouped variants
                 return {
                   productId: product.id,
                   productName: product.productName,
                   productDescription: product.productDescription,
                   productImage: product.productImage,
-                  compareAtPrice:product.productPrice?.compareAtPrice,
-                  costPerItemPerKg:product.productPrice?.costPerItemPerKg,
-                  gstOnProduct:product.gstOnProduct,
-                  pricePerKg:product.productPrice?.pricePerKg,
-                  availableStatus:product.availableStatus,
+                  compareAtPrice: product.productPrice?.compareAtPrice,
+                  costPerItemPerKg: product.productPrice?.costPerItemPerKg,
+                  gstOnProduct: product.gstOnProduct,
+                  pricePerKg: product.productPrice?.pricePerKg,
+                  availableStatus: product.availableStatus,
                   groupedVariants: Object.values(groupedVariants),
                 };
               });
             };
-          
-           
-          
           
     // const finalData = aggregateProductData(productData)
 
@@ -305,31 +310,28 @@ useEffect(() => {
         );
       };
 
+      const handleWeightChange = (orderIndex, newWeight) => {
+        setWeightChanged(true)
 
-      const handleWeightChange = (productId, size, colorIndex, weight) => {
-        setWeightChanged(true);
-        setOrderDetails(prevOrderDetails =>
-          prevOrderDetails.map(order => {
-            if (order.productId === productId && order.size === size) {
-              const updatedColors = order.colors.map((color, index) => {
-                if (index === colorIndex) {
-                  const updatedWeight = parseFloat(weight || 0);
-                  return {
-                    ...color,
-                    weight: updatedWeight,
-                    type: color.type || "Cone",
-                    weightChanged: true
-                  };
-                }
-                return color;
-              });
+        const updatedWeight = parseFloat(newWeight || 0);
+        const updatedOrderDetails = [...orderDetails];
       
-              return { ...order, colors: updatedColors };
-            }
-            return order;
-          })
-        );
+        updatedOrderDetails[orderIndex] = {
+          ...updatedOrderDetails[orderIndex],
+          color: {
+            ...updatedOrderDetails[orderIndex].color,
+            weight: updatedWeight,
+            weightChanged: true,
+          }
+        };
+      
+        setOrderDetails(updatedOrderDetails);
       };
+      
+      
+      
+      
+      
 
       const variantToProductMap = {};
           finalData.forEach((p) => {
@@ -344,82 +346,64 @@ useEffect(() => {
       
       const transformOrderToProductDetails = (order, finalData) => {
         if (!order || !order.orderVariantResponse) return [];
-      
-        const groupedVariants = {};
-      
+    
+        const flatDetails = [];
+    
         order.orderVariantResponse.forEach((variant) => {
-          const {
-            size,
-            color,
-            orderVariantId,
-            orderWeight,
-            variantType,
-            productId,
-            status,
-          } = variant;
-      
-          const product = finalData.find(p => p.productId === productId);
-          if (!product) return;
-      
-          const key = `${productId}-${size}`;
-      
-          if (!groupedVariants[key]) {
-            groupedVariants[key] = {
-              productId: productId,
-              productName: product?.productName,
-              size: size,
-              colors: [],
-              variant: {
-                id: orderVariantId,
+            const {
+                size,
+                color,
+                orderVariantId,
+                orderWeight,
+                variantType,
+                productId,
+                status,
+                statusReason,
+            } = variant;
+    
+            const product = finalData.find(p => p.productId === productId);
+            if (!product) return;
+    
+            // Find size group in finalData
+            const sizeGroup = product.groupedVariants?.find(gv => gv.size === size);
+            if (!sizeGroup) return;
+    
+            // Find matching color in the size group
+            const matchingColor = sizeGroup?.variants?.find(c => c.hexCode?.toLowerCase() === color.hexCode?.toLowerCase());
+            if (!matchingColor) return;
+    
+            // Find the specific variant for the variantType (e.g., 'cone' or 'hank')
+            const variantDetails = matchingColor.variants.find(v => v.variantType.toLowerCase() === variantType.toLowerCase());
+            if (!variantDetails) return;
+    
+            flatDetails.push({
+                productId: product.productId,
+                productName: product.productName,
                 size: size,
-                variants: [],
-                totalWeight: 0,
-              },
-              product: {
-                productId: product?.productId,
-                productName: product?.productName,
-                productDescription: product?.productDescription,
-                productImage: product?.productImage || [],
-                compareAtPrice: product?.compareAtPrice,
-                costPerItemPerKg: product?.costPerItemPerKg,
-                gstOnProduct: product?.gstOnProduct,
-                pricePerKg: product?.pricePerKg,
-                availableStatus: product?.availableStatus,
-                groupedVariants: [],
-              },
-            };
-          }
-      
-          // Find color details in product groupedVariants to fetch pricePerKg & availableWeight
-          const sizeGroup = product.groupedVariants?.find(gv => gv.size === size);
-          const matchingColor = sizeGroup?.variants?.find(c => c.hexCode?.toLowerCase() === color.hexCode?.toLowerCase());
-      
-          const colorDetails = {
-            colorName: color.colorName,
-            hexCode: color.hexCode,
-            available: matchingColor?.available || 0,
-            price: matchingColor?.price || 0,
-            id: color.id,
-            weight: orderWeight,
-            type: variantType,
-            status,
-            orderVariantId,
-            orderId:order.orderId
-          };
-      
-          groupedVariants[key].colors.push(colorDetails);
-          groupedVariants[key].variant.variants.push(colorDetails);
-          groupedVariants[key].variant.totalWeight += parseFloat(orderWeight || 0);
+                color: {
+                    id: color.id,
+                    name: color.colorName,
+                    hex: color.hexCode,
+                    weight: parseFloat(orderWeight) || 0,
+                },
+                variantType,
+                price: variantDetails.price || 0,
+                available: variantDetails.available || 0,
+                costPerKg: matchingColor.costPerItemPerKg || 0,
+                markupPricePerKg: variantDetails.markupPricePerKg || 0,
+                gstOnProduct: product.gstOnProduct || 0,
+                productImage: product.productImage || ["null"],
+                variantId: orderVariantId,
+                status,
+                statusReason,
+                orderId: order.orderId
+            });
         });
+    
+        return flatDetails;
+    };
+    
       
-        const productDetailsArray = Object.values(groupedVariants);
-      
-        productDetailsArray.forEach((item) => {
-          item.product.groupedVariants = [item.variant];
-        });
-      
-        return productDetailsArray;
-      };
       
             
       const [orderDetails, setOrderDetails] = useState([]);
@@ -428,11 +412,11 @@ useEffect(() => {
         if (order && order.orderVariantResponse && finalData?.length > 0) {
           const details = transformOrderToProductDetails(order, finalData);
           setOrderDetails(details);
-       
         } else {
           console.log("Waiting for order or finalData...");
         }
       }, [order, finalData]);
+      
 
       console.log(order)
       console.log(orderDetails)
@@ -555,88 +539,62 @@ useEffect(() => {
     ) => {
       let baseTotal = 0;
       let totalGst = 0;
+      let totalDiscount = 0;
       let totalPaymentTypeDiscount = 0;
-      let totalCouponTypeDiscount = 0
+      let totalCouponTypeDiscount = 0;
+      let totalFinalTotal = 0;
     
       for (const order of orderDetails) {
-        if (!order || !Array.isArray(order.colors) || !order.variant?.variants) continue;
+        if (!order || !order.color || order.color.status === 'CANCELLED') continue;
     
-        for (const colorObj of order.colors) {
-          if (colorObj.status === 'CANCELLED'){
-            continue
-          }            
-          const colorHex = typeof colorObj === "string"
-            ? colorObj.trim().toLowerCase()
-            : colorObj.hexCode?.trim().toLowerCase();
+        const weight = parseFloat(order.color.weight) || 0;
+        const price = order.price || 0;
+        const gstRate = order.gstOnProduct || 0;
+        const rawTotal = weight * price;
     
-          if (!colorHex) continue;
+        // Apply coupon discount if applicable
+        const isCouponApplicable = selectedDiscountData?.applicableProducts?.some(
+          (product) => product.id === order.productId
+        );
     
-          const variant = order.variant.variants.find(v =>
-            v.hexCode?.trim().toLowerCase() === colorHex
-          );
+        const couponDiscountAmount = isCouponApplicable
+          ? (rawTotal * couponDiscount) / 100
+          : 0;
     
-          if (!variant) continue;
+        const subtotalAfterCoupon = rawTotal - couponDiscountAmount;
     
-          const weight = colorObj.weight || 0;
-          const price = variant.price || 0;
-          const gstRate = order.product?.gstOnProduct || 0;
+        // Apply payment discount
+        const paymentDiscountAmount = (subtotalAfterCoupon * paymentDiscount) / 100;
     
-          const rawTotal = weight * price;
-
-          console.log(order)
-
-          console.log(order.productId)
+        const discountedTotal = subtotalAfterCoupon - paymentDiscountAmount;
     
-          
-          console.log(selectedDiscountData)
-
-          // 👇 Check if coupon discount is applicable to this product
-          const isCouponApplicable = selectedDiscountData?.applicableProducts?.some(
-            product => product.id === order.productId
-          );
-
-          
-          
-          const appliedCouponDiscount = isCouponApplicable ? couponDiscount : 0;
-          const totalDiscountPercent = 
-                Number(paymentDiscount) + Number(appliedCouponDiscount) - 
-                (Number(paymentDiscount) * Number(appliedCouponDiscount)) / 100;
-
-          const couponDiscountPercent = Number(appliedCouponDiscount);
-          const paymentDiscountPercent = Number(paymentDiscount);
-          
-          const couponDiscounts = rawTotal * couponDiscountPercent / 100;
-          const subtotalAfterCoupon = rawTotal - couponDiscounts;
-          
-          const paymentDiscounts = subtotalAfterCoupon * paymentDiscountPercent / 100;
-          const finalTotal = subtotalAfterCoupon - paymentDiscounts;
-
-          const discount = rawTotal * totalDiscountPercent / 100;
-          const discountedTotal = rawTotal - discount;
-          const gstAmount = discountedTotal * gstRate / 100;
+        // GST on final discounted total
+        const gstAmount = (discountedTotal * gstRate) / 100;
     
-
-          totalCouponTypeDiscount +=couponDiscounts;
-          totalPaymentTypeDiscount += paymentDiscounts;
-          baseTotal += rawTotal;
-        
-          totalGst += gstAmount;
-          console.log(totalCouponTypeDiscount,totalPaymentTypeDiscount)
-          console.log(rawTotal,totalDiscountPercent,discount,discountedTotal,gstRate,gstAmount)
-           
-        }
+        const finalTotal = discountedTotal + gstAmount;
+        const totalItemDiscount = couponDiscountAmount + paymentDiscountAmount;
+    
+        // Accumulate values
+        baseTotal += rawTotal;
+        totalCouponTypeDiscount += couponDiscountAmount;
+        totalPaymentTypeDiscount += paymentDiscountAmount;
+        totalDiscount += totalItemDiscount;
+        totalGst += gstAmount;
+        totalFinalTotal += finalTotal;
       }
     
       return {
         baseTotal,
-        totalDiscount: totalCouponTypeDiscount + totalPaymentTypeDiscount,
-        finalTotal: baseTotal - totalCouponTypeDiscount + totalPaymentTypeDiscount,
-        cgst: totalGst / 2,
-        sgst: totalGst / 2,
+        totalGst,
+        totalDiscount,
+        totalFinalTotal,
         totalCouponTypeDiscount,
         totalPaymentTypeDiscount,
+        cgst: totalGst / 2,
+        sgst: totalGst / 2,
       };
     };
+    
     
     
     
@@ -751,45 +709,45 @@ useEffect(() => {
   
       const homeAddress = selectedCustomer?.addresses?.find(addr => addr.addressType === "HOME");
       const isOdisha = homeAddress?.state?.toLowerCase() === "odisha";
-
-      const orderVariants = orderDetails.flatMap(order =>
-        order.colors
-          .filter(color => color.id && color.weight > 0)
-          .map(color => {
-            const breakdown = calculatePriceBreakdown(
-              order,
-              color,
-              selectedDiscountValue,
-              discountPercentage,
-              selectedDiscountData
-            );
-      
-          
-            const gstRate = breakdown.gstRate || 0;
-            const gstAmount = breakdown.gstAmount || 0;
-      
-            const weight = Number(color.weight);
-            const proportionalHandlingCharge = totalWeight > 0
-              ? Number(((weight / totalWeight) * handlingCharges ).toFixed(2))
-              : 0;
-      
-            return {
-              variantId: color.id,
-              orderWeight: weight,
-              variantType: color.type || "Cone",
-              orderVariantCgst: isOdisha ? (gstAmount / 2 ).toFixed(1): 0,
-              orderVariantSgst: isOdisha ? (gstAmount / 2 ).toFixed(1): 0,
-              orderVariantIgst: isOdisha ? 0 : gstAmount.toFixed(1),
-              orderVariantDiscount: breakdown.discountAmount.toFixed(1) || 0,
-              orderVariantHandlingCharges: proportionalHandlingCharge,
-              orderVariantTotalAmount: (breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(1),
-              status: "NEW",
-              statusReason: null,
-              statusRemark: null,
-            };
-          })
-      );
-      
+  
+      // Calculate total weight for proportional handling charges
+      const totalWeight = orderDetails.reduce((sum, order) => {
+        return sum + (Number(order.color.weight) || 0);
+      }, 0);
+  
+      const orderVariants = orderDetails
+        .filter(order => order.variantId && order.color?.weight > 0)
+        .map(order => {
+          const breakdown = calculatePriceBreakdown(
+            order,
+            order.color,
+            selectedDiscountValue,
+            discountPercentage,
+            selectedDiscountData
+          );
+  
+          const gstRate = breakdown.gstRate || 0;
+          const gstAmount = breakdown.gstAmount || 0;
+          const weight = Number(order.color.weight) || 0;
+  
+          const proportionalHandlingCharge =
+            totalWeight > 0 ? Number(((weight / totalWeight) * handlingCharges).toFixed(2)) : 0;
+  
+          return {
+            variantId: order.variantId,
+            orderWeight: weight,
+            variantType: order.variantType || "Cone",
+            orderVariantCgst: isOdisha ? (gstAmount / 2).toFixed(1) : "0.0",
+            orderVariantSgst: isOdisha ? (gstAmount / 2).toFixed(1) : "0.0",
+            orderVariantIgst: isOdisha ? "0.0" : gstAmount.toFixed(1),
+            orderVariantDiscount: breakdown.discountAmount?.toFixed(1) || "0.0",
+            orderVariantHandlingCharges: proportionalHandlingCharge,
+            orderVariantTotalAmount: (breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(1),
+            status: "NEW",
+            statusReason: null,
+            statusRemark: null
+          };
+        });
   
       const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
       const totalAmount = Number(calculateTotalAmount());
@@ -804,13 +762,13 @@ useEffect(() => {
       const billingAddress = selectedCustomer.addresses?.find(
         (addr) => addr.addressType === "HOME"
       );
-      
+  
       const formattedCustomer = {
         customerId: selectedCustomer.customerId,
         billingAddressId: billingAddress?.id || null,
         shippingAddressId: selectedAddress?.id || null,
       };
-      
+  
       const orderData = {
         customer: formattedCustomer,
         status: "NEW",
@@ -826,18 +784,17 @@ useEffect(() => {
           onlineAmount: onlineAmt.toFixed(2),
           transactionId: "TXN" + Date.now(),
           paidAmount: onlineAmt.toFixed(2),
-          pendingAmount: (codAmt).toFixed(2),
+          pendingAmount: codAmt.toFixed(2),
           paymentStatus: "UNPAID",
-          totalDiscount:grandTotals.totalDiscount,
+          totalDiscount: grandTotals.totalDiscount,
           totalSgst: isOdisha ? grandTotals.sgst.toFixed(2) : "0.00",
           totalCgst: isOdisha ? grandTotals.cgst.toFixed(2) : "0.00",
           totalIgst: isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(2)
-          
         },
         orderVariants
       };
   
-      console.log(orderData)
+      console.log("Final Payload:", orderData);
       const response = await createOrder(orderData);
       console.log("Order Created:", response);
   
@@ -894,13 +851,12 @@ useEffect(() => {
     
     
     const calculatePriceBreakdown = (
-      order,
-      colorObj,
+      variant, 
       selectedDiscount = 0,
       paymentDiscount = 0,
-      selectedDiscountData = null // Pass full selected discount object
+      selectedDiscountData = null
     ) => {
-      if (!order || !order.variant || !order.variant.variants || !colorObj) {
+      if (!variant) {
         return {
           baseTotal: 0,
           gstAmount: 0,
@@ -911,50 +867,33 @@ useEffect(() => {
         };
       }
 
-      console.log(colorObj)
-    
-      const colorHex = typeof colorObj === "string"
-        ? colorObj.trim().toLowerCase()
-        : colorObj.hexCode?.trim().toLowerCase() || "";
-    
-      const matchingItem = order.variant.variants.find(item =>
-        item.hexCode?.trim().toLowerCase() === colorHex
-      );
-    
-      const weight = colorObj.weight || 0;
-      const price = colorObj?.price || 0;
-      // const price = matchingItem?.price || 0;
-    
 
+      console.log(variant)
+    
+      const weight = parseFloat(variant.weight) || 0;
+      const price = variant.price || 0;
       const baseTotal = weight * price;
-      const gstRate = order.product?.gstOnProduct || 0;
-      // const gstAmount = (baseTotal * gstRate) / 100;
-
+      const gstRate = variant.gstOnProduct || 0;
     
-      // Check if the selected discount is applicable to this product
+      // Discount calculation
       let productDiscountPercent = 0;
-    
       if (selectedDiscountData && Array.isArray(selectedDiscountData.applicableProducts)) {
         const isApplicable = selectedDiscountData.applicableProducts.some(
-          (p) => p.id === order.productId
+          (p) => p.id === variant.productId
         );
-    
         if (isApplicable) {
-          productDiscountPercent = Number(selectedDiscountValue); // Apply only if product is included
+          productDiscountPercent = Number(selectedDiscount);
         }
       }
     
-      const productDiscount = productDiscountPercent;
       const paymentDiscountValue = Number(paymentDiscount);
-      
-      const combinedDiscountPercent = productDiscount + paymentDiscountValue - (productDiscount * paymentDiscountValue) / 100;
-      
+      const combinedDiscountPercent =
+        productDiscountPercent + paymentDiscountValue - (productDiscountPercent * paymentDiscountValue) / 100;
+    
       const discount = baseTotal * (combinedDiscountPercent / 100);
-
       const discountedBase = baseTotal - discount;
       const gstAmount = (discountedBase * gstRate) / 100;
-
-      const finalTotal = baseTotal - discount;
+      const finalTotal = discountedBase + gstAmount;
     
       return {
         baseTotal: isNaN(baseTotal) ? 0 : baseTotal,
@@ -967,7 +906,6 @@ useEffect(() => {
       };
     };
     
-  
 
   const paymentDescriptions = {
     "100%": "100% Online Payment",
@@ -997,7 +935,7 @@ useEffect(() => {
     if (isViewMode) {
       const parts = order.shippingAddress?.split(",") || [];
       if (parts.length >= 3) {
-        state = parts[parts.length - 3]?.trim().toLowerCase(); // "Odisha" etc.
+        state = parts[parts.length - 3]?.trim().toLowerCase(); // e.g., "Odisha"
       }
     } else {
       state = selectedAddress?.state?.toLowerCase();
@@ -1008,44 +946,22 @@ useEffect(() => {
     const ratePerKg = state === "odisha" ? 3 : 5;
   
     const totalWeight = orderDetails.reduce((acc, item) => {
-      const validColors = item.colors?.filter(color => color.status !== 'CANCELLED') || [];
-  
-      const colorWeight = validColors.reduce(
-        (sum, color) => sum + (Number(color.weight) || 0),
-        0
-      );
-  
-      return acc + colorWeight;
+      if (item.color?.status === 'CANCELLED') return acc;
+      return acc + (Number(item.color?.weight) || 0);
     }, 0);
   
     return Number((totalWeight * ratePerKg).toFixed(2));
   };
   
-  // const calculateShippingCost = (orderDetails, selectedCustomer) => {
-
-  //   if (!selectedAddress?.state) return 0;
- 
-  //   const customerState = selectedAddress.state.toLowerCase();
-
-  //   const ratePerKg = customerState === "odisha" ? 3 : 5;
   
-  //   const totalWeight = orderDetails.reduce((acc, item) => {
-  //     const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
-  //     return acc + colorWeight;
-  //   }, 0);
-  
-  //   console.log(totalWeight)
-    
-  
-  //   return Number((totalWeight * ratePerKg).toFixed(2));
 
-  // };
 
   const totalWeight = orderDetails.reduce((acc, item) => {
-    const colorWeight = item.colors.reduce((sum, color) => sum + (Number(color.weight) || 0), 0);
+    // If item.color is not undefined and has a weight property, use it (or adjust based on your data structure)
+    const colorWeight = item.color?.weight || 0; // Assuming color weight is a property of color object
+    
     return acc + colorWeight;
   }, 0);
-  
   
   const grandTotals = calculateGrandTotals(
     orderDetails,
@@ -1086,20 +1002,13 @@ const filteredDiscounts = discountData.filter((discount) => {
   return isActive && !!matchedCustomer;
 });
 
-const handleDeleteColor = (productId, size, colorIndexToDelete) => {
-  const updatedOrderDetails = orderDetails.map(order => {
-    if (order.productId === productId && order.size === size) {
-      const updatedColors = order.colors.filter((_, idx) => idx !== colorIndexToDelete);
-      return {
-        ...order,
-        colors: updatedColors
-      };
-    }
-    return order;
-  }).filter(order => order.colors.length > 0); // Optional: remove order if no colors left
-
+const handleDeleteColor = (productId, size) => {
+  const updatedOrderDetails = orderDetails.filter(
+    (order) => !(order.productId === productId && order.size === size)
+  );
   setOrderDetails(updatedOrderDetails);
 };
+
 
 
 
@@ -1124,38 +1033,25 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
     ]);
 
     setOrderDetails((prev) =>
-      prev.map((item) => ({
-        ...item,
-        colors: item.colors.map((color) =>
-          color.orderVariantId === orderVariantId
-            ? {
-                ...color,
-                status: newStatus,
-                previousStatus:
-                  newStatus === "RETURN_REQUESTED" ? color.status : undefined,
-              }
-            : color
-        ),
-        variant: {
-          ...item.variant,
-          variants: item.variant.variants.map((color) =>
-            color.orderVariantId === orderVariantId
-              ? {
-                  ...color,
-                  status: newStatus,
-                  previousStatus:
-                    newStatus === "RETURN_REQUESTED" ? color.status : undefined,
-                }
-              : color
-          ),
-        },
-      }))
+      prev.map((item) =>
+        item.variantId === orderVariantId
+          ? {
+              ...item,
+              status: newStatus,
+              previousStatus:
+                newStatus === "RETURN_REQUESTED" ? item.status : undefined,
+            }
+          : item
+      )
     );
+
+    
   } catch (err) {
     alert("Failed to update status");
     console.error(err);
   }
 };
+
 
 
 const getStateFromBillingAddress = (billingAddress) => {
@@ -1174,57 +1070,61 @@ const getStateFromBillingAddress = (billingAddress) => {
 const handleOrderChange = async () => {
   const payload = [];
 
-  for (const orders of orderDetails) {
-    for (const color of orders.colors) {
-      if (color.status === "SHIPPED" || !color.weightChanged) continue; // skip unchanged or shipped
+  for (const item of orderDetails) {
+    const { color, status, price, gstOnProduct, productId, orderId , variantId } = item;
 
-      const orderWeight = parseFloat(color.weight || 0);
-      const pricePerKg = color.price || 0;
-      const baseAmount = orderWeight * pricePerKg;
+    if (status === "SHIPPED" || !color.weightChanged) continue;
 
-      // Get discount percent
-      let productDiscountPercent = 0;
-      if (selectedDiscountData?.applicableProducts?.some(p => p.id === orders.productId)) {
-        productDiscountPercent = Number(selectedDiscountValue) || 0;
-      }
-      const paymentDiscountValue = Number(discountPercentage) || 0;
-      const combinedDiscountPercent = productDiscountPercent + paymentDiscountValue - (productDiscountPercent * paymentDiscountValue) / 100;
+    const orderWeight = parseFloat(color.weight || 0);
+    const pricePerKg = parseFloat(price || 0);
+    if (!orderWeight || !pricePerKg) continue;
 
-      const discount = (baseAmount * combinedDiscountPercent) / 100;
-      
-      const stateForShipping = getStateFromBillingAddress(order.shippingAddress);
-      const ratePerKg = stateForShipping === "odisha" ? 3 : 5;
-      const handling = orderWeight * ratePerKg;
+    const baseAmount = orderWeight * pricePerKg;
 
-      const taxableAmount = baseAmount - discount ;
-
-      const gst = orders.product?.gstOnProduct || 0;
-      const state = getStateFromBillingAddress(order.billingAddress);
-
-      console.log(gst)
-
-      let cgst = 0, sgst = 0, igst = 0;
-
-      if (state === "odisha") {
-        cgst = (gst / 2 / 100) * taxableAmount;
-        sgst = (gst / 2 / 100) * taxableAmount;
-      } else {
-        igst = (gst / 100) * taxableAmount;
-      }
-
-      const total = taxableAmount + cgst + sgst + igst + handling;
-
-      payload.push({
-        orderVariantId: color.orderVariantId,
-        orderWeight,
-        orderVariantCgst: Number(cgst.toFixed(2)),
-        orderVariantSgst: Number(sgst.toFixed(2)),
-        orderVariantIgst: Number(igst.toFixed(2)),
-        orderVariantDiscount: Number(discount.toFixed(2)),
-        orderVariantHandlingCharges: Number(handling.toFixed(2)),
-        orderVariantTotalAmount: Number(total.toFixed(2))
-      });
+    // Calculate Discount
+    let productDiscountPercent = 0;
+    if (selectedDiscountData?.applicableProducts?.some(p => p.id === productId)) {
+      productDiscountPercent = parseFloat(selectedDiscountValue) || 0;
     }
+    const paymentDiscountPercent = parseFloat(discountPercentage) || 0;
+
+    const combinedDiscountPercent =
+      productDiscountPercent + paymentDiscountPercent -
+      (productDiscountPercent * paymentDiscountPercent) / 100;
+
+    const discount = (baseAmount * combinedDiscountPercent) / 100;
+
+    // Handling Charges
+    const shippingState = getStateFromBillingAddress(order.shippingAddress);
+    const ratePerKg = shippingState?.toLowerCase() === "odisha" ? 3 : 5;
+    const handling = orderWeight * ratePerKg;
+
+    const taxableAmount = baseAmount - discount;
+
+    // GST Calculation
+    const gst = parseFloat(gstOnProduct || 0);
+    const billingState = getStateFromBillingAddress(order.billingAddress);
+
+    let cgst = 0, sgst = 0, igst = 0;
+    if (billingState?.toLowerCase() === "odisha") {
+      cgst = (gst / 2 / 100) * taxableAmount;
+      sgst = (gst / 2 / 100) * taxableAmount;
+    } else {
+      igst = (gst / 100) * taxableAmount;
+    }
+
+    const total = taxableAmount + cgst + sgst + igst + handling;
+
+    payload.push({
+      orderVariantId: variantId,
+      orderWeight,
+      orderVariantCgst: Number(cgst.toFixed(2)),
+      orderVariantSgst: Number(sgst.toFixed(2)),
+      orderVariantIgst: Number(igst.toFixed(2)),
+      orderVariantDiscount: Number(discount.toFixed(2)),
+      orderVariantHandlingCharges: Number(handling.toFixed(2)),
+      orderVariantTotalAmount: Number(total.toFixed(2))
+    });
   }
 
   try {
@@ -1233,15 +1133,16 @@ const handleOrderChange = async () => {
       return;
     }
 
-    console.log(payload);
-    await updateOrderVariants(order.orderId, payload);
+    console.log("Payload:", payload);
+    await updateOrderVariants(orderDetails[0].orderId, payload);
     alert("Order updated successfully!");
-    setWeightChanged(false); 
+
   } catch (err) {
     console.error(err);
-    alert("Failed to update order");
+    alert("Failed to update order.");
   }
 };
+
 
 
 const billingAddress = order?.billingAddress 
@@ -1281,9 +1182,30 @@ const renderModal = () => {
 };
 
 
+const openReturnModal = (variant) => {
+  setSelectedVariantForModal(variant);
+  setIsReturnModalOpen(true);
+};
 
-  console.log(orderDetails)  
-  console.log(selectedAddress)
+const closeReturnModal = () => {
+  setSelectedVariantForModal(null);
+  setIsReturnModalOpen(false);
+};
+
+const handleApprove = (variant) => {
+  handleStatusChange(variant.orderId, variant.orderVariantId, "RETURNED");
+  closeReturnModal();
+};
+
+const handleReject = (variant) => {
+  handleStatusChange(variant.orderId, variant.orderVariantId, "RETURN_REJECTED");
+  closeReturnModal();
+};
+
+
+
+console.log(orderDetails)  
+console.log(selectedAddress)
 
 
   return (
@@ -1395,285 +1317,213 @@ const renderModal = () => {
                                           </td>
 
                                           {/* Colors Column */}
-                                          <td  style={{ justifyItems: 'center'}}>
-                                              <div className="d-flex flex-column gap-1">
-                                                  {order.colors.map((colorObj, colorIndex) => (
-                                                      <div
-                                                          key={colorIndex}
-                                                          style={{
-                                                              backgroundColor: colorObj.hexCode,
-                                                              width: '25px',
-                                                              height: '25px',
-                                                              borderRadius: '50%',
-                                                              border: '2px solid #ccc',
-                                                              margin: '5px',
-                                                          }}
-                                                      ></div>
-                                                  ))}
-                                              </div>
+                                          <td style={{ justifyItems: 'center'}}>
+                                            <div className="d-flex flex-column gap-1">
+                                              <div
+                                                style={{
+                                                  backgroundColor: order.color.hex, // use order.color.hex
+                                                  width: '25px',
+                                                  height: '25px',
+                                                  borderRadius: '50%',
+                                                  border: '2px solid #ccc',
+                                                  margin: '5px',
+                                                }}
+                                              ></div>
+                                            </div>
                                           </td>
 
                                           <td style={{ textAlign: 'center'}}>
-                                              <div className="d-flex flex-column gap-3">
-                                                  {order.colors.map((colorObj, colorIndex) => (
-                                                      <div
-                                                          key={colorIndex}
-                                                      >{colorObj.colorName}</div>
-                                                  ))}
-                                              </div>
-                                          </td>
-
-                                          <td  style={{ justifyItems: 'center'}}>
-                                          <div className="d-flex flex-column gap-3">
-                                              {order.colors.map((colorObj, colorIndex) => (
-                                                 isViewMode ? (
-                                                  // Show plain text in view mode
-                                                  <span key={colorIndex} className=" w-75">
-                                                      {colorObj.type || 'N/A'}
-                                                  </span>
-                                                 ):(
-                                                <select
-                                                  key={colorIndex}
-                                                  className="form-select form-select-sm"
-                                                  value={colorObj.type || "Cone"}
-                                                  onChange={(e) =>
-                                                    handleTypeChange(order.productId, order.size, colorIndex, e.target.value)
-                                                  }
-                                                  disabled={isViewMode}
-                                                >
-                                                  <option value="Cone">Cone</option>
-                                                  <option value="Hank">Hank</option>
-                                                </select>
-                                                 )
-                                              ))}
+                                            <div className="d-flex flex-column gap-3">
+                                          
+                                              <div>{order.color.name}</div> 
                                             </div>
                                           </td>
+
+                                          <td style={{ justifyItems: 'center' }}>
+                                            <div className="d-flex flex-column gap-3">
+                                              <span className="w-75">
+                                                {order.variantType || 'Cone'} {/* Show type or default to 'Cone' */}
+                                              </span>
+                                            </div>
+                                          </td>
+
+
 
                                           {/* Weight Inputs Column */}
+                                       
                                           <td style={{ width: '8rem' }}>
                                           <div className="d-flex flex-column align-items-center">
-                                          {order.colors.map((colorObj, colorIndex) => (
-                                                    // isViewMode ? (
-                                                    //     // Show plain text in view mode
-                                                    //     <span key={colorIndex} className="mb-1 p-1 w-75">
-                                                    //         {colorObj.weight || 'N/A'}
-                                                    //     </span>
-                                                    // ) : (
-                                                        // Show input field in edit mode
-                                                        <input
-                                                        key={colorIndex}
-                                                        type="number"
-                                                        style={{ border: '1px solid' }}
-                                                        placeholder="Weight"
-                                                        className="rounded border-secondary-subtle weight-input ps-2 mb-3 w-75"
-                                                        value={colorObj.weight || ''}
-                                                        onChange={(e) =>
-                                                          handleWeightChange(order.productId, order.size, colorIndex, e.target.value)
-                                                        }
-                                                        disabled={["SHIPPED", "CANCELLED", "DELIVERED", "RETURN_REQUESTED", "RETURNED", "RETURN_REJECTED"].includes(colorObj.status)}
-                                                      />
-                                                    // )
-                                                ))}
-                                            </div>
+                                          <input
+                                            type="number"
+                                            style={{ border: '1px solid' }}
+                                            placeholder="Weight"
+                                            className="rounded border-secondary-subtle weight-input ps-1 py-1 mb-3 w-75"
+                                            value={order.color.weight || ''}
+                                            onChange={(e) => handleWeightChange(index, e.target.value)}
+                                            disabled={["SHIPPED", "CANCELLED", "DELIVERED", "RETURN_REQUESTED", "RETURNED", "RETURN_REJECTED"].includes(order.status)}
+                                          />
+
+                                          </div>
                                         </td>
+
+
 
                                           {/* Price Calculation */}
-                                          <td style={{ textAlign: 'center'}} colSpan="5">
-                                              <div className="">
-                                              {order.colors.map((colorObj, colorIndex) => {
-                                                    const { 
-                                                      baseTotal,
-                                                      gstAmount,
-                                                      finalTotal,
-                                                      gstRate,
-                                                      discountPercent,
-                                                      isProductDiscountApplied
-                                                     } = calculatePriceBreakdown(order, colorObj ,selectedDiscountValue, discountPercentage , selectedDiscountData);
+                                          <td style={{ textAlign: 'center' }} colSpan="5">
+                                            <div className="d-flex flex-column" style={{ gap: '0.6rem' }}>
+                                              <div className="d-flex justify-content-between mb-3">
+                                                {(() => {
+                                                  const {
+                                                    baseTotal,
+                                                    gstAmount,
+                                                    finalTotal,
+                                                    gstRate,
+                                                    discountPercent
+                                                  } = calculatePriceBreakdown(
+                                                    { ...order.color, productId: order.productId,gstOnProduct:order.gstOnProduct,price:order.price, }, 
+                                                    selectedDiscountValue,
+                                                    discountPercentage,
+                                                    selectedDiscountData
+                                                  );
 
-                                                    return (
-                                                        <div key={colorIndex} className="d-flex justify-content-between mb-3">
-                                                            <span>₹{baseTotal.toFixed(2)}</span>
-                                                            {/* <span>₹{gstAmount.toFixed(2)} ({gstRate}%)</span> */}
-                                                            <span>
-                                                              {discountPercent.toFixed(2)}
-                                                            </span>
-                                                            {/* <span>{gstRate}%</span> */}
-                                                            <span>₹{finalTotal.toFixed(2)}</span>
-                                                            <span>{gstRate/2}%</span>
-                                                            <span>{gstRate/2}%</span>
-                                                        </div>
-                                                    );
-                                                })}
+                                                  return (
+                                                    <>
+                                                      <span>₹{baseTotal.toFixed(2)}</span>
+                                                      <span>{discountPercent.toFixed(2)}%</span>
+                                                      <span>₹{finalTotal.toFixed(2)}</span>
+                                                      <span>{(gstRate / 2).toFixed(2)}%</span>
+                                                      <span>{(gstRate / 2).toFixed(2)}%</span>
+                                                    </>
+                                                  );
+                                                })()}
                                               </div>
+                                            </div>
                                           </td>
 
+
+
+
                                           {isViewMode && (
-                                        <td>
-                                          <div className="d-flex flex-column gap-3">
-                                            {order.colors.map((colorObj, colorIndex) => {
-                                              const currentStatus = colorObj.status;
-                                              const currentIndex = statusFlow.indexOf(currentStatus);
-                                              const isFinalStatus = ["DELIVERED", "RETURNED", "CANCELLED"].includes(
-                                                currentStatus
-                                              );
-
-                                              return (
-                                                <div
-                                                  key={colorIndex}
-                                                  className="d-flex align-items-center justify-content-center"
-                                                >
-                                                  {["RETURNED", "RETURN_REJECTED"].includes(currentStatus) ? (
-                                                   <div className={`${statusClassMap[currentStatus] || ''} text-capitalize`}>
-                                                        {currentStatus.replace("_", " ")}
-                                                     </div>
-                                                  ) : (
-                                                    <select
-                                                      value={
-                                                        currentStatus === "RETURN_REQUESTED"
-                                                          ? colorObj.previousStatus || "DELIVERED"
-                                                          : currentStatus
-                                                      }
-                                                      disabled={isFinalStatus || currentStatus === "RETURN_REQUESTED"}
-                                                      onChange={(e) => {
-                                                        const selectedStatus = e.target.value;
-                                                        setModalData({
-                                                          isOpen: true,
-                                                          orderId: colorObj.orderId,
-                                                          variantId: colorObj.orderVariantId,
-                                                          status: selectedStatus,
-                                                        });
-                                                      }}
-                                                      className={`${statusClassMap[currentStatus] || ''} text-capitalize`}
-                                                    >
-                                                      {statusOptions.map(({ value, label }) => {
-                                                        const optionIndex = statusFlow.indexOf(value);
-                                                        let shouldDisable = false;
-
-                                                        if (isFinalStatus) {
-                                                          shouldDisable = true;
-                                                        } else if (currentStatus === "RETURN_REQUESTED") {
-                                                          shouldDisable = true;
-                                                        } else if (currentStatus === "NEW") {
-                                                          shouldDisable = !["CONFIRMED", "CANCELLED"].includes(value);
-                                                        } else if (currentStatus === "CONFIRMED") {
-                                                          shouldDisable =
-                                                            optionIndex < currentIndex || value === "CANCELLED";
-                                                        } else {
-                                                          shouldDisable =
-                                                            value === "CANCELLED" || optionIndex < currentIndex;
-                                                        }
-
-                                                        const shouldRender = ["RETURNED", "RETURN_REJECTED"].includes(
-                                                          currentStatus
-                                                        )
-                                                          ? value === currentStatus
-                                                          : !["RETURNED", "RETURN_REJECTED", "RETURN_REQUESTED"].includes(
-                                                              value
-                                                            );
-
-                                                        return (
-                                                          shouldRender && (
-                                                            <option key={value} value={value} disabled={shouldDisable}>
-                                                              {label}
-                                                            </option>
-                                                          )
-                                                        );
-                                                      })}
-                                                    </select>
-                                                  )}
-                                                </div>
-                                              );
-                                            })}
-                                          </div>
-                                        </td>
-                                        
-                                      )}
-                                    
-
-
-
-
-
-                                    {isViewMode && (
-                                      <td style={{ justifyItems: 'center', alignContent: 'center' }}>
-                                        <div className='d-flex flex-column gap-3'>
-                                          {order.colors.map((colorObj, colorIndex) => (
-                                            <div key={colorIndex} className="d-flex align-items-center justify-content-between position-relative">
-                                              {colorObj.status === "RETURN_REQUESTED" && (
-                                                <div className="position-relative">
-                                                  <button
-                                                    className="alert-icon-btn"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    title="Return requested for this variant"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      const key = colorObj.orderVariantId;
-                                                      setOpenDropdown(openDropdown === key ? null : key);
+                                            <td>
+                                              <div className="d-flex align-items-center justify-content-center">
+                                                {["RETURNED", "RETURN_REJECTED"].includes(order.status) ? (
+                                                  <div className={`${statusClassMap[order.status] || ''} text-capitalize`}>
+                                                    {order.status.replace("_", " ")}
+                                                  </div>
+                                                ) : (
+                                                  <select
+                                                    value={
+                                                      order.status === "RETURN_REQUESTED"
+                                                        ? order.previousStatus || "DELIVERED"
+                                                        : order.status
+                                                    }
+                                                    disabled={[
+                                                      "DELIVERED",
+                                                      "RETURNED",
+                                                      "CANCELLED",
+                                                      "RETURN_REQUESTED",
+                                                    ].includes(order.status)}
+                                                    onChange={(e) => {
+                                                      const selectedStatus = e.target.value;
+                                                      setModalData({
+                                                        isOpen: true,
+                                                        orderId: order.orderId,
+                                                        variantId: order.variantId,
+                                                        status: selectedStatus,
+                                                      });
                                                     }}
-                                                    
+                                                    className={`${statusClassMap[order.status] || ''} text-capitalize`}
                                                   >
-                                                    <div className="alert-icon-circle">
-                                                      <FiAlertCircle size={16} color="red" />
-                                                    </div>
-                                                  </button>
+                                                    {statusOptions.map(({ value, label }) => {
+                                                      const currentIndex = statusFlow.indexOf(order.status);
+                                                      const optionIndex = statusFlow.indexOf(value);
 
-                                                  {openDropdown === colorObj.orderVariantId && (
-                                                    <div className="position-absolute bg-white border rounded p-2 shadow-sm" style={{ zIndex: 10 }}>
+                                                      const shouldRender =
+                                                        !["RETURNED", "RETURN_REJECTED", "RETURN_REQUESTED"].includes(
+                                                          value
+                                                        ) || value === order.status;
+
+                                                      const shouldDisable =
+                                                        order.status === "RETURN_REQUESTED" ||
+                                                        (order.status === "NEW" &&
+                                                          !["CONFIRMED", "CANCELLED"].includes(value)) ||
+                                                        (order.status === "CONFIRMED" &&
+                                                          (optionIndex < currentIndex || value === "CANCELLED")) ||
+                                                        optionIndex < currentIndex ||
+                                                        value === "CANCELLED";
+
+                                                      return (
+                                                        shouldRender && (
+                                                          <option key={value} value={value} disabled={shouldDisable}>
+                                                            {label}
+                                                          </option>
+                                                        )
+                                                      );
+                                                    })}
+                                                  </select>
+                                                )}
+                                              </div>
+                                            </td>
+                                          )}
+
+
+
+
+                                    
+                                            {isViewMode && (
+                                              <td>
+                                                <div className='d-flex flex-column gap-3'>
+                                                  {order.color.status === "RETURN_REQUESTED" && (
+                                                    <div className="d-flex align-items-center justify-content-between position-relative">
                                                       <button
-                                                        className="btn btn-sm btn-outline-success mb-1 w-100"
-                                                        onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURNED")}
+                                                        className="alert-icon-btn"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="Return requested for this variant"
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          openReturnModal(order.color);
+                                                        }}
                                                       >
-
-                                                        Return Approve
-
-                                                      </button>
-                                                      <button
-                                                        className="btn btn-sm btn-outline-danger w-100"
-                                                        onClick={() => handleStatusChange(colorObj.orderId, colorObj.orderVariantId, "RETURN_REJECTED")}
-                                                      >
-
-                                                        Return Reject 
-
+                                                        <div className="alert-icon-circle">
+                                                          <FiAlertCircle size={16} color="red" />
+                                                        </div>
                                                       </button>
                                                     </div>
                                                   )}
-
                                                 </div>
-                                              )}
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </td>
-                                    )}
+                                                <ModalReturnOrder
+                                                  isOpen={isReturnModalOpen}
+                                                  onClose={() => setIsReturnModalOpen(false)}
+                                                  onCancel={handleReject}
+                                                  onConfirm={handleApprove}
+                                                  variantDetails={selectedVariantForModal}
+                                                />
+                                              </td>
+                                            )}
 
 
 
-                                          <div className='d-flex flex-column gap-3'>
-                                          {order.colors.map((colorObj, colorIndex) => (
-                                          <div key={colorIndex} className="d-flex align-items-center justify-content-between">
-                                      
-                                          {!isViewMode && (
-                                            <button
-                                              className="ms-2"
-                                              onClick={() => handleDeleteColor(order.productId, order.size, colorIndex)}
-                                              title="Remove color"
-                                              style={{
-                                                border:'none',
-                                                background:'transparent',
-                                                color:'red'
-                                              }}
-                                            >
-                                              <RxCross2/>
-                                            </button>
-                                          )}
-                                        </div>
-                                          ))}
 
-                                      
-                                          </div>
+                                    <div className='d-flex flex-column gap-3'>
+                                      <div className="d-flex align-items-center justify-content-between">
+                                        {!isViewMode && (
+                                          <button
+                                            className="ms-2"
+                                            onClick={() => handleDeleteColor(order.productId, order.size)}
+                                            title="Remove color"
+                                            style={{
+                                              border: 'none',
+                                              background: 'transparent',
+                                              color: 'red'
+                                            }}
+                                          >
+                                            <RxCross2 />
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
 
-                                        
 
                                           
                                       </tr>
@@ -1987,13 +1837,12 @@ const renderModal = () => {
                       <td>
                         {
                           orderDetails.reduce((acc, item) => {
-                            const validColors = item.colors?.filter(color => color.status !== 'CANCELLED') || [];
-                            return acc + validColors.length;
+                            return acc + (item.color?.status !== 'CANCELLED' ? 1 : 0);
                           }, 0)
                         } items
                       </td>
 
-                      <td style={{ textAlign: "end" }}>₹{calculateGrandTotal(orderDetails).toFixed(0)}</td>
+                      <td style={{ textAlign: "end" }}>₹{grandTotals.baseTotal}</td>
                     </tr>
 
                    
@@ -2095,7 +1944,7 @@ const renderModal = () => {
 
                     <tr className="border-bottom">
                       <td className="fw-medium pt-2 pb-4 ">Wallet</td>
-                      <td className="pb-3 pt-2">{walletBalances.toFixed(2)}</td>
+                      <td className="pb-3 pt-2">{walletBalances.toFixed(0)}</td>
                       <td style={{ textAlign: "end" }} className="pb-3 pt-2">
                       ₹ {isViewMode ? (
                               // Show plain text in view mode

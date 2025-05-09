@@ -33,7 +33,7 @@ const AddProduct = () => {
 
   const product = (typeof index === 'number' && finalData) ? finalData[index] : null;
 
-  
+  console.log(product)
   
  
   const transformProductData = (product) => {
@@ -41,43 +41,41 @@ const AddProduct = () => {
   
     const groupedVariants = product.groupedVariants;
   
-    // Extract unique sizes
-    const sizes = groupedVariants.map((group) => ({
-      value: group.size,
-    }));
+    const sizes = groupedVariants.map((group) => ({ value: group.size }));
   
-    // Extract unique colors
-    const uniqueColors = [];
-    const colorHexMap = new Map(); // To avoid duplicates
+    const colorHexMap = new Map();
     groupedVariants.forEach((group) => {
-      group.variants.forEach((variant) => {
-        const hexKey = variant.hexCode?.toLowerCase();
+      group.variants.forEach((colorGroup) => {
+        const hexKey = colorGroup.hexCode?.toLowerCase();
         if (hexKey && !colorHexMap.has(hexKey)) {
           colorHexMap.set(hexKey, {
-            value: variant.colorName,
-            color: variant.colorName,
-            hex: variant.hexCode,
-            id: variant.id, // Include ID if available
+            value: colorGroup.colorName,
+            color: colorGroup.colorName,
+            hex: colorGroup.hexCode,
+            id: colorGroup.variants[0]?.id,
           });
         }
       });
     });
   
-    console.log(groupedVariants)
-
-    // Build sizeColorMap
-    const sizeColorMap = groupedVariants.map((group) => ({
-      size: group.size,
-      colors: group.variants.map((variant) => ({
-        color: variant.colorName,
-        hex: variant.hexCode,
-        available: variant.available,
-        price: variant.pricePerKg,
-        id: variant.id,
-        costPerKg: variant.costPerKg,
-        markupPricePerKg: variant.markupPricePerKg,
-      })),
-    }));
+    const sizeColorMap = groupedVariants.map((group) => {
+      const colors = group.variants.map((colorGroup) => ({
+        color: colorGroup.colorName,
+        hex: colorGroup.hexCode,
+        variants: colorGroup.variants.map((variant) => ({
+          variantType: variant.variantType,
+          available: variant.available,
+          price: variant.price,
+          markupPricePerKg: variant.markupPricePerKg,
+          id: variant.id,
+        })),
+      }));
+  
+      return {
+        size: group.size,
+        colors,
+      };
+    });
   
     const variants = [
       { name: "size", values: sizes },
@@ -87,7 +85,6 @@ const AddProduct = () => {
     return { variants, sizeColorMap };
   };
   
-
 
 
 
@@ -149,8 +146,8 @@ const AddProduct = () => {
     // if (!formData.compareAtPrice || formData.compareAtPrice <= 0) validationErrors.compareAtPrice = "Valid Compare at price is required.";
     // if (!formData.media) validationErrors.media = "Please upload a product image or media.";
     if (!formData.gst || formData.gst < 0) validationErrors.gst = "Valid GST value is required.";
-    if (variants.length<2) validationErrors.variants = "At (Size & Color) variant is required.";
-    if (sizeColorMap.length<2) validationErrors.sizeColorMap = "Size and color combination is required.";
+    if (variants.length < 2) validationErrors.variants = "At least (Size & Color) variant is required.";
+    if (sizeColorMap.length < 2) validationErrors.sizeColorMap = "Size and color combination is required.";
 
     // Stop submission if there are errors
     if (Object.keys(validationErrors).length > 0) {
@@ -158,113 +155,91 @@ const AddProduct = () => {
         return;
     }
 
-    console.log(product)
+    console.log(product);
 
     const plainTextDescription = formData.description.replace(/<\/?[^>]+(>|$)/g, "");
+
     // Create variants with calculated prices and availability
-
     const newVariants = sizeColorMap.flatMap(({ size, colors }) => {
-      return colors.map((color) => ({
-        size,
-        color: {
-          colorName: color.color,
-          hexCode: color.hex,
-        },
-        availableWeight: Number(color.available),
-        pricePerKg: Number(color.price),
-        costPerKg: Number(color.costPerKg || 0),
-        markupPricePerKg: Number(color.markupPricePerKg || 0),
-      }));
+        return colors.flatMap((color) => {
+            return (color.variants || []).map(variant => ({
+                size,
+                color: {
+                    colorName: color.color,
+                    hexCode: color.hex,
+                },
+                variantType: variant.variantType.toUpperCase(),
+                availableWeight: Number(variant.available),
+                pricePerKg: Number(variant.price),
+                markupPricePerKg: Number(variant.markupPricePerKg || 0),
+            }));
+        });
     });
-    
-    const averagePrice = sizeColorMap.reduce(
-      (acc, { colors }) => {
-        const total = colors.reduce((sum, color) => sum + Number(color.price), 0);
-        return acc + total;
-      },
-      0
-    ) / sizeColorMap.reduce((count, { colors }) => count + colors.length, 0);
-    
-    const formattedData = {
-      title: formData.productName,
-      description: plainTextDescription,
-      media: [formData.media] || ['localhost:8080/api/img'],
-      availableStatus: status,
-      productType: {
-        productName: formData.productName,
-        description: formData.description,
-      },
-      gstOnProduct: Number(formData.gst),
-      variants: [],
-      deletedVariantIds: [],
-    };
-    
-    try {
-      if (state?.index !== undefined) {
-        const productId = product.productId;
-        const originalGrouped = product.groupedVariants || [];
-    
-        const changedVariants = [];
-        const newVariantIds = new Set();
-        const existingVariantIds = new Set();
-    
-        // Track existing variant IDs from original product
-        originalGrouped.forEach(group =>
-          group.variants.forEach(variant => existingVariantIds.add(variant.id))
-        );
-    
-        // Detect changed and track new variant IDs
-        newVariants.forEach((newVar) => {
-          if (newVar.id) newVariantIds.add(newVar.id);
-    
-          const matchSizeGroup = originalGrouped.find(g => g.size === newVar.size);
-          const matchColor = matchSizeGroup?.variants.find(
-            old => old.colorName === newVar.color.colorName &&
-                   old.hexCode.toLowerCase() === newVar.color.hexCode.toLowerCase()
-          );
-          
-    
-          if (!matchColor ||
-            matchColor.available !== newVar.availableWeight ||
-            matchColor.pricePerKg !== newVar.pricePerKg ||
-            matchColor.costPerKg !== newVar.costPerKg ||
-            matchColor.markupPricePerKg !== newVar.markupPricePerKg ||
-            matchColor.hexCode !== newVar.color.hexCode
-          ) {
-            changedVariants.push(newVar);
-          }
-        });
-    
-        // Determine deleted variant IDs
-        const deletedIds = [];
 
-        originalGrouped.forEach(group => {
-          group.variants.forEach(variant => {
-            const stillExists = newVariants.some(newVar =>
-              newVar.size === group.size &&
-              newVar.color.hexCode.toLowerCase() === variant.hexCode.toLowerCase()
-            );
-        
-            if (!stillExists) {
-              deletedIds.push(variant.id); // only push if it's actually not found
-            }
-          });
-        });
-    
-        formattedData.variants = changedVariants;
-        formattedData.deletedVariantIds = deletedIds;
-    
-        await updateProduct(productId, formattedData);
-      } else {
-        formattedData.variants = newVariants;
-        await addProduct(formattedData);
-      }
-    
-      navigate('/products');
+    const averagePrice = sizeColorMap.reduce(
+        (acc, { colors }) => {
+            const total = colors.reduce((sum, color) => sum + Number(color.price), 0);
+            return acc + total;
+        },
+        0
+    ) / sizeColorMap.reduce((count, { colors }) => count + colors.length, 0);
+
+    const formattedData = {
+        title: formData.productName,
+        description: plainTextDescription,
+        media: [formData.media] || ['localhost:8080/api/img'],
+        availableStatus: status.toUpperCase(),
+        gstOnProduct: Number(formData.gst),
+        variants: newVariants, // All variants are sent
+        deletedVariantIds: [], // No deleted variants are tracked now
+    };
+
+    try {
+        if (state?.index !== undefined) {
+            const productId = product.productId;
+            const originalGrouped = product.groupedVariants || [];
+
+            const changedVariants = [];
+
+            // Loop through newVariants and check for changes
+            newVariants.forEach((newVar) => {
+                const matchSizeGroup = originalGrouped.find(g => g.size === newVar.size);
+                const matchColor = matchSizeGroup?.variants.find(
+                    old =>
+                        old.colorName === newVar.color.colorName &&
+                        old.hexCode.toLowerCase() === newVar.color.hexCode.toLowerCase() &&
+                        old.variantType === newVar.variantType
+                );
+
+                if (!matchColor ||
+                    matchColor.available !== newVar.availableWeight ||
+                    matchColor.pricePerKg !== newVar.pricePerKg ||
+                    matchColor.markupPricePerKg !== newVar.markupPricePerKg ||
+                    matchColor.hexCode !== newVar.color.hexCode
+                ) {
+                    changedVariants.push(newVar); // Track only changed variants
+                }
+            });
+
+            // Send all variants, but mark only the changed ones in formattedData
+            formattedData.variants = newVariants; // All variants, including changed and unchanged
+
+            // Do not track deleted variants
+            // formattedData.deletedVariantIds = deletedIds;  // No longer needed
+
+            await updateProduct(productId, formattedData);
+        } else {
+            // If it's a new product, just add the new variants
+            formattedData.variants = newVariants;
+            await addProduct(formattedData);
+        }
+
+        navigate('/products');
     } catch (error) {
-      console.error('Error submitting product:', error);
+        console.error('Error submitting product:', error);
     }
-  }
+};
+
 
   
   const [variants, setVariants] = useState(product?.variants || []);
@@ -363,17 +338,7 @@ const AddProduct = () => {
     setVariants(updatedVariants);
   };
 
-  const handleVariantValueChangeTable = (sizeIndex, colorIndex, key, value) => {
-    setSizeColorMap((prev) => {
-      const updatedMap = [...prev];
-      // Ensure `colors` exists and `colorIndex` is valid
-      if (updatedMap[sizeIndex]?.colors[colorIndex]) {
-        updatedMap[sizeIndex].colors[colorIndex][key] = value;
-      }
-      return updatedMap;
-    });
-  };
-  
+ 
 
   const addVariantValue = (index) => {
     const updatedVariants = [...variants];
@@ -381,12 +346,7 @@ const AddProduct = () => {
     setVariants(updatedVariants);
   };
 
-  const removeVariant = (index) => {
-    const updatedVariants = [...variants];
-    updatedVariants.splice(index, 1);
-    setVariants(updatedVariants);
-    setExpandedVariant(null);
-  };
+
 
   const handleDone = () => {
     setExpandedVariant(null); // Collapse all forms
@@ -398,23 +358,38 @@ const AddProduct = () => {
 
 
   const calculateTotalAvailable = (colors) => {
-    return colors.reduce((sum, color) => sum + (Number(color.available) || 0), 0);
-  };
-  
-  const calculateAveragePrice = (colors) => {
-    const prices = colors.map((color) => Number(color.price) || 0).filter((price) => price > 0);
-    return prices.length > 0 ? (prices.reduce((sum, price) => sum + price, 0) / prices.length).toFixed(2) : "";
+    return colors.reduce((total, color) => {
+      return (
+        total +
+        color.variants.reduce((vSum, v) => vSum + Number(v.available || 0), 0)
+      );
+    }, 0);
   };
 
   const calculateAverageCostPerKg = (colors) => {
-    const values = colors.map((c) => Number(c.costPerKg) || 0).filter((v) => v > 0);
-    return values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : "";
+    const total = [];
+    colors.forEach((color) => {
+      color.variants.forEach((v) => total.push(Number(v.costPerKg || 0)));
+    });
+    return total.length ? (total.reduce((a, b) => a + b, 0) / total.length).toFixed(2) : 0;
+  };
+
+  const calculateAveragePrice = (colors) => {
+    const total = [];
+    colors.forEach((color) => {
+      color.variants.forEach((v) => total.push(Number(v.price || 0)));
+    });
+    return total.length ? (total.reduce((a, b) => a + b, 0) / total.length).toFixed(2) : 0;
   };
 
   const calculateAverageMarkupPrice = (colors) => {
-    const values = colors.map((c) => Number(c.markupPricePerKg) || 0).filter((v) => v > 0);
-    return values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : "";
+    const total = [];
+    colors.forEach((color) => {
+      color.variants.forEach((v) => total.push(Number(v.markupPricePerKg || 0)));
+    });
+    return total.length ? (total.reduce((a, b) => a + b, 0) / total.length).toFixed(2) : 0;
   };
+
   
   
   const updateColorField = (sizeIndex, colorIndex, field, value) => {
@@ -460,25 +435,22 @@ const AddProduct = () => {
   
 
   const handleAddColor = (sizeIndex) => {
-  const newColor = {
-    color: "New Color",  // Default name
-    hex: "#FFFFFF",     // Default hex color
-    available: "",      // Default availability
-    price: "",          // Default price per kg
-  };
-
-  setSizeColorMap((prev) => {
-    return prev.map((entry, index) => {
-      if (index === sizeIndex) {
-        return {
-          ...entry,
-          colors: [...(entry.colors || []), newColor], // Add new color without mutating
-        };
-      }
-      return entry; // Return other entries unchanged
+    const newData = [...sizeColorMap];
+    newData[sizeIndex].colors.push({
+      color: "",
+      hex: "",
+      variants: [
+        {
+          variantType: "cone",
+          available: 0,
+          price: 0,
+          markupPricePerKg: 0,
+          costPerKg: 0,
+        },
+      ],
     });
-  });
-};
+    setSizeColorMap(newData);
+  };
 
   
   
@@ -524,6 +496,9 @@ const handleFileChange = (event) => {
 
 // Handle file upload & process Excel data
 const handleUpload = () => {
+
+  console.log('hello')
+
   if (!selectedFile) {
     alert("Please select a file to upload.");
     return;
@@ -548,8 +523,9 @@ const handleUpload = () => {
         alert("The uploaded file is empty.");
         return;
       }
-
       console.log("Parsed Data:", data);
+    
+      console.log(data)
       parseSizeColorData(data); // Call your processing function
 
       // Close modal after processing
@@ -569,59 +545,59 @@ const parseSizeColorData = (data) => {
   const sizeColorMap = new Map();
 
   data.forEach((row) => {
-    const size = row.Size ? String(row.Size).trim() : null;
-    const colorName = row.Color ? row.Color.trim() : null;
-    const hexCode = row.HexCode ? row.HexCode.trim().toLowerCase() : null;
-    const available = row.Availability ? Number(row.Availability) : 0;
-    const price = row.PricePerKg ? Number(row.PricePerKg) : 0;
-    const costPerKg = row.costPerKg ? Number(row.costPerKg) : 0;
-    const markupPricePerKg = row.markupPricePerKg ? Number(row.markupPricePerKg) : 0;
+    const size = row.Size?.trim();
+    const colorName = row.Color?.trim();
+    const hexCode = row.HexCode?.trim().toLowerCase();
+    const variantType = row.VariantType?.trim().toLowerCase();
+    const available = Number(row.Availability) || 0;
+    const price = Number(row.PricePerKg) || 0;
+    const markupPricePerKg = Number(row.markupPricePerKg) || 0;
 
-    if (size && colorName && hexCode) {
+    if (size && colorName && hexCode && variantType) {
       if (!sizeColorMap.has(size)) {
         sizeColorMap.set(size, new Map());
       }
 
-      if (!sizeColorMap.get(size).has(hexCode)) {
-        sizeColorMap.get(size).set(hexCode, {
+      const colorMap = sizeColorMap.get(size);
+      if (!colorMap.has(hexCode)) {
+        colorMap.set(hexCode, {
           color: colorName,
           hex: hexCode,
-          available,
-          price,
-          costPerKg,
-          markupPricePerKg
+          variants: []
         });
       }
+
+      const variantEntry = {
+        variantType,
+        available,
+        price,
+        markupPricePerKg,
+      };
+
+      colorMap.get(hexCode).variants.push(variantEntry);
     }
   });
 
-  const sizeArray = [...sizeColorMap.keys()].map((size) => ({ value: size }));
-
-  const formattedSizeColorMap = [...sizeColorMap.entries()].map(([size, colorMap]) => ({
-    size: size,
-    colors: [...colorMap.values()],
+  const formatted = [...sizeColorMap.entries()].map(([size, colorMap]) => ({
+    size,
+    colors: [...colorMap.values()]
   }));
 
-  console.log("Extracted Size-Color Map:", formattedSizeColorMap);
-
   setVariants([
-    { name: "size", values: sizeArray },
+    { name: "size", values: [...sizeColorMap.keys()].map((size) => ({ value: size })) },
     {
       name: "color",
       values: Array.from(
         new Map(
-          formattedSizeColorMap
-            .flatMap((entry) => entry.colors)
-            .map((color) => [color.hex, color])
+          formatted.flatMap((e) => e.colors).map((color) => [color.hex, color])
         ).values()
       ),
     },
   ]);
 
-  setTimeout(() => {
-    setSizeColorMap(formattedSizeColorMap);
-  }, 500);
+  setTimeout(() => setSizeColorMap(formatted), 500);
 };
+
 
 const handleExport = () => {
   if (!sizeColorMap || sizeColorMap.length === 0) {
@@ -661,7 +637,23 @@ const handleExport = () => {
 };
 
 
+const updateVariantField = (sizeIndex, colorIndex, variantIndex, field, value) => {
+  const newData = [...sizeColorMap];
+  newData[sizeIndex].colors[colorIndex].variants[variantIndex][field] = value;
+  setSizeColorMap(newData);
+};
 
+const handleVariantValueChangeTable = (sizeIndex, colorIndex, field, value) => {
+  const newData = [...sizeColorMap];
+  newData[sizeIndex].colors[colorIndex][field] = value;
+  setSizeColorMap(newData);
+};
+
+const removeVariant = (sizeIndex, colorIndex, variantIndex) => {
+  const newData = [...sizeColorMap];
+  newData[sizeIndex].colors[colorIndex].variants.splice(variantIndex, 1);
+  setSizeColorMap(newData);
+};
 
 console.log(sizeColorMap)
 
@@ -1099,188 +1091,197 @@ console.log(sizeColorMap)
                     )} */}
         
 
-                {Object.keys(sizeColorMap).length > 0 && (
-                    <div className="variant-table-ctn">
-                <table  className="variant-table">
-                <thead>
-                <tr>
-                    <th>Counter</th>
-                    <th>Variants</th>
-                    <th>Available (Kg)</th>
-                    <th>Cost/Kg</th>
-                    <th>Price/Kg</th>
-                    <th>Markup Price/Kg</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                    {sizeColorMap.map((entry, sizeIndex) => (
-                <React.Fragment key={sizeIndex}>
-                  
-                    <tr onClick={() => toggleRow(sizeIndex)} style={{ cursor: "pointer" }}>
-                    <td>
-                       <div style={{backgroundColor: "#f0f0f0",borderRadius:"1rem",padding:'0.3rem 1rem',display:"flex",justifyContent:"center"}}>
+                 {sizeColorMap.length > 0 && (
+         <div className="variant-table-ctn">
+         <table className="variant-table">
+           <thead>
+             <tr>
+               <th>Size</th>
+               <th>Variants</th>
+               <th>Available (Kg)</th>
+               {/* <th>Cost/Kg</th> */}
+               <th>Price/Kg</th>
+               <th>Markup Price/Kg</th>
+               <th></th>
+             </tr>
+           </thead>
+           <tbody>
+             {sizeColorMap.map((entry, sizeIndex) => (
+               <React.Fragment key={sizeIndex}>
+                 <tr
+                   onClick={() => toggleRow(sizeIndex)}
+                   style={{ cursor: "pointer" }}
+                 >
+                   <td>
+                     <div
+                       style={{
+                         backgroundColor: "#f0f0f0",
+                         borderRadius: "1rem",
+                         padding: "0.3rem 1rem",
+                         display: "flex",
+                         justifyContent: "center",
+                       }}
+                     >
                        {entry.size}
-                       </div>
-                    </td> 
-                    <td>{entry.colors.length} Variants</td> 
-                    <td>
-                        <input
-                        type="text"
-                        placeholder="Available"
-                        onClick={(e) => e.stopPropagation()}
-                        value={calculateTotalAvailable(entry.colors)}
-                        readOnly
-                        />
-                    </td>
-                    <td>
-                        <input
-                        type="text"
-                        onClick={(e) => e.stopPropagation()}
-                        placeholder="Price/Kg"
-                        value={calculateAverageCostPerKg(entry.colors)}
-                        readOnly
-                        />
-                    </td>
-                    <td>
-                        <input
-                        type="text"
-                        onClick={(e) => e.stopPropagation()}
-                        placeholder="Price/Kg"
-                        value={calculateAveragePrice(entry.colors)}
-                        readOnly
-                        />
-                    </td>
-                    <td>
-                        <input
-                        type="text"
-                        onClick={(e) => e.stopPropagation()}
-                        placeholder="Price/Kg"
-                        value={calculateAverageMarkupPrice(entry.colors)}
-                        readOnly
-                        />
-                    </td>
-                    <td>
-                        <button 
-                         onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddColor(sizeIndex);
-                          }}
-                        style={{ padding: "5px" , background:"none",border:"none" ,color:"#0561FC"}}
-                        ><IoMdAddCircleOutline size={20}/></button>
-                    </td>
-                    </tr>
-
-                    {/* Expandable Rows */}
-                    {expandedRow === sizeIndex &&
-                    entry.colors.map((color, colorIndex) => (
-                        <tr key={colorIndex}>
-                        
-                        <td style={{ alignItems: "center" }} className="d-flex justify-content-between">
-                            <div >
-                            <div
-                            style={{
-                                backgroundColor: color.hex,
-                                width: "20px",
-                                height: "20px",
-                                borderRadius: "50%",
-                                border: "1px solid #ccc",
-                                marginRight: "10px",
-                            }}
-                            ></div>
-
-                                {color.color}
-                            </div>
-                            
-                         
-                            
-                            <input
-                                className="w-50"
-                                type="text"
-                                value={color.hex || ""}
-                                onChange={(e) =>
-                                handleVariantValueChangeTable(sizeIndex, colorIndex, "hex", e.target.value)
-                                }
-                                placeholder="Hex Code"
-                            />
-                            
-                            </td>
-
-                            <td >
-                            <div>
-                              <input 
+                     </div>
+                   </td>
+                   <td>{entry.colors.length} Colors</td>
+                   <td>
+                     <input
+                       type="text"
+                       value={calculateTotalAvailable(entry.colors)}
+                       readOnly
+                       onClick={(e) => e.stopPropagation()}
+                     />
+                   </td>
+                   {/* <td>
+                     <input
+                       type="text"
+                       value={calculateAverageCostPerKg(entry.colors)}
+                       readOnly
+                       onClick={(e) => e.stopPropagation()}
+                     />
+                   </td> */}
+                   <td>
+                     <input
+                       type="text"
+                       value={calculateAveragePrice(entry.colors)}
+                       readOnly
+                       onClick={(e) => e.stopPropagation()}
+                     />
+                   </td>
+                   <td>
+                     <input
+                       type="text"
+                       value={calculateAverageMarkupPrice(entry.colors)}
+                       readOnly
+                       onClick={(e) => e.stopPropagation()}
+                     />
+                   </td>
+                   <td>
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         handleAddColor(sizeIndex);
+                       }}
+                       style={{ padding: "5px", background: "none", border: "none", color: "#0561FC" }}
+                     >
+                       <IoMdAddCircleOutline size={20} />
+                     </button>
+                   </td>
+                 </tr>
+   
+                 {expandedRow === sizeIndex &&
+                   entry.colors.map((color, colorIndex) =>
+                     color.variants?.map((variant, variantIndex) => (
+                       <tr key={`${colorIndex}-${variantIndex}`}>
+                         <td>
+                           {variantIndex === 0 && (
+                             <div className="d-flex align-items-center gap-2">
+                               <div
+                                 style={{
+                                   backgroundColor: color.hex,
+                                   width: "20px",
+                                   height: "20px",
+                                   borderRadius: "50%",
+                                   border: "1px solid #ccc",
+                                   marginRight: "10px",
+                                 }}
+                               ></div>
+                               <input
+                                 className="w-50"
+                                 type="text"
+                                 value={color.hex || ""}
+                                 onChange={(e) =>
+                                   handleVariantValueChangeTable(sizeIndex, colorIndex, "hex", e.target.value)
+                                 }
+                                 placeholder="Hex Code"
+                               />
+                             </div>
+                           )}
+                         </td>
+                         <td>
+                           {variantIndex === 0 && (
+                             <input
                                className="w-75"
                                type="text"
-                               value={color.color }
+                               value={color.color || ""}
                                onChange={(e) =>
-                               handleVariantValueChangeTable(sizeIndex, colorIndex, "color", e.target.value)
+                                 handleVariantValueChangeTable(sizeIndex, colorIndex, "color", e.target.value)
                                }
-                               placeholder="name"
-                              ></input>
-                            </div>
-                        </td>
-                        <td>
-                            <input
-                            type="number"
-                            value={color.available || ""}
-                            onChange={(e) =>
-                                updateColorField(sizeIndex, colorIndex, "available", e.target.value)
-                            }
-                            placeholder="Available"
-                            />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={color.costPerKg || ""}
-                            onChange={(e) =>
-                              updateColorField(sizeIndex, colorIndex, "costPerKg", e.target.value)
-                            }
-                            placeholder="Cost/Kg"
-                          />
-                        </td>
-                        <td>
-                            <input
-                            type="number"
-                            value={color.price || ""}
-                            onChange={(e) =>
-                                updateColorField(sizeIndex, colorIndex, "price", e.target.value)
-                            }
-                            placeholder="Price/Kg"
-                            />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={color.markupPricePerKg || ""}
-                            onChange={(e) =>
-                              updateColorField(sizeIndex, colorIndex, "markupPricePerKg", e.target.value)
-                            }
-                            placeholder="Markup/Kg"
-                          />
-                        </td>
-
-                        <td>
-                            <button
-                            onClick={() => removeColorField(sizeIndex, colorIndex)}
-                            style={{ padding: "5px",background:"none",border:"none",color:"#FF3232" }}
-                            >
-                            <MdDeleteOutline  size={20}/>
-                            </button>
-                        </td>
-                        </tr>
-                    ))
-                    
-                    }
-                </React.Fragment>
-                ))}
-
-
-                            </tbody>
-                        </table>
-                        </div>
-                        
-                )}
+                               placeholder="Color Name"
+                             />
+                           )}
+                         </td>
+                         <td>
+                           <input
+                             type="number"
+                             value={variant.available || ""}
+                             onChange={(e) =>
+                               updateVariantField(sizeIndex, colorIndex, variantIndex, "available", e.target.value)
+                             }
+                             placeholder="Available"
+                           />
+                         </td>
+                         {/* <td>
+                           <input
+                             type="number"
+                             value={variant.costPerKg || ""}
+                             onChange={(e) =>
+                               updateVariantField(sizeIndex, colorIndex, variantIndex, "costPerKg", e.target.value)
+                             }
+                             placeholder="Cost/Kg"
+                           />
+                         </td> */}
+                         <td>
+                           <input
+                             type="number"
+                             value={variant.price || ""}
+                             onChange={(e) =>
+                               updateVariantField(sizeIndex, colorIndex, variantIndex, "price", e.target.value)
+                             }
+                             placeholder="Price/Kg"
+                           />
+                         </td>
+                         <td>
+                           <input
+                             type="number"
+                             value={variant.markupPricePerKg || ""}
+                             onChange={(e) =>
+                               updateVariantField(sizeIndex, colorIndex, variantIndex, "markupPricePerKg", e.target.value)
+                             }
+                             placeholder="Markup/Kg"
+                           />
+                         </td>
+                         <td>
+                           <input
+                             className="w-50"
+                             type="text"
+                             value={variant.variantType || ""}
+                             onChange={(e) =>
+                               updateVariantField(sizeIndex, colorIndex, variantIndex, "variantType", e.target.value)
+                             }
+                             placeholder="Type"
+                           />
+                         </td>
+                         <td>
+                           <button
+                             onClick={() => removeVariant(sizeIndex, colorIndex, variantIndex)}
+                             style={{ padding: "5px", background: "none", border: "none", color: "#FF3232" }}
+                           >
+                             <MdDeleteOutline size={20} />
+                           </button>
+                         </td>
+                       </tr>
+                     ))
+                   )}
+               </React.Fragment>
+             ))}
+           </tbody>
+         </table>
+       </div>
+      )}
+   
 
        
     </div>

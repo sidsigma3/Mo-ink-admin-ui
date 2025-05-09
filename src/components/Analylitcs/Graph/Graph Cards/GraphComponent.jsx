@@ -3,111 +3,68 @@ import {
   Chart,
   CategoryScale,
   LinearScale,
-  BarController,
   BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
+  BarController,
+  LineController,
+  DoughnutController,
 } from "chart.js";
 
-// Register required Chart.js components
+// Register everything needed
 Chart.register(
   CategoryScale,
   LinearScale,
-  BarController,
   BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  BarController,
+  LineController,
+  DoughnutController,
   Title,
   Tooltip,
   Legend
 );
 
-const TopSalesExecutiveChart = () => {
+const GraphComponent = ({ type, data, options, plugins = [], text, number }) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
-
-  const customersData = [
-    { name: "Customer A", sales: 5000 },
-    { name: "Customer B", sales: 4000 },
-    { name: "Customer C", sales: 3000 },
-    { name: "Customer D", sales: 2500 },
-    { name: "Customer E", sales: 2000 },
-    { name: "Customer F", sales: 1500 },
-  ];
-
-  const sortedCustomers = customersData.sort((a, b) => b.sales - a.sales);
-
-  const chartData = {
-    labels: sortedCustomers.map((customer) => customer.name),
-    datasets: [
-      {
-        label: "Customer Purchase",
-        data: sortedCustomers.map((customer) => customer.sales),
-        backgroundColor: sortedCustomers.map((_, index) => {
-          const opacity = 0.2 + (0.8 * (index + 1)) / sortedCustomers.length;
-          return `rgba(5, 97, 252, ${opacity})`;
-        }),
-        borderColor: "rgba(5, 97, 252, 1)",
-        borderWidth: 1,
-        borderRadius: 7,
-        barThickness: 25,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    indexAxis: "y", // Horizontal bars
-    maintainAspectRatio: false,
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            const customerName = context.label;
-            const sales = context.raw;
-            return `${customerName}: $${sales.toLocaleString()}`;
-          },
-        },
-      },
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        title: {
-          display: false,
-        },
-      },
-      y: {
-        grid: { display: false },
-        title: {
-          display: false,
-        },
-      },
-    },
-  };
 
   useEffect(() => {
     const ctx = chartRef.current.getContext("2d");
 
-    // Destroy any existing chart instance before creating a new one
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
 
     chartInstance.current = new Chart(ctx, {
-      type: "bar", // Specify the chart type
-      data: chartData,
-      options: chartOptions,
+      type,
+      data,
+      options,
+      plugins,
     });
-  }, [chartData, chartOptions]);
+
+    return () => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
+    };
+  }, [type, data, options, plugins]);
 
   return (
-    <div style={{ width: "100%", height: "250px" }}>
-      <canvas ref={chartRef}></canvas>
+    <div className="graph-card">
+      {text && <h4>{text}</h4>}
+      {number && <h3>{number}</h3>}
+      <div className="chart-container">
+        <canvas ref={chartRef}></canvas>
+      </div>
     </div>
   );
 };
 
-export default TopSalesExecutiveChart;
+export default GraphComponent;

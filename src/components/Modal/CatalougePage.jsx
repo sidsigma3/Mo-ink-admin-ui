@@ -16,22 +16,29 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
 
   const handleColorClick = (color) => {
     setSelectedColors((prevColors) => {
-      const isAlreadySelected = prevColors.some((c) => c.hexCode === color.hexCode);
+      const isAlreadySelected = prevColors.some(
+        (c) => c.hexCode === color.hexCode && c.variantType === color.variantType
+      );
+  
       if (isAlreadySelected) {
-        return prevColors.filter((c) => c.hexCode !== color.hexCode); // Remove color
+        return prevColors.filter(
+          (c) => !(c.hexCode === color.hexCode && c.variantType === color.variantType)
+        );
       } else {
-        return [...prevColors, color]; // Add color
+        return [...prevColors, color];
       }
     });
   };
+  
 
   const handleSaveSelection = () => {
     if (selectedColors.length > 0) {
-      onColorSelect(selectedColors);
+      onColorSelect(selectedColors); // send color + type
     }
-    console.log(selectedColors)
+    console.log(selectedColors);
     onClose();
   };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -180,11 +187,30 @@ const filteredVariants = variant.variants.filter((item) =>
   item.hexCode.toLowerCase().includes(searchColor)
 );
 
-const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
+const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
+  const baseKey = `${variant.colorName}-${variant.hexCode.toLowerCase()}`;
+  
+  variant.variants.forEach((innerVariant) => {
+    const fullKey = `${baseKey}-${innerVariant.variantType}`;
+    
+    if (!acc[fullKey]) {
+      acc[fullKey] = {
+        colorName: variant.colorName,
+        hexCode: variant.hexCode,
+        variantType: innerVariant.variantType,
+      };
+    }
+  });
+
+  return acc;
+}, {});
+
 
 
   console.log(customColors)
   console.log(tempCustomColors)
+  console.log(selectedColors)
+  console.log(variant)
 
   return (
     <div className="text-center" >
@@ -276,26 +302,29 @@ const height = window.matchMedia("(max-width: 768px)").matches ? "60%" : "50%";
             <h4 className="h6 fw-semibold mt-4">Preset Catalogue</h4>
             <div className="container" style={{height:"16rem", overflow:"auto"}}>
             <div className="d-flex justify-content-start flex-wrap gap-3" style={{ height: 'auto' }}>
-            {filteredVariants.map((item, index) => (
-                <div key={index} 
-                    className={`col-3 col-sm-3 col-md-3 col-lg-3 mr-2 border rounded p-2   ${selectedColors.some((c) => c.hexCode === item.hexCode) ? "border-primary" : ""}`}
-                    onClick={() => handleColorClick(item)}
-                    style={{ 
-                      cursor: "pointer", 
-                      // width: "calc(25% - 10px)"  // Adjust width based on the gap 
-                    }}
-                > 
-                  <div className="position-relative w-100" style={{height:'63%'}}>
-                  <img src="/wool-item-1.png" className="img-fluid" alt="Product" style={{objectFit:'cover',height:'100%'}}/>
-                    <div className="position-absolute top-0 start-0 w-100" style={{height:'100%' , backgroundColor: item.hexCode, mixBlendMode: 'multiply',opacity:0.5 }}>
-                    </div>
-                  </div>
-                  <div className="text-center mt-2" >
-                    <h5 className="fw-bold" style={{fontSize:"0.8rem"}}>{item.colorName}</h5>
-                    <h6 className="text-muted text-sm" style={{fontSize:'0.8rem'}}>{item.hexCode}</h6>
+            {Object.values(groupedByColorAndType).map((colorData, index) => (
+              <div
+                key={index}
+                className={`col-3 border rounded p-2 ${selectedColors.some((c) => c.hexCode === colorData.hexCode && c.variantType === colorData.variantType) ? "border-primary" : ""}`}
+                onClick={() => handleColorClick(colorData)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="position-relative w-100" style={{ height: '5.5rem' }}>
+                  <img src="/wool-item-1.png" className="img-fluid" alt="Product" />
+                  <div className="position-absolute top-0 start-0 w-100"
+                      style={{ backgroundColor: colorData.hexCode, height: '5.5rem', mixBlendMode: 'multiply', opacity: 0.5 }} />
+                </div>
+                <div className="text-center mt-2">
+                  <h5 className="fw-bold" style={{ fontSize: "0.8rem" }}>{colorData.colorName}</h5>
+                  <h6 className="text-muted" style={{ fontSize: "0.7rem" }}>{colorData.hexCode}</h6>
+                  <div style={{ fontSize: "0.7rem", color: '#555' }}>
+                    Type: {colorData.variantType}
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
+
+
             </div>
             </div>
           </div>
