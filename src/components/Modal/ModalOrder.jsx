@@ -39,53 +39,63 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
   };
 
  
-  const handleColorSelection = (colorHex, colorName) => {
-    console.log(colorHex,colorName)
-
+  const handleColorSelection = (selectedColorArray) => {
     if (!currentVariant) return;
-
+  
     setSelectedColors((prev) => ({
       ...prev,
-      [currentVariant.id]: {
-        ...prev[currentVariant.id],
-        [currentVariant.size]: { colorHex, colorName },
+      [currentId]: {
+        ...(prev[currentId] || {}),
+        [currentVariant.size]: selectedColorArray, // ✅ storing array of full color+type objects
       },
     }));
-
-    setShowCatalogue(false); 
+  
+    setShowCatalogue(false);
   };
+  
+  
 
   console.log(selectedColors)
   
   const handleOrderCreation = () => {
-    const order = Object.entries(selectedColors).flatMap(([variantId, sizes]) =>
-      Object.entries(sizes).flatMap(([size, colorData]) => {
-        const product = products.find((p) =>
-          p.groupedVariants?.some((v) =>
-            v.variants?.some((variant) => variant.id === Number(variantId))
-          )
-        );
-  
+    const order = Object.entries(selectedColors).flatMap(([productId, sizes]) =>
+      Object.entries(sizes).flatMap(([size, colorArray]) => {
+        const product = products.find((p) => p.productId === Number(productId));
         if (!product) return [];
   
-        const variant = product.groupedVariants?.find((v) =>
-          v.variants?.some((v) => v.id === Number(variantId))
-        );
+        const sizeGroup = product.groupedVariants.find((group) => group.size === size);
+        if (!sizeGroup) return [];
   
-        const selectedVariant = variant?.variants?.find((v) => v.id === Number(variantId));
+        return colorArray.flatMap((colorData) => {
+          const colorGroup = sizeGroup.variants.find(
+            (v) =>
+              v.colorName === colorData.colorName &&
+              v.hexCode.toLowerCase() === colorData.hexCode.toLowerCase()
+          );
+          if (!colorGroup) return [];
   
-        return colorData.colorHex.length > 0
-          ? [{
-              productId: product.productId,
-              productName: product.productName,
-              size,
-              colors: colorData.colorHex,
-              variant,
-              product,              
-              gstOnProduct:product.gstOnProduct,
-
-            }]
-          : [];
+          const matchingVariant = colorGroup.variants.find(
+            (variant) => variant.variantType === colorData.variantType
+          );
+          if (!matchingVariant) return [];
+  
+          return {
+            productId: product.productId,
+            productName: product.productName,
+            size,
+            color: {
+              name: colorData.colorName,
+              hex: colorData.hexCode,
+            },
+            variantType: matchingVariant.variantType,
+            price: matchingVariant.price,
+            markupPricePerKg: matchingVariant.markupPricePerKg,
+            available: matchingVariant.available,
+            gstOnProduct: product.gstOnProduct,
+            productImage: product.productImage,
+            variantId: matchingVariant.id,
+          };
+        });
       })
     );
   
@@ -135,24 +145,35 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                       </div>
 
                   
-                      {selectedColors[variant.id]?.[variant.size] && (
-                        <div className="selected-color-box d-flex gap-3 overflow-auto" style={{width:'70%'}}>
-                          {selectedColors[variant.id][variant.size].colorHex.map((color, index) => (
-                            <div key={index} className="d-flex flex-column gap-2">
+                      {selectedColors[product.productId]?.[variant.size] && (
+                        <div className="selected-color-box d-flex gap-3 overflow-auto" style={{ width: '70%' }}>
+                          {Object.values(
+                            selectedColors[product.productId][variant.size].reduce((acc, color) => {
+                              const key = `${color.colorName}-${color.hexCode}`;
+                              if (!acc[key]) {
+                                acc[key] = color;
+                              }
+                              return acc;
+                            }, {})
+                          ).map((color, index) => (
+                            <div key={index} className="d-flex flex-column gap-2 align-items-center">
                               <div
                                 style={{
                                   width: "30px",
                                   height: "30px",
                                   borderRadius: "50%",
-                                  backgroundColor: color.hexCode.trim(), 
+                                  backgroundColor: color.hexCode.trim(),
                                   border: "1px solid #ccc",
                                 }}
-                              ></div>
-                              <span style={{width:'2.5rem'}}>{color.colorName}</span>
+                              />
+                              <span style={{ fontSize: '0.7rem', width: '2.5rem', textAlign: 'center' }}>
+                                {color.colorName}
+                              </span>
                             </div>
                           ))}
                         </div>
                       )}
+
 
 
                         <span onClick={() => openCatalogue(variant,product.productId)} className="d-flex align-items-center">
