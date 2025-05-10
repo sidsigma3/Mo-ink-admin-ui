@@ -1,4 +1,4 @@
-import { Avatar } from '@mui/material'
+import { Avatar } from 'react'
 import React , {useState , useEffect } from 'react'
 import { LuHome } from "react-icons/lu";
 import { MdEmail } from "react-icons/md";

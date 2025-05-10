@@ -19,7 +19,7 @@ import { useCustomerContext } from '../../../components/Context/CustomerContext'
 import { getAllProduct } from '../../../services/ProductService';
 import { getAllCustomer , getWalletTransactions} from '../../../services/CustomerService';
 import { getAllOrders , updateOrderVariantStatuses , updateOrderVariants} from '../../../services/OrderService';
-import { Segment } from '@mui/icons-material';
+import { Segment } from 'react';
 import { getAllDiscount } from '../../../services/DiscountService';
 import { createOrder } from '../../../services/OrderService';
 import emailjs from 'emailjs-com';
