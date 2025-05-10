@@ -136,7 +136,8 @@ const handleRowClick = (order) => {
   "Returned": "grey",
   "RETURNED": "purple",
   "CONFIRMED": "muted-clay",
-  
+  "PENDING":"grey",
+
   };
 
   let active = 2;
@@ -212,6 +213,7 @@ const handleRowClick = (order) => {
 
 
   const statusOption = {
+    PENDING:"Pending",
     NEW: "New Order" ,
     CANCELLED: "Cancelled",
     CONFIRMED: "Confirmed",
@@ -314,12 +316,26 @@ const handleRowClick = (order) => {
 </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.orderVariantResponse.length}</td>
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
-                {order.orderVariantResponse.reduce((sum, variant) => sum + (Number(variant.orderWeight) || 0), 0).toFixed(2)} kg
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                {
+                  order.orderVariantResponse.filter(variant => variant.status !== 'CANCELLED').length
+                }
               </td>
 
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>₹{order.totalAmount.toFixed(1)}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                {
+                  order.orderVariantResponse
+                    .filter(variant => variant.status !== 'CANCELLED')
+                    .reduce((sum, variant) => sum + (Number(variant.orderWeight) || 0), 0)
+                    .toFixed(2)
+                } kg
+              </td>
+
+
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                ₹{order.status === 'CANCELLED' ? '0' : order.totalAmount.toFixed(1)}
+              </td>
+
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>
                 <select
                   className={

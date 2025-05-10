@@ -597,7 +597,12 @@ const handleAddressTypeChange = (e) => {
                             {item.type}
                           </td>
                           <td className=" text-center">₹{item.amount.toFixed(0)}</td>
-                          <td className=" text-center">{new Date(item.createdAt).toLocaleDateString()}</td>
+                         
+                          <td className="text-center">
+                            {new Date(item.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
+                          </td>
+
+
                           {(item.source?.includes("Refund for cancellation") || item.source?.includes("Refund for return")) && (
                           <td className=" text-center pr-4">
                             <button
