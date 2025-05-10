@@ -1,0 +1,28 @@
+.custom-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%, 10px);
+    opacity: 0;
+    visibility: hidden;
+    width: 18rem;
+    z-index: 10;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .mfont {
+    font-size: 0.8rem;
+    /* font-weight: 700; */
+  }
+
+  .mfonth{
+    font-size: 0.8rem;
+  }
+  
+  .info-btn:hover + .custom-tooltip,
+  .info-btn:focus + .custom-tooltip {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    visibility: visible;
+  }
+  

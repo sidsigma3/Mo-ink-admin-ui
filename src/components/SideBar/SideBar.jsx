@@ -25,6 +25,7 @@ import { IconContext } from "react-icons";
 import { useLocation } from 'react-router-dom';
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoPricetagOutline } from "react-icons/io5";
+import ModalLogout from '../Modal/ModalLogout';
 
 
 const SideBar = () => {
@@ -37,6 +38,11 @@ const SideBar = () => {
     const [hoverSelected , setHoverSelected] = useState('')
 
     const [isMoreMenuOpen, setMoreMenuOpen] = useState(false);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);  
+
+    const [isLoggedOut, setIsLoggedOut] = useState(false);  
+  
 
 
     const menuRef = useRef(null);
@@ -100,15 +106,25 @@ const SideBar = () => {
   //   setIsAuthenticated(false);
   // };
 
+          const handleLogout = () => {
+            setIsModalOpen(true); 
+          };
 
+          const confirmLogout = () => {
+            localStorage.removeItem("isAuthenticated"); 
+            localStorage.removeItem("userData"); 
+            // sessionStorage.removeItem("authToken");
+            
+            console.log("User logged out");
+            setIsModalOpen(false);  
+            setIsLoggedOut(true);  
+            navigate("/");         
+          };
 
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated"); 
-    localStorage.removeItem("userData"); 
-    // sessionStorage.removeItem("authToken");
-    navigate("/"); 
-  };
-  
+          const closeModal = () => {
+            setIsModalOpen(false);
+          };
+
 
 
   return (
@@ -413,12 +429,27 @@ const SideBar = () => {
                 </Link>
             </li>
 
-            <li onClick={()=>handleLogout()}>
-              <button ><span className='icon' ><AiOutlineLogout size={22}/></span>Log out</button>
+            <div>
+            <li>
+              <button onClick={handleLogout}>
+                <span className='icon'>
+                  <AiOutlineLogout size={22} />
+                </span>
+                Log out
+              </button>
             </li>
 
 
-        </ul>
+              <ModalLogout
+              isOpen={isModalOpen}
+              onConfirm={confirmLogout}
+              onCancel={closeModal}
+            />
+
+
+              {isLoggedOut && <p>You have been logged out successfully.</p>}
+            </div>
+                    </ul>
 
 
 
