@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
 import { Form } from 'react-bootstrap';
+import Tooltip from '../../../components/Tooltip/Tooltip';
 import './ReportBug.css';
 
 const priorities = ['High Priority', 'Medium Priority', 'Low Priority'];
@@ -140,7 +141,10 @@ const ReportBug = () => {
         {/* Actions */}
         <div className="action-buttons mt-3">
           <button type="button" className="cancel-btn">Cancel</button>
+          <Tooltip />
           <button type="submit" className="submit-btn">Submit Report</button>
+         
+
         </div>
       </Form>
     </div>
