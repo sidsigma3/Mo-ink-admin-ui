@@ -50,6 +50,8 @@ const AddCustomerPage = () => {
   const customer =  (typeof index === 'number' && customers) ? customers[index] : null;
 
   const [amount, setAmount] = useState(""); // Amount input
+  const [source, setSource] = useState("");
+
 
   const [status,setStatus] = useState(customer?.customerStatus || 'Active')
 
@@ -199,11 +201,11 @@ const removeSegmentChip = (index) => {
     }
   
     try {
-     
-      const customerId = customer.customerId
-      await addMoneyToWallet(customerId, amount);
+      const customerId = customer.customerId;
+      await addMoneyToWallet(customerId, amount, source || "Manual credit");
       fetchTransactions();
-      setAmount(""); // Clear input
+      setAmount("");
+      setSource("");
       alert("Money added successfully.");
     } catch (error) {
       alert("Failed to add money to wallet.");
@@ -216,10 +218,11 @@ const removeSegmentChip = (index) => {
     }
   
     try {
-      const customerId = customer.customerId
-      await subtractMoneyFromWallet(customerId, amount);
+      const customerId = customer.customerId;
+      await subtractMoneyFromWallet(customerId, amount, source || "Manual debit");
       fetchTransactions();
-      setAmount(""); 
+      setAmount("");
+      setSource("");
       alert("Money deducted successfully.");
     } catch (error) {
       alert("Failed to subtract money from wallet.");
@@ -553,6 +556,13 @@ const handleAddressTypeChange = (e) => {
                     <div className='d-flex gap-2 mt-2'>
                     <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='₹ INR'></input>
                     {/* <AddBtn clickFunction={handleAddMoney}></AddBtn> */}
+                    <input
+                        value={source}
+                        onChange={(e) => setSource(e.target.value)}
+                        className="rounded border border-secondary-subtle p-1 w-100"
+                        placeholder="Comment / Source (e.g., Manual adjustment)"
+                      />
+
 
                     <button className='btn btn-primary d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.28rem 1.2rem'}} onClick={handleAddMoney}>
                     <MdAdd size={19}/>

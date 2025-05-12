@@ -317,9 +317,9 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
                 </div>
                 <div className="text-center mt-2">
                   <h5 className="fw-bold" style={{ fontSize: "0.8rem" }}>{colorData.colorName}</h5>
-                  <h6 className="text-muted" style={{ fontSize: "0.7rem" }}>{colorData.hexCode}</h6>
-                  <div style={{ fontSize: "0.7rem", color: '#555' }}>
-                    Type: {colorData.variantType}
+                  <h6 className="text-muted" style={{ fontSize: "0.8rem" }}>{colorData.hexCode}</h6>
+                  <div style={{ fontSize: "0.8rem", color: '#555' }}>
+                      {colorData.variantType}
                   </div>
                 </div>
               </div>

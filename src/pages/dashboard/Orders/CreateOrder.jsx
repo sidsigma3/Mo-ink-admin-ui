@@ -1193,6 +1193,7 @@ const closeReturnModal = () => {
 };
 
 const handleApprove = (variant) => {
+  console.log(variant)
   handleStatusChange(variant.orderId, variant.orderVariantId, "RETURNED");
   closeReturnModal();
 };
@@ -1443,14 +1444,23 @@ console.log(selectedAddress)
                                                           value
                                                         ) || value === order.status;
 
-                                                      const shouldDisable =
-                                                        order.status === "RETURN_REQUESTED" ||
-                                                        (order.status === "NEW" &&
-                                                          !["CONFIRMED", "CANCELLED"].includes(value)) ||
-                                                        (order.status === "CONFIRMED" &&
-                                                          (optionIndex < currentIndex || value === "CANCELLED")) ||
-                                                        optionIndex < currentIndex ||
-                                                        value === "CANCELLED";
+                                                        const shouldDisable = (() => {
+                                                          if (order.status === "RETURN_REQUESTED") return true;
+                                                        
+                                                          if (order.status === "NEW") {
+                                                            // Only allow moving to CONFIRMED or CANCELLED from NEW
+                                                            return !["CONFIRMED", "CANCELLED"].includes(value);
+                                                          }
+                                                        
+                                                          if (value === "CANCELLED") {
+                                                            // Disable CANCELLED for all statuses except NEW
+                                                            return true;
+                                                          }
+                                                        
+                                                          return optionIndex < currentIndex;
+                                                        })();
+                                                        
+                                                      
 
                                                       return (
                                                         shouldRender && (
@@ -1473,7 +1483,7 @@ console.log(selectedAddress)
                                             {isViewMode && (
                                               <td>
                                                 <div className='d-flex flex-column gap-3'>
-                                                  {order.color.status === "RETURN_REQUESTED" && (
+                                                  {order.status === "RETURN_REQUESTED" && (
                                                     <div className="d-flex align-items-center justify-content-between position-relative">
                                                       <button
                                                         className="alert-icon-btn"
@@ -1482,8 +1492,13 @@ console.log(selectedAddress)
                                                         title="Return requested for this variant"
                                                         onClick={(e) => {
                                                           e.stopPropagation();
-                                                          openReturnModal(order.color);
+                                                          openReturnModal({
+                                                            statusReason: order.statusReason,
+                                                            orderId: order.orderId,
+                                                            orderVariantId: order.variantId,
+                                                          });
                                                         }}
+                                                        
                                                       >
                                                         <div className="alert-icon-circle">
                                                           <FiAlertCircle size={16} color="red" />

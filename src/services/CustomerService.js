@@ -60,12 +60,12 @@ export const getAllCustomer = async () => {
 
 
  
-export const addMoneyToWallet = async (customerId, amount) => {
+  export const addMoneyToWallet = async (customerId, amount, source) => {
     try {
       const response = await axios.post(`${BASE_URL}/customer/${customerId}/wallet`, {
-        source: "Admin",
+        source,
         amount: parseFloat(amount),
-        type: "CREDIT", // Enum value for adding money
+        type: "CREDIT",
       });
       return response.data;
     } catch (error) {
@@ -74,13 +74,12 @@ export const addMoneyToWallet = async (customerId, amount) => {
     }
   };
   
-  
-  export const subtractMoneyFromWallet = async (customerId, amount) => {
+  export const subtractMoneyFromWallet = async (customerId, amount, source) => {
     try {
       const response = await axios.post(`${BASE_URL}/customer/${customerId}/wallet`, {
-        source: "Admin",
+        source,
         amount: parseFloat(amount),
-        type: "DEBIT", // Enum value for subtracting money
+        type: "DEBIT",
       });
       return response.data;
     } catch (error) {
@@ -88,7 +87,6 @@ export const addMoneyToWallet = async (customerId, amount) => {
       throw error;
     }
   };
-
   export const getWalletTransactions = async (customerId) => {
     try {
       const response = await axios.get(`${BASE_URL}/customer/${customerId}/wallet`);
