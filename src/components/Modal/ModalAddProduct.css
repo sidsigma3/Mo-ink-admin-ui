@@ -1,0 +1,125 @@
+.ModalAddProduct-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(75, 75, 75, 0.301);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  .ModalAddProduct-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px 30px 30px;
+    margin: 2rem; 
+    width: 420px;
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.05);
+    position: relative;
+    text-align: center;
+  }
+  
+  .ModalAddProduct-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    font-size: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .ModalAddProduct-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 22px;
+  }
+  
+  .ModalAddProduct-icon.primary {
+    background: #e3eeff;
+    color: #0D6EFD;
+  }
+  
+  .ModalAddProduct-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .ModalAddProduct-message {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.4;
+  }
+  
+  .ModalAddProduct-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+  }
+  
+  .bttn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+  
+  .bttn-primary {
+    background: #0D6EFD;
+    color: #fff;
+  }
+  
+  .bttn-primary:hover {
+    background: #0458d4;
+  }
+  
+  .bttn-outline {
+    background: #ebebeb;
+    color: #414141;
+  }
+  
+  .bttn-outline:hover {
+    background: #f0f0f0;
+  }
+  
+  @media screen and (max-width: 480px) {
+    .ModalAddProduct-content {
+      width: 100%;
+      padding: 1.5rem;
+      margin: 2rem; 
+      box-sizing: border-box;
+    }
+  
+    .ModalAddProduct-header {
+      font-size: 1.25rem;
+    }
+  
+    .ModalAddProduct-body {
+      font-size: 0.95rem;
+    }
+  
+    .ModalAddProduct-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  
+    .ModalAddProduct-actions button {
+      width: 100%;
+    }
+  }
+  

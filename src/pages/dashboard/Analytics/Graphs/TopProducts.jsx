@@ -67,8 +67,8 @@ const TopProducts = () => {
 
   return (
     <div className="top-products-card p-3" onClick={handleClick}>
-      <h4>Top Products</h4>
-      <h3>Cotton Yarn</h3>
+      {/* <h4>Top Products</h4>
+      <h3>Cotton Yarn</h3> */}
       <div className="top-products-graph">
         <GraphComponent
           type="bar"

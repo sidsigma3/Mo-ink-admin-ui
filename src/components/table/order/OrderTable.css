@@ -1,10 +1,8 @@
-/* .order-table{
-    border: 1px solid #ddd;
-    border-radius: 1rem;
+/* .order-table-ctn{
+   z-index: 9999;
+} */
 
-}
-
-.order-table table {
+/*.order-table table {
     width: 100%;
     background-color: white;
     text-align: left;

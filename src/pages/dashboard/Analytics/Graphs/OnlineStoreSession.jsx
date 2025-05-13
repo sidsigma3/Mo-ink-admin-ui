@@ -57,7 +57,7 @@ const OnlineStoreSession = () => {
 
   return (
     <div className="online-store-card p-3" onClick={handleClick}>
-      <h4>Online Store Sessions</h4>
+      {/* <h4>Online Store Sessions</h4> */}
       <div className="online-store-graph">
         <GraphComponent
           type="line"
