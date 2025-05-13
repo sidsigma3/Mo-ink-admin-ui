@@ -76,8 +76,8 @@ const TopSellingColor = () => {
 
   return (
     <div className="top-selling-color-card p-3" onClick={handleClick}>
-  <h4>Top Selling Colors</h4>
-  <h3>
+  {/* <h4>Top Selling Colors</h4> */}
+  {/* <h3>
     <span
       className="badge"
       style={{
@@ -90,8 +90,8 @@ const TopSellingColor = () => {
       }}
     ></span>
  Fiery Orange
-  </h3>
-  <div className="top-selling-color-graph">
+  </h3> */}
+  <div className="top-selling-color-grap">
     <GraphComponent
       type="bar"
       data={chartDataTopColor}

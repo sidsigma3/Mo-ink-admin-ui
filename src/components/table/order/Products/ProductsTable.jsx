@@ -246,10 +246,10 @@ const ProductsTable = forwardRef(({data},ref) => {
                 <td style={{ justifyItems: 'center', alignContent:'center'}} >
   <div 
     style={{
-      color: product.availableStatus === 'Active' ? '#065F46' : '#991B1B',
-      backgroundColor: product.availableStatus === 'Active' ? '#D1FAE5' : '#FEE2E2',
+      color: product.availableStatus === 'ACTIVE' ? '#065F46' : '#991B1B',
+      backgroundColor: product.availableStatus === 'ACTIVE' ? '#D1FAE5' : '#FEE2E2',
       border: '1px solid',
-      borderColor: product.availableStatus === 'Active' ? '#6EE7B7' : '#FCA5A5',
+      borderColor: product.availableStatus === 'ACTIVE' ? '#6EE7B7' : '#FCA5A5',
       borderRadius: '0.2rem',
       padding: '4px',
       width: '6rem',
@@ -315,7 +315,7 @@ const ProductsTable = forwardRef(({data},ref) => {
 
             <div className='d-flex justify-content-between mt-2 pe-4'>
                  <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.availableStatus === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.availableStatus==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
+                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.availableStatus === 'ACTIVE'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.availableStatus==='ACTIVE' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
                     {product.availableStatus}
                     </div>
                 </p>

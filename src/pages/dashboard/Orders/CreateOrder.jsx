@@ -1833,7 +1833,7 @@ console.log(selectedAddress)
                    
                     <tr>
 
-                      <td>Total Cost</td>
+                      <td className="fw-medium">Total Cost</td>
                       <td>
                         {
                           orderDetails.reduce((acc, item) => {
@@ -1895,19 +1895,19 @@ console.log(selectedAddress)
                       isOdisha ? (
                         <>
                           <tr>
-                            <td>CGST</td>
+                            <td className=" fw-medium pt-2">CGST</td>
                             <td></td>
                             <td className="text-end">₹{grandTotals.cgst.toFixed(0)}</td>
                           </tr>
                           <tr>
-                            <td>SGST</td>
+                            <td className=" fw-medium pt-2">SGST</td>
                             <td></td>
                             <td className="text-end">₹{grandTotals.sgst.toFixed(0)}</td>
                           </tr>
                         </>
                       ) : (
                         <tr>
-                          <td>IGST</td>
+                          <td className=" fw-medium pt-2">IGST</td>
                           <td></td>
                           <td className="text-end">₹{(grandTotals.cgst + grandTotals.sgst).toFixed(0)}</td>
                         </tr>

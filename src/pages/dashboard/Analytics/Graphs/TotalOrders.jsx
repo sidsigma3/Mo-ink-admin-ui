@@ -61,8 +61,8 @@ const TotalOrders = () => {
 
   return (
     <div className="total-orders-card p-3" onClick={handleClick}>
-      <h4>Total Orders</h4>
-      <h3>50 Orders</h3>
+      {/* <h4>Total Orders</h4>
+      <h3>50 Orders</h3> */}
       <div className="total-orders-graph">
         <GraphComponent
           type="bar"

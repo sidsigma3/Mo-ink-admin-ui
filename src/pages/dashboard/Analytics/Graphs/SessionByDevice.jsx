@@ -86,7 +86,7 @@ const SessionByDevice = () => {
 
   return (
     <div className="session-device-card  p-3" onClick={handleClick}>
-      <h4>Session by Device Type</h4>
+      {/* <h4>Session by Device Type</h4> */}
       <div className="session-device-graph">
         <GraphComponent
           type="doughnut"
