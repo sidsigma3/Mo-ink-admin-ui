@@ -1,4 +1,4 @@
-import React ,{useState} from 'react'
+import React ,{useState,useEffect} from 'react'
 import { IoArrowBackOutline } from "react-icons/io5";
 import {  useNavigate ,useLocation} from 'react-router-dom';
 import { useCustomerContext } from '../../../components/Context/CustomerContext';
@@ -12,6 +12,10 @@ import { RiFilePaper2Line } from "react-icons/ri";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import { addVendor, deleteVendor, updateVendor } from '../../../services/VendorsService';
 import StatusInput from '../../../components/StatusInput/StatusInput';
+import DownloadRateChartTemplateButton from '../../../components/Buttons/RateChartButton/DownloadRateChartTemplateButton';
+import { getAllProduct } from '../../../services/ProductService';
+import * as XLSX from "xlsx";
+import { createVendorRateChart } from '../../../services/VendorsService';
 
 const AddSpinners = () => {
   
@@ -21,6 +25,8 @@ const AddSpinners = () => {
   const {index,data} = state || {}
 
   const customer = state?.index !== undefined ? data[index] : null;
+
+  const [products,setProducts] = useState()
 
   const [manageWallet,setManageWallet] = useState(false)
 
@@ -45,6 +51,22 @@ const AddSpinners = () => {
     pinCode: customer?.zipcode || "",
     
   });
+
+
+  const [rateChartData, setRateChartData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllProduct();
+        setProducts(data.data)
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+  
+    fetchData(); 
+  }, []); 
 
   const handleAddWallet = () =>{
     setManageWallet(!manageWallet)
@@ -166,7 +188,60 @@ const handleTag = (value) =>{
         }
      }
 
+     const handleFileUpload = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+    
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet);
+    
+      // Group data by Product ID
+      const groupedByProductId = {};
+    
+      json.forEach((item) => {
+        const productId = item["Product ID"];
+        if (!groupedByProductId[productId]) {
+          groupedByProductId[productId] = [];
+        }
+    
+        groupedByProductId[productId].push({
+          variantId: item["Variant ID"],
+          size: item["Size"],
+          color: {
+            colorName: item["Color Name"],
+            hexCode: item["Color Hex Code"] || "#000000",
+          },
+          variantType: item["Variant Type"],
+          ratePerKg: parseFloat(item["Rate Per Kg"]),
+          gstOnVariant: parseFloat(item["GST % on Variant"]),
+        });
+      });
+    
+      // Save to state
+      setRateChartData(groupedByProductId);
+    };
+    
   
+    const handleSubmitForm = async () => {
+      try {
+        const productIds = Object.keys(rateChartData);
+    
+        for (const productId of productIds) {
+          const chartData = rateChartData[productId];
+          await createVendorRateChart(customer?.vendorId, productId, chartData);
+        }
+    
+        alert("Rate chart uploaded successfully for all products!");
+      } catch (err) {
+        console.error("Error uploading rate chart:", err);
+        alert("Error uploading rate chart.");
+      }
+    };
+    
+
     return (
     <div className='add-spinners'>
         <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
@@ -277,6 +352,69 @@ const handleTag = (value) =>{
 
 
     </div>
+
+    <div className='bg-white mt-2 p-3 w-100 rounded'>
+        <div className='d-flex justify-content-between'>
+        <h5>Rate Chart</h5>
+
+        </div>
+
+        <div>
+          <DownloadRateChartTemplateButton products={products}></DownloadRateChartTemplateButton>
+        </div>
+
+        <div className="d-flex justify-content-between align-items-center">
+        <h5>Upload Rate Chart</h5>
+        <input
+          type="file"
+          accept=".xlsx, .xls"
+          onChange={handleFileUpload}
+          className="form-control w-auto"
+        />
+      </div>
+                        
+    </div>
+
+    {rateChartData && Object.keys(rateChartData).length > 0 && (
+  <>
+    {Object.entries(rateChartData).map(([productId, rows]) => (
+      <div key={productId} className="mt-4">
+        <h5>Product ID: {productId}</h5>
+        <table className="table mt-2">
+          <thead>
+            <tr>
+              <th>Variant ID</th>
+              <th>Size</th>
+              <th>Color Name</th>
+              <th>Hex Code</th>
+              <th>Type</th>
+              <th>Rate/Kg</th>
+              <th>GST</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={index}>
+                <td>{row.variantId}</td>
+                <td>{row.size}</td>
+                <td>{row.color.colorName}</td>
+                <td>{row.color.hexCode}</td>
+                <td>{row.variantType}</td>
+                <td>{row.ratePerKg}</td>
+                <td>{row.gstOnVariant}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))}
+
+    <button className="btn btn-primary mt-3" onClick={handleSubmitForm}>
+      Submit Rate Chart
+    </button>
+  </>
+)}
+
 
 
     <div className='bg-white mt-2 p-3 w-100 rounded'>
