@@ -153,6 +153,11 @@ const DiscountsPage = () => {
       saveAs(dataBlob, "Discounts_List.xlsx");
     };
 
+  const allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
+  const selectedProducts = discountData?.applicableProducts || [];
+  const isAllProducts = allProducts.length === selectedProducts.length;
+  const selectedProductText = isAllProducts ? "all products" : "selected products";
+
   return (
     <div className='discounts'>
         <div className='top d-flex justify-content-between mb-2'>
@@ -206,8 +211,8 @@ const DiscountsPage = () => {
                 <div className='d-flex gap-3 align-itmes-cenetr'>
                 <p className="text-muted m-0">
                   {discount.discountType === "Percentage"
-                    ? `${discount.discountValue}% off on ${discount?.applicableProducts[0]?.productName}`
-                    : `₹${discount.discountValue} off on cotton yarn`}
+                    ? `${discount.discountValue}% off on ${selectedProductText}`
+                    :  `₹${discount.discountValue} off on ${selectedProductText}`}
                 </p>
                
                 <p className='text-muted m-0'>{discount.minPurchaseRequirement}</p>
