@@ -175,6 +175,7 @@ const AddProduct = () => {
                 availableWeight: Number(variant.available),
                 pricePerKg: Number(variant.price),
                 markupPricePerKg: Number(variant.markupPricePerKg || 0),
+                availableStatus : "ACTIVE"
             }));
         });
     });
@@ -1304,13 +1305,33 @@ console.log(sizeColorMap)
                            />
                          </td>
                          <td>
+                          <button
+                            onClick={() => {
+                              const newStatus =
+                                variant.availableStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+                              updateVariantField(sizeIndex, colorIndex, variantIndex, "availableStatus", newStatus);
+                            }}
+                            style={{
+                              padding: "4px 8px",
+                              backgroundColor: variant.availableStatus === "ACTIVE" ? "#dc2626" : "#16a34a",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {variant.availableStatus === "ACTIVE" ? "Disable" : "Enable"}
+                          </button>
+                        </td>
+
+                         {/* <td>
                            <button
                              onClick={() => removeVariant(sizeIndex, colorIndex, variantIndex)}
                              style={{ padding: "5px", background: "none", border: "none", color: "#FF3232" }}
                            >
                              <MdDeleteOutline size={20} />
                            </button>
-                         </td>
+                         </td> */}
                        </tr>
                      ))
                    )}

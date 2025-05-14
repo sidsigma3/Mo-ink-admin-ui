@@ -44,3 +44,15 @@ export const getAllVendors = async () => {
       throw error;
     }
   };
+
+  export const createVendorRateChart = async (vendorId, productId, payload) => {
+    try {
+      const response = await axios.put(`${BASE_URL}/vendor/${vendorId}/product/${productId}/vendor-rate-chart`, payload);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating rate chart for vendors:', error);
+      throw error;
+    }
+  };
+
+   
