@@ -1,28 +1,37 @@
 .custom-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translate(-50%, 10px);
-    opacity: 0;
-    visibility: hidden;
-    width: 18rem;
-    z-index: 10;
-    transition: all 0.3s ease-in-out;
-  }
+  position: absolute;
+  bottom: -125%;
+  right: -270%;
+  transform: translate(-50%, 10px);
+  opacity: 0;
+  visibility: hidden;
+  width: 16rem;
+  z-index: 9999;
+  transition: all 0.3s ease-in-out;
+}
 
-  .mfont {
-    font-size: 0.8rem;
-    /* font-weight: 700; */
-  }
+.alert-icon-circle {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
 
-  .mfonth{
-    font-size: 0.8rem;
-  }
-  
-  .info-btn:hover + .custom-tooltip,
-  .info-btn:focus + .custom-tooltip {
-    transform: translate(-50%, 0);
-    opacity: 1;
-    visibility: visible;
-  }
-  
+.mfont {
+  font-size: 0.8rem;
+}
+
+.mfonth {
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+/* ✅ Fix this part — must target child tooltip inside wrapper on hover */
+.tooltip-wrapper:hover .custom-tooltip {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  visibility: visible;
+}

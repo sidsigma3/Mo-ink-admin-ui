@@ -60,8 +60,8 @@ const TopSellingCounter = () => {
 
   return (
     <div className="top-selling-card p-3" onClick={handleClick}>
-      <h4>Top Selling Counter</h4>
-      <h3>Counter 2/92</h3>
+      {/* <h4>Top Selling Counter</h4>
+      <h3>Counter 2/92</h3> */}
       <div className="top-selling-graph">
         <GraphComponent
           type="bar"

@@ -81,8 +81,8 @@ const TopCustomers = () => {
 
   return (
     <div className="top-customers-card p-3" onClick={handleClick}>
-      <h4>Top Customers</h4>
-      <h3>Customer A</h3>
+      {/* <h4>Top Customers</h4>
+      <h3>Customer A</h3> */}
       <div className="top-customers-graph">
         <GraphComponent
           type="bar"

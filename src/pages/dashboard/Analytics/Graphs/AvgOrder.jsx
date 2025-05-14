@@ -57,8 +57,8 @@ const AvgOrder = () => {
 
   return (
     <div className="avg-order-card " onClick={handleClick}>
-      <h4>Average Order Value</h4>
-      <h3>₹16,213.00</h3>
+      {/* <h4>Average Order Value</h4>
+      <h3>₹16,213.00</h3> */}
       <div className="avg-order-graph">
         <GraphComponent
           type="line"

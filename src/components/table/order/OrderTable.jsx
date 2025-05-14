@@ -19,6 +19,7 @@ import ModalPaid from "../../Modal/ModalPaid";
 import ModalUnpaid from "../../Modal/ModalUnpaid";
 import ModalPartiallypaid from "../../Modal/ModalPartiallypaid";
 import moment from 'moment-timezone';
+import Tooltip from "../../Tooltip/Tooltip";
 
 
 const OrderTable = forwardRef(({data}, ref) => {
@@ -264,7 +265,7 @@ const handleRowClick = (order) => {
     <div className="order-table table-ctn-order">
       <Table hover>
         <thead>
-          <tr>
+          <tr className="order-tablemain">
 
             <th style={{ verticalAlign: 'middle'}} >#POID</th>
 
@@ -426,19 +427,8 @@ const handleRowClick = (order) => {
                 {order.orderVariantResponse?.some(variant => 
                  ["RETURN_REQUESTED", "RETURNED"].includes(variant.status)
               ) && (
-                  <button
-                    className="alert-icon-btn"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title="Return requested for this order"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevents row click
-                    }}
-                  >
-                    <div className="alert-icon-circle">
-                      <FiAlertCircle size={16} color="red" />
-                    </div>
-                  </button>
+                    <Tooltip />
+
                 )}
               </td>
 

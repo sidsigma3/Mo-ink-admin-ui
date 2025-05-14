@@ -65,7 +65,7 @@ const OnlineStoreConversionRate = () => {
 
   return (
     <div className="conversion-rate-card p-3" onClick={handleClick}>
-      <h4>Online Conversion Rate</h4>
+      {/* <h4>Online Conversion Rate</h4> */}
       <div className="conversion-rate-graph">
         <GraphComponent
           type="bar"

@@ -61,7 +61,16 @@ const GraphComponent = ({ type, data, options, plugins = [], text, number }) => 
       {text && <h4>{text}</h4>}
       {number && <h3>{number}</h3>}
       <div className="chart-container">
-        <canvas ref={chartRef}></canvas>
+        <canvas   ref={chartRef}
+        style={{
+        maxWidth: '100%',
+        height: '240px',
+        boxSizing: 'border-box',
+        display: 'block',
+        width: '326px'
+      }}>
+
+      </canvas>
       </div>
     </div>
   );

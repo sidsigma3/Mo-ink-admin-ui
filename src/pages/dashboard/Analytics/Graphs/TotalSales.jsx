@@ -73,8 +73,8 @@ const TotalSales = () => {
 
   return (
     <div className="total-sales-card p-3" onClick={handleClick}>
-      <h4>Total Sales</h4>
-      <h3>₹1,04,804.00</h3>
+      {/* <h4>Total Sales</h4>
+      <h3>₹1,04,804.00</h3> */}
       <div className="total-sales-graph">
         <GraphComponent
           type="line"

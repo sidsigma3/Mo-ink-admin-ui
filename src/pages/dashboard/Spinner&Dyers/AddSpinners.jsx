@@ -12,15 +12,29 @@ import { RiFilePaper2Line } from "react-icons/ri";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import { addVendor, deleteVendor, updateVendor } from '../../../services/VendorsService';
 import StatusInput from '../../../components/StatusInput/StatusInput';
+
 import DownloadRateChartTemplateButton from '../../../components/Buttons/RateChartButton/DownloadRateChartTemplateButton';
 import { getAllProduct } from '../../../services/ProductService';
 import * as XLSX from "xlsx";
 import { createVendorRateChart } from '../../../services/VendorsService';
 
+import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
+import { PiExportBold } from "react-icons/pi";
+import { CgImport } from "react-icons/cg";
+
+
+
+
 const AddSpinners = () => {
   
   const navigate = useNavigate ()
   const { state } = useLocation();
+
+  const [expandedTypeIndex, setExpandedTypeIndex] = useState({});
+
+  const [expandedProductIndex, setExpandedProductIndex] = useState(null);
+
+  const [expandedVariantIndex, setExpandedVariantIndex] = useState({});
 
   const {index,data} = state || {}
 
@@ -29,6 +43,7 @@ const AddSpinners = () => {
   const [products,setProducts] = useState()
 
   const [manageWallet,setManageWallet] = useState(false)
+  
 
   const [status,setStatus] = useState(customer?.status.toLowerCase() || 'Active')
 
@@ -53,6 +68,7 @@ const AddSpinners = () => {
   });
 
 
+
   const [rateChartData, setRateChartData] = useState([]);
 
   useEffect(() => {
@@ -67,6 +83,129 @@ const AddSpinners = () => {
   
     fetchData(); 
   }, []); 
+
+  
+  const [expandedRow, setExpandedRow] = useState(null);
+
+  const orders = [
+  {
+    voId: '12501',
+    date: '5/12/2025, 10:30:45 AM',
+    quantity: '72kg',
+    amount: '₹19,850/-',
+  },
+  {
+    voId: '12502',
+    date: '5/12/2025, 10:05:12 AM',
+    quantity: '150kg',
+    amount: '₹1,27,500/-',
+  },
+  {
+    voId: '12503',
+    date: '5/12/2025, 9:47:23 AM',
+    quantity: '34kg',
+    amount: '₹9,020/-',
+  },
+  {
+    voId: '12504',
+    date: '5/12/2025, 9:13:59 AM',
+    quantity: '89kg',
+    amount: '₹24,870/-',
+  },
+  {
+    voId: '12505',
+    date: '5/12/2025, 8:59:34 AM',
+    quantity: '63kg',
+    amount: '₹17,215/-',
+  },
+];
+
+
+  const demoData = [
+  {
+    productName: "Cotton",
+    variants: [
+      {
+        size: "2/40",
+        pricePerKg: 241,
+        gst: "12%",
+        types: [
+          {
+            type: "Cone",
+            colors: [
+              { color: "Red", hex: "#FF0000" },
+              { color: "Blue", hex: "#0000FF" }
+            ]
+          },
+          {
+            type: "Hank",
+            colors: [
+              { color: "Green", hex: "#00FF00" }
+            ]
+          }
+        ]
+      },
+      {
+        size: "2/80",
+        pricePerKg: 154,
+        gst: "12%",
+        types: [
+          {
+            type: "Cone",
+            colors: [
+              { color: "Orange", hex: "#FFA500" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    productName: "Silk",
+    variants: [
+      {
+        size: "3/50",
+        pricePerKg: 200,
+        gst: "5%",
+        types: [
+          {
+            type: "Hank",
+            colors: [
+              { color: "Purple", hex: "#800080" },
+              { color: "Cyan", hex: "#00FFFF" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
+
+
+
+  const toggleProduct = (index) => {
+    setExpandedProductIndex(expandedProductIndex === index ? null : index);
+    setExpandedVariantIndex({}); // close any open variant when changing product
+  };
+
+  const toggleVariant = (productIndex, variantIndex) => {
+    const key = `${productIndex}-${variantIndex}`;
+    setExpandedVariantIndex((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const toggleType = (pIndex, vIndex, tIndex) => {
+  const key = `${pIndex}-${vIndex}-${tIndex}`;
+  setExpandedTypeIndex((prev) => ({
+    ...prev,
+    [key]: !prev[key],
+  }));
+};
+
+
+
 
   const handleAddWallet = () =>{
     setManageWallet(!manageWallet)
@@ -168,6 +307,11 @@ const AddSpinners = () => {
 
       navigate('/spinners-and-dyers')
 };
+
+  const toggleRow = (index) => {
+    setExpandedRow(expandedRow === index ? null : index);
+  };
+
 
 
 const handleTag = (value) =>{
@@ -349,8 +493,30 @@ const handleTag = (value) =>{
         {formErrors.pinCode && <p className="text-danger">{formErrors.pinCode}</p>}
     </div>
 
+    </div>
 
 
+     <>
+
+
+  <div className='bg-white mt-2 p-3 w-100 rounded'>
+    <div className='d-flex justify-content-between'>
+      <h5>Price Chart</h5>
+
+      <div className="d-flex gap-1">
+
+          {state && 
+           <button className="export-bttn">
+        Export
+        <PiExportBold size={16} />
+      </button>
+              } 
+            
+              <button className="import-bttn">
+        Import
+        <CgImport size={16} />
+      </button>
+      </div>
     </div>
 
     <div className='bg-white mt-2 p-3 w-100 rounded'>
@@ -417,18 +583,118 @@ const handleTag = (value) =>{
 
 
 
-    <div className='bg-white mt-2 p-3 w-100 rounded'>
-        <div className='d-flex justify-content-between'>
-        <h5>Assigned Order</h5>
 
-        </div>
+    <div style={{ border: '1px solid #ddd', borderRadius: '1rem', marginTop: '1rem', overflow: 'hidden' }}>
+      <table className="table text-center" style={{ marginBottom: 0 }}>
+  <thead className="table-light">
+    <tr>
+      <th className="py-3 px-4 text-start tablehead">Product Name</th>
+      <th className="py-3 px-4 tablehead">Variants</th>
+      <th className="py-3 px-4 tablehead">Price/Kg</th>
+      <th className="py-3 px-4 tablehead">GST</th>
+    </tr>
+  </thead>
+<tbody>
+  {demoData.map((product, productIndex) => (
+    <React.Fragment key={productIndex}>
+      {/* Level 1 - Product */}
+      <tr
+        onClick={() => toggleProduct(productIndex)}
+        className="level-expanded"
+        style={{ cursor: "pointer" }}
+      >
+        <td className="py-3 px-4 text-start">{product.productName}</td>
+        <td className="py-3 px-4">{product.variants.length}</td>
+        <td className="py-3 px-4">{product.variants[0].pricePerKg}</td>
+        <td className="py-3 px-4">{product.variants[0].gst}</td>
+      </tr>
 
-        <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
-                <RiFilePaper2Line size={50} />
-                <h5 className="fs-6">There's no transaction till now!</h5>
-            </div>
-                        
+      {/* Level 2 - Variant (Size) */}
+      {expandedProductIndex === productIndex &&
+        product.variants.map((variant, variantIndex) => (
+          <React.Fragment key={variantIndex}>
+            <tr
+              className="level-expanded"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleVariant(productIndex, variantIndex);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <td className="py-3 px-4 text-start">
+                <strong>Size:</strong> {variant.size}
+              </td>
+              <td className="py-3 px-4">{variant.types.length}</td>
+              <td className="py-3 px-4">{variant.pricePerKg}</td>
+              <td className="py-3 px-4">{variant.gst}</td>
+            </tr>
+
+            {/* Level 3 - Type (Cone/Hank) */}
+            {expandedVariantIndex[`${productIndex}-${variantIndex}`] &&
+              variant.types.map((type, typeIndex) => (
+                <React.Fragment key={typeIndex}>
+                  <tr
+                    className="level-expanded"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleType(productIndex, variantIndex, typeIndex);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <td className="py-3 px-4 text-start">
+                      <strong>Type:</strong> {type.type}
+                    </td>
+                    <td className="py-3 px-4">{type.colors.length}</td>
+                    <td className="py-3 px-4">{variant.pricePerKg}</td>
+                    <td className="py-3 px-4">{variant.gst}</td>
+                  </tr>
+
+                  {/* Level 4 - Color */}
+                  {expandedTypeIndex[`${productIndex}-${variantIndex}-${typeIndex}`] &&
+                    type.colors.map((color, colorIndex) => (
+                      <tr key={colorIndex} className="level-expanded">
+                        <td className="py-3 px-4 d-flex align-items-center gap-3 color-cell level-expanded">
+                          <div
+                            style={{
+                              backgroundColor: color.hex,
+                              width: "22px",
+                              height: "22px",
+                              borderRadius: "50%",
+                              border: "1px solid #ccc",
+                              flexShrink: 0,
+                            }}
+                          ></div>
+                          <span>{color.color}</span>
+                          <code style={{ fontSize: "0.8rem" }}>{color.hex}</code>
+                        </td>
+                        <td className="py-3 px-4 level-expanded">-</td>
+                        <td className="py-3 px-4 level-expanded">{variant.pricePerKg}</td>
+                        <td className="py-3 px-4 level-expanded">{variant.gst}</td>
+                      </tr>
+                    ))}
+                </React.Fragment>
+              ))}
+          </React.Fragment>
+        ))}
+    </React.Fragment>
+  ))}
+</tbody>
+
+
+</table>
+
     </div>
+  </div>
+</>
+
+
+
+
+
+
+
+
+
 
 
         <div className='d-flex justify-content-between my-4'>
@@ -459,6 +725,32 @@ const handleTag = (value) =>{
             </Dropdown.Menu>
             </Dropdown>
         </div>
+
+        <div className='bg-white mt-2 p-3 w-100 rounded'>
+      <div className='d-flex justify-content-between'>
+        <h5>Assigned Orders</h5>
+      </div>
+
+      {orders.length === 0 ? (
+        <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
+          <RiFilePaper2Line size={50} />
+          <h5 className="fs-6">There's no orders till now!</h5>
+        </div>
+      ) : (
+        orders.map((order, index) => (
+          <div key={index} className="mt-3 border-bottom pb-2">
+            <div className="fw-semibold " style={{ color: '#adadad', fontSize: '12px' }}>{order.date}</div>            
+            <div className=" my-2 d-flex justify-content-between gap-3">
+            <div className="fw-semibold ">V.O ID: {order.voId}</div>
+            <div>&bull;</div>
+              <div> {order.quantity}</div>
+              <div>&bull;</div>
+              <div className="fw-semibold"  style={{ color: '#41b788' }}>{order.amount}</div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
 
     </div>
 

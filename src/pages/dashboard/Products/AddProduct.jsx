@@ -21,6 +21,9 @@ import { Modal, Button } from "react-bootstrap";
 import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
 import ExportBtn from "../../../components/Buttons/Export/ExportBtn";
 import StatusInput from "../../../components/StatusInput/StatusInput";
+import ModalDelete from "../../../components/Modal/ModalDelete";
+import Toast from "../../../components/Toast/Toast";
+
 
 const AddProduct = () => {
 
@@ -453,20 +456,33 @@ const AddProduct = () => {
     setSizeColorMap(newData);
   };
 
-  
-  
-const handleDelete = async () => {
-  const isConfirmed = window.confirm("Are you sure you want to delete this product?");
-  if (!isConfirmed) return; // Stop if the user cancels
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  try {
-    const productId = product.productId;
-    await deleteProduct(productId);
-    navigate('/products'); // Redirect after deletion
-  } catch (error) {
-    console.error("Error Deleting product:", error);
-  }
-};
+  const [pendingDelete, setPendingDelete] = useState(null);
+
+  const handleDelete = async () => {
+  const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+              };
+      try {
+        await deleteProduct(pendingDelete); // or pass product ID
+        showToast("Product deleted successfully");
+      } catch (error) {
+        showToast("Failed to delete product", "error");
+      }
+    };
+
+
+//   try {
+//     const productId = product.productId;
+//     await deleteProduct(productId);
+//     navigate('/products'); // Redirect after deletion
+//   } catch (error) {
+//     console.error("Error Deleting product:", error);
+//   }
+// };
+const [toasts, setToasts] = useState([]);
 
 
 const [selectedFile, setSelectedFile] = useState(null);
@@ -483,12 +499,17 @@ const closeModal = () => {
 // Handle file selection
 const handleFileChange = (event) => {
   const file = event.target.files[0];
+   const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
 
   if (!file) return;
 
   // Validate file type
   if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
-    alert("Invalid file type. Please upload an Excel file.");
+          showToast("Invalid file type. Please upload an Excel file", "error");
+    // alert("Invalid file type. Please upload an Excel file.");
     return;
   }
 
@@ -497,11 +518,16 @@ const handleFileChange = (event) => {
 
 // Handle file upload & process Excel data
 const handleUpload = () => {
+   const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
 
   console.log('hello')
 
   if (!selectedFile) {
-    alert("Please select a file to upload.");
+    showToast("Please select a file to upload.", "error");
+    // alert("Please select a file to upload.");
     return;
   }
 
@@ -521,7 +547,8 @@ const handleUpload = () => {
       const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
       if (!data.length) {
-        alert("The uploaded file is empty.");
+        showToast("The uploaded file is empty", "error");
+      // alert("The uploaded file is empty.");
         return;
       }
       console.log("Parsed Data:", data);
@@ -533,12 +560,15 @@ const handleUpload = () => {
       closeModal();
     } catch (error) {
       console.error("Error reading file:", error);
-      alert("Error processing the file. Please try again.");
+      showToast("Error processing the file. Please try again.", "error");
+
+      // alert("Error processing the file. Please try again.");
     }
   };
 
   reader.onerror = () => {
-    alert("Error reading file. Please try again.");
+    showToast("Error reading file. Please try again", "error");
+    // alert("Error reading file. Please try again.");
   };
 };
 
@@ -601,8 +631,13 @@ const parseSizeColorData = (data) => {
 
 
 const handleExport = () => {
+   const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
   if (!sizeColorMap || sizeColorMap.length === 0) {
-      alert("No data available to export.");
+      showToast("No data available to export.", "error");
+      // alert("No data available to export.");
       return;
   }
 
@@ -660,6 +695,10 @@ console.log(sizeColorMap)
 
   return (
 
+    
+
+
+    
     <div className="add-product-ctn">
         <div className='top d-flex gap-3' style={{cursor:"pointer"}}>
             <span onClick={() => navigate('/products')}><IoArrowBackOutline size={25}/></span>
@@ -1307,13 +1346,23 @@ console.log(sizeColorMap)
        
     </div>
 
-    <div className="w-100 d-flex justify-content-between my-4">
-      {state?.index!== undefined && (
-          <DeleteBtn clickFunction={handleDelete}></DeleteBtn>
-      )}
-        
-        <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
-    </div>
+        <div className="w-100 d-flex justify-content-between my-4">
+          {state?.index !== undefined && (
+            <DeleteBtn clickFunction={() => setShowDeleteModal(true)} />
+          )}
+
+          <SubmitBtn text={'Save'} clickFunction={handleSubmit} />
+
+          <ModalDelete
+            isOpen={showDeleteModal}
+            onCancel={() => setShowDeleteModal(false)}
+            onConfirm={() => {
+              handleDelete();
+              setShowDeleteModal(false);
+            }}
+          />
+        </div>
+
 
       </div>
 
@@ -1324,6 +1373,22 @@ console.log(sizeColorMap)
         </div>
       </div>
     </div>
+
+
+ {/* Toast Notification */}
+    <div className="fixed top-4 right-4 z-[9999] space-y-2">
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() =>
+            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+          }
+        />
+      ))}
+    </div>
+
     </div>
   );
 };
