@@ -17,12 +17,12 @@ const Tooltip = () => {
           >
             <FiAlertCircle size={16} color="red" className="text-danger" />
           </div>
-          <h6 className="mfont mb-0 fw-semibold">Return Requested</h6>
+          <h6 className="mfont mb-0 fw-bold">Return Requested</h6>
         </div>
 
         <p className="mfonth small mb-2 text-light">
-          Due to <strong>Color Mismatch</strong>, the customer initiated the return of the product.
-        </p>
+        The customer has requested a return for the product. Action is needed.     
+       </p>
       </div>
     </div>
   );
