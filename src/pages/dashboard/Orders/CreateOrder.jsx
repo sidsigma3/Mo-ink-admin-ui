@@ -33,6 +33,7 @@ import ModalManufactureOrder from '../../../components/Modal/ModalManufactureOrd
 import ModalShipOrder from '../../../components/Modal/ModalShipOrder';
 import ModalDeliverOrder from '../../../components/Modal/ModalDeliverOrder';
 import ModalReturnOrder from '../../../components/Modal/ModalReturnOrder';
+import Tooltip from '../../../components/Tooltip/Tooltip';
 
 // Optional: style mapping
 export const statusClassMap = {
@@ -436,7 +437,7 @@ useEffect(() => {
         "MANUFACTURING": "purple",
         "DELIVERED": "green",
         "CANCELLED": "red",
-        "Returned": "grey",
+        // "Returned": "grey",
         "RETURNED": "purple",
         "CONFIRMED": "muted-clay",
         
@@ -1408,7 +1409,7 @@ console.log(selectedAddress)
                                             <td>
                                               <div className="d-flex align-items-center justify-content-center">
                                                 {["RETURNED", "RETURN_REJECTED"].includes(order.status) ? (
-                                                  <div className={`${statusClassMap[order.status] || ''} text-capitalize`}>
+                                                  <div className={`${statusClassMap[order.status] || ''} defaultcolor text-capitalize`}>
                                                     {order.status.replace("_", " ")}
                                                   </div>
                                                 ) : (
@@ -1433,7 +1434,7 @@ console.log(selectedAddress)
                                                         status: selectedStatus,
                                                       });
                                                     }}
-                                                    className={`${statusClassMap[order.status] || ''} text-capitalize`}
+                                                    className={`${statusClassMap[order.status] || ''} defaultcolor text-capitalize`}
                                                   >
                                                     {statusOptions.map(({ value, label }) => {
                                                       const currentIndex = statusFlow.indexOf(order.status);
@@ -1464,7 +1465,7 @@ console.log(selectedAddress)
 
                                                       return (
                                                         shouldRender && (
-                                                          <option key={value} value={value} disabled={shouldDisable}>
+                                                          <option key={value} value={value} disabled={shouldDisable} className={`${statusClassMap[value] || ''} defaultcolor text-capitalize`}>
                                                             {label}
                                                           </option>
                                                         )
@@ -1484,27 +1485,27 @@ console.log(selectedAddress)
                                               <td>
                                                 <div className='d-flex flex-column gap-3'>
                                                   {order.status === "RETURN_REQUESTED" && (
-                                                    <div className="d-flex align-items-center justify-content-between position-relative">
-                                                      <button
-                                                        className="alert-icon-btn"
-                                                        data-bs-toggle="tooltip"
-                                                        data-bs-placement="top"
-                                                        title="Return requested for this variant"
-                                                        onClick={(e) => {
-                                                          e.stopPropagation();
-                                                          openReturnModal({
-                                                            statusReason: order.statusReason,
-                                                            orderId: order.orderId,
-                                                            orderVariantId: order.variantId,
-                                                          });
-                                                        }}
-                                                        
-                                                      >
-                                                        <div className="alert-icon-circle">
-                                                          <FiAlertCircle size={16} color="red" />
-                                                        </div>
-                                                      </button>
+                                                   <div className="d-flex align-items-center justify-content-between position-relative">
+                                                    <div
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        openReturnModal({
+                                                          statusReason: order.statusReason,
+                                                          orderId: order.orderId,
+                                                          orderVariantId: order.variantId,
+                                                        });
+                                                      }}
+                                                      
+                                                      className="alert-icon-circle cursor-pointer"
+                                                    >  
+                                                    <Tooltip content="Initiate Return">
+                                                      <FiAlertCircle size={16} color="red" />
+                                                      </Tooltip>
                                                     </div>
+                                                
+                                                </div>
+
+
                                                   )}
                                                 </div>
                                                 <ModalReturnOrder

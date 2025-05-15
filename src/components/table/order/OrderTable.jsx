@@ -159,8 +159,23 @@ const handleRowClick = (order) => {
     }
 
     const formattedData = orders.map((order) => {
-      const rawDate = order.createdAt;
-      const istDate = moment.utc(rawDate).tz("Asia/Kolkata").format("D MMM YYYY, h:mm A");
+     const rawInput = order.createdAt; // get timestamp string
+
+const rawDate = new Date(rawInput); // parse to Date object
+
+const istDate = new Intl.DateTimeFormat('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true
+}).format(rawDate);
+
+console.log(istDate);
+
+
     
     
       return {

@@ -98,6 +98,15 @@
     width: 6rem;
 }
 
+.defaultcolor{
+    background-color: #D1FAE5;
+    border: 1px solid #6EE7B7;
+    padding: 5px 4px;
+    color: #41b788;
+    border-radius: 0.3rem;
+    width: 8rem;
+}
+
 .create-order .blue{
     background-color: #DBEAFE;
     border: 1px solid #5d91cb;

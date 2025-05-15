@@ -14,11 +14,13 @@ const ModalReturnOrder = ({ isOpen, onClose ,onCancel, onConfirm, variantDetails
           <span>!</span>
         </div>
         <h2 className="mreturn-title">Return Request Details</h2>
-        <div className="mreturn-details">
+        <div className="mreturn-details ">
           {/* <p><strong>Color:</strong> {variantDetails.colorName}</p>
           <p><strong>Type:</strong> {variantDetails.type}</p>
           <p><strong>Weight:</strong> {variantDetails.weight} kg</p> */}
-          <p><strong>Reason:</strong> {variantDetails.statusReason}</p>
+          <p className="mb-1"> Reason: <strong>{variantDetails.statusReason}</strong></p>
+          <p>Returned Weight: <strong>{variantDetails.weight}kg</strong></p>
+
         </div>
         <p className="mreturn-message">
           Are you sure you want to approve or reject the return?
