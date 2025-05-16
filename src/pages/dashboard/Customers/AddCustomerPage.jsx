@@ -329,7 +329,7 @@ const handleAddressTypeChange = (e) => {
       email: formData.email,
       company: formData.company,
       cancelledCheque: formData.chequePhoto || "",
-      customerStatus: status,
+      customerStatus: status.toUpperCase(),
       segmentIds,
       addresses: existingAddresses.slice(0, 3), // enforce max 3 types
       customerAddress: formData.address,

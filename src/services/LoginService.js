@@ -5,9 +5,9 @@ const API_URL =  BASE_URL + "/user/login";
 
 
 
-export const loginUser = async (userEmailId, password) => {
+export const loginUser = async (loginId, password) => {
   try {
-    const response = await axios.post(API_URL, { userEmailId, password });
+    const response = await axios.post(API_URL, { loginId, password });
     console.log(response)
 
     if (response.data.status === "SUCCESS") {

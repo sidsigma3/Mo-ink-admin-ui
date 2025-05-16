@@ -16,8 +16,7 @@ import StatusInput from '../../../components/StatusInput/StatusInput';
 import DownloadRateChartTemplateButton from '../../../components/Buttons/RateChartButton/DownloadRateChartTemplateButton';
 import { getAllProduct } from '../../../services/ProductService';
 import * as XLSX from "xlsx";
-import { createVendorRateChart } from '../../../services/VendorsService';
-
+import { createVendorRateChart ,getRateChart} from '../../../services/VendorsService';
 import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
 import { PiExportBold } from "react-icons/pi";
 import { CgImport } from "react-icons/cg";
@@ -35,6 +34,11 @@ const AddSpinners = () => {
   const [expandedProductIndex, setExpandedProductIndex] = useState(null);
 
   const [expandedVariantIndex, setExpandedVariantIndex] = useState({});
+
+
+  const [expandedProducts, setExpandedProducts] = useState({});
+  const [expandedSizes, setExpandedSizes] = useState({});
+  const [expandedVariants, setExpandedVariants] = useState({});
 
   const {index,data} = state || {}
 
@@ -70,6 +74,7 @@ const AddSpinners = () => {
 
 
   const [rateChartData, setRateChartData] = useState([]);
+  const [isChartAvailable, setIsChartAvailable] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,8 +89,30 @@ const AddSpinners = () => {
     fetchData(); 
   }, []); 
 
+
+  useEffect(() => {
+    const fetchRateChart = async () => {
+      try {
+        const data = await getRateChart(customer?.vendorId);
+        if (data && Object.keys(data).length > 0) {
+          setRateChartData(data.data.product); // Assuming data format is { productId: [...] }
+          setIsChartAvailable(true);
+        }
+      } catch (error) {
+        console.error("Failed to fetch rate chart:", error);
+        setIsChartAvailable(false);
+      }
+    };
+  
+    fetchRateChart();
+  }, [customer?.vendorId]);
   
   const [expandedRow, setExpandedRow] = useState(null);
+
+  const toggleExpand = (key, setter) => {
+    setter((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+  
 
   const orders = [
   {
@@ -375,15 +402,87 @@ const handleTag = (value) =>{
     
         for (const productId of productIds) {
           const chartData = rateChartData[productId];
-          await createVendorRateChart(customer?.vendorId, productId, chartData);
+          if (!Array.isArray(chartData) || chartData.length === 0) continue;
+    
+          const gstOnProduct = chartData[0]?.gstOnVariant || 0;
+    
+          const payload = {
+            productId: Number(productId),
+            gstOnProduct: Number(gstOnProduct),
+            variant: chartData.map((entry) => ({
+              variantId: entry.variantId,
+              size: entry.size,
+              color: {
+                colorName: entry.color.colorName,
+                hexCode: entry.color.hexCode,
+              },
+              variantType: entry.variantType,
+              ratePerKg: Number(entry.ratePerKg),
+            })),
+          };
+    
+          await createVendorRateChart(customer?.vendorId,productId, payload);
         }
     
         alert("Rate chart uploaded successfully for all products!");
       } catch (err) {
-        console.error("Error uploading rate chart:", err);
+        console.error("Error uploading rate chart:", err.response?.data || err.message);
         alert("Error uploading rate chart.");
       }
     };
+    
+    const groupRateChartData = () => {
+      const grouped = {};
+    
+      // If data is in API format (array of products)
+      if (Array.isArray(rateChartData)) {
+        rateChartData.forEach((product) => {
+          const productId = product.productId;
+          const variants = product.variant;
+    
+          if (!Array.isArray(variants)) return;
+    
+          if (!grouped[productId]) grouped[productId] = {};
+    
+          variants.forEach((variant) => {
+            const { size, variantType } = variant;
+    
+            if (!grouped[productId][size]) grouped[productId][size] = {};
+            if (!grouped[productId][size][variantType]) grouped[productId][size][variantType] = [];
+    
+            grouped[productId][size][variantType].push({
+              ...variant,
+              gstOnVariant: product.gstOnProduct, // attach GST
+            });
+          });
+        });
+      }
+    
+      // If data is in uploaded file format (object with productId keys)
+      else if (typeof rateChartData === 'object' && rateChartData !== null) {
+        Object.entries(rateChartData).forEach(([productId, rows]) => {
+          if (!grouped[productId]) grouped[productId] = {};
+    
+          rows.forEach((row) => {
+            const { size, variantType } = row;
+    
+            if (!grouped[productId][size]) grouped[productId][size] = {};
+            if (!grouped[productId][size][variantType]) grouped[productId][size][variantType] = [];
+    
+            grouped[productId][size][variantType].push(row);
+          });
+        });
+      }
+    
+      return grouped;
+    };
+        
+
+
+
+    const groupedData = groupRateChartData();
+
+
     
 
     return (
@@ -541,45 +640,95 @@ const handleTag = (value) =>{
                         
     </div>
 
-    {rateChartData && Object.keys(rateChartData).length > 0 && (
-  <>
-    {Object.entries(rateChartData).map(([productId, rows]) => (
-      <div key={productId} className="mt-4">
-        <h5>Product ID: {productId}</h5>
-        <table className="table mt-2">
-          <thead>
-            <tr>
-              <th>Variant ID</th>
-              <th>Size</th>
-              <th>Color Name</th>
-              <th>Hex Code</th>
-              <th>Type</th>
-              <th>Rate/Kg</th>
-              <th>GST</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr key={index}>
-                <td>{row.variantId}</td>
-                <td>{row.size}</td>
-                <td>{row.color.colorName}</td>
-                <td>{row.color.hexCode}</td>
-                <td>{row.variantType}</td>
-                <td>{row.ratePerKg}</td>
-                <td>{row.gstOnVariant}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    ))}
+                    {rateChartData && Object.keys(rateChartData).length > 0 ?  (
+                       <>
+                    <table className="table table-bordered w-full">
+                        <thead className="table-light">
+                          <tr>
+                            <th>Variant ID</th>
+                            <th>Color Name</th>
+                            <th>Hex Code</th>
+                            <th>Rate/Kg</th>
+                            <th>GST (%)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.entries(groupedData).map(([productId, sizes]) => (
+                            <React.Fragment key={productId}>
+                              {/* Product Row */}
+                              <tr className="table-secondary">
+                                <td colSpan={5} onClick={() => toggleExpand(productId, setExpandedProducts)} style={{ cursor: "pointer" }}>
+                                  {expandedProducts[productId] ? "▼" : "▶"} <strong>Product ID:</strong> {productId}
+                                </td>
+                              </tr>
 
-    <button className="btn btn-primary mt-3" onClick={handleSubmitForm}>
-      Submit Rate Chart
-    </button>
-  </>
-)}
+                              {expandedProducts[productId] &&
+                                Object.entries(sizes).map(([size, variantTypes]) => (
+                                  <React.Fragment key={`${productId}-${size}`}>
+                                    {/* Size Row */}
+                                    <tr className="table-light">
+                                      <td colSpan={5} onClick={() => toggleExpand(`${productId}-${size}`, setExpandedSizes)} style={{ cursor: "pointer" }}>
+                                        {expandedSizes[`${productId}-${size}`] ? "▼" : "▶"} <strong>Size:</strong> {size}
+                                      </td>
+                                    </tr>
+
+                                    {expandedSizes[`${productId}-${size}`] &&
+                                      Object.entries(variantTypes).map(([variantType, rows]) => (
+                                        <React.Fragment key={`${productId}-${size}-${variantType}`}>
+                                          {/* Variant Type Row */}
+                                          <tr>
+                                            <td colSpan={5} onClick={() => toggleExpand(`${productId}-${size}-${variantType}`, setExpandedVariants)} style={{ cursor: "pointer" }}>
+                                              {expandedVariants[`${productId}-${size}-${variantType}`] ? "▼" : "▶"} <strong>Variant Type:</strong> {variantType}
+                                            </td>
+                                          </tr>
+
+                                          {/* Color Rows */}
+                                          {expandedVariants[`${productId}-${size}-${variantType}`] &&
+                                            rows.map((row, idx) => (
+                                              <tr key={idx}>
+                                                <td>{row.variantId}</td>
+                                                <td>{row.color.colorName}</td>
+                                                <td>
+                                                  <div className="d-flex align-items-center gap-2">
+                                                    <div
+                                                      style={{
+                                                        backgroundColor: row.color.hexCode,
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        borderRadius: "50%",
+                                                        border: "1px solid #ccc",
+                                                      }}
+                                                    />
+                                                    <code>{row.color.hexCode}</code>
+                                                  </div>
+                                                </td>
+                                                <td>{row.ratePerKg}</td>
+                                                <td>{row.gstOnVariant}</td>
+                                              </tr>
+                                            ))}
+                                        </React.Fragment>
+                                      ))}
+                                  </React.Fragment>
+                                ))}
+                            </React.Fragment>
+                          ))}
+                        </tbody>
+                      </table>
+
+                                      
+                      <button className="btn btn-primary mt-4" onClick={handleSubmitForm}>
+                        Submit Rate Chart
+                      </button>
+
+                        
+                  </>
+                  )
+                  : (
+                    <div className="text-muted text-center mt-4">
+                      No rate chart available. Please upload a file to continue.
+                      {/* Place your upload component or button here */}
+                    </div>
+                  )}
 
 
 

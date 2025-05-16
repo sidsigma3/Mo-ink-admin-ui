@@ -1,4 +1,4 @@
-import React ,{useState}from 'react'
+import React ,{useState , useEffect }from 'react'
 import ImportBtn from '../../../../components/Buttons/Import/ImportBtn'
 import ExportBtn from '../../../../components/Buttons/Export/ExportBtn'
 import ProductFilter from '../../../../components/Filter/DayFilter/ProductFilter/ProductFilter'
@@ -10,18 +10,25 @@ import { Link } from 'react-router-dom'
 import AddBtn from '../../../../components/Buttons/Add/AddBtn'
 import "./VendorOrder.css"
 import { useNavigate } from 'react-router-dom'
+import { getVendorOrder } from '../../../../services/OrderService'
+import { downloadVendorInvoice } from '../../../../services/InvoiceServices'
 
 const VendorOrder = () => {
 
     const navigate = useNavigate()
 
-    const { orders } = useVendorOrderContext();
+    const { order } = useVendorOrderContext();
+    const [orders, setOrders] = useState([]);
+    
 
     const [filteredData, setFilteredData] = useState([]); 
 
-    const handleRowClick = (orderId) => {
-        navigate(`/vendor-order-details/${orderId}`);
-      };
+
+    const handleRowClick = (correlationId) => {
+      const relatedOrders = orders.filter(order => order.correlationId === correlationId);
+      navigate(`/vendor-order-details/${correlationId}`, { state: { relatedOrders } });
+    };
+    
 
 
       const handleFilterChange = (filter, value) => {
@@ -43,6 +50,35 @@ const VendorOrder = () => {
       };
 
 
+      useEffect(() => {
+        const fetchOrders = async () => {
+          try {
+            const data = await getVendorOrder();
+            setOrders(data);
+          } catch (error) {
+            console.error("Failed to fetch vendor orders:", error);
+          }
+        };
+    
+        fetchOrders();
+      }, []);
+
+      const formatDateToIST = (dateStr) => {
+        // Force it to be treated as UTC
+        const utcDate = new Date(dateStr + 'Z');
+      
+        return utcDate.toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+      };
+      
+      
   return (
     <div className='vendor-order'>
          <div className='top d-flex justify-content-between'>
@@ -76,43 +112,105 @@ const VendorOrder = () => {
           <StatusFilter status={"Active"}></StatusFilter>
         </div>
 
+        {/* <div className="table-responsive mt-3 table-ctn">
+      <Table hover bordered>
+        <thead className="thead-dark">
+          <tr>
+            <th>V.O ID</th>
+            <th style={{ textAlign: 'center' }}>Date</th>
+            <th style={{ textAlign: 'center' }}>Order For</th>
+            <th style={{ textAlign: 'center' }}>Vendor</th>
+            <th style={{ textAlign: 'center' }}>Weight</th>
+            <th style={{ textAlign: 'center' }}>Amount</th>
+            <th style={{ textAlign: 'center' }}>Payment</th>
+            <th style={{ textAlign: 'center' }}>Invoice</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.length === 0 ? (
+            <tr>
+              <td colSpan="8" style={{ textAlign: 'center' }}>
+                No orders found.
+              </td>
+            </tr>
+          ) : (
+            orders.map((order) => {
+              const totalWeight = order.vendorOrderVariantResponse.reduce(
+                (sum, variant) => sum + variant.vendorOrderWeight,
+                0
+              );
+
+              return (
+                <tr key={order.vendorOrderId} onClick={() => handleRowClick(order.correlationId)} style={{ cursor: 'pointer' }}>
+              
+                  <td>{order.vendorOrderId}</td>
+                  <td style={{ textAlign: 'center' }}>{formatDate(order.orderDate)}</td>
+                  <td style={{ textAlign: 'center' }}>{order.vendorType}</td>
+                  <td style={{ textAlign: 'center' }}>{order.vendorName}</td>
+                  <td style={{ textAlign: 'center' }}>{totalWeight.toFixed(2)} kg</td>
+                  <td style={{ textAlign: 'center' }}>₹ {order.totalAmount.toFixed(2)}</td>
+                  <td style={{ textAlign: 'center' }}>{order.status}</td>
+                  <td style={{ textAlign: 'center' }}>{order.correlationId || '-'}</td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </Table>
+    </div> */}
+
 
         <div className="table-responsive mt-3 table-ctn">
         <Table hover>
           <thead className="thead-dark">
             <tr>
-              <th>V.O ID</th>
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Date</th>
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Order For</th>
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Vendor</th>
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Weight</th>
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Amount</th>
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Payment</th>
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Inovice</th>
+            <th>ID</th>
+            <th style={{ textAlign: 'center' }}>PO</th>
+            <th style={{ textAlign: 'center' }}>Date</th>
+            <th style={{ textAlign: 'center' }}>Order For</th>
+            <th style={{ textAlign: 'center' }}>Vendor</th>
+            <th style={{ textAlign: 'center' }}>Weight</th>
+            <th style={{ textAlign: 'center' }}>Amount</th>
+            <th style={{ textAlign: 'center' }}>Payment</th>
+            <th style={{ textAlign: 'center' }}>Invoice</th>
              
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr key={order.orderId}onClick={() => handleRowClick(order.orderId)} style={{ cursor: "pointer" }}>
-                <td style={{ verticalAlign: 'middle'}}>{order.orderId}</td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.date}</td>
+          {orders.length === 0 ? (
+            <tr>
+              <td colSpan="8" style={{ textAlign: 'center' }}>
+                No orders found.
+              </td>
+            </tr>
+          ) : (
+            orders.slice().reverse().map((order) => {
+              const totalWeight = order.vendorOrderVariantResponse.reduce(
+                (sum, variant) => sum + variant.vendorOrderWeight,
+                0
+              );
+
+              return (
+              <tr key={order.vendorOrderId} onClick={() => handleRowClick(order.correlationId)} style={{ cursor: 'pointer' }}>
+                <td style={{ verticalAlign: 'middle'}}>{order.vendorOrderId}</td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.correlationId}</td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{formatDateToIST(order.orderDate)}</td>
                 <td style={{ justifyItems: 'center', alignContent:'center'}}>
                     <div 
                     style={{
                         padding: '4px',
                         border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem', 
-                        backgroundColor:order.orderFor === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
-                        borderColor:order.orderFor === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
-                        color : order.orderFor === 'Spinner' ? '#1E40AF' : '#92400E' ,
-                    }}
+                        backgroundColor:order.vendorType === 'SPINNER' ? '#DBEAFE' : '#FEF3C7',
+                        borderColor:order.vendorType === 'SPINNER' ? '#93C5FD' : '#FCD34D' ,
+                        color : order.vendorType === 'SPINNER' ? '#1E40AF' : '#92400E' ,
+                    }}  
                     >
-                    {order.orderFor}
-                </div>
+                    {order.vendorType}
+                </div>    
                 </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer}</td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.weight}</td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.amount}</td>
+                <td  style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.vendorName}</td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{totalWeight.toFixed(2)} kg</td>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.totalAmount.toFixed(2)}</td>
                 <td style={{ justifyItems: 'center', alignContent:'center'}}>
                     <div style={{
                         padding: '4px',
@@ -121,7 +219,7 @@ const VendorOrder = () => {
                         borderColor:order.payment === 'Paid' ? '#6EE7B7' : '#D1D5DB' ,
                         color : order.payment === 'Paid' ? '#41b788' : '#3f3c3c' ,
                     }}>
-                    {order.payment}
+                    {order.status}
                     </div>
 
                 </td>
@@ -129,12 +227,16 @@ const VendorOrder = () => {
                 <div 
                    className="bg-secondary-subtle rounded-circle p-1 text-white d-flex justify-content-center align-items-center"
                      style={{ width: '40px', height: '40px' }}
+                     onClick={(e)=>{
+                       e.stopPropagation()
+                      downloadVendorInvoice(order.vendorOrderId)
+                    }}
                    >
                    <LuFileDown size={20} />
                    </div>
                 </td>
               </tr>
-            ))}
+            )}))}
           </tbody>
             </Table>
       </div>

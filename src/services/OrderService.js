@@ -86,3 +86,26 @@ export const updateOrderPaymentStatuses = async (orderId,updates) => {
     throw error;
   }
 };
+
+
+export const createVendorOrder= async (payload) => {
+  try {
+    const response = await axios.post(`${URL}/vendor-orders`, payload);
+    return response.data;
+  } catch (error) {
+    console.error(`Error Creating Vendor order :`, error);
+    throw error;
+  }
+};
+
+
+export const getVendorOrder= async () => {
+  try {
+    const response = await axios.get(`${URL}/vendor-orders`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error getting vendor orders :`, error);
+    throw error;
+  }
+};
+

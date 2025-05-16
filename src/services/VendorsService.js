@@ -47,7 +47,7 @@ export const getAllVendors = async () => {
 
   export const createVendorRateChart = async (vendorId, productId, payload) => {
     try {
-      const response = await axios.put(`${BASE_URL}/vendor/${vendorId}/product/${productId}/vendor-rate-chart`, payload);
+      const response = await axios.put(`${BASE_URL}/vendor/${vendorId}/vendor-rate-chart/product/${productId}`, payload);
       return response.data;
     } catch (error) {
       console.error('Error creating rate chart for vendors:', error);
@@ -55,4 +55,25 @@ export const getAllVendors = async () => {
     }
   };
 
-   
+  export const getRateChart = async (vendorId) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/vendor/${vendorId}/vendor-rate-chart`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching rate chart for vendors:', error);
+      throw error;
+    }
+  };
+
+
+  export const vendorStatusUpdate = async (vendorOrderId,payload) => {
+    try {
+      const response = await axios.put(`${BASE_URL}/vendor-orders/${vendorOrderId}/status-update`,payload);
+      return response.data;
+    } catch (error) {
+      console.error('Error changing status of vendor orders:', error);
+      throw error;
+    }
+  };
+
+

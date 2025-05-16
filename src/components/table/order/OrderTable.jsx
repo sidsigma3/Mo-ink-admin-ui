@@ -311,7 +311,7 @@ console.log(istDate);
 
         <tbody>
         {[...orders]
-       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .reverse()
        .map((order) => (
     <tr
       key={order.orderId}
@@ -321,15 +321,15 @@ console.log(istDate);
 
               <td style={{ verticalAlign: 'middle', fontWeight: 500 }}>{order.orderId}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-  {new Date(order.createdAt).toLocaleString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'Asia/Kolkata',
-  })}
-</td>
+                  {new Date(order.createdAt).toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Kolkata',
+                  })}
+              </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>

@@ -93,3 +93,30 @@ export const downloadCreditReceipt = async (orderId, type) => {
     };
   }
 };
+
+
+export const downloadVendorInvoice = async (orderId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/purchase-order/download/${orderId}`, {
+      responseType: 'blob',
+    });
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `vendor_invoice_${orderId}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data || "Failed to download credit receipt.",
+    };
+  }
+};
