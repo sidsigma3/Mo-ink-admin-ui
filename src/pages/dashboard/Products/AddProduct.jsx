@@ -466,7 +466,7 @@ const AddProduct = () => {
             setTimeout(() => setToasts([]), 3000);
               };
       try {
-        await deleteProduct(pendingDelete); // or pass product ID
+        await deleteProduct(product.productId); 
         showToast("Product deleted successfully");
       } catch (error) {
         showToast("Failed to delete product", "error");

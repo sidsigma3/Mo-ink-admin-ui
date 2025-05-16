@@ -250,9 +250,9 @@ const Spinners = () => {
                 style={{
                     padding:'4px',
                     border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem',
-                    backgroundColor:customer.vendorType === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
-                    borderColor:customer.vendorType === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
-                    color : customer.vendorType === 'Spinner' ? '#1E40AF' : '#92400E' ,
+                    backgroundColor:customer.vendorType === 'SPINNER' ? '#DBEAFE' : '#FEF3C7',
+                    borderColor:customer.vendorType === 'SPINNER' ? '#93C5FD' : '#FCD34D' ,
+                    color : customer.vendorType === 'SPINNER' ? '#1E40AF' : '#92400E' ,
                 }}
                 >
                {customer.vendorType}
