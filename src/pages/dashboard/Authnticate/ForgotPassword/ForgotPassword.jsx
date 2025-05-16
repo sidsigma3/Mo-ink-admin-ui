@@ -3,32 +3,30 @@ import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import "./ForgotPassword.css"
-
+import { forgotPassword } from '../../../../services/LoginService';
 
 const ForgotPassword = () => {
-
-const [username, setUsername] = useState("");
-   
+    const [email, setEmail] = useState("");
+    const userType = "USER"; 
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    const [user, setUser] = useState(null);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setMessage("");
+        setError("");
 
-        useEffect(() => {
-            axios
-            .get("http://localhost:5000/auth/user", { withCredentials: true })
-            .then((res) => setUser(res.data))
-            .catch(() => setUser(null));
-        }, []);
+        try {
+            await forgotPassword({ email, userType });
+            setMessage("Password reset instructions sent to your email.");
+            setTimeout(() => navigate("/login"), 2000);
+        } catch (err) {
+            setError("Something went wrong. Please check your email and try again.");
+            console.error(err);
+        }
+    };
 
-        const handleLoginSuccess = (response) => {
-            console.log("Login Success:", response);
-            window.location.href = "http://localhost:5000/auth/google";
-        };
-
-        const handleLogout = () => {
-            axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
-            setUser(null);
-        };
 
     return (
     <div className="forgot-wrapper d-flex align-items-center justify-content-center px-3">
@@ -62,20 +60,26 @@ const [username, setUsername] = useState("");
       Don't worry it happens to all of us, Enter your email below to recover your password.
       </p>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <label className="fs-6 fw-normal text-white form-label">Email Address</label>
         <input
           type="text"
           placeholder="Enter your email address"
           className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}    
+          required  
+    
+
+          />
 
         <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium"
-        onClick={() => navigate('/verifycode')}>
-          Get Code
+        >
+          Submit
         </button>
+                    {message && <p className="text-green-400 text-sm mt-4">{message}</p>}
+                    {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
+        
 
       </form>
     </div>
