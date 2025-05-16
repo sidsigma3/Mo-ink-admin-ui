@@ -24,3 +24,27 @@ export const loginUser = async (userEmailId, password) => {
     return { success: false, message: error.response?.data?.message || "Login failed. Please try again." };
   }
 };
+
+
+
+export const forgotPassword = async (customerData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/password/forgot-password`, customerData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating customer:", error);
+    throw error;
+  }
+};
+
+export const resetPassword = async (customerData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/password/reset-password`, customerData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating customer:", error);
+    throw error;
+  }
+};
+
+

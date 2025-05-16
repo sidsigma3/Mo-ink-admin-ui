@@ -1,34 +1,73 @@
 import React ,{useState, useEffect} from 'react'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import "./ResetPassword.css"
+import { resetPassword } from '../../../../services/LoginService';
 
 
 const ResetPassword = () => {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation(); 
 
-const [username, setUsername] = useState("");
-   
-    const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+  const userType = "USER"; 
 
-    const [user, setUser] = useState(null);
+ useEffect(() => {
+    console.log("Token:", token);
+    console.log("UserType:", userType);
+  }, []);
 
-        useEffect(() => {
-            axios
-            .get("http://localhost:5000/auth/user", { withCredentials: true })
-            .then((res) => setUser(res.data))
-            .catch(() => setUser(null));
-        }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
+    console.log("hello")
 
-        const handleLoginSuccess = (response) => {
-            console.log("Login Success:", response);
-            window.location.href = "http://localhost:5000/auth/google";
-        };
 
-        const handleLogout = () => {
-            axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
-            setUser(null);
-        };
+    if (!password || !confirmPassword) {
+      alert("Please fill out both fields.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    if (!token || !userType) {
+      alert("Invalid or expired reset link.");
+      return;
+    }
+
+    try {
+      const payload = {
+        token,
+        password,
+        userType,
+      };
+
+      const data = await resetPassword(payload);
+
+      console.log("Response from resetPassword:", data); 
+
+      if (data?.success) {
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+          navigate("/login");
+        }, 3000);
+      } else {
+        alert(data?.message || "Something went wrong.");
+      }
+    } catch (error) {
+      alert("Failed to reset password. Please try again.");
+      console.error(error);
+    }
+  };
+
 
     return (
     <div className="Reset-wrapper d-flex align-items-center justify-content-center px-3">
@@ -61,14 +100,14 @@ const [username, setUsername] = useState("");
       Your previous password has been reset. Please set a new password for your account.
       </p>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <label className="fs-6 fw-normal text-white form-label">New password</label>
         <input
           type="text"
           placeholder="Create a strong password"
           className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
 <label className="fs-6 fw-normal text-white form-label">Confirm password</label>
@@ -76,21 +115,20 @@ const [username, setUsername] = useState("");
           type="text"
           placeholder="Re-enter the password"
           className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
 
         <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium"
-        onClick={() => navigate("/login")}
         >
           Save
         </button>
 
-        <div className="text-center small fs-6 fw-normal text-white-50 my-3">Or login with</div>
+        {/* <div className="text-center small fs-6 fw-normal text-white-50 my-3">Or login with</div>
 
         <div className="d-flex justify-content-center gap-2 gap-lg-3">
         <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
-        </div>
+        </div> */}
       </form>
     </div>
     </div>
