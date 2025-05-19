@@ -8,6 +8,8 @@ import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/Stat
 import './Inventory.css';
 import { getAllProduct } from '../../../services/ProductService'
 import {getAllInventory} from '../../../services/InventoryService'
+import * as XLSX from 'xlsx';
+
 
 const Inventory = () => {
 
@@ -15,8 +17,17 @@ const Inventory = () => {
 
   const [product,setProduct] = useState([])
   const [filteredData, setFilteredData] = useState([]); 
+  const [dashboardStats, setDashboardStats] = React.useState({
+    totalSKU: 0,
+    fromManufacturer: 0,
+    totalCustomerOrder: 0,
+    stockRemaining: 0,
+  });
 
+  const [allInventory, setAllInventory] = useState([]);
   const [inventory, setInventory] = useState([]);
+
+
 
     useEffect(() => {
            fetchProductdData();
@@ -36,27 +47,51 @@ const Inventory = () => {
         const flatData = [];
 
         response?.data?.product?.forEach((product) => {
-          product.variant.forEach((variant, idx) => {
+          product.variant.forEach((variant) => {
             flatData.push({
               product: product.productName,
               counter: variant.size,
               type: variant.variantType,
               color: variant.color,
-              customerOrder: variant.reserveWeight, // Placeholder
+              customerOrder: variant.reserveWeight,
               remainingWeight: variant.availableWeight,
-              raw: variant // Keep raw if needed later
+              raw: variant,
             });
           });
         });
-
+        
+        setAllInventory(flatData);  
         setInventory(flatData);
+  
+        // Calculate dashboard numbers
+        const totalSKU = flatData.length; // each variant is a SKU
+  
+        const fromManufacturer = flatData.reduce(
+          (acc, item) => acc + (item.remainingWeight || 0),
+          0
+        );
+  
+        const totalCustomerOrder = flatData.reduce(
+          (acc, item) => acc + (item.customerOrder || 0),
+          0
+        );
+  
+        const stockRemaining = fromManufacturer - totalCustomerOrder;
+  
+        setDashboardStats({
+          totalSKU,
+          fromManufacturer,
+          totalCustomerOrder,
+          stockRemaining,
+        });
       } catch (err) {
-        console.error('Failed to fetch inventory:', err);
+        console.error("Failed to fetch inventory:", err);
       }
     };
-
+  
     fetchInventory();
   }, []);
+  
 
  
      const fetchProductdData = async () => {
@@ -71,21 +106,23 @@ const Inventory = () => {
  
  
      const handleFilterChange = (filter, value) => {
-         const lowercasedValue = value.toLowerCase().trim();
-       
-         if (!lowercasedValue) {
-           setFilteredData(product);
-           return;
-         }
-       
-         const filtered = product.filter((item) => {
-           if (filter === "Product Name") return item.productName.toLowerCase().includes(lowercasedValue);
-           return true;
-         });
-       
-         console.log(filtered);
-         setFilteredData(filtered);
-       };
+      const lowercasedValue = value.toLowerCase().trim();
+    
+      if (!lowercasedValue) {
+        setInventory(allInventory);
+        return;
+      }
+    
+      const filtered = allInventory.filter((item) => {
+        if (filter === "Product Name") {
+          return item.product.toLowerCase().includes(lowercasedValue);
+        }
+        return true;
+      });
+    
+      setInventory(filtered);
+    };
+    
  
  
        const handleStatusChange = (status) => {
@@ -96,22 +133,6 @@ const Inventory = () => {
              setFilteredData(filtered);
          }
      };
-
-
-  const inventoryData = [
-    { product: 'Cotton Yarn', counter: '2/80', type: 'Cone', color: 'yellow' },
-    { product: 'Polyester Yarn', counter: '2/80', type: 'Hank', color: 'red' },
-    { product: 'Polyester Yarn', counter: '2/80', type: 'cone', color: 'blue' },
-    { product: 'Polyester Yarn', counter: '2/80', type: 'Cone', color: 'black' },
-    { product: 'Polyester Yarn', counter: '2/80', type: 'Hank', color: 'green' },
-    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'orange' },
-    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'pink' },
-    { product: 'Silk Yarn', counter: '2/80', type: 'Cone', color: 'teal' },
-    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'grey' },
-    { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'violet' },
-  ];
-
-
 
   const renderColorDot = (color) => (
     <div
@@ -127,6 +148,23 @@ const Inventory = () => {
     />
   );
   
+ 
+    const exportToExcel = (data) => {
+      const exportData = data.map(item => ({
+        Product: item.product,
+        Counter: item.counter,
+        Type: item.type,
+        Color: item.color.colorName || item.color.colorName || '',
+        'Customer Order (Kgs)': item.customerOrder,
+        'Remaining Weight (Kgs)': item.remainingWeight,
+      }));
+  
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventory');
+      XLSX.writeFile(workbook, 'inventory.xlsx');
+    };
+  
 
   return (
     <div className='inventory-wrapper p-1'>
@@ -134,7 +172,7 @@ const Inventory = () => {
       <div className='d-flex justify-content-between align-items-center mb-4'>
         <h4 className='page-title mb-0'>Inventory</h4>
         <div className='d-flex gap-2'>
-        <ExportBtn onClick={() => exportRef.current.exportToExcel()}></ExportBtn>
+        <ExportBtn onClick={() => exportToExcel(inventory)}></ExportBtn>
 
           {/* <button className='btn btn-primary d-flex align-items-center gap-2 px-3 add-product-btn'>
             + Add Product
@@ -144,19 +182,19 @@ const Inventory = () => {
 
       {/* Summary Boxes */}
       <div className="info-ctn row">
-        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-          <DashboardBox heading={'Total SKU'} number={256} />
-        </div>
-        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-          <DashboardBox heading={'From Manufacturer'} number={'105 Kgs'} />
-        </div>
-        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-          <DashboardBox heading={'Total Customer Order'} number={'165 Kgs'} />
-        </div>
-        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-          <DashboardBox heading={'Stock Remaining'} number={'206 Kgs'} />
-        </div>
-      </div>
+  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+    <DashboardBox heading={'Total SKU'} number={dashboardStats.totalSKU} />
+  </div>
+  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+    <DashboardBox heading={'From Manufacturer'} number={`${dashboardStats.fromManufacturer} Kgs`} />
+  </div>
+  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+    <DashboardBox heading={'Total Customer Order'} number={`${dashboardStats.totalCustomerOrder} Kgs`} />
+  </div>
+  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+    <DashboardBox heading={'Stock Remaining'} number={`${dashboardStats.stockRemaining} Kgs`} />
+  </div>
+</div>
 
       <div className='filter-sec d-flex gap-2 align-items-center mt-2'>
       
@@ -167,9 +205,9 @@ const Inventory = () => {
           />
       </div>
       
-      <div className='w-25'>
+      {/* <div className='w-25'>
       <StatusFilter status="All" onStatusChange={handleStatusChange} />
-      </div>
+      </div> */}
   </div>
 
   <div className="inventory-container">
@@ -191,9 +229,9 @@ const Inventory = () => {
       {inventory.map((item, index) => (
         <tr 
           key={index} 
-  onClick={() => navigate('/inventorydetails', { state: { item } })} 
-  style={{ cursor: 'pointer' }}
->
+          onClick={()=>handleRowClick(item)} 
+          style={{ cursor: 'pointer' }}
+        >
           <td className="fw-medium text-start pl-3">{item.product}</td>
           <td>{item.counter}</td>
           <td>{item.type}</td>

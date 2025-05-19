@@ -759,18 +759,18 @@ console.log(sizeColorMap)
           <div className="media-input-ctn mt-5 p-2">
             <label>Media</label>
             <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-              <input type="file" multiple onChange={handleMediaChange} />
-              <h4>Accepts images, videos, or 3D models</h4>
+              <input type="file" accept="image/*" onChange={handleMediaChange} />
+              <h4>Accepts images only</h4>
             </div>
             {errors.media && <p className="text-danger">{errors.media}</p>}
 
-            {/* Show uploaded thumbnails */}
-            <div className="mt-3 d-flex gap-2 flex-wrap">
-              {(formData.media || []).map((url, index) => (
-                <img src={`http://localhost:8080${url}`} alt="Uploaded" width="120"/>
-              ))}
-            </div>
+            {formData.media && (
+              <div className="mt-3">
+                <img src={`http://localhost:8080${formData.media}`} alt="Uploaded" width="120" />
+              </div>
+            )}
           </div>
+
 
 
         </div>

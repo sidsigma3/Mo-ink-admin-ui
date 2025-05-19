@@ -482,7 +482,45 @@ const handleTag = (value) =>{
 
     const groupedData = groupRateChartData();
 
-
+    const handleDownloadRateChart = (products) => {
+      if (!Array.isArray(products) || products.length === 0) {
+        alert("No products found.");
+        return;
+      }
+  
+      const allRows = [];
+  
+      products.forEach((product) => {
+        if (Array.isArray(product.variants)) {
+          product.variants.forEach((variant) => {
+            allRows.push({
+              "Product ID": product.id,
+              "Product Name": product.productName,
+              "Product GST (%)": product.gstOnProduct,
+              "Variant ID": variant.id,
+              "Size": variant.size,
+              "Color Name": variant.color?.colorName || "",
+              "Color Hex Code": variant.color?.hexCode || "",
+              "Variant Type": variant.variantType,
+              "Available Weight (Kg)": variant.availableWeight,
+              "Rate Per Kg": "",          // to be filled
+              "GST % on Variant": "",     // to be filled
+            });
+          });
+        }
+      });
+  
+      if (allRows.length === 0) {
+        alert("No variants found in the product list.");
+        return;
+      }
+  
+      const worksheet = XLSX.utils.json_to_sheet(allRows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "VendorRateChartTemplate");
+  
+      XLSX.writeFile(workbook, "Vendor_Rate_Chart_Template.xlsx");
+    };
     
 
     return (
@@ -599,46 +637,34 @@ const handleTag = (value) =>{
 
 
   <div className='bg-white mt-2 p-3 w-100 rounded'>
-    <div className='d-flex justify-content-between'>
+    <div className='d-flex justify-content-between mb-2'>
       <h5>Price Chart</h5>
 
       <div className="d-flex gap-1">
+     
+        <button
+          className="export-bttn"
+          onClick={() => handleDownloadRateChart( products )}
+        >
+          Export
+          <PiExportBold size={16} />
+        </button>
+      
 
-          {state && 
-           <button className="export-bttn">
-        Export
-        <PiExportBold size={16} />
-      </button>
-              } 
-            
-              <button className="import-bttn">
+      <label className="import-bttn mb-0" style={{ cursor: 'pointer' }}>
         Import
         <CgImport size={16} />
-      </button>
-      </div>
-    </div>
-
-    <div className='bg-white mt-2 p-3 w-100 rounded'>
-        <div className='d-flex justify-content-between'>
-        <h5>Rate Chart</h5>
-
-        </div>
-
-        <div>
-          <DownloadRateChartTemplateButton products={products}></DownloadRateChartTemplateButton>
-        </div>
-
-        <div className="d-flex justify-content-between align-items-center">
-        <h5>Upload Rate Chart</h5>
         <input
           type="file"
           accept=".xlsx, .xls"
           onChange={handleFileUpload}
-          className="form-control w-auto"
+          style={{ display: 'none' }}
         />
-      </div>
-                        
+      </label>
     </div>
+    </div>
+
+    
 
                     {rateChartData && Object.keys(rateChartData).length > 0 ?  (
                        <>

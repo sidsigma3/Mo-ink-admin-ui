@@ -6,10 +6,10 @@ import { BsDot } from 'react-icons/bs';
 import "./InventoryDetails.css"
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate , useLocation } from 'react-router-dom';
-import { getInventoryLogs } from '../../../services/InventoryService';
+import { getInventoryLogs , adjustInventory } from '../../../services/InventoryService';
 import { FaMinus } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
-
+import * as XLSX from 'xlsx';
 
 const InventoryDetails = () => {
   const { state } = useLocation();
@@ -25,50 +25,131 @@ const InventoryDetails = () => {
 
   const [logsByVariant, setLogsByVariant] = useState([]);
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const response = await getInventoryLogs(item.raw.variantId);
-        setLogsByVariant(response.data); // wrap in array to keep rendering logic same
-      } catch (error) {
-        console.error('Error loading inventory logs:', error);
-      }
-    };
+  const fetchLogs = async () => {
+    try {
+      const response = await getInventoryLogs(item.raw.variantId);
+      setLogsByVariant(response.data);
+    } catch (error) {
+      console.error('Error loading inventory logs:', error);
+    }
+  };
   
+
+  useEffect(() => {
     if (item?.raw?.variantId) {
       fetchLogs();
     }
   }, [item]);
   
 
-  const [filteredData] = useState([
-    { date: 'April 01, 2025', source: 'Manufacturer', Name: 'Heritage Corp', type: 'Credit', qty: '151 Kgs', total: '251 Kgs' },
-    { date: 'March 25, 2025', source: 'Customer Order', Name: 'Nova Textiles', type: 'Debit', qty: '20 Kgs', total: '50 Kgs' },
-    { date: 'March 25, 2025', source: 'Manufacturer', Name: 'FiberMax Ltd.', type: 'Credit', qty: '10 Kgs', total: '70 Kgs' },
-    { date: 'March 25, 2025', source: 'Manufacturer', Name: 'CottonLeaf Mills', type: 'Credit', qty: '45 Kgs', total: '66 Kgs' },
-    { date: 'March 25, 2025', source: 'Customer Order', Name: 'Urban Weaves', type: 'Debit', qty: '05 Kgs', total: '21 Kgs' },
-    { date: 'March 25, 2025', source: 'Customer Order', Name: 'BlueThread Apparel', type: 'Debit', qty: '12 Kgs', total: '26 Kgs' },
-    { date: 'March 25, 2025', source: 'Customer Order', Name: 'Spindle & Co.', type: 'Debit', qty: '14 Kgs', total: '38 Kgs' },
-    { date: 'March 25, 2025', source: 'Customer Order', Name: 'Texon Garments', type: 'Debit', qty: '10 Kgs', total: '52 Kgs' },
-    { date: 'March 25, 2025', source: 'Customer Order', Name: 'PureStitch Pvt. Ltd.', type: 'Debit', qty: '13 Kgs', total: '62 Kgs' },
-    { date: 'March 01, 2025', source: 'Opening Stock', Name: 'Initial Balance', type: 'Credit', qty: '75 Kgs', total: '75 Kgs' },
-  ]);
-  
+
+  const handleInventoryAdjust = async (actionType) => {
+    if (!amount || isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid weight in kg.");
+      return;
+    }
+
+    if (!source.trim()) {
+      alert("Please enter a comment/source.");
+      return;
+    }
+
+    const payload = {
+      variantId:item.raw.variantId,
+      adjustWeight: Number(amount),
+      remarks: source.trim(),
+      actionType, // "INCREASE" or "DECREASE"
+    };
+
+    try {
+      const response = await adjustInventory(payload,item.raw.variantId);
+    
+      alert(`Inventory successfully ${actionType === "INCREASE" ? "added" : "reduced"}.`);
+      fetchLogs();
+
+     
+      setAmount("");
+      setSource("");
+    } catch (error) {
+      alert("Failed to adjust inventory. See console for details.");
+    }
+  };
 
   const formatDateToIST = (dateStr) => {
-    // Force it to be treated as UTC
-    const utcDate = new Date(dateStr + 'Z');
-  
-    return utcDate.toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata',
+    return new Date(dateStr).toLocaleString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      // second: '2-digit',
       hour12: true,
     });
   };
+
+  const actionDisplayMap = {
+    RESERVE: { label: 'Reserved', color: 'text-primary' },
+    RELEASE: { label: 'Released', color: 'text-warning' },
+    CONFIRM_SOLD: { label: 'Confirmed (Sold)', color: 'text-success' },
+    RETURN: { label: 'Returned', color: 'text-danger' },
+    INCREASE: { label: 'Increased', color: 'text-success' },
+    DECREASE: { label: 'Decreased', color: 'text-danger' },
+    CREATE: { label: 'Created', color: 'text-info' },
+    UPDATE: { label: 'Updated', color: 'text-secondary' },
+    VENDOR_RESTOCK: { label: 'Vendor Restock', color: 'text-success' },
+    VENDOR_RETURN_STOCK: { label: 'Vendor Returned', color: 'text-warning' },
+    ADJUSTMENT: { label: 'Adjusted', color: 'text-dark' },
+  };
+
+  const calculateLogStats = (logs) => {
+    if (!logs || logs.length === 0) return {
+      stockRemaining: 0,
+      totalCredit: 0,
+      totalDebit: 0,
+    };
+  
+    // Latest stockRemaining from last log’s finalAvailableWeight
+    const latestLog = logs[logs.length - 1];
+    const stockRemaining = latestLog.finalAvailableWeight || 0;
+  
+    // Total credit - sum of positive changedAvailableWeight on CREATE/UPDATE actions
+    const totalCredit = logs.reduce((sum, log) => {
+      if (
+        (log.action === "CREATE" || log.action === "UPDATE") &&
+        log.changedAvailableWeight > 0
+      ) {
+        return sum + log.changedAvailableWeight;
+      }
+      return sum;
+    }, 0);
+  
+    // Total debit - sum of changedReservedWeight (assuming debit means reserved weight changes)
+    const totalDebit = logs.reduce((sum, log) => sum + (log.changedReservedWeight || 0), 0);
+  
+    return { stockRemaining, totalCredit, totalDebit };
+  };
+
+  
+  const { stockRemaining, totalCredit, totalDebit } = calculateLogStats(logsByVariant);
+
+
+
+const exportLogsToExcel = (logs, fileName = 'inventory_logs.xlsx') => {
+  const exportData = logs.slice().reverse().map(log => ({
+    Date: formatDateToIST(log.createdAt),
+    Source: log.source || '-',
+    Name: log.name || '-',
+    Type: actionDisplayMap[log.action]?.label || log.action,
+    Quantity: log.changedAvailableWeight,
+    'Total Stock': log.finalAvailableWeight
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventory Logs');
+  XLSX.writeFile(workbook, fileName);
+};
+
 
   return (
     <div className='inventory-wrapper bg p-1'>
@@ -81,7 +162,7 @@ const InventoryDetails = () => {
         <h4 className='page-title mb-0'>Inventory Details</h4>
         </div>
         <div className='d-flex gap-2'>
-        <ExportBtn onClick={() => exportRef.current.exportToExcel()}></ExportBtn>
+        <ExportBtn onClick={() => exportLogsToExcel(logsByVariant)}></ExportBtn>
 
         </div>
       </div>
@@ -89,16 +170,16 @@ const InventoryDetails = () => {
 
 {/* Summary Boxes */}
 <div className="info-ctn row">
-        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
-           <DashboardBox heading="Stock Remaining" number="256 Kgs" />
-        </div>
-        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
-           <DashboardBox heading="Total Credit" number="105 Kgs" />
-        </div>
-        <div className="dashboardBox-ctn col-12 col-md-12 col-lg-4 col-xl">
-           <DashboardBox heading={'Total Debit'} number={'165 Kgs'}/>
-        </div>
-      </div>
+    <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
+      <DashboardBox heading="Stock Remaining" number={`${stockRemaining} Kgs`} />
+    </div>
+    <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
+      <DashboardBox heading="Total Credit" number={`${totalCredit} Kgs`} />
+    </div>
+    <div className="dashboardBox-ctn col-12 col-md-12 col-lg-4 col-xl">
+      <DashboardBox heading="Total Debit" number={`${totalDebit} Kgs`} />
+    </div>
+  </div>
 
 
        {/* Header Info */}
@@ -116,28 +197,40 @@ const InventoryDetails = () => {
     </div>
 
     <div>
-    <div>
-                    <label>Add Inventory</label>
-                    <div className='d-flex gap-2 mt-2'>
-                    <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='weight(Kg)'></input>
-                    {/* <AddBtn clickFunction={handleAddMoney}></AddBtn> */}
-                    <input
-                        value={source}
-                        onChange={(e) => setSource(e.target.value)}
-                        className="rounded border border-secondary-subtle p-1 w-100"
-                        placeholder="Comment / Source (e.g., Manual adjustment)"
-                      />
+      
+      <label>Add Inventory</label>
+        <div className='d-flex gap-2 mt-2'>
+        <input
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className='rounded border border-secondary-subtle p-1 w-50'
+          placeholder='weight (Kg)'
+        />
 
+        <input
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          className="rounded border border-secondary-subtle p-1 w-100"
+          placeholder="Comment / Source (e.g., Manual adjustment)"
+        />
 
-                    <button className='btn btn-primary d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.28rem 1.2rem'}}>
-                    <MdAdd size={19}/>
-                    </button>
-                    
-                    <button className='btn btn-danger d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.55rem 1.2rem'}}>
-                    <FaMinus size={12}/>
-                    </button>
-                    </div>
-                </div>
+        <button
+          className='btn btn-primary d-flex align-items-center'
+          style={{ height: '1.8rem', padding: '0.28rem 1.2rem' }}
+          onClick={() => handleInventoryAdjust("INCREASE")}
+        >
+          <MdAdd size={19} />
+        </button>
+
+        <button
+          className='btn btn-danger d-flex align-items-center'
+          style={{ height: '1.8rem', padding: '0.55rem 1.2rem' }}
+          onClick={() => handleInventoryAdjust("DECREASE")}
+        >
+          <FaMinus size={12} />
+        </button>
+      </div>
+         
     </div>
 
 
@@ -157,16 +250,16 @@ const InventoryDetails = () => {
         </tr>
       </thead>
       <tbody>
-        {logsByVariant.map((item, idx) => (
+        {logsByVariant.slice().reverse().map((item, idx) => (
           <tr key={idx}>
             <td className="text-start py-3 px-4 fw-medium">{formatDateToIST(item.createdAt)}</td>
             <td>{item.source}</td>
             <td>{item.name}</td>
-            <td className={item.type === 'Credit' ? 'text-success fw-semibold' : 'text-danger fw-semibold'}>
-              {item.action}
+            <td className={`fw-semibold ${actionDisplayMap[item.action]?.color || 'text-muted'}`}>
+              {actionDisplayMap[item.action]?.label || item.action}
             </td>
             <td>{item.changedAvailableWeight}</td>
-            <td>{item.finalReservedWeight}</td>
+            <td>{item.finalAvailableWeight}</td>
           </tr>
         ))}
       </tbody>
@@ -177,19 +270,19 @@ const InventoryDetails = () => {
 
   {/* Card View (Visible on smaller screens) */}
   <div className="card-view">
-    {filteredData.map((item, idx) => (
+    {logsByVariant.slice().reverse().map((item, idx) => (
       <div key={idx} className="stock-card">
-        <div className="stock-card-row"><span className="label">Date:</span> <span>{item.date}</span></div>
+        <div className="stock-card-row"><span className="label">Date:</span> <span>{formatDateToIST(item.createdAt)}</span></div>
         <div className="stock-card-row"><span className="label">Source:</span> <span>{item.source}</span></div>
-        <div className="stock-card-row"><span className="label">Name:</span> <span>{item.Name}</span></div>
+        <div className="stock-card-row"><span className="label">Name:</span> <span>{item.name}</span></div>
         <div className="stock-card-row">
           <span className="label">Type:</span>
-          <span className={item.type === 'Credit' ? 'text-success fw-semibold' : 'text-danger fw-semibold'}>
-            {item.type}
+          <span className={`fw-semibold ${actionDisplayMap[item.action]?.color || 'text-muted'}`}>
+            {actionDisplayMap[item.action]?.label || item.action}
           </span>
         </div>
-        <div className="stock-card-row"><span className="label">Quantity:</span> <span>{item.qty}</span></div>
-        <div className="stock-card-row"><span className="label">Total Stock:</span> <span>{item.total}</span></div>
+        <div className="stock-card-row"><span className="label">Quantity:</span> <span>{item.changedAvailableWeight}</span></div>
+        <div className="stock-card-row"><span className="label">Total Stock:</span> <span>{item.finalAvailableWeight}</span></div>
       </div>
     ))}
   </div>
