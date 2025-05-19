@@ -8,7 +8,7 @@ export const getAllInventory = async () => {
       const response = await axios.get(`${BASE_URL}/inventory`);
       return response.data;
     } catch (error) {
-      console.error('Error getting discount:', error);
+      console.error('Error getting inventory:', error);
       throw error;
     }
   };
@@ -19,7 +19,7 @@ export const getAllInventory = async () => {
       const response = await axios.get(`${BASE_URL}/inventory/${variantId}`);
       return response.data;
     } catch (error) {
-      console.error('Error getting discount:', error);
+      console.error('Error getting inventory by Id:', error);
       throw error;
     }
   };
@@ -30,7 +30,17 @@ export const getAllInventory = async () => {
       const response = await axios.get(`${BASE_URL}/inventory/${variantId}/logs`);
       return response.data;
     } catch (error) {
-      console.error('Error getting discount:', error);
+      console.error('Error getting inventory logs:', error);
+      throw error;
+    }
+  };
+
+  export const adjustInventory = async (payload,variantId) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/inventory/${variantId}/adjust`,payload);
+      return response.data;
+    } catch (error) {
+      console.error('Error adjusting inventory:', error);
       throw error;
     }
   };

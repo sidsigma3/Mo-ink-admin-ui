@@ -171,7 +171,7 @@ const VendorOrder = () => {
             <th style={{ textAlign: 'center' }}>Vendor</th>
             <th style={{ textAlign: 'center' }}>Weight</th>
             <th style={{ textAlign: 'center' }}>Amount</th>
-            <th style={{ textAlign: 'center' }}>Payment</th>
+            <th style={{ textAlign: 'center' }}>Status</th>
             <th style={{ textAlign: 'center' }}>Invoice</th>
              
             </tr>
