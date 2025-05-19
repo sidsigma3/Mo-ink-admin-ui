@@ -186,6 +186,14 @@ const BulkAssignPage = () => {
      
 
       const getRateForVariant = (variantId, rateChart) => {
+        if (!Array.isArray(rateChart)) return {
+          rate: 0,
+          gst: 0,
+          productName: "",
+          colorName: "",
+          colorHex: "",
+        };
+      
         for (const product of rateChart) {
           if (Array.isArray(product.variant)) {
             for (const variant of product.variant) {
@@ -193,13 +201,24 @@ const BulkAssignPage = () => {
                 return {
                   rate: variant.ratePerKg || 0,
                   gst: product.gstOnProduct || 0,
+                  productName: product.productName || "",
+                  colorName: variant.color?.colorName || "",
+                  colorHex: variant.color?.hexCode || "",
                 };
               }
             }
           }
         }
-        return { rate: 0, gst: 0 };
+      
+        return {
+          rate: 0,
+          gst: 0,
+          productName: "",
+          colorName: "",
+          colorHex: "",
+        };
       };
+      
       
       
 
@@ -329,7 +348,6 @@ const BulkAssignPage = () => {
               totalCgst,
               totalSgst,
               totalIgst,
-              totalTransportationCharges,
               quantity,
               createdAt,
               correlationId,
@@ -563,6 +581,7 @@ const BulkAssignPage = () => {
       </div>
     </div>
 
+  {Array.isArray(spinnerRateChart) && spinnerRateChart.length > 0 ? (
     <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
       <thead>
         <tr>
@@ -648,6 +667,9 @@ const BulkAssignPage = () => {
         })}
       </tbody>
     </table>
+    ) : (
+        <p className="mt-2 text-muted">Rate chart not available for this spinner.</p>
+      )}
   </>
 )}
 
@@ -736,6 +758,7 @@ const BulkAssignPage = () => {
       </div>
     </div>
 
+    {Array.isArray(dyerRateChart) && dyerRateChart.length > 0 ? (
     <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
       <thead>
         <tr>
@@ -797,7 +820,21 @@ const BulkAssignPage = () => {
                   {item.color.name}
                 </div>
               </td>
-              <td>{item.weight}</td>
+              <td className='w-25'>
+            {orderFor === "Dyer" ? (
+                <input
+                type="number"
+                className="form-control form-control-sm p-1"
+                value={item.weight || ""}
+                min={0}
+                onChange={(e) =>
+                    handleWeightChange(index, parseFloat(e.target.value || 0))
+                }
+                />
+            ) : (
+                item.weight
+            )}
+            </td>
               <td>{rate.toFixed(2)}</td>
               {billingState?.toLowerCase() === "odisha"?(
                   <>
@@ -815,6 +852,9 @@ const BulkAssignPage = () => {
         })}
       </tbody>
     </table>
+      ) : (
+        <p className="mt-2 text-muted">Rate chart not available for this spinner.</p>
+      )}
   </>
 )}
 

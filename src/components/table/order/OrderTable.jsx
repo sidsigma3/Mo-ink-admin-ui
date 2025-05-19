@@ -138,6 +138,7 @@ const handleRowClick = (order) => {
   "RETURNED": "purple",
   "CONFIRMED": "muted-clay",
   "PENDING":"grey",
+  "FAILED":"red"
 
   };
 
@@ -239,6 +240,7 @@ console.log(istDate);
     RETURNED: "Returned",
     RETURN_REQUESTED: "Return Requested",
     RETURN_REJECTED: "Return Rejected",
+    FAILED:"Failed"
   };
 
   const renderModal = () => {
@@ -273,6 +275,21 @@ console.log(istDate);
       default:
         return null;
     }
+  };
+  
+  const formatDateToIST = (dateStr) => {
+    // Force it to be treated as UTC
+    const utcDate = new Date(dateStr + 'Z');
+  
+    return utcDate.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
   };
   
 
@@ -321,14 +338,7 @@ console.log(istDate);
 
               <td style={{ verticalAlign: 'middle', fontWeight: 500 }}>{order.orderId}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {new Date(order.createdAt).toLocaleString('en-IN', {
-                    day: '2-digit',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true,
-                    timeZone: 'Asia/Kolkata',
-                  })}
+                  {formatDateToIST(order.createdAt)}
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>

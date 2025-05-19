@@ -1,14 +1,45 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState , useEffect} from 'react';
 import { Table } from 'react-bootstrap';
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn';
 import DashboardBox from "../../../components/DashboardBox/DashboardBox";
 import { BsDot } from 'react-icons/bs';
 import "./InventoryDetails.css"
+import { IoArrowBackOutline } from "react-icons/io5";
+import { useNavigate , useLocation } from 'react-router-dom';
+import { getInventoryLogs } from '../../../services/InventoryService';
+import { FaMinus } from "react-icons/fa";
+import { MdAdd } from "react-icons/md";
+
 
 const InventoryDetails = () => {
+  const { state } = useLocation();
+  const item = state?.item;
   const exportRef = useRef(null);
+  const navigate = useNavigate()
+  const [amount, setAmount] = useState(""); // Amount input
+  const [source, setSource] = useState("");
 
 
+
+  console.log(item)
+
+  const [logsByVariant, setLogsByVariant] = useState([]);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const response = await getInventoryLogs(item.raw.variantId);
+        setLogsByVariant(response.data); // wrap in array to keep rendering logic same
+      } catch (error) {
+        console.error('Error loading inventory logs:', error);
+      }
+    };
+  
+    if (item?.raw?.variantId) {
+      fetchLogs();
+    }
+  }, [item]);
+  
 
   const [filteredData] = useState([
     { date: 'April 01, 2025', source: 'Manufacturer', Name: 'Heritage Corp', type: 'Credit', qty: '151 Kgs', total: '251 Kgs' },
@@ -24,16 +55,37 @@ const InventoryDetails = () => {
   ]);
   
 
+  const formatDateToIST = (dateStr) => {
+    // Force it to be treated as UTC
+    const utcDate = new Date(dateStr + 'Z');
+  
+    return utcDate.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
   return (
     <div className='inventory-wrapper bg p-1'>
       {/* Page Title */}
       <div className='d-flex justify-content-between align-items-center mb-4'>
+      <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
+      <span onClick={() => navigate("/inventory")}>
+          <IoArrowBackOutline size={25} />
+        </span>
         <h4 className='page-title mb-0'>Inventory Details</h4>
+        </div>
         <div className='d-flex gap-2'>
         <ExportBtn onClick={() => exportRef.current.exportToExcel()}></ExportBtn>
 
         </div>
       </div>
+
 
 {/* Summary Boxes */}
 <div className="info-ctn row">
@@ -50,18 +102,45 @@ const InventoryDetails = () => {
 
 
        {/* Header Info */}
-<div className="d-flex justify-content-start align-items-center gap-2 my-4">
-  <h5 className="mb-0 fw-semibold" style={{ fontSize: '1.2rem' }}>Cotton Yarn</h5>
-  <BsDot size="1.8rem" color="#6c757d" /> 
-  <span className="badge bg-light px-1 py-1"style={{ fontSize: '1.2rem', color: 'black', fontWeight: 500 }}>2/80</span>
-  <BsDot size="1.8rem" color="#6c757d" />
-  <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>Hank</h5>
-  <BsDot size="1.8rem" color="#6c757d" />
-  <span className="rounded-circle d-inline-block"style={{ width: 25, height: 25, backgroundColor: '#ffc107' }}></span>
-  <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>Yellow</h5>
+    <div className="d-flex justify-content-start align-items-center gap-2 my-4">
+      <h5 className="mb-0 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.product}</h5>
+      <BsDot size="1.8rem" color="#6c757d" /> 
+      <span className="badge bg-light px-1 py-1"style={{ fontSize: '1.2rem', color: 'black', fontWeight: 500 }}>{item.raw.size}</span>
+      <BsDot size="1.8rem" color="#6c757d" />
+      <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.type}</h5>
+      <BsDot size="1.8rem" color="#6c757d" />
+      <span className="rounded-circle d-inline-block"style={{ width: 25, height: 25, backgroundColor: item.color.hexCode }}></span>
+      <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.raw.color.colorName}</h5>
 
 
-</div>
+    </div>
+
+    <div>
+    <div>
+                    <label>Add Inventory</label>
+                    <div className='d-flex gap-2 mt-2'>
+                    <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='weight(Kg)'></input>
+                    {/* <AddBtn clickFunction={handleAddMoney}></AddBtn> */}
+                    <input
+                        value={source}
+                        onChange={(e) => setSource(e.target.value)}
+                        className="rounded border border-secondary-subtle p-1 w-100"
+                        placeholder="Comment / Source (e.g., Manual adjustment)"
+                      />
+
+
+                    <button className='btn btn-primary d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.28rem 1.2rem'}}>
+                    <MdAdd size={19}/>
+                    </button>
+                    
+                    <button className='btn btn-danger d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.55rem 1.2rem'}}>
+                    <FaMinus size={12}/>
+                    </button>
+                    </div>
+                </div>
+    </div>
+
+
 
 <div className="stock-container">
   {/* Table View (Visible on large screens) */}
@@ -78,21 +157,23 @@ const InventoryDetails = () => {
         </tr>
       </thead>
       <tbody>
-        {filteredData.map((item, idx) => (
+        {logsByVariant.map((item, idx) => (
           <tr key={idx}>
-            <td className="text-start py-3 px-4 fw-medium">{item.date}</td>
+            <td className="text-start py-3 px-4 fw-medium">{formatDateToIST(item.createdAt)}</td>
             <td>{item.source}</td>
-            <td>{item.Name}</td>
+            <td>{item.name}</td>
             <td className={item.type === 'Credit' ? 'text-success fw-semibold' : 'text-danger fw-semibold'}>
-              {item.type}
+              {item.action}
             </td>
-            <td>{item.qty}</td>
-            <td>{item.total}</td>
+            <td>{item.changedAvailableWeight}</td>
+            <td>{item.finalReservedWeight}</td>
           </tr>
         ))}
       </tbody>
     </Table>
   </div>
+
+
 
   {/* Card View (Visible on smaller screens) */}
   <div className="card-view">

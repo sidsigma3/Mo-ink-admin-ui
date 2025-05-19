@@ -4,6 +4,8 @@ import "./ModalReturnOrder.css";
 const ModalReturnOrder = ({ isOpen, onClose ,onCancel, onConfirm, variantDetails}) => {
   if (!isOpen || !variantDetails) return null;
 
+  console.log(variantDetails)
+
   return (
     <div className="mreturn-overlay">
       <div className="mreturn-box">
@@ -19,7 +21,7 @@ const ModalReturnOrder = ({ isOpen, onClose ,onCancel, onConfirm, variantDetails
           <p><strong>Type:</strong> {variantDetails.type}</p>
           <p><strong>Weight:</strong> {variantDetails.weight} kg</p> */}
           <p className="mb-1"> Reason: <strong>{variantDetails.statusReason}</strong></p>
-          <p>Returned Weight: <strong>{variantDetails.weight}kg</strong></p>
+          <p>Returned Weight: <strong>{variantDetails.returnWeight}kg</strong></p>
 
         </div>
         <p className="mreturn-message">

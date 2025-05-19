@@ -239,6 +239,8 @@ const getProductNameById = (productId) => {
   };
   
   
+  console.log(dyerOrder)
+  console.log(dyerRateChart)
 
 
   return (
@@ -506,7 +508,7 @@ const getProductNameById = (productId) => {
         </tr>
       </thead>
       <tbody>
-      {Array.isArray(spinnerRateChart) && spinnerRateChart.length > 0 ? 
+      {Array.isArray(dyerRateChart) && dyerRateChart.length > 0 ? 
         (dyerOrder?.vendorOrderVariantResponse.map((item, index) => {
           const { rate, gst ,colorName , colorHex} = getRateForVariant(item.variantId, dyerRateChart);
           const weight = item.vendorOrderWeight || 0;
