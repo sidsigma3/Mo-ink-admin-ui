@@ -58,3 +58,24 @@ export const deleteProduct = async (productId) => {
 };
 
 
+export const uploadProductImage = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axios.post(
+      `${BASE_URL}/files/upload-image?type=product`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    return response.data; // Should be { url: "/uploads/products/abc123.png" }
+  } catch (error) {
+    console.error("Error uploading product image:", error);
+    throw error;
+  }
+};

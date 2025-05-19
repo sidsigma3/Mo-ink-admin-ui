@@ -359,7 +359,8 @@ useEffect(() => {
                 variantType,
                 productId,
                 status,
-                statusReason,
+                statusReason,    
+                returnWeight
             } = variant;
     
             const product = finalData.find(p => p.productId === productId);
@@ -397,6 +398,7 @@ useEffect(() => {
                 variantId: orderVariantId,
                 status,
                 statusReason,
+                returnWeight,
                 orderId: order.orderId
             });
         });
@@ -1022,10 +1024,11 @@ const sendInvoice = async(orderId) =>{
 }
 
 
-const handleStatusChange = async (orderId, orderVariantId, newStatus) => {
+const handleStatusChange = async (orderId, orderVariantId, newStatus,returnWeight) => {
   try {
     await updateOrderVariantStatuses(orderId, [
       {
+        returnWeight,
         orderVariantId,
         status: newStatus,
         reason: "Updated by admin",
@@ -1161,7 +1164,7 @@ const renderModal = () => {
     onCancel: () =>
       setModalData({ isOpen: false, orderId: null, variantId: null, status: null }),
     onConfirm: () => {
-      handleStatusChange(modalData.orderId, modalData.variantId, modalData.status);
+      handleStatusChange(modalData.orderId, modalData.variantId, modalData.status,modalData.returnWeight);
       setModalData({ isOpen: false, orderId: null, variantId: null, status: null });
     },
   };
@@ -1195,12 +1198,12 @@ const closeReturnModal = () => {
 
 const handleApprove = (variant) => {
   console.log(variant)
-  handleStatusChange(variant.orderId, variant.orderVariantId, "RETURNED");
+  handleStatusChange(variant.orderId, variant.orderVariantId, "RETURNED",variant.returnWeight);
   closeReturnModal();
 };
 
 const handleReject = (variant) => {
-  handleStatusChange(variant.orderId, variant.orderVariantId, "RETURN_REJECTED");
+  handleStatusChange(variant.orderId, variant.orderVariantId, "RETURN_REJECTED",variant.returnWeight);
   closeReturnModal();
 };
 
@@ -1490,6 +1493,7 @@ console.log(selectedAddress)
                                                       onClick={(e) => {
                                                         e.stopPropagation();
                                                         openReturnModal({
+                                                          returnWeight:order.returnWeight,
                                                           statusReason: order.statusReason,
                                                           orderId: order.orderId,
                                                           orderVariantId: order.variantId,

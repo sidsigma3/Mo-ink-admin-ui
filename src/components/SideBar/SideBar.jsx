@@ -89,6 +89,10 @@ const SideBar = () => {
       setSelected("customers");
     }else if (location.pathname.includes("/segments") || location.pathname.includes("/add-segments")) {
       setSelected("segments");
+    }else if (location.pathname.includes("/inventory") || location.pathname.includes("/inventorydetails")) {
+      setSelected("inventory");
+    }else if (location.pathname.includes("/vendor-order") || location.pathname.includes("/vendor-order-details") ||  location.pathname.includes("/BulkAssignPage")) {
+      setSelected("vendors");
     }else if (location.pathname.includes("/spinners-and-dyers") || location.pathname.includes("/add-spinner-and-dyers")) {
       setSelected("manufactures");
     }else if (location.pathname.includes("/users") || location.pathname.includes("/add-user")) {

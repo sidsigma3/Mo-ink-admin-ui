@@ -14,7 +14,7 @@ import AddBtn from "../../../components/Buttons/Add/AddBtn";
 import { ProductContext } from './../../../components/Context/ProductContext';
 import DeleteBtn from "../../../components/Buttons/Delete/DeleteBtn";
 import SubmitBtn from "../../../components/Buttons/Submit/SubmitBtn";
-import { addProduct , deleteProduct, updateProduct } from "../../../services/ProductService";
+import { addProduct , deleteProduct, updateProduct , uploadProductImage } from "../../../services/ProductService";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Modal, Button } from "react-bootstrap";
@@ -24,6 +24,7 @@ import StatusInput from "../../../components/StatusInput/StatusInput";
 import ModalDelete from "../../../components/Modal/ModalDelete";
 import Toast from "../../../components/Toast/Toast";
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const AddProduct = () => {
 
@@ -33,11 +34,11 @@ const AddProduct = () => {
   const [sizeColorError, setSizeColorError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const [uploadedMedia, setUploadedMedia] = useState([]);
+ 
+
 
   const product = (typeof index === 'number' && finalData) ? finalData[index] : null;
-
-  console.log(product)
-  
  
   const transformProductData = (product) => {
     if (!product || !product.groupedVariants) return { variants: [], sizeColorMap: [] };
@@ -100,7 +101,10 @@ const AddProduct = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [status, setStatus] = useState(product?.availableStatus || "Active"); 
 
-  
+  const showToast = (message, type = "error") => {
+    setToasts([{ message, type }]);
+    setTimeout(() => setToasts([]), 3000);
+      };
  
  
 
@@ -116,7 +120,7 @@ const AddProduct = () => {
     stock: product?.stock || '',
     colorVariants: product?.groupedVariants || [],
     status: product?.availableStatus || 'Active',
-    media: product?.media || null,
+    media: product?.productImage || null,
   });
 
 
@@ -125,14 +129,27 @@ const AddProduct = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleMediaChange = (e) => {
-    setFormData({ ...formData, media: e.target.files[0] });
-  };
 
   const handleDescriptionChange = (value) => {
     setFormData({ ...formData, description: value });
   };
 
+  const handleMediaChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    try {
+      const res = await uploadProductImage(file); // Uploads file to backend
+      const uploadedUrl = res.data;
+  
+      setFormData(prev => ({
+        ...prev,
+        media: uploadedUrl, // Save the URL instead of File object
+      }));
+    } catch (error) {
+      showToast('Image upload failed. Please try again.', 'error');
+    }
+  };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -191,7 +208,7 @@ const AddProduct = () => {
     const formattedData = {
         title: formData.productName,
         description: plainTextDescription,
-        media: [formData.media] || ['localhost:8080/api/img'],
+        media: [formData.media],
         availableStatus: status.toUpperCase(),
         gstOnProduct: Number(formData.gst),
         variants: newVariants, // All variants are sent
@@ -461,10 +478,7 @@ const AddProduct = () => {
   const [pendingDelete, setPendingDelete] = useState(null);
 
   const handleDelete = async () => {
-  const showToast = (message, type = "error") => {
-            setToasts([{ message, type }]);
-            setTimeout(() => setToasts([]), 3000);
-              };
+  
       try {
         await deleteProduct(product.productId); 
         showToast("Product deleted successfully");
@@ -745,11 +759,20 @@ console.log(sizeColorMap)
           <div className="media-input-ctn mt-5 p-2">
             <label>Media</label>
             <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-              <input type="file" onChange={handleMediaChange}></input>
-              <h4>Accepts images,videos,or 3D models</h4>
+              <input type="file" multiple onChange={handleMediaChange} />
+              <h4>Accepts images, videos, or 3D models</h4>
             </div>
             {errors.media && <p className="text-danger">{errors.media}</p>}
+
+            {/* Show uploaded thumbnails */}
+            <div className="mt-3 d-flex gap-2 flex-wrap">
+              {(formData.media || []).map((url, index) => (
+                <img src={`http://localhost:8080${url}`} alt="Uploaded" width="120"/>
+              ))}
+            </div>
           </div>
+
+
         </div>
 
         <div className="pricing-ctn mt-2 p-3 rounded">

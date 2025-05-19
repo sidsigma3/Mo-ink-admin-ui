@@ -7,14 +7,17 @@ import ProductFilter from '../../../components/Filter/DayFilter/ProductFilter/Pr
 import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/StatusFilter';
 import './Inventory.css';
 import { getAllProduct } from '../../../services/ProductService'
+import {getAllInventory} from '../../../services/InventoryService'
 
 const Inventory = () => {
 
   const exportRef = useRef(null);
 
- const [product,setProduct] = useState([])
-   const [filteredData, setFilteredData] = useState([]); 
- 
+  const [product,setProduct] = useState([])
+  const [filteredData, setFilteredData] = useState([]); 
+
+  const [inventory, setInventory] = useState([]);
+
     useEffect(() => {
            fetchProductdData();
      }, []);
@@ -25,6 +28,35 @@ const Inventory = () => {
   const handleRowClick = (item) => {
     navigate('/inventorydetails', { state: { item } });
   };
+
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await getAllInventory();
+        const flatData = [];
+
+        response?.data?.product?.forEach((product) => {
+          product.variant.forEach((variant, idx) => {
+            flatData.push({
+              product: product.productName,
+              counter: variant.size,
+              type: variant.variantType,
+              color: variant.color,
+              customerOrder: variant.reserveWeight, // Placeholder
+              remainingWeight: variant.availableWeight,
+              raw: variant // Keep raw if needed later
+            });
+          });
+        });
+
+        setInventory(flatData);
+      } catch (err) {
+        console.error('Failed to fetch inventory:', err);
+      }
+    };
+
+    fetchInventory();
+  }, []);
 
  
      const fetchProductdData = async () => {
@@ -79,15 +111,22 @@ const Inventory = () => {
     { product: 'Silk Yarn', counter: '2/80', type: 'Hank', color: 'violet' },
   ];
 
+
+
   const renderColorDot = (color) => (
-    <div className="color-dot" style={{
-      backgroundColor: color,
-      width: '25px',
-      height: '25px',
-      borderRadius: '50%',
-      display: 'inline-block'
-    }}></div>
+    <div
+      title={color?.colorName}
+      style={{
+        backgroundColor: color?.hexCode,
+        width: 20,
+        height: 20,
+        borderRadius: '50%',
+        display: 'inline-block',
+        border: '1px solid #999',
+      }}
+    />
   );
+  
 
   return (
     <div className='inventory-wrapper p-1'>
@@ -143,13 +182,13 @@ const Inventory = () => {
           <th className="py-3">Counter</th>
           <th className="py-3">Type</th>
           <th className="py-3">Color</th>
-          <th className="py-3">From Vendor</th>
+          {/* <th className="py-3">From Vendor</th> */}
           <th className="py-3">Customer Order</th>
           <th className="py-3">Remaining Weight</th>
         </tr>
       </thead>
       <tbody>
-      {inventoryData.map((item, index) => (
+      {inventory.map((item, index) => (
         <tr 
           key={index} 
   onClick={() => navigate('/inventorydetails', { state: { item } })} 
@@ -159,18 +198,19 @@ const Inventory = () => {
           <td>{item.counter}</td>
           <td>{item.type}</td>
           <td>{renderColorDot(item.color)}</td>
-          <td>150 Kgs</td>
-          <td>150 Kgs</td>
-          <td>150 Kgs</td>
+          {/* <td>150 Kgs</td> */}
+          <td>{item.customerOrder} Kgs</td>
+          <td>{item.remainingWeight} Kgs</td>
         </tr>
       ))}
     </tbody>
     </Table>
   </div>
+ 
 
   {/* Card View (Visible on smaller screens) */}
   <div className="card-view">
-    {inventoryData.map((item, index) => (
+    {inventory.map((item, index) => (
       <div key={index} className="inventory-card">
         <h5 className=""style={{ fontSize: '1.2rem', color: 'black', fontWeight: 500 }}>{item.product}</h5>
         <div className="inventory-card-row">
@@ -180,14 +220,14 @@ const Inventory = () => {
            <span className="label">Color:</span>
          <div className="color-dot">{renderColorDot(item.color)}</div>
          </div>
-        <div className="inventory-card-row">
+        {/* <div className="inventory-card-row">
           <span className="label">From Vendor:</span> <span>150 Kgs</span>
+        </div> */}
+        <div className="inventory-card-row">
+          <span className="label">Customer Order:</span> <span>{item.customerOrder} Kgs</span>
         </div>
         <div className="inventory-card-row">
-          <span className="label">Customer Order:</span> <span>150 Kgs</span>
-        </div>
-        <div className="inventory-card-row">
-          <span className="label">Remaining Weight:</span> <span>150 Kgs</span>
+          <span className="label">Remaining Weight:</span> <span>{item.remainingWeight} Kgs</span>
         </div>
       </div>
     ))}
