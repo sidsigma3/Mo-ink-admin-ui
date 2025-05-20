@@ -299,7 +299,7 @@ console.log(istDate);
         <thead>
           <tr className="order-tablemain">
 
-            <th style={{ verticalAlign: 'middle'}} >#POID</th>
+            <th style={{ verticalAlign: 'middle'}} >#ID</th>
 
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Date</th>
@@ -316,7 +316,7 @@ console.log(istDate);
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Order Status</th>
 
-            <th style={{ width: "11.3rem", textAlign: "center", verticalAlign: 'middle' }}>V.O I'D</th>
+            {/* <th style={{ width: "11.3rem", textAlign: "center", verticalAlign: 'middle' }}>V.O I'D</th> */}
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Invoice</th>
 
@@ -419,7 +419,7 @@ console.log(istDate);
                     {statusOption[order.status]}
                   </div>
             </td>
-              <td>
+              {/* <td>
                 <div className="manufacturer">
                   {order.manufacturer ? (
                     <div>Assigned</div>
@@ -435,7 +435,7 @@ console.log(istDate);
                     </div>
                   )}
                 </div>
-              </td>
+              </td> */}
               <td>
                 <button
                 className="border-0 btn"

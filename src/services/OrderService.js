@@ -109,3 +109,15 @@ export const getVendorOrder= async () => {
   }
 };
 
+
+export const getVendorOrdersByVendorId= async (vendorId) => {
+  try {
+    const response = await axios.get(`${URL}/vendor-orders/vendor/${vendorId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error getting vendor orders :`, error);
+    throw error;
+  }
+};
+
+
