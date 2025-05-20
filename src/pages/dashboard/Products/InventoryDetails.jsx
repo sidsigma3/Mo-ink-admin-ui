@@ -111,7 +111,7 @@ const InventoryDetails = () => {
     // Latest stockRemaining from last log’s finalAvailableWeight
     const latestLog = logs[logs.length - 1];
     const stockRemaining = latestLog.finalAvailableWeight || 0;
-  
+    const totalOrders = latestLog.finalReservedWeight || 0
     // Total credit - sum of positive changedAvailableWeight on CREATE/UPDATE actions
     const totalCredit = logs.reduce((sum, log) => {
       if (
@@ -126,30 +126,30 @@ const InventoryDetails = () => {
     // Total debit - sum of changedReservedWeight (assuming debit means reserved weight changes)
     const totalDebit = logs.reduce((sum, log) => sum + (log.changedReservedWeight || 0), 0);
   
-    return { stockRemaining, totalCredit, totalDebit };
+    return { stockRemaining,totalOrders ,totalCredit, totalDebit };
   };
 
   
-  const { stockRemaining, totalCredit, totalDebit } = calculateLogStats(logsByVariant);
+  const { stockRemaining, totalOrders,totalCredit, totalDebit } = calculateLogStats(logsByVariant);
 
 
 
-const exportLogsToExcel = (logs, fileName = 'inventory_logs.xlsx') => {
-  const exportData = logs.slice().reverse().map(log => ({
-    Date: formatDateToIST(log.createdAt),
-    Source: log.source || '-',
-    Name: log.name || '-',
-    Type: actionDisplayMap[log.action]?.label || log.action,
-    Quantity: log.changedAvailableWeight,
-    'Total Stock': log.finalAvailableWeight
-  }));
-
-  const worksheet = XLSX.utils.json_to_sheet(exportData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventory Logs');
-  XLSX.writeFile(workbook, fileName);
-};
-
+  const exportLogsToExcel = (visibleLogs, fileName = 'inventory_logs.xlsx') => {
+    const exportData = visibleLogs.map(log => ({
+      Date: formatDateToIST(log.createdAt),
+      Source: log.source || '-',
+      Name: log.name || '-',
+      Type: actionDisplayMap[log.action]?.label || log.action,
+      Quantity: log.changedAvailableWeight,
+      'Total Stock': log.finalAvailableWeight
+    }));
+  
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventory Logs');
+    XLSX.writeFile(workbook, fileName);
+  };
+  
 
   return (
     <div className='inventory-wrapper bg p-1'>
@@ -169,16 +169,19 @@ const exportLogsToExcel = (logs, fileName = 'inventory_logs.xlsx') => {
 
 
 {/* Summary Boxes */}
-<div className="info-ctn row">
+<div className="info-ctn row w-50">
     <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
-      <DashboardBox heading="Stock Remaining" number={`${stockRemaining} Kgs`} />
+      <DashboardBox heading="Total Customer Order" number={`${totalOrders} Kgs`} />
     </div>
     <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
+      <DashboardBox heading="Total Available Weight" number={`${stockRemaining} Kgs`} />
+    </div>
+    {/* <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
       <DashboardBox heading="Total Credit" number={`${totalCredit} Kgs`} />
     </div>
     <div className="dashboardBox-ctn col-12 col-md-12 col-lg-4 col-xl">
       <DashboardBox heading="Total Debit" number={`${totalDebit} Kgs`} />
-    </div>
+    </div> */}
   </div>
 
 
@@ -245,8 +248,8 @@ const exportLogsToExcel = (logs, fileName = 'inventory_logs.xlsx') => {
           <th className="py-3">Source</th>
           <th className="py-3">Name</th>
           <th className="py-3">Type</th>
-          <th className="py-3">Quantity</th>
-          <th className="py-3">Total Stock</th>
+          <th className="py-3">Customer Order</th>
+          <th className="py-3">Change in inventory</th>
         </tr>
       </thead>
       <tbody>
@@ -258,8 +261,8 @@ const exportLogsToExcel = (logs, fileName = 'inventory_logs.xlsx') => {
             <td className={`fw-semibold ${actionDisplayMap[item.action]?.color || 'text-muted'}`}>
               {actionDisplayMap[item.action]?.label || item.action}
             </td>
+            <td>{item.changedReservedWeight}</td>
             <td>{item.changedAvailableWeight}</td>
-            <td>{item.finalAvailableWeight}</td>
           </tr>
         ))}
       </tbody>
@@ -281,8 +284,8 @@ const exportLogsToExcel = (logs, fileName = 'inventory_logs.xlsx') => {
             {actionDisplayMap[item.action]?.label || item.action}
           </span>
         </div>
-        <div className="stock-card-row"><span className="label">Quantity:</span> <span>{item.changedAvailableWeight}</span></div>
-        <div className="stock-card-row"><span className="label">Total Stock:</span> <span>{item.finalAvailableWeight}</span></div>
+        <div className="stock-card-row"><span className="label">Customer Order:</span> <span>{item.changedReservedWeight}</span></div>
+        <div className="stock-card-row"><span className="label">Change in inventory:</span> <span>{item.changedAvailableWeight}</span></div>
       </div>
     ))}
   </div>

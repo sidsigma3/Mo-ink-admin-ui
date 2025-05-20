@@ -181,20 +181,33 @@ const Inventory = () => {
       </div>
 
       {/* Summary Boxes */}
-      <div className="info-ctn row">
-  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-    <DashboardBox heading={'Total SKU'} number={dashboardStats.totalSKU} />
+    <div className="info-ctn row">
+        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+          <DashboardBox heading={'Total SKU'} number={dashboardStats.totalSKU} />
+        </div>
+        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+          <DashboardBox heading={'From Manufacturer'} number={`${dashboardStats.fromManufacturer} Kgs`} />
+        </div>
+        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+          <DashboardBox heading={'Total Customer Order'} number={`${dashboardStats.totalCustomerOrder} Kgs`} />
+        </div>
+        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+          <DashboardBox heading={'Stock Remaining'} number={`${dashboardStats.stockRemaining} Kgs`} />
+        </div>
   </div>
-  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-    <DashboardBox heading={'From Manufacturer'} number={`${dashboardStats.fromManufacturer} Kgs`} />
-  </div>
-  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-    <DashboardBox heading={'Total Customer Order'} number={`${dashboardStats.totalCustomerOrder} Kgs`} />
-  </div>
-  <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-    <DashboardBox heading={'Stock Remaining'} number={`${dashboardStats.stockRemaining} Kgs`} />
-  </div>
-</div>
+
+  {/* <div>
+  <div className='dashboardBox shadow-sm'>
+        <div className='title d-flex justify-content-between'>
+            <h4></h4>
+           
+        </div>
+
+        <div className='mt-2'>
+            <h3>{props.number}</h3>
+        </div>
+    </div>
+  </div> */}
 
       <div className='filter-sec d-flex gap-2 align-items-center mt-2'>
       
@@ -222,7 +235,7 @@ const Inventory = () => {
           <th className="py-3">Color</th>
           {/* <th className="py-3">From Vendor</th> */}
           <th className="py-3">Customer Order</th>
-          <th className="py-3">Remaining Weight</th>
+          <th className="py-3">Available Weight</th>
         </tr>
       </thead>
       <tbody>

@@ -1005,9 +1005,15 @@ const filteredDiscounts = discountData.filter((discount) => {
   return isActive && !!matchedCustomer;
 });
 
-const handleDeleteColor = (productId, size) => {
+const handleDeleteColor = (productId, size, colorName, variantType) => {
   const updatedOrderDetails = orderDetails.filter(
-    (order) => !(order.productId === productId && order.size === size)
+    (order) =>
+      !(
+        order.productId === productId &&
+        order.size === size &&
+        order.color?.name === colorName &&
+        order.variantType === variantType
+      )
   );
   setOrderDetails(updatedOrderDetails);
 };
@@ -1530,7 +1536,9 @@ console.log(selectedAddress)
                                         {!isViewMode && (
                                           <button
                                             className="ms-2"
-                                            onClick={() => handleDeleteColor(order.productId, order.size)}
+                                            onClick={() =>
+                                              handleDeleteColor(order.productId, order.size, order.color?.name, order.variantType)
+                                            }
                                             title="Remove color"
                                             style={{
                                               border: 'none',

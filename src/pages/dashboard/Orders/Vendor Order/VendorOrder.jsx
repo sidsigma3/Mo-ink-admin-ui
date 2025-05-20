@@ -4,7 +4,7 @@ import ExportBtn from '../../../../components/Buttons/Export/ExportBtn'
 import ProductFilter from '../../../../components/Filter/DayFilter/ProductFilter/ProductFilter'
 import StatusFilter from '../../../../components/Filter/DayFilter/StatusFilter/StatusFilter'
 import { useVendorOrderContext } from '../../../../components/Context/VendorOrderContext'
-import { LuFileDown } from "react-icons/lu";
+import { FiDownload } from "react-icons/fi";
 import { Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AddBtn from '../../../../components/Buttons/Add/AddBtn'
@@ -89,7 +89,7 @@ const VendorOrder = () => {
 
                 <ExportBtn></ExportBtn>
 
-                <ImportBtn></ImportBtn>
+                {/* <ImportBtn></ImportBtn> */}
 
                 <Link to={'/BulkAssignPage'}>
                                     <AddBtn
@@ -225,14 +225,14 @@ const VendorOrder = () => {
                 </td>
                 <td  style={{ justifyItems: 'center', alignContent:'center'}}>
                 <div 
-                   className="bg-secondary-subtle rounded-circle p-1 text-white d-flex justify-content-center align-items-center"
+                     className="border-0 btn"
                      style={{ width: '40px', height: '40px' }}
                      onClick={(e)=>{
                        e.stopPropagation()
                       downloadVendorInvoice(order.vendorOrderId)
                     }}
                    >
-                   <LuFileDown size={20} />
+                    <FiDownload size={20}/>
                    </div>
                 </td>
               </tr>

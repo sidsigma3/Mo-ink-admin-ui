@@ -25,6 +25,7 @@ import ModalDelete from "../../../components/Modal/ModalDelete";
 import Toast from "../../../components/Toast/Toast";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const backendUrl = process.env.REACT_APP_IMAGE_URL
 
 const AddProduct = () => {
 
@@ -766,7 +767,7 @@ console.log(sizeColorMap)
 
             {formData.media && (
               <div className="mt-3">
-                <img src={`http://localhost:8080${formData.media}`} alt="Uploaded" width="120" />
+                <img src={`${backendUrl}${formData.media}`} alt="Uploaded" width="120" />
               </div>
             )}
           </div>
@@ -1166,6 +1167,9 @@ console.log(sizeColorMap)
                <th>Price/Kg</th>
                <th>Markup Price/Kg</th>
                <th></th>
+               {state?.index !== undefined && (
+               <th></th>
+               )}
              </tr>
            </thead>
            <tbody>

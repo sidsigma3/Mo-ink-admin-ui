@@ -20,6 +20,7 @@ import { createVendorRateChart ,getRateChart} from '../../../services/VendorsSer
 import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
 import { PiExportBold } from "react-icons/pi";
 import { CgImport } from "react-icons/cg";
+import { getVendorOrdersByVendorId } from '../../../services/OrderService';
 
 
 
@@ -35,7 +36,9 @@ const AddSpinners = () => {
 
   const [expandedVariantIndex, setExpandedVariantIndex] = useState({});
 
-
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
   const [expandedProducts, setExpandedProducts] = useState({});
   const [expandedSizes, setExpandedSizes] = useState({});
   const [expandedVariants, setExpandedVariants] = useState({});
@@ -89,6 +92,23 @@ const AddSpinners = () => {
     fetchData(); 
   }, []); 
 
+  useEffect(() => {
+    const fetchVendorOrders = async () => {
+      try {
+        const response = await getVendorOrdersByVendorId(customer?.vendorId);
+        setOrders(response);
+        
+      } catch (error) {
+        console.error("Error fetching vendor orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchVendorOrders();
+  }, []);
+  
+
 
   useEffect(() => {
     const fetchRateChart = async () => {
@@ -107,107 +127,13 @@ const AddSpinners = () => {
     fetchRateChart();
   }, [customer?.vendorId]);
   
+  
   const [expandedRow, setExpandedRow] = useState(null);
 
   const toggleExpand = (key, setter) => {
     setter((prev) => ({ ...prev, [key]: !prev[key] }));
   };
   
-
-  const orders = [
-  {
-    voId: '12501',
-    date: '5/12/2025, 10:30:45 AM',
-    quantity: '72kg',
-    amount: '₹19,850/-',
-  },
-  {
-    voId: '12502',
-    date: '5/12/2025, 10:05:12 AM',
-    quantity: '150kg',
-    amount: '₹1,27,500/-',
-  },
-  {
-    voId: '12503',
-    date: '5/12/2025, 9:47:23 AM',
-    quantity: '34kg',
-    amount: '₹9,020/-',
-  },
-  {
-    voId: '12504',
-    date: '5/12/2025, 9:13:59 AM',
-    quantity: '89kg',
-    amount: '₹24,870/-',
-  },
-  {
-    voId: '12505',
-    date: '5/12/2025, 8:59:34 AM',
-    quantity: '63kg',
-    amount: '₹17,215/-',
-  },
-];
-
-
-  const demoData = [
-  {
-    productName: "Cotton",
-    variants: [
-      {
-        size: "2/40",
-        pricePerKg: 241,
-        gst: "12%",
-        types: [
-          {
-            type: "Cone",
-            colors: [
-              { color: "Red", hex: "#FF0000" },
-              { color: "Blue", hex: "#0000FF" }
-            ]
-          },
-          {
-            type: "Hank",
-            colors: [
-              { color: "Green", hex: "#00FF00" }
-            ]
-          }
-        ]
-      },
-      {
-        size: "2/80",
-        pricePerKg: 154,
-        gst: "12%",
-        types: [
-          {
-            type: "Cone",
-            colors: [
-              { color: "Orange", hex: "#FFA500" }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    productName: "Silk",
-    variants: [
-      {
-        size: "3/50",
-        pricePerKg: 200,
-        gst: "5%",
-        types: [
-          {
-            type: "Hank",
-            colors: [
-              { color: "Purple", hex: "#800080" },
-              { color: "Cyan", hex: "#00FFFF" }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-];
-
 
 
   const toggleProduct = (index) => {
@@ -521,7 +447,17 @@ const handleTag = (value) =>{
   
       XLSX.writeFile(workbook, "Vendor_Rate_Chart_Template.xlsx");
     };
+
+    function getProductNameById(productId) {
+      for (let product of products) {
+        if (product.id == productId) {
+          return product.productName;
+        }
+      }
+      return "Unknown Product";
+    }
     
+    console.log(products)
 
     return (
     <div className='add-spinners'>
@@ -684,7 +620,7 @@ const handleTag = (value) =>{
                               {/* Product Row */}
                               <tr className="table-secondary">
                                 <td colSpan={5} onClick={() => toggleExpand(productId, setExpandedProducts)} style={{ cursor: "pointer" }}>
-                                  {expandedProducts[productId] ? "▼" : "▶"} <strong>Product ID:</strong> {productId}
+                                  {expandedProducts[productId] ? "▼" : "▶"} <strong>Product ID:</strong> {getProductNameById(productId)}
                                 </td>
                               </tr>
 
@@ -759,7 +695,7 @@ const handleTag = (value) =>{
 
 
 
-    <div style={{ border: '1px solid #ddd', borderRadius: '1rem', marginTop: '1rem', overflow: 'hidden' }}>
+    {/* <div style={{ border: '1px solid #ddd', borderRadius: '1rem', marginTop: '1rem', overflow: 'hidden' }}>
       <table className="table text-center" style={{ marginBottom: 0 }}>
   <thead className="table-light">
     <tr>
@@ -772,7 +708,7 @@ const handleTag = (value) =>{
 <tbody>
   {demoData.map((product, productIndex) => (
     <React.Fragment key={productIndex}>
-      {/* Level 1 - Product */}
+  
       <tr
         onClick={() => toggleProduct(productIndex)}
         className="level-expanded"
@@ -784,7 +720,7 @@ const handleTag = (value) =>{
         <td className="py-3 px-4">{product.variants[0].gst}</td>
       </tr>
 
-      {/* Level 2 - Variant (Size) */}
+    
       {expandedProductIndex === productIndex &&
         product.variants.map((variant, variantIndex) => (
           <React.Fragment key={variantIndex}>
@@ -804,7 +740,7 @@ const handleTag = (value) =>{
               <td className="py-3 px-4">{variant.gst}</td>
             </tr>
 
-            {/* Level 3 - Type (Cone/Hank) */}
+           
             {expandedVariantIndex[`${productIndex}-${variantIndex}`] &&
               variant.types.map((type, typeIndex) => (
                 <React.Fragment key={typeIndex}>
@@ -824,7 +760,7 @@ const handleTag = (value) =>{
                     <td className="py-3 px-4">{variant.gst}</td>
                   </tr>
 
-                  {/* Level 4 - Color */}
+                
                   {expandedTypeIndex[`${productIndex}-${variantIndex}-${typeIndex}`] &&
                     type.colors.map((color, colorIndex) => (
                       <tr key={colorIndex} className="level-expanded">
@@ -858,7 +794,7 @@ const handleTag = (value) =>{
 
 </table>
 
-    </div>
+    </div> */}
   </div>
 </>
 
@@ -906,25 +842,40 @@ const handleTag = (value) =>{
         <h5>Assigned Orders</h5>
       </div>
 
-      {orders.length === 0 ? (
-        <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
-          <RiFilePaper2Line size={50} />
-          <h5 className="fs-6">There's no orders till now!</h5>
-        </div>
-      ) : (
-        orders.map((order, index) => (
-          <div key={index} className="mt-3 border-bottom pb-2">
-            <div className="fw-semibold " style={{ color: '#adadad', fontSize: '12px' }}>{order.date}</div>            
-            <div className=" my-2 d-flex justify-content-between gap-3">
-            <div className="fw-semibold ">V.O ID: {order.voId}</div>
-            <div>&bull;</div>
-              <div> {order.quantity}</div>
+      <div>
+    {loading ? (
+      <div className="text-center py-5">Loading orders...</div>
+    ) : orders.length === 0 ? (
+      <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
+        <RiFilePaper2Line size={50} />
+        <h5 className="fs-6">There's no orders till now!</h5>
+      </div>
+    ) : (
+      orders.slice().reverse().map((order) => {
+        const totalWeight = order.vendorOrderVariantResponse.reduce(
+          (sum, item) => sum + item.vendorOrderWeight,
+          0
+        );
+
+        return (
+          <div key={order.vendorOrderId} className="mt-3 border-bottom pb-2">
+            <div className="fw-semibold text-secondary" style={{ fontSize: "12px" }}>
+              PO : {order.correlationId}
+            </div>
+            <div className="my-2 d-flex justify-content-between gap-3">
+              <div className="fw-semibold">V.O ID: {order.vendorOrderId}</div>
               <div>&bull;</div>
-              <div className="fw-semibold"  style={{ color: '#41b788' }}>{order.amount}</div>
+              <div>{totalWeight} kg</div>
+              <div>&bull;</div>
+              <div className="fw-semibold" style={{ color: "#41b788" }}>
+                ₹{order.totalAmount.toFixed(2)}
+              </div>
             </div>
           </div>
-        ))
-      )}
+        );
+      })
+    )}
+  </div>
     </div>
 
     </div>
