@@ -9,8 +9,14 @@ import { useLocation } from "react-router-dom";
 import { getAllProduct } from "../../../../services/ProductService";
 import { downloadVendorInvoice } from "../../../../services/InvoiceServices";
 import { vendorStatusUpdate } from "../../../../services/VendorsService";
+import "./VendorOrderDetails.css"
+
+
 
 const VendorOrderDetails = () => {
+
+
+  
   
   const navigate = useNavigate()
   const { orderId } = useParams();
@@ -149,12 +155,12 @@ const getProductNameById = (productId) => {
   ];
   
   const statusClassMap = {
-    PLACED: "badge bg-secondary",
-    CONFIRMED: "badge bg-info",
-    RECEIVED: "badge bg-success",
-    RETURNED: "badge bg-danger",
-    REPLACED: "badge bg-warning",
-    CANCELLED: "badge bg-dark"
+    PLACED: "vendor-order blue",
+    CONFIRMED: "vendor-order yellow",
+    RECEIVED: "vendor-order green",
+    RETURNED: "vendor-order grey",
+    REPLACED: "vendor-order purple",
+    CANCELLED: "vendor-order red",
   };
   
   
@@ -252,10 +258,10 @@ const getProductNameById = (productId) => {
                   <h5>V.O.Id : {relatedOrders[0].correlationId}</h5>
                   </div>
 
-                  <div className="d-flex gap-2">
+                  {/* <div className="d-flex gap-2">
                     <button className="btn bg-secondary-subtle">Print</button>
                     <button className="btn bg-secondary-subtle">Share</button>
-                  </div>
+                  </div> */}
 
         </div>
 
@@ -265,7 +271,7 @@ const getProductNameById = (productId) => {
         <div className='d-flex justify-content-between'>
             <h6>Order for: <span className='text-primary'>{spinnerOrder?.vendorName}</span></h6>
 
-            <div className='px-2 rounded' style={{border:'1px solid #93C5FD', backgroundColor:'#DBEAFE',color:'#1E40AF'}}>
+            <div className='px-3 py-1 rounded' style={{border:'1px solid #93C5FD', backgroundColor:'#DBEAFE',color:'#1E40AF'}}>
                 <p className='m-0'>Spinner</p>
             </div>
 
@@ -273,23 +279,23 @@ const getProductNameById = (productId) => {
             <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
             <thead>
               <tr>
-                <th>Product</th>
-                <th>Size</th>
-                <th>Variant</th>
-                <th>Weight</th>
-                <th>Rate</th>
+                <th  className="thtable" >Product</th>
+                <th  className="thtable">Size</th>
+                <th  className="thtable">Variant</th>
+                <th  className="thtable">Weight</th>
+                <th  className="thtable">Rate</th>
                 {extractStateFromAddress(spinnerOrder?.vendorAddress) === "odisha" ?(
                     <>
-                    <th>CGST</th>
-                    <th>SGST</th>
+                    <th  className="thtable">CGST</th>
+                    <th  className="thtable">SGST</th>
                     </>
                 ):
                 (
-                    <th>IGST</th>
+                    <th  className="thtable">IGST</th>
                 )
                 }
-                <th>Total</th>
-                <th>Status</th>
+                <th  className="thtable">Total</th>
+                <th  className="thtable">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -324,10 +330,10 @@ const getProductNameById = (productId) => {
                     <td>{(gst/2).toFixed(1)}</td>
                     <td>{(gst/2).toFixed(1)}</td>
                     <td>{totalAmount.toFixed(2)}</td>
-                    <td>
+                    <td  style={{ justifyItems: 'center', alignContent:'center'}}  >
                     <select
                         value={item.status}
-                        className={`form-select form-select p-2 ${statusClassMap[item.status] || ''}`}
+                        className={`form-select form-select  ${statusClassMap[item.status] || ''}`}
                         onChange={async (e) => {
                           const newStatus = e.target.value;
                           const confirmMessage = `Are you sure you want to change the status from "${item.status}" to "${newStatus}"?`;
@@ -415,7 +421,7 @@ const getProductNameById = (productId) => {
                     <div className='d-flex justify-content-between' style={{ fontSize: '1rem', fontWeight: 500 }}>
                             <h6>Payment</h6>
                            
-                            <div className='bg-secondary-subtle rounded-circle p-2 text-white' style={{cursor:'pointer'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><LuFileDown size={20}/></div>
+                            <div className='bg-secondary-subtle rounded-circle p-2 text-white d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '40px', height: '40px'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><LuFileDown size={20}/></div>
                         </div>
         
                     <table className="w-100 table border rounded mt-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
@@ -478,7 +484,7 @@ const getProductNameById = (productId) => {
         <div className='d-flex justify-content-between'>
             <h6>Order for: <span className='text-primary'>{dyerOrder?.vendorName}</span></h6>
 
-            <div className='px-2 rounded' style={{border:'1px solid #FCD34D', backgroundColor:'#FEF3C7',color:'#92400E'}}>
+            <div className='px-3 py-1  rounded' style={{border:'1px solid #FCD34D', backgroundColor:'#FEF3C7',color:'#92400E'}}>
                 <p className='m-0'>Dyer</p>
             </div>
 
@@ -486,25 +492,25 @@ const getProductNameById = (productId) => {
             <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
       <thead>
         <tr>
-          <th>Product</th>
-          <th>Size</th>
-          <th>Variant</th>
-          <th>Color</th>
-          <th>Weight</th>
-          <th>Rate</th>
+          <th  className="thtable">Product</th>
+          <th  className="thtable text-center">Size</th>
+          <th  className="thtable text-center">Variant</th>
+          <th  className="thtable text-center">Color</th>
+          <th  className="thtable text-center">Weight</th>
+          <th  className="thtable text-center">Rate</th>
           {extractStateFromAddress(dyerOrder?.vendorAddress) === "odisha" ?(
               <>
-               <th>CGST</th>
-               <th>SGST</th>
+               <th  className="thtable text-center">CGST</th>
+               <th  className="thtable text-center">SGST</th>
                </>
           ):
           (
-              <th>IGST</th>
+              <th  className="thtable text-center">IGST</th>
           )
           }
          
-          <th>Total</th>
-          <th>Status</th>
+          <th  className="thtable text-center">Total</th>
+          <th  className="thtable text-center">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -531,11 +537,11 @@ const getProductNameById = (productId) => {
 
           return (
             <tr key={`dyer-${index}`} >
-              <td>{getProductNameById(item.productId)}</td>
-              <td>{item.size}</td>
-              <td>{item.variantType}</td>
+              <td className=" text-center">{getProductNameById(item.productId)}</td>
+              <td className=" text-center">{item.size}</td>
+              <td className=" text-center">{item.variantType}</td>
               <td>
-                <div className="d-flex align-items-center gap-2">
+                <div className="d-flex justify-content-center align-items-center gap-2">
                   <span
                     style={{
                       width: "14px",
@@ -548,8 +554,8 @@ const getProductNameById = (productId) => {
                   {colorName}
                 </div>
               </td>
-              <td>{item.vendorOrderWeight}</td>
-              <td>{rate.toFixed(2)}</td>
+              <td  className=" text-center">{item.vendorOrderWeight}</td>
+              <td className=" text-center">{rate.toFixed(2)}</td>
               {billingState?.toLowerCase() === "odisha"?(
                   <>
                     <td>{(gst/2).toFixed(1)}</td>
@@ -560,8 +566,8 @@ const getProductNameById = (productId) => {
               )
             }
               
-              <td>{totalAmount.toFixed(2)}</td>
-              <td>
+              <td className=" text-center">{totalAmount.toFixed(2)}</td>
+              <td  style={{ justifyItems: 'center', alignContent:'center'}}  >
               <select
                     value={item.status}
                     className={`form-select form-select p-2 ${statusClassMap[item.status] || ''}`}
@@ -649,7 +655,7 @@ const getProductNameById = (productId) => {
                         <div className='d-flex justify-content-between'style={{ fontSize: '1rem', fontWeight: 500 }}>
                             <h6>Payment</h6>
                            
-                            <div className='bg-secondary-subtle rounded-circle p-2 text-white' style={{cursor:'pointer'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><LuFileDown size={20}/></div>
+                            <div className='bg-secondary-subtle rounded-circle p-2 text-white d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '40px', height: '40px'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><LuFileDown size={20}/></div>
                         </div>
         
                         <table className='w-100 table border rounded mt-2' style={{ fontSize: '0.8rem', fontWeight: 500 }}>

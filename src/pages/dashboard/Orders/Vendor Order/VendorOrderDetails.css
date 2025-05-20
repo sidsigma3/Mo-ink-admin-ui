@@ -1,0 +1,112 @@
+.thtable {
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+}
+
+
+.vendor-order.green{
+    background-color: #D1FAE5;
+    border: 1px solid #6EE7B7;
+    color: #41b788;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 6rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem !important;
+
+}
+
+.vendor-order.grey{
+    background-color: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    color: rgb(63, 60, 60);
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 6rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem !important;
+
+}
+
+.vendor-order.purple{
+    background-color: #EDE9FE;
+    border: 1px solid #C4B5FD;
+    color: #7C3AED;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 6rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem !important;
+
+}
+
+.vendor-order.disabled{
+    background-color: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    color: rgb(63, 60, 60);
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 6rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem !important;
+
+}
+
+
+.vendor-order.blue{
+    background-color: #DBEAFE;
+    border: 1px solid #5d91cb;
+    color: #5c9de8;
+     border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 6rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem !important;
+
+}
+
+.vendor-order.yellow{
+    background-color: #FEF3C7;
+    border: 1px solid #FCD34D;
+    color: #8e741d;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 6rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem !important;
+}
+
+
+.vendor-order.red{
+    background-color: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    color: #be5757;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 6rem;
+    height: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem !important;
+
+}
+

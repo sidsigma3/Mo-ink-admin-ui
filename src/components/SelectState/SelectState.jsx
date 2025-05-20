@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 
 const SelectState = ({ value, onChange }) => {
   const states = [
-    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-    "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-    "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
-    "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands",
-    "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep", "Delhi", "Puducherry"
+     "Jammu & Kashmir", "Himachal Pradesh", "Punjab", "Chandigarh", "Uttarakhand",
+  "Haryana", "Delhi", "Rajasthan", "Uttar Pradesh", "Bihar", "Sikkim",
+  "Arunachal Pradesh", "Nagaland", "Manipur", "Mizoram", "Tripura",
+  "Meghalaya", "Assam", "West Bengal", "Jharkhand", "Odisha", "Chhattisgarh",
+  "Madhya Pradesh", "Gujarat", "Daman & Diu", "Dadra & Nagar Haveli",
+  "Maharashtra", "Karnataka", "Goa", "Lakshadweep", "Kerala",
+  "Tamil Nadu", "Puducherry", "Andaman & Nicobar Islands", "Telangana",
+  "Andhra Pradesh", "Ladakh", "Other Territory", "Centre Jurisdiction"
+  
   ];
 
   const [query, setQuery] = useState(value || '');
