@@ -1,4 +1,4 @@
-.msinvoice-overlay {
+.dorder-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -11,7 +11,7 @@
   z-index: 9999;
 }
 
-.msinvoice-box {
+.dorder-box {
   background: #ffffff;
   border-radius: 20px;
   padding: 40px 30px 30px;
@@ -23,7 +23,7 @@
   text-align: center;
 }
 
-.msinvoice-close {
+.dorder-close {
   position: absolute;
   top: 18px;
   right: 22px;
@@ -35,7 +35,7 @@
   line-height: 1;
 }
 
-.msinvoice-icon {
+.dorder-icon {
   width: 48px;
   height: 48px;
   margin: 0 auto 18px;
@@ -47,32 +47,32 @@
   font-weight: bold;
 }
 
-.msinvoice-icon--primary {
+.dorder-icon--primary {
   background-color: #0d6dfd17;
   color: #0d6efd;
 }
 
-.msinvoice-title {
+.dorder-title {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 10px;
 }
 
-.msinvoice-message {
+.dorder-message {
   font-size: 14px;
   color: #666666;
   margin-bottom: 30px;
   line-height: 1.5;
 }
 
-.msinvoice-actions {
+.dorder-actions {
   display: flex;
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
 }
 
-.msinvoice-btn {
+.dorder-btn {
   padding: 12px 24px;
   border-radius: 10px;
   font-weight: 500;
@@ -82,36 +82,36 @@
   border: none;
 }
 
-.msinvoice-btn--primary {
+.dorder-btn--primary {
   background: #0d6efd;
   color: #ffffff;
 }
 
-.msinvoice-btn--primary:hover {
+.dorder-btn--primary:hover {
   background: #0a5bd4;
 }
 
-.msinvoice-btn--outline {
+.dorder-btn--outline {
   background: #ebebeb;
   color: #414141;
 }
 
-.msinvoice-btn--outline:hover {
+.dorder-btn--outline:hover {
   background: #cccccc;
 }
 
 /* Responsive */
 @media (max-width: 480px) {
-  .msinvoice-box {
+  .dorder-box {
     padding: 1.5rem;
   }
 
-  .msinvoice-actions {
+  .dorder-actions {
     flex-direction: column;
     gap: 12px;
   }
 
-  .msinvoice-actions .msinvoice-btn {
+  .dorder-actions .dorder-btn {
     width: 100%;
   }
 }
