@@ -233,6 +233,7 @@ const Inventory = () => {
           <th className="py-3">Counter</th>
           <th className="py-3">Type</th>
           <th className="py-3">Color</th>
+          <th className="py-3">Color Name</th>
           {/* <th className="py-3">From Vendor</th> */}
           <th className="py-3">Customer Order</th>
           <th className="py-3">Available Weight</th>
@@ -249,6 +250,7 @@ const Inventory = () => {
           <td>{item.counter}</td>
           <td>{item.type}</td>
           <td>{renderColorDot(item.color)}</td>
+          <td>{item.color.colorName}</td>
           {/* <td>150 Kgs</td> */}
           <td>{item.customerOrder} Kgs</td>
           <td>{item.remainingWeight} Kgs</td>
