@@ -80,6 +80,8 @@
     color: #41b788;
     border-radius: 0.3rem;
     width: 6rem;
+    text-align: center;    
+
 }
 
 .create-order .grey{
@@ -88,6 +90,7 @@
     color: rgb(63, 60, 60);
     border-radius: 0.3rem;
     width: 6rem;
+    text-align: center;
 }
 
 .create-order .disabled{
@@ -96,6 +99,7 @@
     color: rgb(63, 60, 60);
     border-radius: 0.3rem;
     width: 6rem;
+    text-align: center;
 }
 
 .defaultcolor{
@@ -105,6 +109,7 @@
     color: #41b788;
     border-radius: 0.3rem;
     width: 8rem;
+    text-align: center;
 }
 
 .create-order .blue{
@@ -113,6 +118,7 @@
     color: #5c9de8;
     border-radius: 0.3rem;
     width: 6rem;
+    text-align: center;
 }
 
 .create-order .yellow{
@@ -131,6 +137,7 @@
     color: #be5757;
     border-radius: 0.3rem;
     width: 6rem;
+    text-align: center;
 }
 
 
@@ -153,6 +160,7 @@
     border-radius: 0.3rem;
     width: 8rem;
     padding: 4px;
+    text-align: center;
 }
 
 .create-order .order-detail table tbody td .grey{
@@ -162,6 +170,7 @@
     border-radius: 0.3rem;
     width: 8rem;
     padding: 4px;
+    text-align: center;
 }
 
 .create-order .order-detail table tbody td .blue{
@@ -170,7 +179,9 @@
     color: #5c9de8;
     border-radius: 0.3rem;
     width: 8rem;
+    text-align: center;
     padding: 4px;
+    text-align: center;
 }
 
 .create-order .order-detail table tbody td .yellow{
@@ -179,7 +190,9 @@
     color: #8e741d;
     border-radius: 0.3rem;
     width: 8rem;
+    text-align: center;
     padding: 4px;
+    text-align: center;
 }
 
 
@@ -190,6 +203,7 @@
     border-radius: 0.3rem;
     width: 8rem;
     padding: 4px;
+    text-align: center;
 }
 
 .create-order .order-detail table tbody td .orange {
@@ -199,6 +213,7 @@
     border-radius: 0.3rem;
     width: 8rem;
     padding: 4px;
+    text-align: center;
   }
   
   .create-order .order-detail table tbody td .purple {
@@ -208,6 +223,7 @@
     border-radius: 0.3rem;
     width: 8rem;
     padding: 4px;
+    text-align: center;
   }
   
   .create-order .order-detail table tbody td .muted-clay {
@@ -217,6 +233,7 @@
     border-radius: 0.3rem;
     width: 8rem;
     padding: 4px;
+    text-align: center;
   }
   
 
