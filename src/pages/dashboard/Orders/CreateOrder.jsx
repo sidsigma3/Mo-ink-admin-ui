@@ -73,6 +73,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [selectedVariantForModal, setSelectedVariantForModal] = useState(null);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
+    
 
     // Filter customers based on search input
     const filteredCustomers = customers.filter((customer) =>
@@ -1899,8 +1900,8 @@ console.log(selectedAddress)
 
                       <td>
                         <div>
-                          <p className="text-end">
-                            ₹{grandTotals.totalDiscount.toFixed(0)}
+                          <p className='text-end text-success'>
+                          <span className="mr-1 font-semibold">-</span> ₹{grandTotals.totalDiscount.toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
                             ₹{(grandTotals.totalPaymentTypeDiscount).toFixed(0)}
@@ -1973,14 +1974,14 @@ console.log(selectedAddress)
                     <tr className="border-bottom">
                       <td className="fw-medium pt-2 pb-4 ">Wallet</td>
                       <td className="pb-3 pt-2">{walletBalances.toFixed(0)}</td>
-                      <td style={{ textAlign: "end" }} className="pb-3 pt-2">
-                      ₹ {isViewMode ? (
+                      <td style={{ textAlign: "end" }} className="pb-3 text-success pt-2">
+                      <span className="mr-1 font-semibold">-</span> ₹ {isViewMode ? (
                               // Show plain text in view mode
                               <span>{walletDeduction ? `${walletDeduction}` : "0"}</span>
                           ) : (
                               // Show input field in edit mode
                               <input
-                                  className="border border-secondary-subtle rounded-1 ps-2 text-end p-1"
+                                  className="border border-secondary-subtle text-success rounded-1 ps-2 text-end p-1"
                                   type="number"
                                   placeholder="Enter amount"
                                   value={walletDeduction}

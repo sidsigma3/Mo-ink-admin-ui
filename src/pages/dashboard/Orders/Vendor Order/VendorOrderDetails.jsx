@@ -10,6 +10,7 @@ import { getAllProduct } from "../../../../services/ProductService";
 import { downloadVendorInvoice } from "../../../../services/InvoiceServices";
 import { vendorStatusUpdate } from "../../../../services/VendorsService";
 import "./VendorOrderDetails.css"
+import { FiDownload } from "react-icons/fi";
 
 
 
@@ -255,7 +256,7 @@ const getProductNameById = (productId) => {
                     <div className="d-flex gap-2">
                   <span onClick={() => navigate(-1)}><IoArrowBackOutline size={25}/></span>
                 
-                  <h5>V.O.Id : {relatedOrders[0].correlationId}</h5>
+                  <h5>P.O: {relatedOrders[0].correlationId}</h5>
                   </div>
 
                   {/* <div className="d-flex gap-2">
@@ -271,7 +272,7 @@ const getProductNameById = (productId) => {
         <div className='d-flex justify-content-between'>
             <h6>Order for: <span className='text-primary'>{spinnerOrder?.vendorName}</span></h6>
 
-            <div className='px-3 py-1 rounded' style={{border:'1px solid #93C5FD', backgroundColor:'#DBEAFE',color:'#1E40AF'}}>
+            <div className='px-3 py-1 rounded-1' style={{border:'1px solid #93C5FD', backgroundColor:'#DBEAFE',color:'#1E40AF'}}>
                 <p className='m-0'>Spinner</p>
             </div>
 
@@ -421,7 +422,7 @@ const getProductNameById = (productId) => {
                     <div className='d-flex justify-content-between' style={{ fontSize: '1rem', fontWeight: 500 }}>
                             <h6>Payment</h6>
                            
-                            <div className='bg-secondary-subtle rounded-circle p-2 text-white d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '40px', height: '40px'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><LuFileDown size={20}/></div>
+                            <div className='bg-secondary-subtle rounded-circle p-2 text-dark d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '34px', height: '34px'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><FiDownload size={18}/></div>
                         </div>
         
                     <table className="w-100 table border rounded mt-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
@@ -484,7 +485,7 @@ const getProductNameById = (productId) => {
         <div className='d-flex justify-content-between'>
             <h6>Order for: <span className='text-primary'>{dyerOrder?.vendorName}</span></h6>
 
-            <div className='px-3 py-1  rounded' style={{border:'1px solid #FCD34D', backgroundColor:'#FEF3C7',color:'#92400E'}}>
+            <div className='px-3 py-1  rounded-1' style={{border:'1px solid #FCD34D', backgroundColor:'#FEF3C7',color:'#92400E'}}>
                 <p className='m-0'>Dyer</p>
             </div>
 
@@ -655,7 +656,7 @@ const getProductNameById = (productId) => {
                         <div className='d-flex justify-content-between'style={{ fontSize: '1rem', fontWeight: 500 }}>
                             <h6>Payment</h6>
                            
-                            <div className='bg-secondary-subtle rounded-circle p-2 text-white d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '40px', height: '40px'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><LuFileDown size={20}/></div>
+                            <div className='bg-secondary-subtle rounded-circle p-2 text-dark d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '34px', height: '34px'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><FiDownload size={18}/></div>
                         </div>
         
                         <table className='w-100 table border rounded mt-2' style={{ fontSize: '0.8rem', fontWeight: 500 }}>

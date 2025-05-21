@@ -29,6 +29,25 @@ const VendorOrder = () => {
       navigate(`/vendor-order-details/${correlationId}`, { state: { relatedOrders } });
     };
     
+const statusClassMap = {
+    PLACED: "vendor blue",
+    CONFIRMED: "vendor yellow",
+    RECEIVED: "vendor green",
+    RETURNED: "vendor grey",
+    REPLACED: "vendor purple",
+    CANCELLED: "vendor red",
+  };
+
+  const statusOption = [
+  "PLACED",
+  "CONFIRMED",
+  "RECEIVED",
+  "RETURNED",
+  "REPLACED",
+  "CANCELLED",
+];
+
+  
 
 
       const handleFilterChange = (filter, value) => {
@@ -212,7 +231,10 @@ const VendorOrder = () => {
                 <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{totalWeight.toFixed(2)} kg</td>
                 <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.totalAmount.toFixed(2)}</td>
                 <td style={{ justifyItems: 'center', alignContent:'center'}}>
-                    <div style={{
+                  <div className={statusClassMap[order.status]}>
+                    {[order.status]}
+                  </div>
+                    {/* <div style={{
                         padding: '4px',
                         border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem', 
                         backgroundColor:order.payment === 'Paid' ? '#D1FAE5' : '#F3F4F6',
@@ -220,20 +242,19 @@ const VendorOrder = () => {
                         color : order.payment === 'Paid' ? '#41b788' : '#3f3c3c' ,
                     }}>
                     {order.status}
-                    </div>
+                    </div> */}
 
                 </td>
-                <td  style={{ justifyItems: 'center', alignContent:'center'}}>
-                <div 
-                     className="border-0 btn"
-                     style={{ width: '40px', height: '40px' }}
+                <td  style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+                <button
+                className="border-0 btn"
                      onClick={(e)=>{
                        e.stopPropagation()
                       downloadVendorInvoice(order.vendorOrderId)
                     }}
                    >
                     <FiDownload size={20}/>
-                   </div>
+                   </button>
                 </td>
               </tr>
             )}))}
