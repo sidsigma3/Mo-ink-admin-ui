@@ -20,7 +20,7 @@ import { createVendorRateChart ,getRateChart} from '../../../services/VendorsSer
 import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
 import { PiExportBold } from "react-icons/pi";
 import { CgImport } from "react-icons/cg";
-
+import { IoIosArrowForward, IoIosArrowDown  } from "react-icons/io";
 import { getVendorOrdersByVendorId } from '../../../services/OrderService';
 
 
@@ -625,7 +625,12 @@ const handleTag = (value) =>{
                               {/* Product Row */}
                               <tr className="table-secondary">
                                 <td colSpan={5} onClick={() => toggleExpand(productId, setExpandedProducts)} style={{ cursor: "pointer" }}>
-                                  {expandedProducts[productId] ? "▼" : "▶"} <strong>Product ID:</strong> {getProductNameById(productId)}
+                                  {expandedProducts[productId] ? (
+                                            <IoIosArrowDown className="inline-block w-4 h-4 mr-1" />
+                                          ) : (
+                                            <IoIosArrowForward  className="inline-block w-4 h-4 mr-1" />
+                                          )} 
+                                         {getProductNameById(productId)}
                                 </td>
                               </tr>
 
@@ -635,7 +640,12 @@ const handleTag = (value) =>{
                                     {/* Size Row */}
                                     <tr className="table-light ">
                                       <td colSpan={5} onClick={() => toggleExpand(`${productId}-${size}`, setExpandedSizes)} style={{ cursor: "pointer" }}>
-                                        {expandedSizes[`${productId}-${size}`] ? "▼" : "▶"} <strong>Size:</strong> {size}
+                                        {expandedSizes[`${productId}-${size}`] ? (
+                                             <IoIosArrowDown className="inline-block w-4 h-4 mr-1" />
+                                          ) : (
+                                            <IoIosArrowForward  className="inline-block w-4 h-4 mr-1" />
+                                          )} 
+                                          {size}
                                       </td>
                                     </tr>
 
@@ -645,7 +655,12 @@ const handleTag = (value) =>{
                                           {/* Variant Type Row */}
                                           <tr>
                                             <td colSpan={5} onClick={() => toggleExpand(`${productId}-${size}-${variantType}`, setExpandedVariants)} style={{ cursor: "pointer" }}>
-                                              {expandedVariants[`${productId}-${size}-${variantType}`] ? "▼" : "▶"} <strong>Variant Type:</strong> {variantType}
+                                              {expandedVariants[`${productId}-${size}-${variantType}`] ? (
+                                             <IoIosArrowDown className="inline-block w-4 h-4 mr-1" />
+                                          ) : (
+                                            <IoIosArrowForward  className="inline-block w-4 h-4 mr-1" />
+                                          )} 
+                                           {variantType}
                                             </td>
                                           </tr>
 

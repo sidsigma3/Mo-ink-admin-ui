@@ -185,9 +185,9 @@ const Inventory = () => {
         <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
           <DashboardBox heading={'Total SKU'} number={dashboardStats.totalSKU} />
         </div>
-        <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
+        {/* <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
           <DashboardBox heading={'From Manufacturer'} number={`${dashboardStats.fromManufacturer} Kgs`} />
-        </div>
+        </div> */}
         <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
           <DashboardBox heading={'Total Customer Order'} number={`${dashboardStats.totalCustomerOrder} Kgs`} />
         </div>
@@ -209,19 +209,19 @@ const Inventory = () => {
     </div>
   </div> */}
 
-      <div className='filter-sec d-flex gap-2 align-items-center mt-2'>
+      {/* <div className='filter-sec d-flex gap-2 align-items-center mt-2'>
       
       <div className='w-75'>
           <ProductFilter 
               filterOptions={["Product Name"]} 
               onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
           />
-      </div>
+      </div> */}
       
       {/* <div className='w-25'>
       <StatusFilter status="All" onStatusChange={handleStatusChange} />
       </div> */}
-  </div>
+  {/* </div> */}
 
   <div className="inventory-container">
   {/* Table View (Visible on large screens) */}
