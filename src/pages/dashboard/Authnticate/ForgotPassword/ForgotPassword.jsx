@@ -7,7 +7,7 @@ import { forgotPassword } from '../../../../services/LoginService';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
-    const userType = "USER"; 
+    const accountType = "USER"; 
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -18,7 +18,7 @@ const ForgotPassword = () => {
         setError("");
 
         try {
-            await forgotPassword({ email, userType });
+            await forgotPassword({ email, accountType });
             setMessage("Password reset instructions sent to your email.");
             setTimeout(() => navigate("/login"), 2000);
         } catch (err) {
