@@ -300,7 +300,9 @@ const BulkAssignPage = () => {
             let totalCgst = 0;
             let totalSgst = 0;
             let totalIgst = 0;
-            let totalTransportationCharges = 200; // Example static charge, adjust as needed
+            let totalTransportationCharges = 200;
+      
+            const missingRates = [];
       
             const vendorOrderVariants = orderDetails.map((item, index) => {
               const rateGstInfo = getRateForVariant(item.variantId, rateChart);
@@ -308,6 +310,15 @@ const BulkAssignPage = () => {
               const gstRate = rateGstInfo.gst || 0;
               const weight = item.weight || 0;
               const baseAmount = rate * weight;
+      
+              if (!rate || rate === 0) {
+                missingRates.push({
+                  productName: item.productName,
+                  size: item.size,
+                  color: item.color?.name || "N/A",
+                  variantType: item.variantType,
+                });
+              }
       
               // Tax Calculation
               let cgst = 0, sgst = 0, igst = 0;
@@ -318,7 +329,6 @@ const BulkAssignPage = () => {
                 igst = (gstRate / 100) * baseAmount;
               }
       
-              // Track totals
               totalCgst += cgst;
               totalSgst += sgst;
               totalIgst += igst;
@@ -333,10 +343,19 @@ const BulkAssignPage = () => {
                 vendorOrderVariantSgst: sgst,
                 vendorOrderVariantIgst: igst,
                 status: 'PLACED',
-                statusReason: index === 0 ? 'Initial batch' : 'Second batch', // or customize per logic
+                statusReason: index === 0 ? 'Initial batch' : 'Second batch',
                 statusRemark: index === 0 ? 'Urgent delivery required' : 'Standard delivery',
               };
             });
+      
+            // Show alert and stop if any rates are missing
+            if (missingRates.length > 0) {
+              const message = missingRates.map(m =>
+                `Product: ${m.productName}, Size: ${m.size}, Color: ${m.color}, Type: ${m.variantType}`
+              ).join('\n');
+              alert(`Please add rate chart entries for the following variants:\n\n${message}`);
+              throw new Error("Rate chart entries missing");
+            }
       
             const totalAmount = vendorOrderVariants.reduce((acc, v) => acc + v.vendorOrderVariantTotalAmount, 0);
             const quantity = vendorOrderVariants.length;
@@ -355,24 +374,24 @@ const BulkAssignPage = () => {
             };
           };
       
-          // Spinner Order
           if (orderFor === 'Spinner' || orderFor === 'Both') {
             const spinnerPayload = buildPayload(selectedSpinner?.vendorId, spinnerRateChart, selectedSpinner?.state);
             await createVendorOrder(spinnerPayload);
           }
       
-          // Dyer Order
           if (orderFor === 'Dyer' || orderFor === 'Both') {
             const dyerPayload = buildPayload(selectedDyer?.vendorId, dyerRateChart, selectedDyer?.state);
             await createVendorOrder(dyerPayload);
           }
       
           console.log('Vendor order(s) created successfully with correlation ID:', correlationId);
-          navigate("/vendor-order")
+          navigate("/vendor-order");
+      
         } catch (error) {
           console.error('Failed to create vendor orders:', error);
         }
       };
+      
       
 
       const calculateInvoiceTotals = (orderDetails, rateChart, vendorState) => {
@@ -454,7 +473,7 @@ const BulkAssignPage = () => {
                 <div className="d-flex flex-column flex-md-row gap-4 align-items-md-center col-12 col-md-12 col-lg-6">
 
                     {/* Label Div */}
-                    <div className="w-20">
+                    <div className="col-2">
                     <label className="form-label fs-6 fw-medium mb-0">Order for:</label>
                     </div>
 

@@ -20,13 +20,9 @@ import { createVendorRateChart ,getRateChart} from '../../../services/VendorsSer
 import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
 import { PiExportBold } from "react-icons/pi";
 import { CgImport } from "react-icons/cg";
-import { IoIosArrowForward, IoIosArrowDown  } from "react-icons/io";
 import { getVendorOrdersByVendorId } from '../../../services/OrderService';
-
-
 import SelectState from '../../../components/SelectState/SelectState';
-
-
+import { IoIosArrowForward, IoIosArrowDown  } from "react-icons/io";
 
 
 const AddSpinners = () => {
@@ -417,12 +413,27 @@ const handleTag = (value) =>{
         alert("No products found.");
         return;
       }
-  
+    
       const allRows = [];
-  
+    
+      // Create a map of variantId to { ratePerKg, gstOnVariant } for quick lookup
+      const rateMap = {};
+      rateChartData.forEach((product) => {
+        if (Array.isArray(product.variant)) {
+          product.variant.forEach((variant) => {
+            rateMap[variant.variantId] = {
+              ratePerKg: variant.ratePerKg,
+              gstOnVariant: variant.gstOnVariant,
+            };
+          });
+        }
+      });
+    
       products.forEach((product) => {
         if (Array.isArray(product.variants)) {
           product.variants.forEach((variant) => {
+            const rateInfo = rateMap[variant.id] || {}; // find matching rate data by variantId
+    
             allRows.push({
               "Product ID": product.id,
               "Product Name": product.productName,
@@ -432,25 +443,26 @@ const handleTag = (value) =>{
               "Color Name": variant.color?.colorName || "",
               "Color Hex Code": variant.color?.hexCode || "",
               "Variant Type": variant.variantType,
-              "Available Weight (Kg)": variant.availableWeight,
-              "Rate Per Kg": "",          // to be filled
-              "GST % on Variant": "",     // to be filled
+              "Available Weight (Kg)": variant.availableWeight || "",
+              "Rate Per Kg": rateInfo.ratePerKg || "",           // Fill if available
+              "GST % on Variant": rateInfo.gstOnVariant || "",   // Fill if available
             });
           });
         }
       });
-  
+    
       if (allRows.length === 0) {
         alert("No variants found in the product list.");
         return;
       }
-  
+    
       const worksheet = XLSX.utils.json_to_sheet(allRows);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "VendorRateChartTemplate");
-  
+    
       XLSX.writeFile(workbook, "Vendor_Rate_Chart_Template.xlsx");
     };
+    
 
     function getProductNameById(productId) {
       for (let product of products) {
@@ -461,7 +473,8 @@ const handleTag = (value) =>{
       return "Unknown Product";
     }
     
-    console.log(products)
+
+
 
     return (
     <div className='add-spinners'>
@@ -469,7 +482,12 @@ const handleTag = (value) =>{
         <span onClick={() => navigate("/spinners-and-dyers")}>
           <IoArrowBackOutline size={25} />
         </span>
-        <h5>New Spinners & Dyers</h5>
+        {state?.index !== undefined? (
+          <h5>{customer?.firstName+" "+customer?.lastName}</h5>
+        ):(
+          <h5>New Spinners & Dyers</h5>
+        )}
+      
       </div>
 
       <div className='main d-flex gap-3 mt-2'>
@@ -606,7 +624,7 @@ const handleTag = (value) =>{
 
     
 
-                    {rateChartData && Object.keys(rateChartData).length > 0 ?  (
+    {rateChartData && Object.keys(rateChartData).length > 0 ?  (
                        <>
                     <div style={{ border: '1px solid #ddd', borderRadius: '1rem', marginTop: '1rem', overflow: 'hidden', }}>
                     <table className="table w-full h-auto">
@@ -714,26 +732,8 @@ const handleTag = (value) =>{
                     </div>
                   )}
 
-
-
-
-
-    {/* <div style={{ border: '1px solid #ddd', borderRadius: '1rem', marginTop: '1rem', overflow: 'hidden' }}>
-    
-
-    </div> */}
-
   </div>
 </>
-
-
-
-
-
-
-
-
-
 
 
         <div className='d-flex justify-content-between my-4'>

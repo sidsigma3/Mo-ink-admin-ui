@@ -646,44 +646,46 @@ const parseSizeColorData = (data) => {
 
 
 const handleExport = () => {
-   const showToast = (message, type = "error") => {
-            setToasts([{ message, type }]);
-            setTimeout(() => setToasts([]), 3000);
-          };
+  const showToast = (message, type = "error") => {
+    setToasts([{ message, type }]);
+    setTimeout(() => setToasts([]), 3000);
+  };
+
   if (!sizeColorMap || sizeColorMap.length === 0) {
-      showToast("No data available to export.", "error");
-      // alert("No data available to export.");
-      return;
+    showToast("No data available to export.", "error");
+    return;
   }
 
-  // Convert sizeColorMap to a structured array
   const exportData = [];
-  
-  sizeColorMap.forEach(({ size, colors }) => {
-      colors.forEach(({ color, hex, available, price ,markupPricePerKg ,  costPerKg}) => {
-          exportData.push({
-              Size: size,
-              Color: color,
-              HexCode: hex,
-              Availability: available,
-              PricePerKg: price,
-              markupPricePerKg:markupPricePerKg,
-              costPerKg:costPerKg,
 
-          });
+  sizeColorMap.forEach(({ size, colors }) => {
+    colors.forEach(({ color, hex, variants }) => {
+      variants?.forEach((variant) => {
+        exportData.push({
+          Size: size,
+          Color: color,
+          HexCode: hex,
+          VariantType: variant.variantType || "",
+          Availability: variant.available ?? "",
+          PricePerKg: variant.price ?? "",
+          MarkupPricePerKg: variant.markupPricePerKg ?? "",
+        });
       });
+    });
   });
 
-  // Create a new workbook and worksheet
+  if (exportData.length === 0) {
+    showToast("No variant data to export.", "error");
+    return;
+  }
+
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(exportData);
-  
   XLSX.utils.book_append_sheet(wb, ws, "Size-Color Data");
 
-  // Generate and trigger file download
   const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-  
+
   saveAs(data, "Size_Color_Data.xlsx");
 };
 
@@ -709,10 +711,6 @@ const removeVariant = (sizeIndex, colorIndex, variantIndex) => {
 console.log(sizeColorMap)
 
   return (
-
-    
-
-
     
     <div className="add-product-ctn">
         <div className='top d-flex gap-3' style={{cursor:"pointer"}}>

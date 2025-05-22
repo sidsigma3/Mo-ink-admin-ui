@@ -66,7 +66,7 @@ const Inventory = () => {
         // Calculate dashboard numbers
         const totalSKU = flatData.length; // each variant is a SKU
   
-        const fromManufacturer = flatData.reduce(
+        const stockRemaining = flatData.reduce(
           (acc, item) => acc + (item.remainingWeight || 0),
           0
         );
@@ -76,13 +76,12 @@ const Inventory = () => {
           0
         );
   
-        const stockRemaining = fromManufacturer - totalCustomerOrder;
+       
   
         setDashboardStats({
           totalSKU,
-          fromManufacturer,
-          totalCustomerOrder,
           stockRemaining,
+          totalCustomerOrder,
         });
       } catch (err) {
         console.error("Failed to fetch inventory:", err);
@@ -186,7 +185,7 @@ const Inventory = () => {
           <DashboardBox heading={'Total SKU'} number={dashboardStats.totalSKU} />
         </div>
         {/* <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-          <DashboardBox heading={'From Manufacturer'} number={`${dashboardStats.fromManufacturer} Kgs`} />
+          <DashboardBox heading={'From Manufacturer'} number={`${dashboardStats.stockRemaining} Kgs`} />
         </div> */}
         <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
           <DashboardBox heading={'Total Customer Order'} number={`${dashboardStats.totalCustomerOrder} Kgs`} />
