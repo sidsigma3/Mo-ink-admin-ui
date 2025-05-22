@@ -34,7 +34,11 @@ import ModalShipOrder from '../../../components/Modal/ModalShipOrder';
 import ModalDeliverOrder from '../../../components/Modal/ModalDeliverOrder';
 import ModalReturnOrder from '../../../components/Modal/ModalReturnOrder';
 import Tooltip from '../../../components/Tooltip/Tooltip';
+import ModalSendInvoice from '../../../components/Modal/ModalSendInvoice';
+import Toast from "../../../components/Toast/Toast";
 
+
+ 
 // Optional: style mapping
 export const statusClassMap = {
   NEW: "text-primary",
@@ -73,7 +77,14 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [selectedVariantForModal, setSelectedVariantForModal] = useState(null);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+    const [toasts, setToasts] = useState([]);
+
+
     
+
 
     // Filter customers based on search input
     const filteredCustomers = customers.filter((customer) =>
@@ -1023,11 +1034,17 @@ const handleDeleteColor = (productId, size, colorName, variantType) => {
 
 
 const sendInvoice = async(orderId) =>{
+   const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
+
+
     const result = await emailInvoice(orderId);
       if (!result.success) {
-        alert("Failed to download invoice.");
+        showToast("Failed to download invoice.", "error");
       }
-      alert("Invoice sent successfully")
+      showToast("Invoice sent successfully", "success")
 }
 
 
@@ -1564,6 +1581,13 @@ console.log(selectedAddress)
                         </div>
                         )}
 
+                                                    {orderDetails.length > 0 && isViewMode && weightChanged && (
+                                                      <div className='d-flex justify-content-end w-100'>
+                                                        <Button className='btn btn-primary' onClick={handleOrderChange}>
+                                                          Save Changes
+                                                        </Button>
+                                                      </div>
+                                                    )}
 
 
                     <ModalAssign
@@ -2048,26 +2072,59 @@ console.log(selectedAddress)
                         <button className="whatsapp-btn">Send on WhatsApp</button>
                     </ReactWhatsapp> */}
 
+                            {orderDetails.length > 0 && (
+                              <div className='d-flex justify-content-end w-100'>
+                                {isViewMode && !weightChanged ? (
+                                  <Button
+                                    className='btn btn-primary'
+                                    onClick={() => {
+                                      sendInvoice(order.orderId);
+                                      setModalData({ orderId: order.orderId });
+                                      setIsModalOpen(true);
+                                    }}
+                                  >
+                                    Send Invoice
+                                  </Button>
+                                ) : (
+                                  !isViewMode && (
+                                    <Button className='btn-sm' onClick={handleCreateOrder}>
+                                      Create Order
+                                    </Button>
+                                  )
+                                )}
+                              </div>
+                            )}
 
-                    {orderDetails.length > 0 && (
-                      <div className='d-flex justify-content-end w-100'>
-                        {isViewMode ? (
-                          weightChanged ? (
-                            <Button className='btn-sm' onClick={handleOrderChange}>Save Changes</Button>
-                          ) : (
-                            <Button className='btn-sm' onClick={() => sendInvoice(order.orderId)}>Send Invoice</Button>
-                          )
-                        ) : (
-                          <Button className='btn-sm' onClick={handleCreateOrder}>Create Order</Button>
-                        )}
-                      </div>
-                    )}
 
                    
 
                 </div>
             </div>
-            
+            {isModalOpen && (
+  <ModalSendInvoice
+    orderId={selectedOrderId}
+    onConfirm={() => {
+      sendInvoice(order.orderId);
+      setIsModalOpen(false);
+    }}
+    onCancel={() => setIsModalOpen(false)}
+  />
+)}
+
+
+ {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
 
             
         </div>
