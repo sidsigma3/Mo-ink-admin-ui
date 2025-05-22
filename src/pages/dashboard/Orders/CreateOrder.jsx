@@ -1479,7 +1479,7 @@ console.log(selectedAddress)
                                                           }
                                                         
                                                           // Allow CONFIRMED → SHIPPING directly, but disallow skipping SHIPPING to DELIVERED
-                                                          if (value === "DELIVERED" && !["SHIPPING"].includes(order.status)) {
+                                                          if (value === "DELIVERED" && !["SHIPPED"].includes(order.status)) {
                                                             return true;
                                                           }
                                                         

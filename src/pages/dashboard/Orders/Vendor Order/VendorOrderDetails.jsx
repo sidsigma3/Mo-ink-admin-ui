@@ -247,6 +247,7 @@ const getProductNameById = (productId) => {
   
   
   console.log(dyerOrder)
+  console.log(spinnerOrder)
   console.log(dyerRateChart)
 
 
@@ -409,7 +410,7 @@ const getProductNameById = (productId) => {
               })
               ) : (
                 <tr>
-                  <td colSpan={7}>Loading rate chart...</td>
+                  <td colSpan={7}></td>
                 </tr>
               )}
             </tbody>
@@ -422,7 +423,7 @@ const getProductNameById = (productId) => {
                     <div className='d-flex justify-content-between' style={{ fontSize: '1rem', fontWeight: 500 }}>
                             <h6>Payment</h6>
                            
-                            <div className='bg-secondary-subtle rounded-circle p-2 text-dark d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '34px', height: '34px'}} onClick={()=>downloadVendorInvoice(dyerOrder?.vendorOrderId)}><FiDownload size={18}/></div>
+                            <div className='bg-secondary-subtle rounded-circle p-2 text-dark d-flex justify-content-center align-items-center' style={{cursor:'pointer', width: '34px', height: '34px'}} onClick={()=>downloadVendorInvoice(spinnerOrder?.vendorOrderId)}><FiDownload size={18}/></div>
                         </div>
         
                     <table className="w-100 table border rounded mt-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
@@ -643,7 +644,7 @@ const getProductNameById = (productId) => {
         })
         ) : (
           <tr>
-            <td colSpan={7}>Loading rate chart...</td>
+            <td colSpan={7}></td>
           </tr>
         )}
       </tbody>

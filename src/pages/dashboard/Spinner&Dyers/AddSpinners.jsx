@@ -21,8 +21,8 @@ import ImportBtn from "../../../components/Buttons/Import/ImportBtn";
 import { PiExportBold } from "react-icons/pi";
 import { CgImport } from "react-icons/cg";
 import { getVendorOrdersByVendorId } from '../../../services/OrderService';
-
-
+import SelectState from '../../../components/SelectState/SelectState';
+import { IoIosArrowForward, IoIosArrowDown  } from "react-icons/io";
 
 
 const AddSpinners = () => {
@@ -413,12 +413,27 @@ const handleTag = (value) =>{
         alert("No products found.");
         return;
       }
-  
+    
       const allRows = [];
-  
+    
+      // Create a map of variantId to { ratePerKg, gstOnVariant } for quick lookup
+      const rateMap = {};
+      rateChartData.forEach((product) => {
+        if (Array.isArray(product.variant)) {
+          product.variant.forEach((variant) => {
+            rateMap[variant.variantId] = {
+              ratePerKg: variant.ratePerKg,
+              gstOnVariant: variant.gstOnVariant,
+            };
+          });
+        }
+      });
+    
       products.forEach((product) => {
         if (Array.isArray(product.variants)) {
           product.variants.forEach((variant) => {
+            const rateInfo = rateMap[variant.id] || {}; // find matching rate data by variantId
+    
             allRows.push({
               "Product ID": product.id,
               "Product Name": product.productName,
@@ -428,25 +443,26 @@ const handleTag = (value) =>{
               "Color Name": variant.color?.colorName || "",
               "Color Hex Code": variant.color?.hexCode || "",
               "Variant Type": variant.variantType,
-              "Available Weight (Kg)": variant.availableWeight,
-              "Rate Per Kg": "",          // to be filled
-              "GST % on Variant": "",     // to be filled
+              "Available Weight (Kg)": variant.availableWeight || "",
+              "Rate Per Kg": rateInfo.ratePerKg || "",           // Fill if available
+              "GST % on Variant": rateInfo.gstOnVariant || "",   // Fill if available
             });
           });
         }
       });
-  
+    
       if (allRows.length === 0) {
         alert("No variants found in the product list.");
         return;
       }
-  
+    
       const worksheet = XLSX.utils.json_to_sheet(allRows);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "VendorRateChartTemplate");
-  
+    
       XLSX.writeFile(workbook, "Vendor_Rate_Chart_Template.xlsx");
     };
+    
 
     function getProductNameById(productId) {
       for (let product of products) {
@@ -556,8 +572,8 @@ const handleTag = (value) =>{
 
     <div className="col-md-6 d-flex flex-column">
         <label>State</label>
-        <input type="text" name="state" value={formData.state} onChange={handleChange} />
-        {formErrors.state && <p className="text-danger">{formErrors.state}</p>}
+          <SelectState value={formData.state} onChange={handleChange} />
+          {formErrors.state && <p className="text-danger">{formErrors.state}</p>}
     </div>
 
     <div className="col-md-6 d-flex flex-column">
@@ -608,25 +624,31 @@ const handleTag = (value) =>{
 
     
 
-                    {rateChartData && Object.keys(rateChartData).length > 0 ?  (
+    {rateChartData && Object.keys(rateChartData).length > 0 ?  (
                        <>
-                    <table className="table table-bordered w-full">
-                        <thead className="table-light">
+                    <div style={{ border: '1px solid #ddd', borderRadius: '1rem', marginTop: '1rem', overflow: 'hidden', }}>
+                    <table className="table w-full h-auto">
+                        <thead className="table-light fw-normal tablehead">
                           <tr>
-                            <th>Variant ID</th>
-                            <th>Color Name</th>
-                            <th>Hex Code</th>
-                            <th>Rate/Kg</th>
-                            <th>GST (%)</th>
+                            <th className="py-3 px-4 tablehead">Variant ID</th>
+                            <th className="py-3 px-4 tablehead text-center">Color Name</th>
+                            <th className="py-3 px-4 tablehead text-center">Hex Code</th>
+                            <th className="py-3 px-4 tablehead text-center">Rate/Kg</th>
+                            <th className="py-3 px-4 tablehead text-center">GST (%)</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="level-expanded">
                           {Object.entries(groupedData).map(([productId, sizes]) => (
                             <React.Fragment key={productId}>
                               {/* Product Row */}
                               <tr className="table-secondary">
                                 <td colSpan={5} onClick={() => toggleExpand(productId, setExpandedProducts)} style={{ cursor: "pointer" }}>
-                                  {expandedProducts[productId] ? "▼" : "▶"} <strong>Product ID:</strong> {getProductNameById(productId)}
+                                  {expandedProducts[productId] ? (
+                                            <IoIosArrowDown className="inline-block w-4 h-4 mr-1" />
+                                          ) : (
+                                            <IoIosArrowForward  className="inline-block w-4 h-4 mr-1" />
+                                          )} 
+                                         {getProductNameById(productId)}
                                 </td>
                               </tr>
 
@@ -634,9 +656,14 @@ const handleTag = (value) =>{
                                 Object.entries(sizes).map(([size, variantTypes]) => (
                                   <React.Fragment key={`${productId}-${size}`}>
                                     {/* Size Row */}
-                                    <tr className="table-light">
+                                    <tr className="table-light ">
                                       <td colSpan={5} onClick={() => toggleExpand(`${productId}-${size}`, setExpandedSizes)} style={{ cursor: "pointer" }}>
-                                        {expandedSizes[`${productId}-${size}`] ? "▼" : "▶"} <strong>Size:</strong> {size}
+                                        {expandedSizes[`${productId}-${size}`] ? (
+                                             <IoIosArrowDown className="inline-block w-4 h-4 mr-1" />
+                                          ) : (
+                                            <IoIosArrowForward  className="inline-block w-4 h-4 mr-1" />
+                                          )} 
+                                          {size}
                                       </td>
                                     </tr>
 
@@ -646,7 +673,12 @@ const handleTag = (value) =>{
                                           {/* Variant Type Row */}
                                           <tr>
                                             <td colSpan={5} onClick={() => toggleExpand(`${productId}-${size}-${variantType}`, setExpandedVariants)} style={{ cursor: "pointer" }}>
-                                              {expandedVariants[`${productId}-${size}-${variantType}`] ? "▼" : "▶"} <strong>Variant Type:</strong> {variantType}
+                                              {expandedVariants[`${productId}-${size}-${variantType}`] ? (
+                                             <IoIosArrowDown className="inline-block w-4 h-4 mr-1" />
+                                          ) : (
+                                            <IoIosArrowForward  className="inline-block w-4 h-4 mr-1" />
+                                          )} 
+                                           {variantType}
                                             </td>
                                           </tr>
 
@@ -654,10 +686,10 @@ const handleTag = (value) =>{
                                           {expandedVariants[`${productId}-${size}-${variantType}`] &&
                                             rows.map((row, idx) => (
                                               <tr key={idx}>
-                                                <td>{row.variantId}</td>
-                                                <td>{row.color.colorName}</td>
-                                                <td>
-                                                  <div className="d-flex align-items-center gap-2">
+                                                <td  className="text-center ">{row.variantId}</td>
+                                                <td  className="text-center ">{row.color.colorName}</td>
+                                                <td  className="text-center align-middle">
+                                                  <div className="d-flex justify-content-center align-items-center gap-2">
                                                     <div
                                                       style={{
                                                         backgroundColor: row.color.hexCode,
@@ -670,8 +702,8 @@ const handleTag = (value) =>{
                                                     <code>{row.color.hexCode}</code>
                                                   </div>
                                                 </td>
-                                                <td>{row.ratePerKg}</td>
-                                                <td>{row.gstOnVariant}</td>
+                                                <td  className="text-center ">{row.ratePerKg}</td>
+                                                <td  className="text-center ">{row.gstOnVariant}</td>
                                               </tr>
                                             ))}
                                         </React.Fragment>
@@ -682,11 +714,13 @@ const handleTag = (value) =>{
                           ))}
                         </tbody>
                       </table>
+                      </div>
 
-                                      
-                      <button className="btn btn-primary mt-4" onClick={handleSubmitForm}>
+                       <div className="d-flex justify-content-end mt-4">    
+                      <button className="btn btn-tertiary" onClick={handleSubmitForm}>
                         Submit Rate Chart
                       </button>
+                      </div>
 
                         
                   </>
@@ -698,120 +732,8 @@ const handleTag = (value) =>{
                     </div>
                   )}
 
-
-
-
-    {/* <div style={{ border: '1px solid #ddd', borderRadius: '1rem', marginTop: '1rem', overflow: 'hidden' }}>
-      <table className="table text-center" style={{ marginBottom: 0 }}>
-  <thead className="table-light">
-    <tr>
-      <th className="py-3 px-4 text-start tablehead">Product Name</th>
-      <th className="py-3 px-4 tablehead">Variants</th>
-      <th className="py-3 px-4 tablehead">Price/Kg</th>
-      <th className="py-3 px-4 tablehead">GST</th>
-    </tr>
-  </thead>
-<tbody>
-  {demoData.map((product, productIndex) => (
-    <React.Fragment key={productIndex}>
-  
-      <tr
-        onClick={() => toggleProduct(productIndex)}
-        className="level-expanded"
-        style={{ cursor: "pointer" }}
-      >
-        <td className="py-3 px-4 text-start">{product.productName}</td>
-        <td className="py-3 px-4">{product.variants.length}</td>
-        <td className="py-3 px-4">{product.variants[0].pricePerKg}</td>
-        <td className="py-3 px-4">{product.variants[0].gst}</td>
-      </tr>
-
-    
-      {expandedProductIndex === productIndex &&
-        product.variants.map((variant, variantIndex) => (
-          <React.Fragment key={variantIndex}>
-            <tr
-              className="level-expanded"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleVariant(productIndex, variantIndex);
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <td className="py-3 px-4 text-start">
-                <strong>Size:</strong> {variant.size}
-              </td>
-              <td className="py-3 px-4">{variant.types.length}</td>
-              <td className="py-3 px-4">{variant.pricePerKg}</td>
-              <td className="py-3 px-4">{variant.gst}</td>
-            </tr>
-
-           
-            {expandedVariantIndex[`${productIndex}-${variantIndex}`] &&
-              variant.types.map((type, typeIndex) => (
-                <React.Fragment key={typeIndex}>
-                  <tr
-                    className="level-expanded"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleType(productIndex, variantIndex, typeIndex);
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <td className="py-3 px-4 text-start">
-                      <strong>Type:</strong> {type.type}
-                    </td>
-                    <td className="py-3 px-4">{type.colors.length}</td>
-                    <td className="py-3 px-4">{variant.pricePerKg}</td>
-                    <td className="py-3 px-4">{variant.gst}</td>
-                  </tr>
-
-                
-                  {expandedTypeIndex[`${productIndex}-${variantIndex}-${typeIndex}`] &&
-                    type.colors.map((color, colorIndex) => (
-                      <tr key={colorIndex} className="level-expanded">
-                        <td className="py-3 px-4 d-flex align-items-center gap-3 color-cell level-expanded">
-                          <div
-                            style={{
-                              backgroundColor: color.hex,
-                              width: "22px",
-                              height: "22px",
-                              borderRadius: "50%",
-                              border: "1px solid #ccc",
-                              flexShrink: 0,
-                            }}
-                          ></div>
-                          <span>{color.color}</span>
-                          <code style={{ fontSize: "0.8rem" }}>{color.hex}</code>
-                        </td>
-                        <td className="py-3 px-4 level-expanded">-</td>
-                        <td className="py-3 px-4 level-expanded">{variant.pricePerKg}</td>
-                        <td className="py-3 px-4 level-expanded">{variant.gst}</td>
-                      </tr>
-                    ))}
-                </React.Fragment>
-              ))}
-          </React.Fragment>
-        ))}
-    </React.Fragment>
-  ))}
-</tbody>
-
-
-</table>
-
-    </div> */}
   </div>
 </>
-
-
-
-
-
-
-
-
-
 
 
         <div className='d-flex justify-content-between my-4'>
