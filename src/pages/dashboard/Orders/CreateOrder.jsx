@@ -1058,8 +1058,8 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus,returnWeigh
 
     
   } catch (err) {
-    alert("Failed to update status");
-    console.error(err);
+    const errorMessage = err?.response?.data?.message || err.message || "Unknown error";
+    alert(`Failed to update status: ${errorMessage}`);
   }
 };
 
@@ -1456,20 +1456,37 @@ console.log(selectedAddress)
                                                         ) || value === order.status;
 
                                                         const shouldDisable = (() => {
+                                                          const currentIndex = statusFlow.indexOf(order.status);
+                                                          const optionIndex = statusFlow.indexOf(value);
+                                                        
                                                           if (order.status === "RETURN_REQUESTED") return true;
                                                         
                                                           if (order.status === "NEW") {
-                                                            // Only allow moving to CONFIRMED or CANCELLED from NEW
+                                                            // Only allow CONFIRMED or CANCELLED
                                                             return !["CONFIRMED", "CANCELLED"].includes(value);
                                                           }
                                                         
-                                                          if (value === "CANCELLED") {
-                                                            // Disable CANCELLED for all statuses except NEW
+                                                          if (value === "CANCELLED" && order.status !== "NEW") {
+                                                            return true; // Prevent cancelling after NEW
+                                                          }
+                                                        
+                                                          // Prevent skipping SHIPPING before DELIVERED
+                                                          if (
+                                                            value === "DELIVERED" &&
+                                                            order.status === "CONFIRMED" // trying to go directly to DELIVERED
+                                                          ) {
                                                             return true;
                                                           }
                                                         
+                                                          // Allow CONFIRMED → SHIPPING directly, but disallow skipping SHIPPING to DELIVERED
+                                                          if (value === "DELIVERED" && !["SHIPPING"].includes(order.status)) {
+                                                            return true;
+                                                          }
+                                                        
+                                                          // Default: disallow going backward in flow
                                                           return optionIndex < currentIndex;
                                                         })();
+                                                        
                                                         
                                                       
 

@@ -7,7 +7,7 @@ import { resetPassword } from '../../../../services/LoginService';
 
 
 const ResetPassword = () => {
-  const [password, setPassword] = useState("");
+  const [newPassword, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
@@ -24,12 +24,12 @@ const ResetPassword = () => {
     console.log("hello")
 
 
-    if (!password || !confirmPassword) {
+    if (!newPassword || !confirmPassword) {
       alert("Please fill out both fields.");
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       alert("Passwords do not match.");
       return;
     }
@@ -42,7 +42,7 @@ const ResetPassword = () => {
     try {
       const payload = {
         token,
-        password,
+        newPassword,
         accountType,
       };
 
@@ -103,7 +103,7 @@ const ResetPassword = () => {
           type="text"
           placeholder="Create a strong password"
           className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
-          value={password}
+          value={newPassword}
           onChange={(e) => setPassword(e.target.value)}
         />
 
