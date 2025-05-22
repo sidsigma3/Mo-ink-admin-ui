@@ -5,12 +5,11 @@ const ModalSendInvoice = ({
   isOpen,
   onCancel,
   onConfirm,
-  modalData, // ✅ ADDED
-  customers  // ✅ ADDED
+  modalData,
+  customers
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen || !modalData) return null; // ✅ SAFETY CHECK
 
-  // ✅ MOVED inside the component body and scoped correctly
   const matchedCustomer = customers.find((customer) =>
     customer.orders?.some(order => order.id === modalData.orderId)
   );
