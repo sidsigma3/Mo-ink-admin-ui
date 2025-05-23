@@ -356,23 +356,34 @@ const handleAddressTypeChange = (e) => {
   };
 
   const handleDownloadCreditReceipt = async (source) => {
-    const isCancellation = source.toLowerCase().includes("cancellation");
-    const isReturn = source.toLowerCase().includes("return");
+    const lowerSource = source.toLowerCase();
+    const isCancellation = lowerSource.includes("cancellation");
+    const isReturn = lowerSource.includes("return");
   
-    // Extract order ID (last number in the string)
-    const match = source.match(/order:\s*(\d+)/i);
-    const orderId = match ? match[1] : null;
+    // Extract orderId (last number after 'order:') and optionally returnedId (number after 'item:')
+    const orderIdMatch = source.match(/order:\s*(\d+)/i);
+    const returnedIdMatch = source.match(/item:\s*(\d+)/i);
+  
+    const orderId = orderIdMatch ? orderIdMatch[1] : null;
+    const returnedId = returnedIdMatch ? returnedIdMatch[1] : null;
   
     if (!orderId || (!isCancellation && !isReturn)) {
       console.error("Invalid source format:", source);
       return;
     }
   
-    const type = isCancellation ? "CANCELLED" : "RETURNED";
+    const type = isCancellation ? "cancelled" : "returned";
   
-    console.log(type,orderId)
     try {
-      await downloadCreditReceipt(orderId, type);
+      if (type === "returned") {
+        if (!returnedId) {
+          console.error("Returned ID missing for return type");
+          return;
+        }
+        await downloadCreditReceipt(orderId, type, returnedId);
+      } else {
+        await downloadCreditReceipt(orderId, type);
+      }
     } catch (error) {
       console.error("Failed to download credit receipt:", error);
     }

@@ -110,11 +110,20 @@ const getCustomerOrderStats = (customerId) => {
   const customerOrders = orders.filter(order => order.customer.id === customerId);
 
   const totalOrders = customerOrders.length;
-  const lastOrderDate = customerOrders.length > 0
-    ? new Intl.DateTimeFormat("en-GB").format(new Date(
+
+  const lastOrderDate = totalOrders > 0
+    ? new Date(
         Math.max(...customerOrders.map(order => new Date(order.createdAt)))
-      ))
-    : "No order"; // Default if no orders
+      ).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    : "No order";
 
   return { totalOrders, lastOrderDate };
 };

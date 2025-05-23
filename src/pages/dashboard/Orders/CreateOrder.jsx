@@ -37,8 +37,32 @@ import Tooltip from '../../../components/Tooltip/Tooltip';
 import ModalSendInvoice from '../../../components/Modal/ModalSendInvoice';
 import Toast from "../../../components/Toast/Toast";
 
+const ConfirmWeightChangeModal = ({ onConfirm, onCancel }) => (
+  <div className="sorder-overlay">
+    <div className="sorder-box">
+      <button className="sorder-close" onClick={onCancel}>
+        &times;
+      </button>
+      <div className="sorder-icon sorder-icon--primary">
+        <span>!</span>
+      </div>
+      <h2 className="sorder-title">Confirm Weight Change?</h2>
+      <p className="sorder-message">
+        This will save the updated weights and recalculate totals. Are you sure you want to proceed?
+      </p>
+      <div className="sorder-actions">
+        <button className="sorder-btn sorder-btn--outline" onClick={onCancel}>
+          Cancel
+        </button>
+        <button className="sorder-btn sorder-btn--primary" onClick={onConfirm}>
+          Yes, Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+);
 
- 
+
 // Optional: style mapping
 export const statusClassMap = {
   NEW: "text-primary",
@@ -73,6 +97,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [customers,setCustomer] = useState([])
     const [openDropdown,setOpenDropdown] = useState(null)
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     const [selectedVariantForModal, setSelectedVariantForModal] = useState(null);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
@@ -83,6 +108,18 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [toasts, setToasts] = useState([]);
 
 
+    const onClickSaveWeightChanges = () => {
+      setShowConfirmModal(true);
+    };
+    
+    const confirmWeightChange = async () => {
+      setShowConfirmModal(false);
+      await handleOrderChange();
+    };
+    
+    const cancelWeightChange = () => {
+      setShowConfirmModal(false);
+    };
     
 
 
@@ -1050,7 +1087,7 @@ const sendInvoice = async(orderId) =>{
 
 const handleStatusChange = async (orderId, orderVariantId, newStatus,returnWeight) => {
   try {
-    await updateOrderVariantStatuses(orderId, [
+    await updateOrderVariantStatuses(orderId, 
       {
         returnWeight,
         orderVariantId,
@@ -1058,7 +1095,7 @@ const handleStatusChange = async (orderId, orderVariantId, newStatus,returnWeigh
         reason: "Updated by admin",
         remark: "Changed from UI",
       },
-    ]);
+    );
 
     setOrderDetails((prev) =>
       prev.map((item) =>
@@ -1096,10 +1133,10 @@ const getStateFromBillingAddress = (billingAddress) => {
 
 
 const handleOrderChange = async () => {
-  const payload = [];
+  const updatedVariants = [];
 
   for (const item of orderDetails) {
-    const { color, status, price, gstOnProduct, productId, orderId , variantId } = item;
+    const { color, status, price, gstOnProduct, productId, orderId, variantId } = item;
 
     if (status === "SHIPPED" || !color.weightChanged) continue;
 
@@ -1143,7 +1180,7 @@ const handleOrderChange = async () => {
 
     const total = taxableAmount + cgst + sgst + igst + handling;
 
-    payload.push({
+    const singlePayload = {
       orderVariantId: variantId,
       orderWeight,
       orderVariantCgst: Number(cgst.toFixed(2)),
@@ -1152,24 +1189,28 @@ const handleOrderChange = async () => {
       orderVariantDiscount: Number(discount.toFixed(2)),
       orderVariantHandlingCharges: Number(handling.toFixed(2)),
       orderVariantTotalAmount: Number(total.toFixed(2))
-    });
+    };
+
+    updatedVariants.push({ orderId, payload: singlePayload });
   }
 
   try {
-    if (payload.length === 0) {
+    if (updatedVariants.length === 0) {
       alert("No changes to update.");
       return;
     }
 
-    console.log("Payload:", payload);
-    await updateOrderVariants(orderDetails[0].orderId, payload);
-    alert("Order updated successfully!");
+    for (const { orderId, payload } of updatedVariants) {
+      await updateOrderVariants(orderId, payload);
+    }
 
+    alert("Order updated successfully!");
   } catch (err) {
     console.error(err);
     alert("Failed to update order.");
   }
 };
+
 
 
 
@@ -1258,6 +1299,12 @@ console.log(selectedAddress)
           
         </div>
 
+        {showConfirmModal && (
+          <ConfirmWeightChangeModal
+            onConfirm={confirmWeightChange}
+            onCancel={cancelWeightChange}
+          />
+        )}
 
 
         <ModalOrder
@@ -1600,7 +1647,7 @@ console.log(selectedAddress)
 
                                                     {orderDetails.length > 0 && isViewMode && weightChanged && (
                                                       <div className='d-flex justify-content-end w-100'>
-                                                        <Button className='btn btn-primary' onClick={handleOrderChange}>
+                                                        <Button className='btn btn-primary' onClick={onClickSaveWeightChanges}>
                                                           Save Changes
                                                         </Button>
                                                       </div>

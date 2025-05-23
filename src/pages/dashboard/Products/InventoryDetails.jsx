@@ -76,13 +76,14 @@ const InventoryDetails = () => {
   };
 
   const formatDateToIST = (dateStr) => {
-    return new Date(dateStr).toLocaleString('en-IN', {
+    const istDate = new Date(dateStr); // already in IST
+    return istDate.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata', // no effect if date is already in IST
       year: 'numeric',
       month: 'short',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      // second: '2-digit',
       hour12: true,
     });
   };

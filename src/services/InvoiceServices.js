@@ -68,22 +68,28 @@ export const emailCreditReceipt = async (orderId, type) => {
 };
 
 
-export const downloadCreditReceipt = async (orderId, type) => {
+export const downloadCreditReceipt = async (orderId, type, returnedId = null) => {
   try {
-    const response = await axios.get(`${BASE_URL}/credit-receipt/download/${orderId}/${type}`, {
+    // Build URL based on type
+    let url = `${BASE_URL}/credit-receipt/download/${orderId}/${type}`;
+    if (type === "returned" && returnedId) {
+      url += `/${returnedId}`;
+    }
+
+    const response = await axios.get(url, {
       responseType: 'blob',
     });
 
     const blob = new Blob([response.data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
+    const downloadUrl = window.URL.createObjectURL(blob);
 
     const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `credit_receipt_${orderId}_${type}.pdf`);
+    link.href = downloadUrl;
+    link.setAttribute('download', `credit_receipt_${orderId}_${type}${returnedId ? `_${returnedId}` : ""}.pdf`);
     document.body.appendChild(link);
     link.click();
     link.remove();
-    window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(downloadUrl);
 
     return { success: true };
   } catch (error) {
@@ -93,6 +99,7 @@ export const downloadCreditReceipt = async (orderId, type) => {
     };
   }
 };
+
 
 
 export const downloadVendorInvoice = async (orderId) => {
