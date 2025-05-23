@@ -359,7 +359,7 @@ console.log(istDate);
 
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                ₹{order.status === 'CANCELLED' ? '0' : order.totalAmount.toFixed(1)}
+                ₹{order.status === 'CANCELLED' ? '0' : order.totalAmount.toFixed(0)}
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>

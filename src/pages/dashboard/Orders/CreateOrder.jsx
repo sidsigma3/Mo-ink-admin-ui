@@ -1417,9 +1417,9 @@ console.log(selectedAddress)
 
                                                   return (
                                                     <>
-                                                      <span>₹{baseTotal.toFixed(2)}</span>
+                                                      <span>₹{Math.round(baseTotal)}</span>
                                                       <span>{discountPercent.toFixed(2)}%</span>
-                                                      <span>₹{finalTotal.toFixed(2)}</span>
+                                                      <span>₹{Math.round(finalTotal)}</span>
                                                       <span>{(gstRate / 2).toFixed(2)}%</span>
                                                       <span>{(gstRate / 2).toFixed(2)}%</span>
                                                     </>
@@ -1912,7 +1912,7 @@ console.log(selectedAddress)
                         } items
                       </td>
 
-                      <td style={{ textAlign: "end" }}>₹{grandTotals.baseTotal}</td>
+                      <td style={{ textAlign: "end" }}>₹{Math.round(grandTotals.baseTotal)}</td>
                     </tr>
 
                    
@@ -1957,7 +1957,7 @@ console.log(selectedAddress)
                     <tr>
                       <td className=" fw-medium pt-4">Final Cost</td>
                         <td></td>
-                        <td className="text-end">₹{grandTotals.baseTotal-grandTotals.totalDiscount.toFixed(0)}</td>
+                        <td className="text-end">₹{Math.round(grandTotals.baseTotal - grandTotals.totalDiscount)}</td>
                     </tr>
 
 
