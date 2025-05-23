@@ -416,14 +416,14 @@ const handleTag = (value) =>{
     
       const allRows = [];
     
-      // Create a map of variantId to { ratePerKg, gstOnVariant } for quick lookup
+      // Create a map of variantId to rate and product-level GST
       const rateMap = {};
       rateChartData.forEach((product) => {
         if (Array.isArray(product.variant)) {
           product.variant.forEach((variant) => {
             rateMap[variant.variantId] = {
               ratePerKg: variant.ratePerKg,
-              gstOnVariant: variant.gstOnVariant,
+              gstOnProduct: product.gstOnProduct, // <-- GST is from the product
             };
           });
         }
@@ -432,20 +432,20 @@ const handleTag = (value) =>{
       products.forEach((product) => {
         if (Array.isArray(product.variants)) {
           product.variants.forEach((variant) => {
-            const rateInfo = rateMap[variant.id] || {}; // find matching rate data by variantId
+            const rateInfo = rateMap[variant.id] || {};
     
             allRows.push({
               "Product ID": product.id,
               "Product Name": product.productName,
-              "Product GST (%)": product.gstOnProduct,
+              "Product GST (%)": rateInfo.gstOnProduct || "", // Use product-level GST
               "Variant ID": variant.id,
               "Size": variant.size,
               "Color Name": variant.color?.colorName || "",
               "Color Hex Code": variant.color?.hexCode || "",
               "Variant Type": variant.variantType,
               "Available Weight (Kg)": variant.availableWeight || "",
-              "Rate Per Kg": rateInfo.ratePerKg || "",           // Fill if available
-              "GST % on Variant": rateInfo.gstOnVariant || "",   // Fill if available
+              "Rate Per Kg": rateInfo.ratePerKg?.toFixed(0) || "",
+              "GST % on Variant": rateInfo.gstOnProduct || "", // You can repeat the same here, or rename/remove
             });
           });
         }
@@ -462,6 +462,7 @@ const handleTag = (value) =>{
     
       XLSX.writeFile(workbook, "Vendor_Rate_Chart_Template.xlsx");
     };
+    
     
 
     function getProductNameById(productId) {

@@ -278,11 +278,9 @@ console.log(istDate);
   };
   
   const formatDateToIST = (dateStr) => {
-    // Force it to be treated as UTC
-    const utcDate = new Date(dateStr + 'Z');
-  
-    return utcDate.toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata',
+    const istDate = new Date(dateStr); // already in IST
+    return istDate.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata', // no effect if date is already in IST
       year: 'numeric',
       month: 'short',
       day: '2-digit',
@@ -292,7 +290,6 @@ console.log(istDate);
     });
   };
   
-
   return (
     <div className="order-table table-ctn-order">
       <Table hover>
