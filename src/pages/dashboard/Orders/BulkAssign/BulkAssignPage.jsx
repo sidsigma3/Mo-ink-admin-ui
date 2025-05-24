@@ -9,6 +9,7 @@ import { getAllProduct } from '../../../../services/ProductService';
 import { getRateChart } from '../../../../services/VendorsService';
 import { getAllVendors } from '../../../../services/VendorsService';
 import { createVendorOrder } from '../../../../services/OrderService';
+import Toast from '../../../../components/Toast/Toast';
 
 const BulkAssignPage = () => {
     const navigate = useNavigate();
@@ -24,6 +25,8 @@ const BulkAssignPage = () => {
     const [spinnerRateChart, setSpinnerRateChart] = useState({});
     const [dyerRateChart, setDyerRateChart] = useState({});
     const [isChartAvailable, setIsChartAvailable] = useState(false);
+    const [toasts, setToasts] = useState([]);
+
 
     const [customer, setCustomer] = useState(null);
 
@@ -297,6 +300,10 @@ const BulkAssignPage = () => {
           const createdAt = new Date().toISOString();
       
           const buildPayload = (vendorId, rateChart, billingAddressState) => {
+             const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
             let totalCgst = 0;
             let totalSgst = 0;
             let totalIgst = 0;
@@ -350,10 +357,11 @@ const BulkAssignPage = () => {
       
             // Show alert and stop if any rates are missing
             if (missingRates.length > 0) {
+              
               const message = missingRates.map(m =>
                 `Product: ${m.productName}, Size: ${m.size}, Color: ${m.color}, Type: ${m.variantType}`
               ).join('\n');
-              alert(`Please add rate chart entries for the following variants:\n\n${message}`);
+              showToast(`Please add rate chart entries for the following variants:\n\n${message}`, 'error');
               throw new Error("Rate chart entries missing");
             }
       
@@ -953,6 +961,22 @@ const BulkAssignPage = () => {
                 onOrderCreate={handleReceiveOrder}
                 addToCart={handleReceiveOrder}
             />
+
+  {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
+
         </div>
     );
 };

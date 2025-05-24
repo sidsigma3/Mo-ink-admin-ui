@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import emailjs from 'emailjs-com';
 import { Form } from 'react-bootstrap';
-import Tooltip from '../../../components/Tooltip/Tooltip';
 import './ReportBug.css';
-import ModalAddProduct from '../../../components/Modal/ModalAddProduct';
+import Toast from '../../../components/Toast/Toast';
 
 const priorities = ['High Priority', 'Medium Priority', 'Low Priority'];
 const bugTypes = [
@@ -24,9 +23,15 @@ const ReportBug = () => {
   const [description, setDescription] = useState('');
   const [file, setFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [toasts, setToasts] = useState([]);
+
 
 
   const handleSubmit = (e) => {
+     const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
     e.preventDefault();
 
     const formData = {
@@ -41,7 +46,7 @@ const ReportBug = () => {
       .send('service_hmdvy1a', 'template_4tvas4g', formData, 'xSdlnpzRkYS5A05r6')
       .then(
         () => {
-          alert('✅ Bug report submitted successfully!');
+          showToast('Bug report submitted successfully!', 'success');
           setEmail('');
           setDescription('');
           setSelectedBug('Visual/Aesthetic Issue');
@@ -49,7 +54,7 @@ const ReportBug = () => {
           setFile(null);
         },
         (error) => {
-          alert('❌ Failed to submit the bug report. Please try again later.');
+          showToast('Failed to submit the bug report. Try again.' , 'error');
           console.error('EmailJS error:', error);
         }
       );
@@ -143,28 +148,24 @@ const ReportBug = () => {
         {/* Actions */}
         <div className="action-buttons mt-3">
           <button type="button" className="cancel-btn">Cancel</button>
-          <Tooltip />
           <button type="submit" className="submit-btn">Submit Report</button>
 
-          {/* ✅ Open Modal Button */}
-          <button
-            type="button"
-            className="btn btn-secondary me-3"
-            onClick={() => setShowModal(true)}
-          >
-            Product Info save
-          </button>
         </div>
       </Form>
 
-      {/* ✅ Modal Component */}
-<ModalAddProduct
-  isOpen={showModal}
-  onCancel={() => setShowModal(false)}
-  onConfirm={() => {
-    setShowModal(false);
-  }}
-/>
+  {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
 
     </div>
   );

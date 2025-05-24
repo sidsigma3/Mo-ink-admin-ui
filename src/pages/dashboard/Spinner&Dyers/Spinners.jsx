@@ -16,6 +16,7 @@ import { addVendor, getAllVendors } from '../../../services/VendorsService'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Modal, Button } from "react-bootstrap";
+import Toast from '../../../components/Toast/Toast'
 
 const Spinners = () => {
 
@@ -30,6 +31,8 @@ const Spinners = () => {
 
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+    const [toasts, setToasts] = useState([]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -132,7 +135,13 @@ const Spinners = () => {
   };
 
   const handleSubmit = async () => {
-    if (!parsedData.length) return alert("No data to submit!");
+     const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
+    if (!parsedData.length) 
+      return 
+    showToast("No data to submit!", "error");
 
     try {
       await Promise.all(
@@ -152,10 +161,10 @@ const Spinners = () => {
           await addVendor(newCustomer);
         })
       );
-      alert("Upload Successful!");
+      showToast("Upload Successful!", "success");
     } catch (error) {
       console.error("Error uploading vendors:", error);
-      alert("Upload Failed!");
+      showToast("Upload Failed!", "error");
     }
   };
 
@@ -318,6 +327,21 @@ const Spinners = () => {
       </div>
 
         </div>
+
+          {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
         
     </div>
   )

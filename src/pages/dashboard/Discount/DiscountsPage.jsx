@@ -15,6 +15,7 @@ import { Dropdown } from 'react-bootstrap'
 import { getAllDiscount } from '../../../services/DiscountService'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import Toast from '../../../components/Toast/Toast'
 
 const DiscountsPage = () => {
 
@@ -24,6 +25,8 @@ const DiscountsPage = () => {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [toasts, setToasts] = useState([]);
+
 
 
   const [discountData , setDiscountData] = useState([])
@@ -119,8 +122,12 @@ const DiscountsPage = () => {
   
 
     const exportToExcel = (discounts) => {
+       const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
       if (!discounts || !discounts.length) {
-        alert("No discounts available for export.");
+        showToast("No discounts available for export.", "error");
         return;
       }
     
@@ -328,7 +335,20 @@ const DiscountsPage = () => {
 
         </div>
 
-      
+       {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
 
     </div>
   )

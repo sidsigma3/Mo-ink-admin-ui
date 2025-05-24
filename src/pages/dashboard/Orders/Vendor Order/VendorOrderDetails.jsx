@@ -11,6 +11,7 @@ import { downloadVendorInvoice } from "../../../../services/InvoiceServices";
 import { vendorStatusUpdate } from "../../../../services/VendorsService";
 import "./VendorOrderDetails.css"
 import { FiDownload } from "react-icons/fi";
+import Toast from "../../../../components/Toast/Toast";
 
 
 
@@ -22,6 +23,8 @@ const VendorOrderDetails = () => {
   const navigate = useNavigate()
   const { orderId } = useParams();
   const { orders } = useVendorOrderContext();
+  const [toasts, setToasts] = useState([]);
+
 
   const [spinnerOrder,setSpinnerOrder] = useState()
   const [dyerOrder,setDyerOrder] = useState()
@@ -337,6 +340,10 @@ const getProductNameById = (productId) => {
                         value={item.status}
                         className={`form-select form-select  ${statusClassMap[item.status] || ''}`}
                         onChange={async (e) => {
+                           const showToast = (message, type = "error") => {
+                                  setToasts([{ message, type }]);
+                                  setTimeout(() => setToasts([]), 3000);
+                                };
                           const newStatus = e.target.value;
                           const confirmMessage = `Are you sure you want to change the status from "${item.status}" to "${newStatus}"?`;
                           const confirmed = window.confirm(confirmMessage);
@@ -355,6 +362,7 @@ const getProductNameById = (productId) => {
 
                             // Update local state
                             setSpinnerOrder((prev) => {
+                             
                               const updatedVariants = prev.vendorOrderVariantResponse.map((v) =>
                                 v.vendorOrderVariantId === item.vendorOrderVariantId
                                   ? { ...v, status: newStatus }
@@ -363,7 +371,7 @@ const getProductNameById = (productId) => {
                               return { ...prev, vendorOrderVariantResponse: updatedVariants };
                             });
                           } catch (error) {
-                            alert("Failed to update status. Please try again.");
+                            showToast("Failed to update status. Please try again.", "error");
                           }
                         }}
                       >
@@ -574,6 +582,10 @@ const getProductNameById = (productId) => {
                     value={item.status}
                     className={`form-select form-select p-2 ${statusClassMap[item.status] || ''}`}
                     onChange={async (e) => {
+                       const showToast = (message, type = "error") => {
+                                  setToasts([{ message, type }]);
+                                  setTimeout(() => setToasts([]), 3000);
+                                };
                       const newStatus = e.target.value;
                       const confirmMessage = `Are you sure you want to change the status from "${item.status}" to "${newStatus}"?`;
                       const confirmed = window.confirm(confirmMessage);
@@ -600,7 +612,7 @@ const getProductNameById = (productId) => {
                           return { ...prev, vendorOrderVariantResponse: updatedVariants };
                         });
                       } catch (error) {
-                        alert("Failed to update status. Please try again.");
+                        showToast("Failed to update status. Please try again.", "error");
                       }
                     }}
                   >
@@ -712,6 +724,21 @@ const getProductNameById = (productId) => {
               </div>
               </div>
     
+  {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
+
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import "./ResetPassword.css"
 import { resetPassword } from '../../../../services/LoginService';
+import Toast from '../../../../components/Toast/Toast';
 
 
 const ResetPassword = () => {
@@ -12,6 +13,8 @@ const ResetPassword = () => {
   const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); 
+  const [toasts, setToasts] = useState([]);
+
 
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
@@ -20,22 +23,28 @@ const ResetPassword = () => {
 
 
   const handleSubmit = async (e) => {
+    
+ const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
+
     e.preventDefault(); 
     console.log("hello")
 
 
     if (!newPassword || !confirmPassword) {
-      alert("Please fill out both fields.");
+      showToast("Please fill out both fields.", "error");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match.");
+      showToast("Passwords do not match.", "error");
       return;
     }
 
     if (!token || !accountType) {
-      alert("Invalid or expired reset link.");
+      showToast("Invalid or expired reset link.", "error");
       return;
     }
 
@@ -57,10 +66,10 @@ const ResetPassword = () => {
           navigate("/login");
         }, 3000);
       } else {
-        alert(data?.message || "Something went wrong.");
+        showToast(data?.message || "Something went wrong." ,"error");
       }
     } catch (error) {
-      alert("Failed to reset password. Please try again.");
+      showToast("Failed to reset password. Please try again.", "error");
       console.error(error);
     }
   };
@@ -128,6 +137,20 @@ const ResetPassword = () => {
         </div> */}
       </form>
     </div>
+    {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
     </div>
 
 );
