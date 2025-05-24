@@ -9,10 +9,14 @@ import { getAllProduct } from '../../../../services/ProductService';
 import { forwardRef, useImperativeHandle } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import Toast from '../../../Toast/Toast';
+
+
 
 const ProductsTable = forwardRef(({data},ref) => {
 
   const navigate = useNavigate();
+const [toasts, setToasts] = useState([]);
 
   const [productData,setProductData] = useState([])
 
@@ -115,8 +119,13 @@ const ProductsTable = forwardRef(({data},ref) => {
 
   useImperativeHandle(ref, () => ({
     exportToExcel: () => {
+      
+ const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
       if (!finalData || !finalData.length) {
-        alert("No product finalData available for export.");
+        showToast("No product finalData available for export.", "error");
         return;
       }
 
@@ -325,6 +334,20 @@ const ProductsTable = forwardRef(({data},ref) => {
         ))))}
 
       </div>
+        {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
     </div>
   );
 });

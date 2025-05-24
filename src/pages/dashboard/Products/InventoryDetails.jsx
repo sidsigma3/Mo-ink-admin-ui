@@ -10,6 +10,7 @@ import { getInventoryLogs , adjustInventory } from '../../../services/InventoryS
 import { FaMinus } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
 import * as XLSX from 'xlsx';
+import Toast from '../../../components/Toast/Toast';
 
 const InventoryDetails = () => {
   const { state } = useLocation();
@@ -18,6 +19,8 @@ const InventoryDetails = () => {
   const navigate = useNavigate()
   const [amount, setAmount] = useState(""); // Amount input
   const [source, setSource] = useState("");
+  const [toasts, setToasts] = useState([]);
+
 
 
 
@@ -44,13 +47,17 @@ const InventoryDetails = () => {
 
 
   const handleInventoryAdjust = async (actionType) => {
+     const showToast = (message, type = "error") => {
+        setToasts([{ message, type }]);
+        setTimeout(() => setToasts([]), 3000);
+      };
     if (!amount || isNaN(amount) || amount <= 0) {
-      alert("Please enter a valid weight in kg.");
+      showToast("Please enter a valid weight in kg.", "error");
       return;
     }
 
     if (!source.trim()) {
-      alert("Please enter a comment/source.");
+      showToast("Please enter a comment/source.", "error");
       return;
     }
 
@@ -64,14 +71,14 @@ const InventoryDetails = () => {
     try {
       const response = await adjustInventory(payload,item.raw.variantId);
     
-      alert(`Inventory successfully ${actionType === "INCREASE" ? "added" : "reduced"}.`);
+      showToast(`Inventory successfully ${actionType === "INCREASE" ? "added" : "reduced"}.`, "success" );
       fetchLogs();
 
      
       setAmount("");
       setSource("");
     } catch (error) {
-      alert("Failed to adjust inventory. See console for details.");
+      showToast("Failed to adjust inventory. See console for details.", "error");
     }
   };
 
@@ -299,6 +306,19 @@ const InventoryDetails = () => {
           <li className='page-item active'><span className='page-link'>1</span></li>
         </ul>
       </div>
+        {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
     </div>
   );
 };

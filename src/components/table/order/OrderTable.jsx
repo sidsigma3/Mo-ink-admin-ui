@@ -20,12 +20,15 @@ import ModalUnpaid from "../../Modal/ModalUnpaid";
 import ModalPartiallypaid from "../../Modal/ModalPartiallypaid";
 import moment from 'moment-timezone';
 import Tooltip from "../../Tooltip/Tooltip";
+import Toast from "../../Toast/Toast";
 
 
 const OrderTable = forwardRef(({data}, ref) => {
  
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [toasts, setToasts] = useState([]);
+
   const createOrderRef = useRef(null);
 
   const [modalData, setModalData] = useState({
@@ -81,6 +84,10 @@ const OrderTable = forwardRef(({data}, ref) => {
 
 
   const handleStatusChange = async (orderId, newStatus) => {
+    const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
     try {
         // Fetch the existing order details before updating
         const existingOrder = orders.find(order => order.orderId === orderId);
@@ -100,7 +107,7 @@ const OrderTable = forwardRef(({data}, ref) => {
         await updateOrder(orderId, updatedOrderData);
         fetchOrders();
 
-      alert("Order status updated successfully.");
+      showToast("Order status updated successfully.", "success");
     } catch (error) {
         console.error("Failed to update order status:", error);
     }
@@ -154,8 +161,14 @@ const handleRowClick = (order) => {
 
 
   const exportOrders = () => {
+    
+ const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
+
     if (!orders || orders.length === 0) {
-      alert("No orders available to export.");
+      showToast("No orders available to export.", "error");
       return;
     }
 
@@ -222,9 +235,15 @@ console.log(istDate);
   }));
 
   const handleDownloadInvoice = async(orderId) => {
+    
+ const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
+
     const result = await downloadInvoice(orderId);
     if (!result.success) {
-      alert("Failed to download invoice.");
+      showToast("Failed to download invoice.", "error");
     }
   };
 
@@ -594,6 +613,20 @@ console.log(istDate);
           </div>
         ))}
       </div>
+        {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
     </div>
   );
 });

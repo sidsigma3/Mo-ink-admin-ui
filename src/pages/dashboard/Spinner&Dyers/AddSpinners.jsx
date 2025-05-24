@@ -23,6 +23,7 @@ import { CgImport } from "react-icons/cg";
 import { getVendorOrdersByVendorId } from '../../../services/OrderService';
 import SelectState from '../../../components/SelectState/SelectState';
 import { IoIosArrowForward, IoIosArrowDown  } from "react-icons/io";
+import Toast from '../../../components/Toast/Toast';
 
 
 const AddSpinners = () => {
@@ -35,6 +36,8 @@ const AddSpinners = () => {
   const [expandedProductIndex, setExpandedProductIndex] = useState(null);
 
   const [expandedVariantIndex, setExpandedVariantIndex] = useState({});
+  const [toasts, setToasts] = useState([]);
+
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -286,6 +289,7 @@ const handleTag = (value) =>{
      }
 
      const handleFileUpload = async (e) => {
+       
       const file = e.target.files[0];
       if (!file) return;
     
@@ -323,6 +327,10 @@ const handleTag = (value) =>{
     
   
     const handleSubmitForm = async () => {
+      const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
       try {
         const productIds = Object.keys(rateChartData);
     
@@ -350,10 +358,10 @@ const handleTag = (value) =>{
           await createVendorRateChart(customer?.vendorId,productId, payload);
         }
     
-        alert("Rate chart uploaded successfully for all products!");
+        showToast("Rate chart uploaded successfully for all products!", "success");
       } catch (err) {
         console.error("Error uploading rate chart:", err.response?.data || err.message);
-        alert("Error uploading rate chart.");
+        showToast("Error uploading rate chart.", "error");
       }
     };
     
@@ -409,8 +417,12 @@ const handleTag = (value) =>{
     const groupedData = groupRateChartData();
 
     const handleDownloadRateChart = (products) => {
+       const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
       if (!Array.isArray(products) || products.length === 0) {
-        alert("No products found.");
+        showToast("No products found.", "error");
         return;
       }
     
@@ -452,7 +464,7 @@ const handleTag = (value) =>{
       });
     
       if (allRows.length === 0) {
-        alert("No variants found in the product list.");
+        showToast("No variants found in the product list.", "error");
         return;
       }
     
@@ -811,7 +823,21 @@ const handleTag = (value) =>{
 
     </div>
 
-        
+          {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
+
 
 
     </div>

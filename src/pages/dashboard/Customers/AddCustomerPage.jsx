@@ -20,6 +20,7 @@ import StatusInput from '../../../components/StatusInput/StatusInput';
 import { FiDownload } from "react-icons/fi";
 import { downloadCreditReceipt } from '../../../services/InvoiceServices';
 import SelectState from '../../../components/SelectState/SelectState';
+import Toast from '../../../components/Toast/Toast';
 
 const AddCustomerPage = () => {
 
@@ -27,6 +28,8 @@ const AddCustomerPage = () => {
   const { index, customers } = state || {};
   const { rows, setRows } = useSegments();
   const [errors, setErrors] = useState({});
+  const [toasts, setToasts] = useState([]);
+
   const [selectedAddressType, setSelectedAddressType] = useState("HOME");
 
   const navigate =useNavigate()
@@ -196,8 +199,12 @@ const removeSegmentChip = (index) => {
 
 
   const handleAddMoney = async () => {
+     const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
     if (!amount || isNaN(amount)) {
-      return alert("Enter a valid amount.");
+      return showToast("Enter a valid amount.", "error");
     }
   
     try {
@@ -206,15 +213,19 @@ const removeSegmentChip = (index) => {
       fetchTransactions();
       setAmount("");
       setSource("");
-      alert("Money added successfully.");
+      showToast("Money added successfully.", "success");
     } catch (error) {
-      alert("Failed to add money to wallet.");
+      showToast("Failed to add money to wallet.", "error");
     }
   };
 
   const handleSubtractMoney = async () => {
+     const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
     if (!amount || isNaN(amount)) {
-      return alert("Enter a valid amount.");
+      return showToast("Enter a valid amount.", "error");
     }
   
     try {
@@ -223,9 +234,9 @@ const removeSegmentChip = (index) => {
       fetchTransactions();
       setAmount("");
       setSource("");
-      alert("Money deducted successfully.");
+      showToast("Money deducted successfully.", "success");
     } catch (error) {
-      alert("Failed to subtract money from wallet.");
+      showToast("Failed to subtract money from wallet.", "error");
     }
   };
 
@@ -764,7 +775,19 @@ const handleAddressTypeChange = (e) => {
 
         </div>
 
-
+{/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
 
 
     </div>

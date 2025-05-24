@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { getProductById , updateProduct } from "../../services/ProductService";
 import ModalAddColor from "./ModalAddColor";
-
+import Toast from "../Toast/Toast";
 
 
 const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
@@ -15,6 +15,8 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
   const [searchColor,setSearchColor] = useState('')
   const [selectedColors, setSelectedColors] = useState([]); 
   const [showAddColorModal, setShowAddColorModal] = useState(false);
+  const [toasts, setToasts] = useState([]);
+
 
   const handleColorClick = (color) => {
     setSelectedColors((prevColors) => {
@@ -56,6 +58,10 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
   // };
 
   const handleSaveColor = () => {
+    const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
     const { colorName, hexCode } = newColor;
   
     if (colorName && hexCode) {
@@ -71,15 +77,19 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
       setTempCustomColors((prev) => [...prev, colorWithDetails]);
       setNewColor({ colorName: "", hexCode: "" });
     } else {
-      alert("Please enter both color name and hex code");
+      showToast("Please enter both color name and hex code", "error");
     }
   };
   
 
 
   const handleAddColor = async () => {
+    const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
     if (tempCustomColors.length === 0) {
-      alert("Please select at least one color before adding.");
+      showToast("Please select at least one color before adding.", "success");
       return;
     }
   
@@ -116,7 +126,7 @@ const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
   
       const filteredNewVariants = newVariants.filter(isNewVariant);
       if (filteredNewVariants.length === 0) {
-        alert("All selected variants already exist.");
+        showToast("All selected variants already exist.", "error");
         return;
       }
   
@@ -174,7 +184,7 @@ setIsAddingColor(false);
   
     } catch (error) {
       console.error("Error adding color variant:", error);
-      alert("Failed to add color variant. Please try again.");
+      showToast("Failed to add color variant. Please try again.", "error");
     }
   };
   
@@ -368,6 +378,22 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
        
       </div>
     </div>
+
+ {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
+
+
   </div>
   );
 };

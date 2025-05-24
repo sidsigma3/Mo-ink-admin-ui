@@ -8,12 +8,15 @@ import { addUser, updateUser , deleteUser} from '../../../services/UserService';
 import DeleteBtn from '../../../components/Buttons/Delete/DeleteBtn';
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import StatusInput from '../../../components/StatusInput/StatusInput';
+import Toast from '../../../components/Toast/Toast';
 
 const AddUser = () => {
 
     const {state} = useLocation()
     const { index, users} = state || {};
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [toasts, setToasts] = useState([]);
+
    
 
     const customer = state?.index !== undefined ? users[index] : null;
@@ -135,14 +138,19 @@ const AddUser = () => {
 
 
     const handleDelete = async (userId) => {
+         const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
+
         if (window.confirm("Are you sure you want to delete this user?")) {
           try {
             await deleteUser(userId);
-            alert("User deleted successfully!");
+            showToast("User deleted successfully!", "success");
             navigate("/users")
           } catch (error) {
             console.error("Error deleting user:", error);
-            alert("Failed to delete user.");
+            showToast("Failed to delete user.", "error");
           }
         }
       };
@@ -381,6 +389,19 @@ const AddUser = () => {
         </div>
 
       </div>
+  {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
 
     </div>
   )

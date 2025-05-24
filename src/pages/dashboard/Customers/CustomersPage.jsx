@@ -17,6 +17,7 @@ import { getAllCustomer , getWalletTransactions} from '../../../services/Custome
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { getAllOrders } from '../../../services/OrderService'
+import Toast from '../../../components/Toast/Toast'
 
 const CustomersPage = () => {
 
@@ -27,6 +28,8 @@ const CustomersPage = () => {
     const [customers,setCustomer] = useState([])
     const [orders, setOrders] = useState([]); 
     const [filteredData, setFilteredData] = useState([]);
+    const [toasts, setToasts] = useState([]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -131,8 +134,12 @@ const getCustomerOrderStats = (customerId) => {
 
 
 const exportToExcel = () => {
+   const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
   if (!customers || !customers.length) {
-    alert("No customer customers available for export.");
+    showToast("No customer customers available for export.", "error");
     return;
   }
 
@@ -324,6 +331,19 @@ const handleFilterChange = (filter, value) => {
 
 
         </div>
+ {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
 
 
 

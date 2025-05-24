@@ -1,10 +1,14 @@
 import React ,{useState,useEffect} from 'react'
 import { IoMdArrowBack } from "react-icons/io";
 import { FiShoppingCart } from "react-icons/fi";
+import Toast from "../../../components/Toast/Toast";
+
 
 const BulkAssignBox = ({size,sizeData,handleBack,productName,setOrderList,setOrders}) => {
     const [showAssign, setShowAssign] = useState(false); // State for showing product details
     const [selectedDetails, setSelectedDetails] = useState({})
+    const [toasts, setToasts] = useState([]);
+
 
     const [quantity,setQuantity] = useState('')
 
@@ -36,8 +40,12 @@ const BulkAssignBox = ({size,sizeData,handleBack,productName,setOrderList,setOrd
     
 
       const handleAddtoCart = () => {
+        const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
         if (!quantity || quantity <= 0) {
-          alert("Please enter a valid quantity.");
+          showToast("Please enter a valid quantity.", "error");
           return;
         }
       
@@ -157,6 +165,20 @@ const BulkAssignBox = ({size,sizeData,handleBack,productName,setOrderList,setOrd
 
 
                 )}
+
+{/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
 
 
     </div>

@@ -5,6 +5,7 @@ import { addUser } from '../../../../services/UserService';
 import emailjs from 'emailjs-com';
 import ToggleBtn from '../../../../components/Buttons/ToggleButton/ToggleBtn';
 import './SignupPage.css';
+import Toast from '../../../../components/Toast/Toast';
 
 const SignupPage = ({ togglePage, isLogin }) => {
   const [username, setUsername] = useState("");
@@ -12,6 +13,8 @@ const SignupPage = ({ togglePage, isLogin }) => {
      const [showPassword, setShowPassword] = useState(false);
      const [error, setError] = useState("");
      const navigate = useNavigate();
+     const [toasts, setToasts] = useState([]);
+
   
 
   const sendEmail = (email, name) => {
@@ -31,6 +34,10 @@ const SignupPage = ({ togglePage, isLogin }) => {
   };
 
   const handleSignup = async (e) => {
+     const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
     e.preventDefault();
     const formData = new FormData(e.target);
     const signupData = {
@@ -54,14 +61,14 @@ const SignupPage = ({ togglePage, isLogin }) => {
     try {
       const response = await addUser(signupData);
       if (response) {
-        alert('Signup successful!');
+        showToast('Signup successful!', 'success');
         e.target.reset();
         togglePage()
         // sendEmail(signupData.email, signupData.firstName);
       }
     } catch (error) {
       console.error('Signup Error:', error);
-      alert('An error occurred during signup. Please try again.');
+      showToast('An error occurred during signup. Please try again.', 'error');
     }
   };
 
@@ -218,6 +225,19 @@ const SignupPage = ({ togglePage, isLogin }) => {
 
         </form>
       </div>
+      {/* Toast Notification */}
+     <div className="fixed top-4 right-4 z-50 space-y-2">
+                {toasts.map((toast) => (
+                    <Toast
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() =>
+                            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                        }
+                    />
+                ))}
+            </div>
     </div>
   );
 };
