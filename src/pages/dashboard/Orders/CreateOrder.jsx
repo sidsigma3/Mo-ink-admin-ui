@@ -1342,7 +1342,7 @@ console.log(selectedAddress)
                             <thead>
                                 <tr>
                                     <th className='fw-medium'>Product</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Counter</th>
+                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Count</th>
                                     <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Color</th>
                                     <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Name</th>
                                     <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Type</th>
@@ -1436,7 +1436,7 @@ console.log(selectedAddress)
                                             className="rounded border-secondary-subtle weight-input ps-1 py-1 mb-3 w-75"
                                             value={order.color.weight || ''}
                                             onChange={(e) => handleWeightChange(index, e.target.value)}
-                                            disabled={["SHIPPED", "CANCELLED", "DELIVERED", "RETURN_REQUESTED", "RETURNED", "RETURN_REJECTED"].includes(order.status)}
+                                            disabled={["SHIPPED", "CANCELLED", "DELIVERED", "RETURN_REQUESTED", "RETURNED", "RETURN_REJECTED","NEW"].includes(order.status)}
                                           />
 
                                           </div>
@@ -1646,7 +1646,7 @@ console.log(selectedAddress)
                         )}
 
                                                     {orderDetails.length > 0 && isViewMode && weightChanged && (
-                                                      <div className='d-flex justify-content-end w-100'>
+                                                      <div className='d-flex justify-content-center w-100'>
                                                         <Button className='btn btn-primary' onClick={onClickSaveWeightChanges}>
                                                           Save Changes
                                                         </Button>

@@ -377,6 +377,8 @@ const getProductNameById = (productId) => {
                           const isPlaced = currentStatus === "PLACED";
                           const isCancelled = currentStatus === "CANCELLED";
                           const isConfirmed = currentStatus === "CONFIRMED";
+                          const isReceived = currentStatus === "RECEIVED";
+                          const isReturned = currentStatus === "RETURNED";
 
                           let shouldEnable = false;
 
@@ -386,9 +388,20 @@ const getProductNameById = (productId) => {
                           } else if (isPlaced) {
                             // During PLACED show only CONFIRMED and CANCELLED
                             shouldEnable = value === "CONFIRMED" || value === "CANCELLED" || isSame;
-                          } else if (isConfirmed) {
+                          }
+                          else if (isReturned) {
+                            // During PLACED show only CONFIRMED and CANCELLED
+                            shouldEnable = "";
+                          }
+                          else if (isReceived) {
+                        // During PLACED show only CONFIRMED and CANCELLED
+                        // shouldEnable = value === "RETURNED" || value === "REPLACED" || isSame;
+                          shouldEnable = optionIndex > currentIndex || isSame;
+                          }
+                          else if (isConfirmed) {
                             // After CONFIRMED, allow all next statuses (no cancel)
-                            shouldEnable = optionIndex > currentIndex || isSame;
+                            // shouldEnable = optionIndex > currentIndex || isSame;
+                            shouldEnable = value === "RECEIVED"
                           } else {
                             // Allow only next immediate status (e.g., from REPLACED → DISPATCHED)
                             shouldEnable = optionIndex === currentIndex + 1 || isSame;
@@ -614,6 +627,8 @@ const getProductNameById = (productId) => {
                       const isPlaced = currentStatus === "PLACED";
                       const isCancelled = currentStatus === "CANCELLED";
                       const isConfirmed = currentStatus === "CONFIRMED";
+                      const isReceived = currentStatus === "RECEIVED";
+                      const isReturned = currentStatus === "RETURNED";
 
                       let shouldEnable = false;
 
@@ -623,12 +638,23 @@ const getProductNameById = (productId) => {
                       } else if (isPlaced) {
                         // During PLACED show only CONFIRMED and CANCELLED
                         shouldEnable = value === "CONFIRMED" || value === "CANCELLED" || isSame;
-                      } else if (isConfirmed) {
-                        // After CONFIRMED, allow all next statuses (no cancel)
-                        shouldEnable = optionIndex > currentIndex || isSame;
-                      } else {
-                        // Allow only next immediate status (e.g., from REPLACED → DISPATCHED)
-                        shouldEnable = optionIndex === currentIndex + 1 || isSame;
+                      }
+                     else if (isReturned) {
+                      // During PLACED show only CONFIRMED and CANCELLED
+                      shouldEnable = "";
+                    }
+                    else if (isReceived) {
+                  // During PLACED show only CONFIRMED and CANCELLED
+                  // shouldEnable = value === "RETURNED" || value === "REPLACED" || isSame;
+                    shouldEnable = optionIndex > currentIndex || isSame;
+                    }
+                    else if (isConfirmed) {
+                      // After CONFIRMED, allow all next statuses (no cancel)
+                      // shouldEnable = optionIndex > currentIndex || isSame;
+                      shouldEnable = value === "RECEIVED"
+                    } else {
+                  // Allow only next immediate status (e.g., from REPLACED → DISPATCHED)
+                  shouldEnable = optionIndex === currentIndex + 1 || isSame;
                       }
 
                       return (
