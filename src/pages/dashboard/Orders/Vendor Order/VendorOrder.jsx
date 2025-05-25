@@ -12,6 +12,8 @@ import "./VendorOrder.css"
 import { useNavigate } from 'react-router-dom'
 import { getVendorOrder } from '../../../../services/OrderService'
 import { downloadVendorInvoice } from '../../../../services/InvoiceServices'
+import * as XLSX from "xlsx";
+import VendorOrderFilter from '../../../../components/Filter/OrderFilter/VendorOrderFilter'
 
 const VendorOrder = () => {
 
@@ -20,6 +22,9 @@ const VendorOrder = () => {
     const { order } = useVendorOrderContext();
     const [orders, setOrders] = useState([]);
     
+    const [searchFilter, setSearchFilter] = useState({ filter: "", value: "" });
+    const [statusFilter, setStatusFilter] = useState("ALL");
+
 
     const [filteredData, setFilteredData] = useState([]); 
 
@@ -50,23 +55,38 @@ const statusClassMap = {
   
 
 
-      const handleFilterChange = (filter, value) => {
-        const lowercasedValue = value.toLowerCase().trim();
-      
-        if (!lowercasedValue) {
-          setFilteredData(orders);
-          return;
-        }
-      
-        const filtered = orders.filter((item) => {
-          if (filter === "Product Id") return item.id.toString().includes(value);
-          if (filter === "Product Name") return item.productName.toLowerCase().includes(lowercasedValue);
-          return true;
-        });
-      
-        console.log(filtered);
-        setFilteredData(filtered);
-      };
+    const handleFilterChange = (filter, value) => {
+      setSearchFilter({ filter, value });
+      applyCombinedFilters({ filter, value }, statusFilter);
+    };
+
+    const handleStatusChange = (newStatus) => {
+      setStatusFilter(newStatus);
+      applyCombinedFilters(searchFilter, newStatus);
+    };
+
+    const applyCombinedFilters = (search, status) => {
+  let filtered = orders;
+
+  const lowercasedValue = search.value.toLowerCase().trim();
+
+  // Apply text filter
+  if (lowercasedValue) {
+    filtered = filtered.filter((item) => {
+      if (search.filter === "PO") return item.correlationId.toString().includes(lowercasedValue);
+      if (search.filter === "Vendor") return item.vendorName.toLowerCase().includes(lowercasedValue);
+      return true;
+    });
+  }
+
+  // Apply status filter
+  if (status !== "ALL") {
+    filtered = filtered.filter((item) => item.status === status);
+  }
+
+  setFilteredData(filtered);
+};
+
 
 
       useEffect(() => {
@@ -74,6 +94,7 @@ const statusClassMap = {
           try {
             const data = await getVendorOrder();
             setOrders(data);
+            setFilteredData(data)
           } catch (error) {
             console.error("Failed to fetch vendor orders:", error);
           }
@@ -98,6 +119,34 @@ const statusClassMap = {
       };
       
       
+ const handleExport = () => {
+    if (!orders || orders.length === 0) return;
+
+    const data = orders.map((order) => {
+      const totalWeight = order.vendorOrderVariantResponse.reduce(
+        (sum, variant) => sum + variant.vendorOrderWeight,
+        0
+      );
+
+      return {
+        "ID": order.vendorOrderId,
+        "PO": order.correlationId,
+        "Date": new Date(order.orderDate).toLocaleDateString('en-IN'),
+        "Order For": order.vendorType,
+        "Vendor": order.vendorName,
+        "Weight (kg)": totalWeight.toFixed(2),
+        "Amount": order.totalAmount.toFixed(2),
+        "Status": order.status
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Vendor Orders");
+    XLSX.writeFile(workbook, "Vendor_Orders.xlsx");
+  };
+
   return (
     <div className='vendor-order'>
          <div className='top d-flex justify-content-between'>
@@ -106,7 +155,7 @@ const statusClassMap = {
             <div className='btn-ctn d-flex gap-2'>
               
 
-                <ExportBtn></ExportBtn>
+                <ExportBtn onClick={handleExport}></ExportBtn>
 
                 {/* <ImportBtn></ImportBtn> */}
 
@@ -124,11 +173,12 @@ const statusClassMap = {
         <div className='order-filter-ctn d-flex gap-2 mb-2 w-50 mt-3'>
           
           <ProductFilter 
-                filterOptions={["Order Id", "Customer"]} 
-                onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+                filterOptions={["PO", "Vendor"]} 
+                onFilterChange={handleFilterChange} 
           />
     
-          <StatusFilter status={"Active"}></StatusFilter>
+          <VendorOrderFilter status="ALL" onStatusChange={handleStatusChange} />
+
         </div>
 
         {/* <div className="table-responsive mt-3 table-ctn">
@@ -203,7 +253,7 @@ const statusClassMap = {
               </td>
             </tr>
           ) : (
-            orders.slice().reverse().map((order) => {
+            filteredData.slice().reverse().map((order) => {
               const totalWeight = order.vendorOrderVariantResponse.reduce(
                 (sum, variant) => sum + variant.vendorOrderWeight,
                 0

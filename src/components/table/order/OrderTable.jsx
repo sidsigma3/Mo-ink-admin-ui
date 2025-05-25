@@ -297,9 +297,10 @@ console.log(istDate);
   };
   
   const formatDateToIST = (dateStr) => {
-    const istDate = new Date(dateStr); // already in IST
-    return istDate.toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata', // no effect if date is already in IST
+    const utcDate = new Date(dateStr + 'Z');
+  
+    return utcDate.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
       year: 'numeric',
       month: 'short',
       day: '2-digit',
