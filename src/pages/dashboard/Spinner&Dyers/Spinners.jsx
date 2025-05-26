@@ -216,7 +216,7 @@ const Spinners = () => {
                   </Modal.Footer>
                 </Modal>
 
-                <ImportBtn onClick={handleOpenModal}></ImportBtn>
+                {/* <ImportBtn onClick={handleOpenModal}></ImportBtn> */}
         
                 <Link to={'/add-spinner-and-dyers'}>
                 <AddBtn text={"Add New"}></AddBtn>

@@ -37,7 +37,7 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const [uploadedMedia, setUploadedMedia] = useState([]);
  
-
+  const isViewMode = !!state
 
   const product = (typeof index === 'number' && finalData) ? finalData[index] : null;
  
@@ -169,6 +169,23 @@ const AddProduct = () => {
     if (!formData.gst || formData.gst < 0) validationErrors.gst = "Valid GST value is required.";
     if (variants.length < 2) validationErrors.variants = "At least (Size & Color) variant is required.";
     if (sizeColorMap.length < 2) validationErrors.sizeColorMap = "Size and color combination is required.";
+
+    let hasInvalidPricing = false;
+      sizeColorMap.forEach(({ size, colors }) => {
+        colors.forEach(color => {
+          (color.variants || []).forEach(variant => {
+            const price = Number(variant.price);
+            const markup = Number(variant.markupPricePerKg);
+            if (!price || price <= 0 || !markup || markup <= 0) {
+              hasInvalidPricing = true;
+            }
+          });
+        });
+      });
+
+      if (hasInvalidPricing) {
+        validationErrors.sizeColorMap = "Each size-color variant must have a valid Price and Markup Price.";
+      }
 
     // Stop submission if there are errors
     if (Object.keys(validationErrors).length > 0) {
@@ -1152,7 +1169,7 @@ console.log(sizeColorMap)
                         </div>
                     )} */}
         
-
+ {errors.sizeColorMap && <p className="text-danger">{errors.sizeColorMap}</p>}
                  {sizeColorMap.length > 0 && (
          <div className="variant-table-ctn">
          <table className="variant-table">
@@ -1286,6 +1303,7 @@ console.log(sizeColorMap)
                                updateVariantField(sizeIndex, colorIndex, variantIndex, "available", e.target.value)
                              }
                              placeholder="Available"
+                             disabled={isViewMode}
                            />
                          </td>
                          {/* <td>
