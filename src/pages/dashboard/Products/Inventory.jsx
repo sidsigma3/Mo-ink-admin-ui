@@ -27,7 +27,27 @@ const Inventory = () => {
   const [allInventory, setAllInventory] = useState([]);
   const [inventory, setInventory] = useState([]);
 
+const [expandedProduct, setExpandedProduct] = useState(null);
+const [expandedSize, setExpandedSize] = useState(null);
+const [expandedType, setExpandedType] = useState(null);
 
+
+const toggleProduct = (product) => {
+  setExpandedProduct(product === expandedProduct ? null : product);
+  setExpandedSize(null); // Reset child levels
+  setExpandedType(null);
+};
+
+const toggleSize = (product, size) => {
+  const key = `${product}-${size}`;
+  setExpandedSize(key === expandedSize ? null : key);
+  setExpandedType(null); // Reset type
+};
+
+const toggleType = (product, size, type) => {
+  const key = `${product}-${size}-${type}`;
+  setExpandedType(key === expandedType ? null : key);
+};
 
     useEffect(() => {
            fetchProductdData();
@@ -40,57 +60,66 @@ const Inventory = () => {
     navigate('/inventorydetails', { state: { item } });
   };
 
-  useEffect(() => {
-    const fetchInventory = async () => {
-      try {
-        const response = await getAllInventory();
-        const flatData = [];
 
-        response?.data?.product?.forEach((product) => {
-          product.variant.forEach((variant) => {
-            flatData.push({
-              product: product.productName,
-              counter: variant.size,
-              type: variant.variantType,
-              color: variant.color,
-              customerOrder: variant.reserveWeight,
-              remainingWeight: variant.availableWeight,
-              raw: variant,
-            });
+  const groupInventory = (data) => {
+  const grouped = {};
+
+  data.forEach(item => {
+    const { product, counter, type } = item;
+
+    if (!grouped[product]) grouped[product] = {};
+    if (!grouped[product][counter]) grouped[product][counter] = {};
+    if (!grouped[product][counter][type]) grouped[product][counter][type] = [];
+
+    grouped[product][counter][type].push(item);
+  });
+
+  return grouped;
+};
+
+
+  useEffect(() => {
+  const fetchInventory = async () => {
+    try {
+      const response = await getAllInventory();
+      const flatData = [];
+
+      response?.data?.product?.forEach((product) => {
+        product.variant.forEach((variant) => {
+          flatData.push({
+            product: product.productName,
+            counter: variant.size,
+            type: variant.variantType,
+            color: variant.color,
+            customerOrder: variant.reserveWeight,
+            remainingWeight: variant.availableWeight,
+            raw: variant,
           });
         });
-        
-        setAllInventory(flatData);  
-        setInventory(flatData);
-  
-        // Calculate dashboard numbers
-        const totalSKU = flatData.length; // each variant is a SKU
-  
-        const stockRemaining = flatData.reduce(
-          (acc, item) => acc + (item.remainingWeight || 0),
-          0
-        );
-  
-        const totalCustomerOrder = flatData.reduce(
-          (acc, item) => acc + (item.customerOrder || 0),
-          0
-        );
-  
-       
-  
-        setDashboardStats({
-          totalSKU,
-          stockRemaining,
-          totalCustomerOrder,
-        });
-      } catch (err) {
-        console.error("Failed to fetch inventory:", err);
-      }
-    };
-  
-    fetchInventory();
-  }, []);
-  
+      });
+
+      setAllInventory(flatData);
+      setInventory(groupInventory(flatData)); // ✅ grouped data
+
+      // Dashboard stats
+      const totalSKU = flatData.length;
+      const stockRemaining = flatData.reduce((acc, item) => acc + (item.remainingWeight || 0), 0);
+      const totalCustomerOrder = flatData.reduce((acc, item) => acc + (item.customerOrder || 0), 0);
+
+      setDashboardStats({
+        totalSKU,
+        stockRemaining,
+        totalCustomerOrder,
+      });
+
+    } catch (err) {
+      console.error("Failed to fetch inventory:", err);
+    }
+  };
+
+  fetchInventory();
+}, []);
+
 
  
      const fetchProductdData = async () => {
@@ -225,44 +254,86 @@ const Inventory = () => {
   <div className="inventory-container">
   {/* Table View (Visible on large screens) */}
   <div className="table-wrapper">
-    <Table hover className="text-center align-middle mb-0 inventory-table">
-      <thead className="table-light">
-        <tr>
-          <th className="text-start py-3">Product</th>
-          <th className="py-3">Counter</th>
-          <th className="py-3">Type</th>
-          <th className="py-3">Color</th>
-          <th className="py-3">Color Name</th>
-          {/* <th className="py-3">From Vendor</th> */}
-          <th className="py-3">Customer Order</th>
-          <th className="py-3">Available Weight</th>
+ <Table hover className="text-center align-middle mb-0 inventory-table">
+  <thead className="table-light">
+    <tr>
+      <th className="text-start py-3">Product</th>
+      <th className="py-3">Count</th>
+      <th className="py-3">Type</th>
+      <th className="py-3">Color</th>
+      <th className="py-3">Color Name</th>
+      <th className="py-3">Customer Order</th>
+      <th className="py-3">Available Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    {Object.entries(inventory).map(([product, sizes]) => (
+      <React.Fragment key={product}>
+        {/* Product Row */}
+        <tr className="fw-bold text-start">
+          <td onClick={() => toggleProduct(product)} style={{ cursor: "pointer" }}>
+            {product}
+          </td>
+          <td colSpan={6}></td>
         </tr>
-      </thead>
-      <tbody>
-      {inventory.map((item, index) => (
-        <tr 
-          key={index} 
-          onClick={()=>handleRowClick(item)} 
-          style={{ cursor: 'pointer' }}
-        >
-          <td className="fw-medium text-start pl-3">{item.product}</td>
-          <td>{item.counter}</td>
-          <td>{item.type}</td>
-          <td>{renderColorDot(item.color)}</td>
-          <td>{item.color.colorName}</td>
-          {/* <td>150 Kgs</td> */}
-          <td>{item.customerOrder} Kgs</td>
-          <td>{item.remainingWeight} Kgs</td>
-        </tr>
-      ))}
-    </tbody>
-    </Table>
+
+        {/* Size Level */}
+        {expandedProduct === product &&
+          Object.entries(sizes).map(([size, types]) => (
+            <React.Fragment key={`${product}-${size}`}>
+              <tr className="table-secondary">
+                <td></td>
+                <td onClick={() => toggleSize(product, size)} style={{ cursor: "pointer" }}>
+                  {size}
+                </td>
+                <td colSpan={5}></td>
+              </tr>
+
+              {/* Type Level */}
+              {expandedSize === `${product}-${size}` &&
+                Object.entries(types).map(([type, variants]) => (
+                  <React.Fragment key={`${product}-${size}-${type}`}>
+                    <tr className="table-light">
+                      <td></td>
+                      <td></td>
+                      <td onClick={() => toggleType(product, size, type)} style={{ cursor: "pointer" }}>
+                        {type}
+                      </td>
+                      <td colSpan={4}></td>
+                    </tr>
+
+                    {/* Variant Rows */}
+                    {expandedType === `${product}-${size}-${type}` &&
+                      variants.map((item, index) => (
+                        <tr
+                          key={`${product}-${size}-${type}-${index}`}
+                          onClick={() => handleRowClick(item)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td>{renderColorDot(item.color)}</td>
+                          <td>{item.color.colorName}</td>
+                          <td>{item.customerOrder} Kgs</td>
+                          <td>{item.remainingWeight} Kgs</td>
+                        </tr>
+                      ))}
+                  </React.Fragment>
+                ))}
+            </React.Fragment>
+          ))}
+      </React.Fragment>
+    ))}
+  </tbody>
+</Table>
+
   </div>
  
 
   {/* Card View (Visible on smaller screens) */}
   <div className="card-view">
-    {inventory.map((item, index) => (
+    {allInventory.map((item, index) => (
       <div key={index} className="inventory-card">
         <h5 className=""style={{ fontSize: '1.2rem', color: 'black', fontWeight: 500 }}>{item.product}</h5>
         <div className="inventory-card-row">

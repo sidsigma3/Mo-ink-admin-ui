@@ -1068,17 +1068,15 @@ const handleDeleteColor = (productId, size, colorName, variantType) => {
 };
 
 
+ const showToast = (message, type = "error") => {
+    setToasts([{ message, type }]);
+    setTimeout(() => setToasts([]), 3000);
+  };
 
-
+  
 const sendInvoice = async(orderId) =>{
-   const showToast = (message, type = "error") => {
-            setToasts([{ message, type }]);
-            setTimeout(() => setToasts([]), 3000);
-          };
-
-
     const result = await emailInvoice(orderId);
-      if (!result.success) {
+      if (!result) {
         showToast("Failed to download invoice.", "error");
       }
       showToast("Invoice sent successfully", "success")
@@ -2069,15 +2067,23 @@ console.log(selectedAddress)
                           ) : (
                               // Show input field in edit mode
                               <input
-                                  className="border border-secondary-subtle text-success rounded-1 ps-2 text-end p-1"
-                                  type="number"
-                                  placeholder="Enter amount"
-                                  value={walletDeduction}
-                                  onChange={(e) => handleWalletDeductionChange(e.target.value)}
-                                  min="0"
-                                  max={walletBalances}
-                                  disabled={isViewMode}
+                                className="border border-secondary-subtle text-success rounded-1 ps-2 text-end p-1"
+                                type="number"
+                                placeholder="Enter amount"
+                                value={walletDeduction ? Math.min(walletDeduction.toFixed(0), Math.min(walletBalances.toFixed(0), netPayablePrice.toFixed(0))) : ""}
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value);
+                                  if (!isNaN(val)) {
+                                    handleWalletDeductionChange(val);
+                                  } else {
+                                    handleWalletDeductionChange(""); // Clear input if invalid
+                                  }
+                                }}
+                                min="0"
+                                max={Math.min(walletBalances, netPayablePrice)}
+                                disabled={isViewMode}
                               />
+
                           )}
                       </td>
                   </tr>
