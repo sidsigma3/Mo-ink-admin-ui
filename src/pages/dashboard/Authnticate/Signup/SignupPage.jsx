@@ -89,12 +89,12 @@ const SignupPage = ({ togglePage, isLogin }) => {
 
     {/* Auth Box */}
     <div className="signup-card bg-opacity-40 border border-3 border-white p-4 p-sm-4 rounded-5 text-white position-relative z-2">
-      <button
+      {/* <button
         className="btn btn-link text-white fw-normal text-decoration-none mb-3"
-        onClick={() => navigate("/login")}
+        onClick={() => navigate("/")}
       >
         &larr; Back to Login
-      </button>
+      </button> */}
 
       <h3 className="text-center fw-bold mb-4">Welcome Team!</h3>
 

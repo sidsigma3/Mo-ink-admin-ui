@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import "./ResetPassword.css"
+import { Eye, EyeOff } from "lucide-react";
 import { resetPassword } from '../../../../services/LoginService';
 import Toast from '../../../../components/Toast/Toast';
 
@@ -14,6 +15,8 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation(); 
   const [toasts, setToasts] = useState([]);
+  const [showNewPassword, setShowNewPassword] = useState(false); 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
 
 
   const queryParams = new URLSearchParams(location.search);
@@ -48,31 +51,24 @@ const ResetPassword = () => {
       return;
     }
 
-    try {
-      const payload = {
-        token,
-        newPassword,
-        accountType,
-      };
+   try {
+  const payload = { token, newPassword, accountType };
+  const response = await resetPassword(payload);
+  const data = response.data;
 
-      const data = await resetPassword(payload);
-
-      console.log("Response from resetPassword:", data); 
-
-      if (data?.success) {
-        setShowToast(true);
-        setTimeout(() => {
-          setShowToast(false);
-          navigate("/login");
-        }, 3000);
-      } else {
-        showToast(data?.message || "Something went wrong." ,"error");
-      }
+  console.log("Response from resetPassword:", data);
+  showToast(data?.message || "Password successfully reset!", "success");
+  setTimeout(() => navigate("/"), 3000);
     } catch (error) {
-      showToast("Failed to reset password. Please try again.", "error");
-      console.error(error);
+      showToast(
+        error.response?.data?.message || "Failed to reset password. Please try again.",
+        "error"
+      );
+      console.error("Error in resetPassword:", error);
     }
-  };
+
+};
+
 
 
     return (
@@ -93,7 +89,7 @@ const ResetPassword = () => {
     <div className="Reset-card bg-opacity-40 border border-3 border-white p-4 p-sm-4 rounded-5 text-white position-relative z-2">
     <button
         className="btn btn-link text-white fw-normal text-decoration-none p-0 mb-3"
-        onClick={() => navigate("/login")}
+        onClick={() => navigate("/")}
       >
         &larr; Back to Login
       </button>
@@ -108,22 +104,42 @@ const ResetPassword = () => {
 
       <form onSubmit={handleSubmit}>
         <label className="fs-6 fw-normal text-white form-label">New password</label>
+        <div className="position-relative mb-2">
         <input
-          type="text"
+          type={showNewPassword ? "text" : "password"}
           placeholder="Create a strong password"
           className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
           value={newPassword}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <button
+            type="button"
+            className="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+            onClick={() => setShowNewPassword(!showNewPassword)}
+          >
+            {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
-<label className="fs-6 fw-normal text-white form-label">Confirm password</label>
+
+
+      <label className="fs-6 fw-normal text-white form-label">Confirm password</label>
+        <div className="position-relative mb-2">
         <input
-          type="text"
+          type={showConfirmPassword ? "text" : "password"}
           placeholder="Re-enter the password"
           className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
+         <button
+            type="button"
+            className="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
         <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium"
         >

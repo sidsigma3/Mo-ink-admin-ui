@@ -20,7 +20,7 @@ const ForgotPassword = () => {
         try {
             await forgotPassword({ email, accountType });
             setMessage("Password reset instructions sent to your email.");
-            setTimeout(() => navigate("/login"), 2000);
+            setTimeout(() => navigate("/"), 2000);
         } catch (err) {
             setError("Something went wrong. Please check your email and try again.");
             console.error(err);
@@ -47,7 +47,7 @@ const ForgotPassword = () => {
     <div className="forgot-card bg-opacity-40 border border-3 border-white p-4 p-sm-4 rounded-5 text-white position-relative z-2">
     <button
         className="btn btn-link text-white fw-normal text-decoration-none p-0 mb-3"
-        onClick={() => navigate("/login")}
+        onClick={() => navigate("/")}
       >
         &larr; Back to Login
       </button>
