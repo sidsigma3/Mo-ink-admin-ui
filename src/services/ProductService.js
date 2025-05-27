@@ -58,13 +58,13 @@ export const deleteProduct = async (productId) => {
 };
 
 
-export const uploadProductImage = async (file) => {
+export const uploadProductImage = async (file,type) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
 
     const response = await axios.post(
-      `${BASE_URL}/files/upload-image?type=product`,
+      `${BASE_URL}/files/upload-image?type=${type}`,
       formData,
       {
         headers: {

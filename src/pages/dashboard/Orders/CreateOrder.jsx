@@ -2,7 +2,7 @@
 import React , {useState , useEffect , useMemo , useRef , forwardRef , useImperativeHandle} from 'react'
 import SearchBox from '../../../components/SearchBox/SearchBox'
 import { IoArrowBackOutline } from "react-icons/io5";
-import { useNavigate ,useLocation } from 'react-router-dom';
+import { useNavigate ,useLocation, json } from 'react-router-dom';
 import ModalOrder from '../../../components/Modal/ModalOrder';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -107,7 +107,8 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 
     const [toasts, setToasts] = useState([]);
 
-
+    console.log(isModalOpen)
+    console.log(selectedOrderId)
     const onClickSaveWeightChanges = () => {
       setShowConfirmModal(true);
     };
@@ -121,6 +122,8 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       setShowConfirmModal(false);
     };
     
+
+   const user = JSON.parse(localStorage.getItem('userData'));
 
 
     // Filter customers based on search input
@@ -829,6 +832,7 @@ useEffect(() => {
         walletAmount: walletUsed,
         quantity: totalQuantity,
         paymentTypeDiscount: selectedPayment || "",
+        createdByUserId:user.userId,
         payment: {
           paymentId: Date.now(),
           totalAmount: toPay,
@@ -1073,14 +1077,18 @@ const handleDeleteColor = (productId, size, colorName, variantType) => {
     setTimeout(() => setToasts([]), 3000);
   };
 
-  
-const sendInvoice = async(orderId) =>{
+const sendInvoice = async (orderId) => {
+  try {
     const result = await emailInvoice(orderId);
-      if (!result) {
-        showToast("Failed to download invoice.", "error");
-      }
-      showToast("Invoice sent successfully", "success")
-}
+    if (!result) {
+      showToast("Failed to send invoice.", "error");
+    } else {
+      showToast("Invoice sent successfully", "success");
+    }
+  } catch (error) {
+    showToast("An error occurred while sending the invoice.", "error");
+  }
+};
 
 
 const handleStatusChange = async (orderId, orderVariantId, newStatus,returnWeight) => {
@@ -2143,21 +2151,21 @@ console.log(selectedAddress)
                     </ReactWhatsapp> */}
 
                             {orderDetails.length > 0 && (
-                              <div className='d-flex justify-content-end w-100'>
+                              <div className="d-flex justify-content-end w-100">
                                 {isViewMode && !weightChanged ? (
                                   <Button
-                                    className='btn btn-primary'
+                                    className="btn btn-primary"
                                     onClick={() => {
-                                      sendInvoice(order.orderId);
-                                      setModalData({ orderId: order.orderId });
+                                      setSelectedOrderId(order.orderId);
                                       setIsModalOpen(true);
+                                      console.log('hello')
                                     }}
                                   >
                                     Send Invoice
                                   </Button>
                                 ) : (
                                   !isViewMode && (
-                                    <Button className='btn-sm' onClick={handleCreateOrder}>
+                                    <Button className="btn-sm" onClick={handleCreateOrder}>
                                       Create Order
                                     </Button>
                                   )
@@ -2165,21 +2173,25 @@ console.log(selectedAddress)
                               </div>
                             )}
 
+                            
+                            {isModalOpen && (
+                              <ModalSendInvoice
+                                isOpen={isModalOpen}
+                                onConfirm={async () => {
+                                  await sendInvoice(selectedOrderId);
+                                  setIsModalOpen(false);
+                                }}
+                                onCancel={() => setIsModalOpen(false)}
+                              />
+                            )}
+
 
                    
 
                 </div>
             </div>
-            {isModalOpen && (
-  <ModalSendInvoice
-    orderId={selectedOrderId}
-    onConfirm={() => {
-      sendInvoice(order.orderId);
-      setIsModalOpen(false);
-    }}
-    onCancel={() => setIsModalOpen(false)}
-  />
-)}
+         
+
 
 
  {/* Toast Notification */}

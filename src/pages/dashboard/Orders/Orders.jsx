@@ -43,9 +43,11 @@ const Orders = () => {
     const [totalOrders, setTotalOrders] = useState(0);
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [totalWeightSold, setTotalWeightSold] = useState(0);
+    const [totalOrderWeight, setTotalOrderWeight] = useState(0);
     const [totalQuantity,setTotalQuantity] =useState(0)
     const [totalReceivedAmount, setTotalReceivedAmount] = useState(0);
 
+    const [selectedStatus, setSelectedStatus] = useState("All");
 
     const [dateRange, setDateRange] = useState([
         {
@@ -63,42 +65,56 @@ const Orders = () => {
         return new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
       };
 
+      
     useEffect(() => {
         fetchDashboardData();
       }, []);
 
-    const fetchDashboardData = async () => {
+      const fetchDashboardData = async () => {
         try {
-          
-          let revenue = 0;
-          let weight = 0;
-          let quantity = 0;
-          let received = 0; 
-
-          const data = await getAllOrders()
-          setOrdersData(data)
-          setFilteredData(data)
-
-          data.forEach(order => {
-            revenue += order.totalAmount || 0;
-            weight += order.totalWeight || 0;
-            quantity += order.orderVariantResponse.length || 0
-            received += order.amountReceived || 0; 
-          });
-    
-          setTotalOrders(data.length);
-          setTotalRevenue(revenue);
-          setTotalWeightSold(weight);
-          setTotalQuantity(quantity);
-          setTotalReceivedAmount(received);
+          const data = await getAllOrders();
+          setOrdersData(data);
+          setFilteredData(data);
+          calculateDashboardStats(data); // ✅ Calculate stats for full data
         } catch (error) {
           console.error("Error fetching dashboard data:", error);
         }
       };
 
+
+   const calculateDashboardStats = (data) => {
+    let revenue = 0;
+    let weight = 0;
+    let quantity = 0;
+    let received = 0;
+
+    data.forEach(order => {
+      revenue += order.totalAmount || 0;
+      weight += order.orderVariantResponse.reduce((total, variant) => total + (Number(variant.orderWeight) || 0), 0);
+      quantity += order.orderVariantResponse.length || 0;
+      received += order.payment.totalAmountPaid || 0;
+
+    });
+
+    setTotalOrders(data.length);
+    setTotalRevenue(revenue);
+    setTotalWeightSold(weight);
+    setTotalOrderWeight(weight)
+    setTotalQuantity(quantity);
+    setTotalReceivedAmount(received);
+  };
+
+
     const handleChange = (event, newValue) => {
       setValue(newValue);
     };
+
+
+    const handleStatusChange = (status) => {
+      setSelectedStatus(status);
+      applyFilters(selectedFilter, searchValue, dateRange[0].startDate, dateRange[0].endDate, status);
+    };
+
 
 
     const handleFilterChange = (filter, value) => {
@@ -116,9 +132,10 @@ const Orders = () => {
         };
     
       // Apply both date and product filters
-      const applyFilters = (filter, value, startDate, endDate) => {
+     const applyFilters = (filter, value, startDate, endDate, status = selectedStatus) => {
         let filtered = ordersData;
-    
+
+        // Filter by order ID or customer
         if (filter && value) {
           filtered = filtered.filter((item) => {
             if (filter === "Order Id") return item.orderId.toString().includes(value);
@@ -126,16 +143,24 @@ const Orders = () => {
             return true;
           });
         }
-    
+
+        // Filter by date range
         if (startDate && endDate) {
           filtered = filtered.filter((item) => {
-            const orderDate = toIST(new Date(item.createdAt)); // Convert order date to IST
+            const orderDate = toIST(new Date(item.createdAt));
             return orderDate >= toIST(startDate) && orderDate <= toIST(endDate);
           });
         }
-    
+
+        // Filter by status
+        if (status && status !== "All") {
+          filtered = filtered.filter((item) => item.status === status);
+        }
+
         setFilteredData(filtered);
+         calculateDashboardStats(filtered); 
       };
+
 
 
 
@@ -169,6 +194,9 @@ const Orders = () => {
         }
         return num; // Return as-is if less than 1000
     };
+
+
+    console.log(filteredData)
 
   return (
     <div className='order'>
@@ -239,7 +267,7 @@ const Orders = () => {
                 </li>
 
                 <li className='col-lg col-md-6 col-sm-6 col-6'>
-                <DashboardBox heading={'Total Order Weight'} number={'141 Kgs'}></DashboardBox>
+                <DashboardBox heading={'Total Order Weight'} number={totalOrderWeight + " Kg"}></DashboardBox>
                    
                 </li>
 
@@ -258,7 +286,7 @@ const Orders = () => {
             />
           
                 {/* <StatusFilter status={"Active"}></StatusFilter> */}
-                <OrderFilter status={"All"}></OrderFilter>
+              <OrderFilter status={selectedStatus} onStatusChange={handleStatusChange} />
         </div>
 {/* 
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>

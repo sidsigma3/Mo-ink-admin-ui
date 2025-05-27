@@ -297,7 +297,7 @@ console.log(istDate);
   };
   
   const formatDateToIST = (dateStr) => {
-    const utcDate = new Date(dateStr + 'Z');
+    const utcDate = new Date(dateStr);
   
     return utcDate.toLocaleString('en-IN', {
       timeZone: 'Asia/Kolkata',
@@ -321,6 +321,8 @@ console.log(istDate);
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Date</th>
 
+              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Source</th>
+
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Customer</th>
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Quantity</th>
@@ -335,6 +337,8 @@ console.log(istDate);
 
             {/* <th style={{ width: "11.3rem", textAlign: "center", verticalAlign: 'middle' }}>V.O I'D</th> */}
 
+          
+           
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Invoice</th>
 
             <th></th>
@@ -357,6 +361,11 @@ console.log(istDate);
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                   {formatDateToIST(order.createdAt)}
               </td>
+
+               <td   style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
+
+                {null}
+            </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
@@ -436,6 +445,8 @@ console.log(istDate);
                     {statusOption[order.status]}
                   </div>
             </td>
+
+           
               {/* <td>
                 <div className="manufacturer">
                   {order.manufacturer ? (

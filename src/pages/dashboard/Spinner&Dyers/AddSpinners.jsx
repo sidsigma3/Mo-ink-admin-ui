@@ -729,7 +729,7 @@ const handleTag = (value) =>{
                       </table>
                       </div>
 
-                       <div className="d-flex justify-content-end mt-4">    
+                       <div className="d-flex justify-content-center mt-4">    
                       <button className="btn btn-tertiary" onClick={handleSubmitForm}>
                         Submit Rate Chart
                       </button>

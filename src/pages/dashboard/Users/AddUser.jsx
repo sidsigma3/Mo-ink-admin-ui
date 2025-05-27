@@ -9,9 +9,10 @@ import DeleteBtn from '../../../components/Buttons/Delete/DeleteBtn';
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import StatusInput from '../../../components/StatusInput/StatusInput';
 import Toast from '../../../components/Toast/Toast';
+import { uploadProductImage } from '../../../services/ProductService';
 
 const AddUser = () => {
-
+    const backendUrl = process.env.REACT_APP_IMAGE_URL
     const {state} = useLocation()
     const { index, users} = state || {};
     const navigate = useNavigate();
@@ -155,6 +156,23 @@ const AddUser = () => {
         }
       };
 
+       const handleChequePhotoChange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+      
+                try {
+                  const res = await uploadProductImage(file,"user"); // Implement this backend uploader
+                  const uploadedUrl = res.data;
+      
+                  setFormData((prev) => ({
+                    ...prev,
+                    chequePhoto: uploadedUrl,
+                  }));
+                } catch (error) {
+                  // showToast('Cheque photo upload failed. Please try again.', 'error');
+                }
+        };
+
   return (
     <div className='add-user'>
 
@@ -276,10 +294,17 @@ const AddUser = () => {
 
             <div className="media-input-ctn mt-5 p-2 col-md-12">
                 <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-                <input type="file" name="chequePhoto" onChange={handleChange} />
+                <input type="file" name="chequePhoto" onChange={handleChequePhotoChange} />
                 <h4>Add photo of a business PAN</h4>
                 </div>
                 {formErrors.chequePhoto && <div className="invalid-feedback d-block">{formErrors.chequePhoto}</div>}
+
+                {formData.chequePhoto && (
+                    <div className="mt-3">
+                      <img src={`${backendUrl}${formData.chequePhoto}`} alt="Cheque" width="120" />
+                    </div>
+                )}
+
             </div>
 
             <div className="col-md-12 d-flex flex-column">
