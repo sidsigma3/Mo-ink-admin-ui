@@ -21,9 +21,10 @@ import { FiDownload } from "react-icons/fi";
 import { downloadCreditReceipt } from '../../../services/InvoiceServices';
 import SelectState from '../../../components/SelectState/SelectState';
 import Toast from '../../../components/Toast/Toast';
+import { uploadProductImage } from '../../../services/ProductService';
 
 const AddCustomerPage = () => {
-
+const backendUrl = process.env.REACT_APP_IMAGE_URL
   const { state } = useLocation();
   const { index, customers } = state || {};
   const { rows, setRows } = useSegments();
@@ -418,6 +419,24 @@ const handleAddressTypeChange = (e) => {
   }
 
 
+        const handleChequePhotoChange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          try {
+            const res = await uploadProductImage(file,"customer"); // Implement this backend uploader
+            const uploadedUrl = res.data;
+
+            setFormData((prev) => ({
+              ...prev,
+              chequePhoto: uploadedUrl,
+            }));
+          } catch (error) {
+            // showToast('Cheque photo upload failed. Please try again.', 'error');
+          }
+        };
+
+
  
   return (
     <div className='add-customer'>
@@ -499,13 +518,21 @@ const handleAddressTypeChange = (e) => {
                     {errors.gstin && <p className="text-danger">{errors.gstin}</p>}
                 </div>
 
+
                 <div className="media-input-ctn mt-5 p-2 col-md-12">
-                    <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-                    <input type="file" name="chequePhoto" onChange={handleChange} />
+                  <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
+                    <input type="file" accept="image/*" onChange={handleChequePhotoChange} />
                     <h4>Add photo of cancelled cheque</h4>
+                  </div>
+                  {errors.chequePhoto && <p className="text-danger">{errors.chequePhoto}</p>}
+
+                  {formData.chequePhoto && (
+                    <div className="mt-3">
+                      <img src={`${backendUrl}${formData.chequePhoto}`} alt="Cheque" width="120" />
                     </div>
-                    {errors.chequePhoto && <p className="text-danger">{errors.chequePhoto}</p>}
+                  )}
                 </div>
+
 
                 
                 <div className='d-flex justify-content-end'>

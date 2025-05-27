@@ -9,7 +9,7 @@ import './Inventory.css';
 import { getAllProduct } from '../../../services/ProductService'
 import {getAllInventory} from '../../../services/InventoryService'
 import * as XLSX from 'xlsx';
-
+import TooltipVendor from '../../../components/Tooltip/TooltipVendor';
 
 const Inventory = () => {
 
@@ -316,7 +316,20 @@ const toggleType = (product, size, type) => {
                           <td>{renderColorDot(item.color)}</td>
                           <td>{item.color.colorName}</td>
                           <td>{item.customerOrder} Kgs</td>
-                          <td>{item.remainingWeight} Kgs</td>
+                          <td className=''>
+                            <div className='d-flex gap-2 align-items-center text-center justify-content-center'>
+                            {item.remainingWeight} Kgs
+                              
+                              {item.customerOrder > item.remainingWeight
+                            && (
+                                 <TooltipVendor></TooltipVendor>
+
+                              )}
+                              </div>
+                        
+
+                          </td>
+                          
                         </tr>
                       ))}
                   </React.Fragment>

@@ -121,7 +121,7 @@ const AddProduct = () => {
     stock: product?.stock || '',
     colorVariants: product?.groupedVariants || [],
     status: product?.availableStatus || 'Active',
-    media: product?.productImage || null,
+    media: product?.productImage[0] || null,
   });
 
 
@@ -140,7 +140,7 @@ const AddProduct = () => {
     if (!file) return;
   
     try {
-      const res = await uploadProductImage(file); // Uploads file to backend
+      const res = await uploadProductImage(file,'product'); // Uploads file to backend
       const uploadedUrl = res.data;
   
       setFormData(prev => ({
@@ -685,7 +685,7 @@ const handleExport = () => {
           VariantType: variant.variantType || "",
           Availability: variant.available ?? "",
           PricePerKg: variant.price ?? "",
-          MarkupPricePerKg: variant.markupPricePerKg ?? "",
+          markupPricePerKg: variant.markupPricePerKg ?? "",
         });
       });
     });
@@ -703,7 +703,7 @@ const handleExport = () => {
   const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   const data = new Blob([excelBuffer], { type: "application/octet-stream" });
 
-  saveAs(data, "Size_Color_Data.xlsx");
+  saveAs(data, product.productName+"_data.xlsx");
 };
 
 

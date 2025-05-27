@@ -17,6 +17,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Modal, Button } from "react-bootstrap";
 import Toast from '../../../components/Toast/Toast'
+import { getVendorOrdersByVendorId } from '../../../services/OrderService'
 
 const Spinners = () => {
 
@@ -32,6 +33,7 @@ const Spinners = () => {
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
     const [toasts, setToasts] = useState([]);
+    const [vendorOrdersMap, setVendorOrdersMap] = useState({});
 
 
     useEffect(() => {
@@ -48,6 +50,31 @@ const Spinners = () => {
         fetchData(); 
       }, []); 
 
+      useEffect(() => {
+        const fetchAllVendorOrders = async () => {
+           console.log(filteredData)
+          const ordersMap = {};
+          await Promise.all(
+            filteredData.map(async (vendor) => {
+              try {
+                const orders = await getVendorOrdersByVendorId(vendor.vendorId);
+                ordersMap[vendor.vendorId] = orders;
+              } catch (err) {
+                console.error(`Failed to fetch orders for vendor ${vendor.vendorId}`, err);
+                ordersMap[vendor.vendorId] = [];
+              }
+            })
+          );
+          setVendorOrdersMap(ordersMap);
+        };
+
+        if (filteredData.length > 0) {
+          fetchAllVendorOrders();
+        }
+      }, [filteredData]);
+
+      console.log(filteredData)
+      console.log(vendorOrdersMap)
 
     const handleSelect = (status) => {
         setSelectedStatus(status);
@@ -190,6 +217,22 @@ const Spinners = () => {
     setFilteredData(filtered);
 };
 
+const formatToIST = (utcDateString) => {
+  const utcDate = new Date(utcDateString + 'Z');
+
+  // const utcDate = new Date(utcDateString);
+  return utcDate.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+};
+
+
 
   return (
     <div className='spinner-page'>
@@ -268,8 +311,18 @@ const Spinners = () => {
                </div>
               </td>
 
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.assignOrders || 'No order'}</td>
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.lastOrder || 'No order'}</td>
+             <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                {vendorOrdersMap[customer.vendorId]?.length || 'No order'}
+              </td>
+
+            <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+              {vendorOrdersMap[customer.vendorId]?.length
+                ? formatToIST(vendorOrdersMap[customer.vendorId].at(-1).orderDate)
+                : 'No order'}
+            </td>
+
+
+
 
               <td>
                     <Dropdown align="end" style={{ zIndex: 10 }}>
