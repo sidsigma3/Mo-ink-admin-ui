@@ -47,7 +47,8 @@ const Orders = () => {
     const [totalQuantity,setTotalQuantity] =useState(0)
     const [totalReceivedAmount, setTotalReceivedAmount] = useState(0);
 
-    const [selectedStatus, setSelectedStatus] = useState("All");
+    const [selectedStatus, setSelectedStatus] = useState([]); // Start with no status selected
+
 
     const [dateRange, setDateRange] = useState([
         {
@@ -65,7 +66,12 @@ const Orders = () => {
         return new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
       };
 
-      
+    const deliveryStatuses = ['CONFIRMED', 'MANUFACTURING', 'SHIPPED'];
+
+    const ordersToDeliverCount = ordersData.filter(order =>
+      deliveryStatuses.includes(order.status)
+    ).length;
+
     useEffect(() => {
         fetchDashboardData();
       }, []);
@@ -117,52 +123,60 @@ const Orders = () => {
 
 
 
+ 
+
+
+
+// ✅ Call applyFilters every time selectedStatus changes
+    useEffect(() => {
+      applyFilters(selectedFilter, searchValue, dateRange[0].startDate, dateRange[0].endDate, selectedStatus);
+    }, [selectedStatus]);
+
     const handleFilterChange = (filter, value) => {
-        setSelectedFilter(filter);
-        setSearchValue(value.toLowerCase());
-    
-        applyFilters(filter, value.toLowerCase(), dateRange[0].startDate, dateRange[0].endDate);
-      };
-    
-      // Function to filter data based on date range
-        const handleDateChange = (ranges) => {
-          setDateRange([ranges.selection]);
-          applyFilters(selectedFilter, searchValue, ranges.selection.startDate, ranges.selection.endDate);
-          setShowDatePicker(false)
-        };
+      setSelectedFilter(filter);
+      setSearchValue(value.toLowerCase());
+      applyFilters(filter, value.toLowerCase(), dateRange[0].startDate, dateRange[0].endDate, selectedStatus);
+    };
+
+    const handleDateChange = (ranges) => {
+      setDateRange([ranges.selection]);
+      applyFilters(selectedFilter, searchValue, ranges.selection.startDate, ranges.selection.endDate, selectedStatus);
+    };
+
     
       // Apply both date and product filters
-     const applyFilters = (filter, value, startDate, endDate, status = selectedStatus) => {
-        let filtered = ordersData;
+     const applyFilters = (filter, value, startDate, endDate, statusList = []) => {
+  let filtered = ordersData;
 
-        // Filter by order ID or customer
-        if (filter && value) {
-          filtered = filtered.filter((item) => {
-            if (filter === "Order Id") return item.orderId.toString().includes(value);
-            if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(value);
-            return true;
-          });
-        }
+  // Filter by Order ID or Customer
+  if (filter && value) {
+    filtered = filtered.filter((item) => {
+      if (filter === "Order Id") return item.orderId.toString().includes(value);
+      if (filter === "Customer") return item.customer.customerName.toLowerCase().includes(value.toLowerCase());
+      return true;
+    });
+  }
 
-        // Filter by date range
-        if (startDate && endDate) {
-          filtered = filtered.filter((item) => {
-            const orderDate = toIST(new Date(item.createdAt));
-            return orderDate >= toIST(startDate) && orderDate <= toIST(endDate);
-          });
-        }
+  // Filter by Date Range
+  if (startDate && endDate) {
+    filtered = filtered.filter((item) => {
+      const orderDate = toIST(new Date(item.createdAt));
+      return orderDate >= toIST(startDate) && orderDate <= toIST(endDate);
+    });
+  }
 
-        // Filter by status
-        if (status && status !== "All") {
-          filtered = filtered.filter((item) => item.status === status);
-        }
+  // Filter by Status (multi-select)
+  if (statusList.length > 0) {
+    filtered = filtered.filter((item) => statusList.includes(item.status));
+  }
 
-        setFilteredData(filtered);
-         calculateDashboardStats(filtered); 
-      };
+  setFilteredData(filtered);
+  calculateDashboardStats(filtered);
+};
 
 
-
+    console.log(selectedStatus)
+    console.log(filteredData)
 
       const datePickerRef = useRef(null);
 
@@ -272,7 +286,7 @@ const Orders = () => {
                 </li>
 
                 <li className='col-lg col-md-6 col-sm-12 col-12'>
-                <DashboardBox heading={'Order to Deliver'} number={totalOrders}></DashboardBox>
+                <DashboardBox heading={'Order to Deliver'} number={ordersToDeliverCount}></DashboardBox>
                    
                 </li>
             </ul>
@@ -286,7 +300,8 @@ const Orders = () => {
             />
           
                 {/* <StatusFilter status={"Active"}></StatusFilter> */}
-              <OrderFilter status={selectedStatus} onStatusChange={handleStatusChange} />
+              <OrderFilter status={selectedStatus} onStatusChange={setSelectedStatus} />
+
         </div>
 {/* 
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>

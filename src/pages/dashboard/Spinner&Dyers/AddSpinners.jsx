@@ -24,10 +24,10 @@ import { getVendorOrdersByVendorId } from '../../../services/OrderService';
 import SelectState from '../../../components/SelectState/SelectState';
 import { IoIosArrowForward, IoIosArrowDown  } from "react-icons/io";
 import Toast from '../../../components/Toast/Toast';
-
+import { uploadProductImage } from '../../../services/ProductService';
 
 const AddSpinners = () => {
-  
+  const backendUrl = process.env.REACT_APP_IMAGE_URL
   const navigate = useNavigate ()
   const { state } = useLocation();
 
@@ -67,7 +67,7 @@ const AddSpinners = () => {
     email: customer?.email || "",
     company: customer?.company || "",
     gstin: customer?.gstNumber || "",
-    chequePhoto: null,
+    chequePhoto: customer?.panImageLink || "",
     address: customer?.address || "",
     apartment: customer?.street || "",
     country: customer?.country || "",
@@ -235,6 +235,7 @@ const AddSpinners = () => {
         vendorType:tag.toUpperCase(),
         zipcode:formData.pinCode,
         street:formData.apartment,
+        panImageLink:formData.chequePhoto,
         ...formData,
         };
 
@@ -254,6 +255,7 @@ const AddSpinners = () => {
             vendorType:tag.toUpperCase(),
             zipcode:formData.pinCode,
             street:formData.apartment,
+            panImageLink:formData.chequePhoto,
             ...formData,
           };
         
@@ -487,7 +489,22 @@ const handleTag = (value) =>{
     }
     
 
+ const handleChequePhotoChange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
 
+          try {
+            const res = await uploadProductImage(file,"vendor"); // Implement this backend uploader
+            const uploadedUrl = res.data;
+
+            setFormData((prev) => ({
+              ...prev,
+              chequePhoto: uploadedUrl,
+            }));
+          } catch (error) {
+            // showToast('Cheque photo upload failed. Please try again.', 'error');
+          }
+        };
 
     return (
     <div className='add-spinners'>
@@ -559,10 +576,16 @@ const handleTag = (value) =>{
 
     <div className="media-input-ctn mt-5 p-2 col-md-12">
         <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-        <input type="file" name="chequePhoto" onChange={handleChange} />
+        <input type="file" accept="image/*" name="chequePhoto" onChange={handleChequePhotoChange} />
         <h4>Add photo of a business PAN</h4>
         </div>
         {formErrors.chequePhoto && <p className="text-danger">{formErrors.chequePhoto}</p>}
+
+        {formData.chequePhoto && (
+          <div className="mt-3">
+            <img src={`${backendUrl}${formData.chequePhoto}`} alt="Cheque" width="120" />
+          </div>
+        )}
     </div>
 
     <div className="col-md-12 d-flex flex-column">

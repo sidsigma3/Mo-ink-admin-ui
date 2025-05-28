@@ -412,7 +412,8 @@ useEffect(() => {
                 productId,
                 status,
                 statusReason,    
-                returnWeight
+                returnWeight,
+                statusRemark
             } = variant;
     
             const product = finalData.find(p => p.productId === productId);
@@ -451,6 +452,7 @@ useEffect(() => {
                 status,
                 statusReason,
                 returnWeight,
+                statusRemark,
                 orderId: order.orderId
             });
         });
@@ -1591,6 +1593,7 @@ console.log(selectedAddress)
                                                           statusReason: order.statusReason,
                                                           orderId: order.orderId,
                                                           orderVariantId: order.variantId,
+                                                          statusRemark:order.statusRemark,
                                                         });
                                                       }}
                                                       

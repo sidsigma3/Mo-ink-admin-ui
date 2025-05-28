@@ -281,7 +281,7 @@ const formatToIST = (utcDateString) => {
         </div>
 
         <div className='table-ctn'>
-            <Table>
+            <Table hover>
                 <thead>
                     <tr>
                         <th style={{ verticalAlign: 'middle'}} >Name</th>

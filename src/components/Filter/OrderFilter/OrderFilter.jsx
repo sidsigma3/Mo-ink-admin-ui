@@ -1,33 +1,50 @@
-import React, { useState } from 'react';
-import { Dropdown } from 'react-bootstrap';
-import "./OrderFilter.css"
+import React, { useState, useEffect } from 'react';
+import { Dropdown, Form } from 'react-bootstrap';
+import "./OrderFilter.css";
 
+const statusOptions = [
+  "NEW",
+  "CONFIRMED",
+  "SHIPPED",
+  "MANUFACTURING",
+  "DELIVERED",
+  "CANCELLED",
+  "RETURNED"
+];
 
-const OrderFilter = ({ status ,onStatusChange }) => {
-  const [selectedStatus, setSelectedStatus] = useState(status); // Default status selection
+const OrderFilter = ({ status = [], onStatusChange }) => {
+  const [selectedStatuses, setSelectedStatuses] = useState(status);
 
-  const handleSelect = (status) => {
-    setSelectedStatus(status);
-    if (onStatusChange) onStatusChange(status); // Pass selected status to parent
+  const handleToggle = (status) => {
+    const updated = selectedStatuses.includes(status)
+      ? selectedStatuses.filter(s => s !== status)
+      : [...selectedStatuses, status];
+
+    setSelectedStatuses(updated);
+    if (onStatusChange) onStatusChange(updated);
   };
-   
+
+  const isChecked = (status) => selectedStatuses.includes(status);
+
   return (
-    <Dropdown onSelect={handleSelect}  size="sm" className='order-filter'>
+    <Dropdown className='order-filter'>
       <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2">
-        <p className="m-0">{selectedStatus}</p>
+        <p className="m-0">
+          {selectedStatuses.length === 0 ? "All" : selectedStatuses.join(", ")}
+        </p>
       </Dropdown.Toggle>
 
-      <Dropdown.Menu>
-      <Dropdown.Item eventKey="All">All</Dropdown.Item>
-        <Dropdown.Item eventKey="NEW">New Order</Dropdown.Item>
-        <Dropdown.Item eventKey="CONFIRMED">Confirm</Dropdown.Item>
-        <Dropdown.Item eventKey="SHIPPED">Shipped</Dropdown.Item>
-        <Dropdown.Item eventKey="MANUFACTURING">Manufactured</Dropdown.Item>
-        <Dropdown.Item eventKey="DELIVERED">Delivered</Dropdown.Item>
-        <Dropdown.Item eventKey="CANCELLED">Cancelled</Dropdown.Item>
-        <Dropdown.Item eventKey="RETURNED">Returned</Dropdown.Item>
-      
-
+      <Dropdown.Menu className="px-2" style={{ minWidth: "200px" }}>
+        {statusOptions.map((status) => (
+          <Form.Check
+            key={status}
+            type="checkbox"
+            id={`status-${status}`}
+            label={status}
+            checked={isChecked(status)}
+            onChange={() => handleToggle(status)}
+          />
+        ))}
       </Dropdown.Menu>
     </Dropdown>
   );
