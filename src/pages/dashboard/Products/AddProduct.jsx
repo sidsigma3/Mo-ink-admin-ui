@@ -109,20 +109,26 @@ const AddProduct = () => {
  
  
 
-  const [formData, setFormData] = useState({
-    productName: product?.productName || '',
-    description: product?.productDescription || '',
-    pricePerKg: product?.pricePerKg || '',
-    compareAtPrice: product?.compareAtPrice || '',
-    costPerItem: product?.costPerItemPerKg || '',
-    profit: product?.profit || '',
-    gst: product?.gstOnProduct || '',
-    size: product?.size || '',
-    stock: product?.stock || '',
-    colorVariants: product?.groupedVariants || [],
-    status: product?.availableStatus || 'Active',
-    media: product?.productImage[0] || null,
-  });
+const coneImage = product?.productImage?.find(img => img.includes('/cone/')) || null;
+const hankImage = product?.productImage?.find(img => img.includes('/hank/')) || null;
+
+const [formData, setFormData] = useState({
+  productName: product?.productName || '',
+  description: product?.productDescription || '',
+  pricePerKg: product?.pricePerKg || '',
+  compareAtPrice: product?.compareAtPrice || '',
+  costPerItem: product?.costPerItemPerKg || '',
+  profit: product?.profit || '',
+  gst: product?.gstOnProduct || '',
+  size: product?.size || '',
+  stock: product?.stock || '',
+  colorVariants: product?.groupedVariants || [],
+  status: product?.availableStatus || 'Active',
+  media: product?.productImage?.[0] || null,
+  mediaHank: hankImage,
+  mediaCone: coneImage,
+});
+
 
 
   const handleInputChange = (e) => {
@@ -135,23 +141,26 @@ const AddProduct = () => {
     setFormData({ ...formData, description: value });
   };
 
-  const handleMediaChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+const handleMediaChange = async (e, type) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const res = await uploadProductImage(file, `product-${type}`); // type: hank or cone
+    const uploadedUrl = res.data;
+
+    setFormData(prev => ({
+      ...prev,
+      [`media${type.charAt(0).toUpperCase() + type.slice(1)}`]: uploadedUrl, // mediaHank or mediaCone
+    }));
+  } catch (error) {
+    showToast('Image upload failed. Please try again.', 'error');
+  }
+};
+
   
-    try {
-      const res = await uploadProductImage(file,'product'); // Uploads file to backend
-      const uploadedUrl = res.data;
-  
-      setFormData(prev => ({
-        ...prev,
-        media: uploadedUrl, // Save the URL instead of File object
-      }));
-    } catch (error) {
-      showToast('Image upload failed. Please try again.', 'error');
-    }
-  };
-  
+console.log(formData)
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -226,7 +235,7 @@ const AddProduct = () => {
     const formattedData = {
         title: formData.productName,
         description: plainTextDescription,
-        media: [formData.media],
+        media: [formData.mediaCone,formData.mediaHank],
         availableStatus: status.toUpperCase(),
         gstOnProduct: Number(formData.gst),
         variants: newVariants, // All variants are sent
@@ -773,19 +782,39 @@ console.log(sizeColorMap)
           </div>
          
           <div className="media-input-ctn mt-5 p-2">
-            <label>Media</label>
-            <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-              <input type="file" accept="image/*" onChange={handleMediaChange} />
-              <h4>Accepts images only</h4>
-            </div>
-            {errors.media && <p className="text-danger">{errors.media}</p>}
-
-            {formData.media && (
-              <div className="mt-3">
-                <img src={`${backendUrl}${formData.media}`} alt="Uploaded" width="120" />
+              <label>Hank Image</label>
+              <div className="media-input d-flex flex-column justify-content-center align-items-center py-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleMediaChange(e, 'hank')}
+                />
+                <h6 className="mt-2">Accepts images only</h6>
               </div>
-            )}
-          </div>
+              {formData.mediaHank && (
+                <div className="mt-4">
+                  <img src={`${backendUrl}${formData.mediaHank}`} alt="Hank" width="120" />
+                </div>
+              )}
+            </div>
+
+            <div className="media-input-ctn mt-4 p-2">
+              <label>Cone Image</label>
+              <div className="media-input d-flex flex-column justify-content-center align-items-center py-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleMediaChange(e, 'cone')}
+                />
+                <h6  className="mt-4">Accepts images only</h6>
+              </div>
+              {formData.mediaCone && (
+                <div className="mt-2">
+                  <img src={`${backendUrl}${formData.mediaCone}`} alt="Cone" width="120" />
+                </div>
+              )}
+            </div>
+
 
 
 

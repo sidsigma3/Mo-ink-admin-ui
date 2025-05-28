@@ -31,8 +31,8 @@ const AddUser = () => {
         phone: customer?.phoneNumber || "",
         email: customer?.email || "",
         company: customer?.company || "",
-        adharNumber: customer?.adharNumber || "",
-        chequePhoto: null,
+        adharNumber: customer?.aadhaarNumber || "",
+        chequePhoto: customer?.aadhaarDocumentUploadLink || "",
         address: customer?.userAddress || "",
         apartment: customer?.street || "",
         country: customer?.country || "",
@@ -105,12 +105,13 @@ const AddUser = () => {
             lastName: formData.lastName,
             email: formData.email,
             whatsappNumber: formData.whatsapp,
-            adharNumber:formData.adharNumber,
+            aadhaarNumber:formData.adharNumber,
             phoneNumber: formData.phone,
             userAddress: formData.address, // Fixed duplicate key issue
             userStatus: formData.status.toUpperCase(),
             zipcode: formData.pinCode,
             street: formData.apartment,
+            aadhaarDocumentUploadLink:formData.chequePhoto,
             ...formData,
         };
     
@@ -294,7 +295,7 @@ const AddUser = () => {
 
             <div className="media-input-ctn mt-5 p-2 col-md-12">
                 <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-                <input type="file" name="chequePhoto" onChange={handleChequePhotoChange} />
+                <input type="file" accept="image/*"  name="chequePhoto" onChange={handleChequePhotoChange} />
                 <h4>Add photo of a business PAN</h4>
                 </div>
                 {formErrors.chequePhoto && <div className="invalid-feedback d-block">{formErrors.chequePhoto}</div>}

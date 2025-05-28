@@ -20,7 +20,8 @@ const ModalReturnOrder = ({ isOpen, onClose ,onCancel, onConfirm, variantDetails
           {/* <p><strong>Color:</strong> {variantDetails.colorName}</p>
           <p><strong>Type:</strong> {variantDetails.type}</p>
           <p><strong>Weight:</strong> {variantDetails.weight} kg</p> */}
-          <p className="mb-1"> Reason: <strong>{variantDetails.statusReason}</strong></p>
+           <p className="mb-1"> Reason: <strong>{variantDetails.statusReason}</strong></p>
+          <p className="mb-1"> Remark: <strong>{variantDetails.statusRemark}</strong></p>
           <p>Returned Weight: <strong>{variantDetails.returnWeight}kg</strong></p>
 
         </div>

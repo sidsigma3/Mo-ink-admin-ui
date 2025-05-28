@@ -103,7 +103,7 @@ const UserPage = () => {
         </div>
 
         <div className='table-ctn'>
-            <Table>
+            <Table hover>
                 <thead>
                     <tr>
                         <th style={{ verticalAlign: 'middle'}} >Name</th>
@@ -118,6 +118,7 @@ const UserPage = () => {
                     {filteredData.map((user, index) => (
                         <tr key={index}  
                         onClick={() => handleRowClick(index)}
+                        style={{cursor:'pointer'}}
                          >
                         <td style={{ verticalAlign: 'middle'}} >{user.firstName +" "+user.lastName}</td>
                         <td style={{ verticalAlign: 'middle'}} >{user.email}</td>
