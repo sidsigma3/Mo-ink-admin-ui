@@ -1,5 +1,5 @@
 import React from "react";
-import "./ModalWeightChange.css";
+import "./ModalInventoryChange.css";
 
 const ModalInventoryChange = ({ isOpen, onCancel, onConfirm }) => {
   if (!isOpen) return null;
@@ -13,9 +13,9 @@ const ModalInventoryChange = ({ isOpen, onCancel, onConfirm }) => {
         <div className="Modalinvchange-icon Modalinvchange-icon--primary">
           <span>!</span>
         </div>
-        <h2 className="Modalinvchange-title">Do you want to save changes?y</h2>
+        <h2 className="Modalinvchange-title">Confirm Weight Adjustment</h2>
         <p className="Modalinvchange-message">
-        This will changes the current weights of product variants. Are you sure you want to proceed?
+        This action will update the current weight values of product variants. Are you sure you want to proceed?
         </p>
         <div className="Modalinvchange-actions">
           <button className="Modalinvchange-btn Modalinvchange-btn--outline" onClick={onCancel}>

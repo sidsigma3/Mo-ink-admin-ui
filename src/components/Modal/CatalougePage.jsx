@@ -188,15 +188,16 @@ setIsAddingColor(false);
     }
   };
   
+ const handleSearchColor = (e) => {
+    setSearchColor(e.target.value.toLowerCase());
+  };
 
-const handleSearchColor = (e) =>{
-  setSearchColor(e.target.value.toLowerCase());
-}
+  const filteredVariants = variant.variants.filter(
+    (item) =>
+      item.colorName.toLowerCase().includes(searchColor) ||
+      item.hexCode.toLowerCase().includes(searchColor)
+  );
 
-const filteredVariants = variant.variants.filter((item) =>
-  item.colorName.toLowerCase().includes(searchColor) || 
-  item.hexCode.toLowerCase().includes(searchColor)
-);
 
 const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
   const baseKey = `${variant.colorName}-${variant.hexCode.toLowerCase()}`;
@@ -270,10 +271,15 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
         )}
 
           </div>
-        ) : (
-          <div>
+          ) : (
             <div>
-              <input className="w-100 p-2 rounded border  mb-4" onChange={(e)=>handleSearchColor(e)} placeholder="Search by name or hexcode"></input>
+              <div>
+                 <input
+                  className="w-100 p-2 rounded border mb-4"
+                  onChange={handleSearchColor}
+                  placeholder="Search by name or hexcode"
+                  value={searchColor}
+                ></input>
             </div>
             <div className="d-flex justify-content-between"> 
             <h3 className="h6 fw-semibold border-bottom pb-2">Custom Colors</h3>
@@ -393,6 +399,28 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
                 ))}
             </div>
 
+
+        {/* {filteredVariants.length > 0 ? (
+                <ul>
+                  {filteredVariants.map((item, index) => (
+                    <li key={index} style={{ marginBottom: "0.5rem" }}>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: "20px",
+                          height: "20px",
+                          backgroundColor: item.hexCode,
+                          marginRight: "8px",
+                          border: "1px solid #ccc",
+                        }}
+                      ></span>
+                      <strong>{item.colorName}</strong> — {item.hexCode}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No matching colors found.</p>
+              )} */}
 
   </div>
   );
