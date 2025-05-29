@@ -220,7 +220,7 @@ const SignupPage = ({ togglePage, isLogin }) => {
           <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium mt-3"
           onClick={() => handleSignup}
           >
-            Resgister
+            Register
           </button>
 
         </form>

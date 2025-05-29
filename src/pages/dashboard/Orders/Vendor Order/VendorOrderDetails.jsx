@@ -54,6 +54,10 @@ const VendorOrderDetails = () => {
   const [statusUpdates, setStatusUpdates] = useState({});
   const [modalData, setModalData] = useState({ isOpen: false, variantId: null, status: "", vendorOrderId: null });
 
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [selectedReturnItem, setSelectedReturnItem] = useState(null);
+  const [returnWeight, setReturnWeight] = useState('');
+
 
 const initializeProductMap = async () => {
   try {
@@ -249,10 +253,10 @@ const getProductNameById = (productId) => {
   };
   
   
-  console.log(dyerOrder)
-  console.log(spinnerOrder)
-  console.log(dyerRateChart)
-
+ const showToast = (message, type = "error") => {
+      setToasts([{ message, type }]);
+      setTimeout(() => setToasts([]), 3000);
+    };
 
   return (
     <div className="order-details">
@@ -340,40 +344,41 @@ const getProductNameById = (productId) => {
                         value={item.status}
                         className={`form-select form-select  ${statusClassMap[item.status] || ''}`}
                         onChange={async (e) => {
-                           const showToast = (message, type = "error") => {
-                                  setToasts([{ message, type }]);
-                                  setTimeout(() => setToasts([]), 3000);
-                                };
-                          const newStatus = e.target.value;
-                          const confirmMessage = `Are you sure you want to change the status from "${item.status}" to "${newStatus}"?`;
-                          const confirmed = window.confirm(confirmMessage);
+                        const newStatus = e.target.value;
 
-                          if (!confirmed) return;
+                        if (newStatus === "RETURNED") {
+                          // Open modal and set current item
+                          setSelectedReturnItem(item);
+                          setShowReturnModal(true);
+                          return;
+                        }
 
-                          const payload = [{
-                            vendorOrderVariantId: item.vendorOrderVariantId,
-                            status: newStatus,
-                            reason: newStatus === "CANCELLED" ? "Vendor cancelled the order" : "Vendor accepted the order",
-                            remark: newStatus === "CANCELLED" ? "Order not possible" : "Expected delivery within 7 days"
-                          }];
+                        const confirmMessage = `Are you sure you want to change the status from "${item.status}" to "${newStatus}"?`;
+                        const confirmed = window.confirm(confirmMessage);
+                        if (!confirmed) return;
 
-                          try {
-                            await vendorStatusUpdate(spinnerOrder.vendorOrderId, payload);
+                        const payload = [{
+                          vendorOrderVariantId: item.vendorOrderVariantId,
+                          status: newStatus,
+                          reason: newStatus === "CANCELLED" ? "Vendor cancelled the order" : "Vendor accepted the order",
+                          remark: newStatus === "CANCELLED" ? "Order not possible" : "Expected delivery within 7 days"
+                        }];
 
-                            // Update local state
-                            setSpinnerOrder((prev) => {
-                             
-                              const updatedVariants = prev.vendorOrderVariantResponse.map((v) =>
-                                v.vendorOrderVariantId === item.vendorOrderVariantId
-                                  ? { ...v, status: newStatus }
-                                  : v
-                              );
-                              return { ...prev, vendorOrderVariantResponse: updatedVariants };
-                            });
-                          } catch (error) {
-                            showToast("Failed to update status. Please try again.", "error");
-                          }
-                        }}
+                        try {
+                          await vendorStatusUpdate(spinnerOrder.vendorOrderId, payload);
+                          setSpinnerOrder((prev) => {
+                            const updatedVariants = prev.vendorOrderVariantResponse.map((v) =>
+                              v.vendorOrderVariantId === item.vendorOrderVariantId
+                                ? { ...v, status: newStatus }
+                                : v
+                            );
+                            return { ...prev, vendorOrderVariantResponse: updatedVariants };
+                          });
+                        } catch (error) {
+                          showToast("Failed to update status. Please try again.", "error");
+                        }
+                      }}
+
                       >
                         {vendorStatusOptions.map(({ value, label }) => {
                           const currentStatus = item.status;
@@ -592,90 +597,79 @@ const getProductNameById = (productId) => {
               <td className=" text-center">{totalAmount.toFixed(2)}</td>
               <td  style={{ justifyItems: 'center', alignContent:'center'}}  >
               <select
-                    value={item.status}
-                    className={`form-select form-select p-2 ${statusClassMap[item.status] || ''}`}
-                    onChange={async (e) => {
-                       const showToast = (message, type = "error") => {
-                                  setToasts([{ message, type }]);
-                                  setTimeout(() => setToasts([]), 3000);
-                                };
-                      const newStatus = e.target.value;
-                      const confirmMessage = `Are you sure you want to change the status from "${item.status}" to "${newStatus}"?`;
-                      const confirmed = window.confirm(confirmMessage);
+                value={item.status}
+                className={`form-select form-select p-2 ${statusClassMap[item.status] || ''}`}
+                onChange={async (e) => {
+                  const newStatus = e.target.value;
 
-                      if (!confirmed) return;
+                  if (newStatus === "RETURNED") {
+                    setSelectedReturnItem(item);
+                    setShowReturnModal(true);
+                    return;
+                  }
 
-                      const payload = [{
-                        vendorOrderVariantId: item.vendorOrderVariantId,
-                        status: newStatus,
-                        reason: newStatus === "CANCELLED" ? "Vendor cancelled the order" : "Vendor accepted the order",
-                        remark: newStatus === "CANCELLED" ? "Order not possible" : "Expected delivery within 7 days"
-                      }];
+                  const confirmMessage = `Are you sure you want to change the status from "${item.status}" to "${newStatus}"?`;
+                  const confirmed = window.confirm(confirmMessage);
+                  if (!confirmed) return;
 
-                      try {
-                        await vendorStatusUpdate(dyerOrder.vendorOrderId, payload);
+                  const payload = [{
+                    vendorOrderVariantId: item.vendorOrderVariantId,
+                    status: newStatus,
+                    reason: newStatus === "CANCELLED" ? "Dyer cancelled the order" : "Dyer accepted the order",
+                    remark: newStatus === "CANCELLED" ? "Order not possible" : "Expected delivery within 7 days"
+                  }];
 
-                        // Update local state
-                        setDyerOrder((prev) => {
-                          const updatedVariants = prev.vendorOrderVariantResponse.map((v) =>
-                            v.vendorOrderVariantId === item.vendorOrderVariantId
-                              ? { ...v, status: newStatus }
-                              : v
-                          );
-                          return { ...prev, vendorOrderVariantResponse: updatedVariants };
-                        });
-                      } catch (error) {
-                        showToast("Failed to update status. Please try again.", "error");
-                      }
-                    }}
-                  >
-                    {vendorStatusOptions.map(({ value, label }) => {
-                      const currentStatus = item.status;
-
-                      const currentIndex = vendorStatusFlow.indexOf(currentStatus);
-                      const optionIndex = vendorStatusFlow.indexOf(value);
-
-                      const isSame = value === currentStatus;
-                      const isPlaced = currentStatus === "PLACED";
-                      const isCancelled = currentStatus === "CANCELLED";
-                      const isConfirmed = currentStatus === "CONFIRMED";
-                      const isReceived = currentStatus === "RECEIVED";
-                      const isReturned = currentStatus === "RETURNED";
-
-                      let shouldEnable = false;
-
-                      if (isCancelled) {
-                        // Cancelled is final
-                        shouldEnable = isSame;
-                      } else if (isPlaced) {
-                        // During PLACED show only CONFIRMED and CANCELLED
-                        shouldEnable = value === "CONFIRMED" || value === "CANCELLED" || isSame;
-                      }
-                     else if (isReturned) {
-                      // During PLACED show only CONFIRMED and CANCELLED
-                      shouldEnable = "";
-                    }
-                    else if (isReceived) {
-                  // During PLACED show only CONFIRMED and CANCELLED
-                  // shouldEnable = value === "RETURNED" || value === "REPLACED" || isSame;
-                    shouldEnable = optionIndex > currentIndex || isSame;
-                    }
-                    else if (isConfirmed) {
-                      // After CONFIRMED, allow all next statuses (no cancel)
-                      // shouldEnable = optionIndex > currentIndex || isSame;
-                      shouldEnable = value === "RECEIVED"
-                    } else {
-                  // Allow only next immediate status (e.g., from REPLACED → DISPATCHED)
-                  shouldEnable = optionIndex === currentIndex + 1 || isSame;
-                      }
-
-                      return (
-                        <option key={value} value={value} disabled={!shouldEnable}>
-                          {label}
-                        </option>
+                  try {
+                    await vendorStatusUpdate(dyerOrder.vendorOrderId, payload);
+                    setDyerOrder((prev) => {
+                      const updatedVariants = prev.vendorOrderVariantResponse.map((v) =>
+                        v.vendorOrderVariantId === item.vendorOrderVariantId
+                          ? { ...v, status: newStatus }
+                          : v
                       );
-                    })}
-                  </select>
+                      return { ...prev, vendorOrderVariantResponse: updatedVariants };
+                    });
+                  } catch (error) {
+                    showToast("Failed to update status. Please try again.", "error");
+                  }
+                }}
+              >
+                {vendorStatusOptions.map(({ value, label }) => {
+                  const currentStatus = item.status;
+                  const currentIndex = vendorStatusFlow.indexOf(currentStatus);
+                  const optionIndex = vendorStatusFlow.indexOf(value);
+
+                  const isSame = value === currentStatus;
+                  const isPlaced = currentStatus === "PLACED";
+                  const isCancelled = currentStatus === "CANCELLED";
+                  const isConfirmed = currentStatus === "CONFIRMED";
+                  const isReceived = currentStatus === "RECEIVED";
+                  const isReturned = currentStatus === "RETURNED";
+
+                  let shouldEnable = false;
+
+                  if (isCancelled) {
+                    shouldEnable = isSame;
+                  } else if (isPlaced) {
+                    shouldEnable = value === "CONFIRMED" || value === "CANCELLED" || isSame;
+                  } else if (isReturned) {
+                    shouldEnable = "";
+                  } else if (isReceived) {
+                    shouldEnable = optionIndex > currentIndex || isSame;
+                  } else if (isConfirmed) {
+                    shouldEnable = value === "RECEIVED";
+                  } else {
+                    shouldEnable = optionIndex === currentIndex + 1 || isSame;
+                  }
+
+                  return (
+                    <option key={value} value={value} disabled={!shouldEnable}>
+                      {label}
+                    </option>
+                  );
+                })}
+              </select>
+
               </td>
             </tr>
           );
@@ -749,6 +743,67 @@ const getProductNameById = (productId) => {
         
               </div>
               </div>
+              {showReturnModal && (
+                <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+                  <div className="modal-dialog">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Enter Return Weight</h5>
+                        <button type="button" className="btn-close" onClick={() => setShowReturnModal(false)}></button>
+                      </div>
+                      <div className="modal-body">
+                        <input
+                          type="number"
+                          min="0"
+                          className="form-control"
+                          placeholder="Enter return weight (kg)"
+                          value={returnWeight}
+                          onChange={(e) => setReturnWeight(e.target.value)}
+                        />
+                      </div>
+                      <div className="modal-footer">
+                        <button className="btn btn-secondary" onClick={() => setShowReturnModal(false)}>Cancel</button>
+                        <button
+                          className="btn btn-primary"
+                          onClick={async () => {
+                            if (!returnWeight || Number(returnWeight) <= 0) {
+                              showToast("Please enter a valid return weight.", "error");
+                              return;
+                            }
+
+                            const payload = [{
+                              vendorOrderVariantId: selectedReturnItem.vendorOrderVariantId,
+                              status: "RETURNED",
+                              returnWeight: Number(returnWeight),
+                              reason: "Vendor returned the item",
+                              remark: `Returned ${returnWeight} kg`,
+                            }];
+
+                            try {
+                              await vendorStatusUpdate(spinnerOrder.vendorOrderId, payload);
+                              setSpinnerOrder((prev) => {
+                                const updatedVariants = prev.vendorOrderVariantResponse.map((v) =>
+                                  v.vendorOrderVariantId === selectedReturnItem.vendorOrderVariantId
+                                    ? { ...v, status: "RETURNED" }
+                                    : v
+                                );
+                                return { ...prev, vendorOrderVariantResponse: updatedVariants };
+                              });
+                              setShowReturnModal(false);
+                              setReturnWeight('');
+                            } catch (error) {
+                              showToast("Failed to update status.", "error");
+                            }
+                          }}
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
     
   {/* Toast Notification */}
      <div className="fixed top-4 right-4 z-50 space-y-2">

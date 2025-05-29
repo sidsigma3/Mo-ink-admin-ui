@@ -361,7 +361,7 @@ const BulkAssignPage = () => {
               const message = missingRates.map(m =>
                 `Product: ${m.productName}, Size: ${m.size}, Color: ${m.color}, Type: ${m.variantType}`
               ).join('\n');
-              showToast(`Please add rate chart entries for the following variants:\n\n${message}`, 'error');
+              showToast(`Please add price chart for selected vendor in spinner&dyer tab`);
               throw new Error("Rate chart entries missing");
             }
       
@@ -401,6 +401,11 @@ const BulkAssignPage = () => {
       };
       
       
+      const handleDeleteRow = (indexToDelete) => {
+          const updated = orderDetails.filter((_, idx) => idx !== indexToDelete);
+          setOrderDetails(updated);
+      };
+
 
       const calculateInvoiceTotals = (orderDetails, rateChart, vendorState) => {
         let subtotal = 0;
@@ -455,6 +460,8 @@ const BulkAssignPage = () => {
       } = calculateInvoiceTotals(orderDetails, spinnerRateChart, selectedSpinner?.state);
       
 
+
+
     return (
         <div className='create-order'>
          <div className='top d-flex gap-3 mb-2 mt-2' style={{cursor:'pointer'}}>
@@ -497,7 +504,7 @@ const BulkAssignPage = () => {
                             onChange={e => setOrderFor(e.target.value)}
                         >
                             <option value="Spinner">Spinner</option>
-                            <option value="Dyer">Dyer</option>
+                            {/* <option value="Dyer">Dyer</option> */}
                             <option value="Both">Both</option>
                         </select>
                         </div>
@@ -629,6 +636,7 @@ const BulkAssignPage = () => {
           )
           }
           <th>Total</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -667,7 +675,7 @@ const BulkAssignPage = () => {
                   {item.color.name}
                 </div>
               </td> */}
-              <td className='w-25'>
+              <td style={{width:"6rem"}}>
                 <input
                   type="number"
                   className="form-control form-control-sm p-1"
@@ -689,6 +697,15 @@ const BulkAssignPage = () => {
               )
             }
               <td>{totalAmount.toFixed(2)}</td>
+              <td>
+            <button
+              type="button"
+              className="btn btn-sm text-danger"
+              onClick={() => handleDeleteRow(index)}
+            >
+              ✕
+            </button>
+          </td>
             </tr>
           );
         })}
@@ -847,7 +864,7 @@ const BulkAssignPage = () => {
                   {item.color.name}
                 </div>
               </td>
-              <td className='w-25'>
+              <td style={{width:"5rem"}}>
             {orderFor === "Dyer" ? (
                 <input
                 type="number"
