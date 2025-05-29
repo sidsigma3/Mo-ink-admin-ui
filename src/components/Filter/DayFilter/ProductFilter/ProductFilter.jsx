@@ -26,7 +26,7 @@ const ProductFilter = ({ filterOptions, onFilterChange }) => {
         {/* Dropdown Selection */}
         <div className="d-flex align-items-center justify-content-between border border-right" style={{ width: "39%" }}>
           <Dropdown onSelect={handleSelect} size="sm" className="d-flex align-items-center w-100">
-            <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 border border-0">
+            <Dropdown.Toggle variant="light" id="dropdown-basic" className="p-0 px-2 d-flex align-items-center justify-content-between gap-2 w-100 border border-0">
               <p className="m-0 d-flex align-items-center gap-2">{selectedFilter}</p>
             </Dropdown.Toggle>
   

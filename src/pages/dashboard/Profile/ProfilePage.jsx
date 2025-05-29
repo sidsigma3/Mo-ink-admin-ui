@@ -11,6 +11,7 @@ import { addUser, getUserById, updateUser } from '../../../services/UserService'
 import {Modal, Button, ModalBody, ModalFooter, ModalHeader, ModalTitle } from 'react-bootstrap';
 
 
+
 const ProfilePage = ({setIsAuthenticated}) => {
 
   const navigate = useNavigate()
@@ -23,7 +24,7 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
 
   const [showToast, setShowToast] = useState(false);
-
+  const [showToastPassword, setShowToastPassword] = useState(false);
 
   const userDetails =  JSON.parse(localStorage.getItem('userData'));
 
@@ -88,35 +89,38 @@ const ProfilePage = ({setIsAuthenticated}) => {
     setModalShow(!modalShow)
   }
 
-  const handlePasswordChange = async() =>{
-    const body = 
-        {
-            "firstName": userDetails.firstName,
-            "lastName": userDetails.lastName,
-            "phoneNumber": userDetails.phoneNumber,
-            "password":password,
-            "whatsappNumber": userDetails.whatsappNumber,
-            "adharNumber" : userDetails.adharNumber,
-            "adharDocumentUploadLink" :userDetails.adharDocumentUploadLink,
-            "email": userDetails.email,
-            "company": userDetails.company,
-            "userAddress": userDetails.userAddress,
-            "street": userDetails.street,
-            "city": userDetails.city,
-            "state": userDetails.state,
-            "country": userDetails.country,
-            "zipcode": userDetails.zipcode,
-            "userStatus": userDetails.userStatus,
-            "role": userDetails.role,
-        }
+  const handlePasswordChange = async () => {
+  const body = {
+    firstName: userDetails.firstName,
+    lastName: userDetails.lastName,
+    phoneNumber: userDetails.phoneNumber,
+    password: password,
+    whatsappNumber: userDetails.whatsappNumber,
+    adharNumber: userDetails.adharNumber,
+    adharDocumentUploadLink: userDetails.adharDocumentUploadLink,
+    email: userDetails.email,
+    company: userDetails.company,
+    userAddress: userDetails.userAddress,
+    street: userDetails.street,
+    city: userDetails.city,
+    state: userDetails.state,
+    country: userDetails.country,
+    zipcode: userDetails.zipcode,
+    userStatus: userDetails.userStatus,
+    role: userDetails.role,
+  };
 
-         try {
-            await updateUser(userDetails.userId, body);
-            navigate('/users');
-        } catch (error) {
-            console.error("Error submitting user:", error);
-        } 
+  try {
+    await updateUser(userDetails.userId, body);
+    handleClose()
+    setShowToastPassword(true);
+    setTimeout(() => setShowToastPassword(false), 3000);
+    // navigate('/users');
+  } catch (error) {
+    console.error("Error submitting user:", error);
   }
+};
+
 
 
   const handleSubmit = async() => {
@@ -148,7 +152,7 @@ const ProfilePage = ({setIsAuthenticated}) => {
         localStorage.setItem("userData", JSON.stringify(response.data));
 
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 5000);
+        setTimeout(() => setShowToast(false), 3000);
 
         
     } catch (error) {
@@ -286,19 +290,34 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
       {/* Toast */}
       {showToast && (
-  <div
-    className="position-fixed top-0 end-0 toast show custom-toast"
-    role="alert"
-    aria-live="assertive"
-    aria-atomic="true"
-    style={{ zIndex: 9999 }}
-  >
-    <div className="d-flex align-items-center h-100 px-3">
-    <BsCheckCircleFill className="me-2 toast-icon" />
-    <span className="fs-6 fw-medium text-center">Profile updated successfully!</span>
-    </div>
-  </div>
-)}
+        <div
+            className="position-fixed top-0 end-0 toast show custom-toast"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            style={{ zIndex: 9999 }}
+        >
+            <div className="d-flex align-items-center h-100 px-3">
+            <BsCheckCircleFill className="me-2 toast-icon" />
+            <span className="fs-6 fw-medium text-center">Profile updated successfully!</span>
+            </div>
+        </div>
+        )}
+
+        {showToastPassword && (
+        <div
+            className="position-fixed top-0 end-0 toast show custom-toast"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            style={{ zIndex: 9999 }}
+        >
+            <div className="d-flex align-items-center h-100 px-3">
+            <BsCheckCircleFill className="me-2 toast-icon" />
+            <span className="fs-6 fw-medium text-center">Passsword updated successfully!</span>
+            </div>
+        </div>
+        )}
 
             </div>
 

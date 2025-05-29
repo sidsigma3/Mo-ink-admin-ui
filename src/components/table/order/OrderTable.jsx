@@ -298,7 +298,6 @@ console.log(istDate);
   
   const formatDateToIST = (dateStr) => {
     const utcDate = new Date(dateStr);
-  
     return utcDate.toLocaleString('en-IN', {
       timeZone: 'Asia/Kolkata',
       year: 'numeric',
@@ -362,9 +361,13 @@ console.log(istDate);
                   {formatDateToIST(order.createdAt)}
               </td>
 
-               <td   style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
-
-                {null}
+               <td   style={{ textAlign: 'center', verticalAlign: 'middle'}}  onClick={(e) => e.stopPropagation()}>
+                {order.createdByUser !== null ? (
+                  order.createdByUser+" (A)"
+                ):(
+                  order.customer.customerName.split(" ")[0] + " (C)"
+                  // "Customer"
+                )}
             </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>

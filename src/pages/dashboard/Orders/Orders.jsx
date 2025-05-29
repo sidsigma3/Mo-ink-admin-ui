@@ -89,26 +89,39 @@ const Orders = () => {
 
 
    const calculateDashboardStats = (data) => {
-    let revenue = 0;
-    let weight = 0;
-    let quantity = 0;
-    let received = 0;
+      let revenue = 0;
+      let weight = 0;
+      let quantity = 0;
+      let received = 0;
 
-    data.forEach(order => {
-      revenue += order.totalAmount || 0;
-      weight += order.orderVariantResponse.reduce((total, variant) => total + (Number(variant.orderWeight) || 0), 0);
-      quantity += order.orderVariantResponse.length || 0;
-      received += order.payment.totalAmountPaid || 0;
+      data.forEach(order => {
+        // Total order amount and weight (regardless of payment status)
+        revenue += order.totalAmount || 0;
+        weight += order.orderVariantResponse.reduce(
+          (total, variant) => total + (Number(variant.orderWeight) || 0), 
+          0
+        );
+        quantity += order.orderVariantResponse.length || 0;
 
-    });
+        // Received amount based on payment status
+        const paymentStatus = order.payment?.paymentStatus;
 
-    setTotalOrders(data.length);
-    setTotalRevenue(revenue);
-    setTotalWeightSold(weight);
-    setTotalOrderWeight(weight)
-    setTotalQuantity(quantity);
-    setTotalReceivedAmount(received);
-  };
+        if (paymentStatus === "FULLY_PAID") {
+          received += order.totalAmount || 0;
+        } else if (paymentStatus === "PARTIALLY_PAID") {
+          received += order.payment?.totalAmountPaid || 0;
+        }
+      
+      });
+
+      setTotalOrders(data.length);
+      setTotalRevenue(revenue);
+      setTotalWeightSold(weight);
+      setTotalOrderWeight(weight);
+      setTotalQuantity(quantity);
+      setTotalReceivedAmount(received);
+    };
+
 
 
     const handleChange = (event, newValue) => {
@@ -120,10 +133,6 @@ const Orders = () => {
       setSelectedStatus(status);
       applyFilters(selectedFilter, searchValue, dateRange[0].startDate, dateRange[0].endDate, status);
     };
-
-
-
- 
 
 
 
@@ -175,8 +184,6 @@ const Orders = () => {
 };
 
 
-    console.log(selectedStatus)
-    console.log(filteredData)
 
       const datePickerRef = useRef(null);
 
@@ -209,8 +216,6 @@ const Orders = () => {
         return num; // Return as-is if less than 1000
     };
 
-
-    console.log(filteredData)
 
   return (
     <div className='order'>

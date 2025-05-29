@@ -14,6 +14,7 @@ import { getVendorOrder } from '../../../../services/OrderService'
 import { downloadVendorInvoice } from '../../../../services/InvoiceServices'
 import * as XLSX from "xlsx";
 import VendorOrderFilter from '../../../../components/Filter/OrderFilter/VendorOrderFilter'
+import DashboardBox from '../../../../components/DashboardBox/DashboardBox'
 
 const VendorOrder = () => {
 
@@ -23,7 +24,7 @@ const VendorOrder = () => {
     const [orders, setOrders] = useState([]);
     
     const [searchFilter, setSearchFilter] = useState({ filter: "", value: "" });
-    const [statusFilter, setStatusFilter] = useState("ALL");
+    const [statusFilter, setStatusFilter] = useState([]);
 
 
     const [filteredData, setFilteredData] = useState([]); 
@@ -60,12 +61,12 @@ const statusClassMap = {
       applyCombinedFilters({ filter, value }, statusFilter);
     };
 
-    const handleStatusChange = (newStatus) => {
-      setStatusFilter(newStatus);
-      applyCombinedFilters(searchFilter, newStatus);
-    };
+ const handleStatusChange = (newStatuses) => {
+  setStatusFilter(newStatuses); // This is now an array
+  applyCombinedFilters(searchFilter, newStatuses);
+};
 
-    const applyCombinedFilters = (search, status) => {
+ const applyCombinedFilters = (search, statusArray) => {
   let filtered = orders;
 
   const lowercasedValue = search.value.toLowerCase().trim();
@@ -79,13 +80,14 @@ const statusClassMap = {
     });
   }
 
-  // Apply status filter
-  if (status !== "ALL") {
-    filtered = filtered.filter((item) => item.status === status);
+  // Apply status filter (support multiple selections)
+  if (statusArray.length > 0) {
+    filtered = filtered.filter((item) => statusArray.includes(item.status));
   }
 
   setFilteredData(filtered);
 };
+
 
 
 
@@ -147,6 +149,36 @@ const statusClassMap = {
     XLSX.writeFile(workbook, "Vendor_Orders.xlsx");
   };
 
+
+
+const uniquePOMap = new Map();
+
+filteredData.forEach((order) => {
+  const key = order.correlationId;
+  if (!uniquePOMap.has(key)) {
+    uniquePOMap.set(key, {
+      correlationId: order.correlationId,
+      weight: order.vendorOrderVariantResponse.reduce((sum, variant) => sum + variant.vendorOrderWeight, 0),
+      amount: order.totalAmount,
+      status: order.status,
+    });
+  } else {
+    const existing = uniquePOMap.get(key);
+    existing.weight += order.vendorOrderVariantResponse.reduce((sum, variant) => sum + variant.vendorOrderWeight, 0);
+    existing.amount += order.totalAmount;
+  }
+});
+
+const uniquePOs = Array.from(uniquePOMap.values());
+
+const totalOrders = uniquePOs.length;
+const totalQuantity = uniquePOs.reduce((sum, order) => sum + order.weight, 0).toFixed(2);
+const totalAmount = uniquePOs.reduce((sum, order) => sum + order.amount, 0).toFixed(2);
+const totalReceived = uniquePOs.filter(order => order.status === 'RECEIVED').length;
+const totalPending = uniquePOs.filter(order => order.status === 'CONFIRMED').length;
+
+
+
   return (
     <div className='vendor-order'>
          <div className='top d-flex justify-content-between'>
@@ -168,6 +200,30 @@ const statusClassMap = {
                
             </div>
         </div>
+        <div className='info-ctn mt-3'>
+          <ul className='row'>
+            <li className='col-lg col-md-4 col-sm-6 col-6'>
+              <DashboardBox heading={'Total Orders'} number={totalOrders} />
+            </li>
+
+            <li className='col-lg col-md-4 col-sm-6 col-6'>
+              <DashboardBox heading={'Ordered Quantity'} number={`${totalQuantity} kg`} />
+            </li>
+
+            <li className='col-lg col-md-4 col-sm-6 col-6'>
+              <DashboardBox heading={'Total Amount'} number={`₹${totalAmount}`} />
+            </li>
+
+            <li className='col-lg col-md-4 col-sm-6 col-6'>
+              <DashboardBox heading={'Total Received'} number={totalReceived} />
+            </li>
+
+            <li className='col-lg col-md-4 col-sm-6 col-6'>
+              <DashboardBox heading={'Total Pending'} number={totalPending} />
+            </li>
+          </ul>
+        </div>
+
 
 
         <div className='order-filter-ctn d-flex gap-2 mb-2 w-50 mt-3'>
@@ -177,7 +233,8 @@ const statusClassMap = {
                 onFilterChange={handleFilterChange} 
           />
     
-          <VendorOrderFilter status="ALL" onStatusChange={handleStatusChange} />
+        <VendorOrderFilter status={statusFilter} onStatusChange={handleStatusChange} />
+
 
         </div>
 
