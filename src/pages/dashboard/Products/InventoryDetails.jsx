@@ -11,6 +11,7 @@ import { FaMinus } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
 import * as XLSX from 'xlsx';
 import Toast from '../../../components/Toast/Toast';
+import ModalInventoryChange from '../../../components/Modal/ModalInventoryChange';
 
 const InventoryDetails = () => {
   const { state } = useLocation();
@@ -20,6 +21,26 @@ const InventoryDetails = () => {
   const [amount, setAmount] = useState(""); // Amount input
   const [source, setSource] = useState("");
   const [toasts, setToasts] = useState([]);
+   const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [pendingAction, setPendingAction] = useState(null); 
+
+  const openConfirmationModal = (actionType) => {
+    setPendingAction(actionType); 
+    setIsModalOpen(true);
+  };
+
+  const handleModalConfirm = () => {
+    if (pendingAction) {
+      handleInventoryAdjust(pendingAction); 
+    }
+    setIsModalOpen(false);
+    setPendingAction(null);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+    setPendingAction(null);
+  };
 
 
 
@@ -228,7 +249,7 @@ const InventoryDetails = () => {
         <button
           className='btn btn-primary d-flex align-items-center'
           style={{ height: '1.8rem', padding: '0.28rem 1.2rem' }}
-          onClick={() => handleInventoryAdjust("INCREASE")}
+          onClick={() => openConfirmationModal("INCREASE")}
         >
           <MdAdd size={19} />
         </button>
@@ -236,10 +257,17 @@ const InventoryDetails = () => {
         <button
           className='btn btn-danger d-flex align-items-center'
           style={{ height: '1.8rem', padding: '0.55rem 1.2rem' }}
-          onClick={() => handleInventoryAdjust("DECREASE")}
+          onClick={() => openConfirmationModal("DECREASE")} // ✅
         >
           <FaMinus size={12} />
         </button>
+
+         {/* ✅ Modal component */}
+      <ModalInventoryChange
+        isOpen={isModalOpen}
+        onConfirm={handleModalConfirm}
+        onCancel={handleModalCancel}
+      />
       </div>
          
     </div>

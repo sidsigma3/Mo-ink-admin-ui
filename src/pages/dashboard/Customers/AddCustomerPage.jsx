@@ -655,7 +655,15 @@ const handleAddressTypeChange = (e) => {
                           >
                             {item.type}
                           </td>
-                          <td className=" text-center">₹{item.amount.toFixed(0)}</td>
+
+                          <td className="text-center"
+                            style={{
+                              color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000", 
+                            }}
+                          >
+                            {item.type === "DEBIT" ? "−" : ""}
+                            ₹{item.amount.toFixed(0)} 
+                          </td>
                          
                           <td className="text-center">
                             {new Date(item.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}

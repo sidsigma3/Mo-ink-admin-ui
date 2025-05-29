@@ -213,9 +213,21 @@ const SegmentsPage = () => {
                     <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{row.customerCount}</td>
                     <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{formatSegmentCondition(row.segmentCondition)}</td>
                     <td style={{ justifyItems: 'center', alignContent:'center'}}  >
-                    <div style={{color: row.segmentStatus.toLowerCase() === 'Active' ? '#065F46' : '#991B1B', backgroundColor: row.segmentStatus.toLowerCase() === 'Active' ? '#D1FAE5' : '#FEE2E2', border: '1px solid', borderColor: row.segmentStatus.toLowerCase() === 'Active' ? '#6EE7B7' : '#FCA5A5', borderRadius: '0.2rem', textAlign:'center',width:'6rem' ,padding: '4px',}}>
-                      {row.segmentStatus}
+                    <div
+                        style={{
+                          color: row.segmentStatus.toLowerCase() === 'active' ? '#065F46' : '#991B1B',
+                          backgroundColor: row.segmentStatus.toLowerCase() === 'active' ? '#D1FAE5' : '#FEE2E2',
+                          border: '1px solid',
+                          borderColor: row.segmentStatus.toLowerCase() === 'active' ? '#6EE7B7' : '#FCA5A5',
+                          borderRadius: '0.2rem',
+                          textAlign: 'center',
+                          width: '6rem',
+                          padding: '4px',
+                        }}
+                      >
+                        {row.segmentStatus}
                       </div>
+
                     </td>
                     <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                     
