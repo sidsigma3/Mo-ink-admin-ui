@@ -852,15 +852,15 @@ useEffect(() => {
         orderVariants
       };
   
-      console.log("Final Payload:", orderData);
+   
       const response = await createOrder(orderData);
-      console.log("Order Created:", response);
+    
   
-      alert("Order created successfully!");
+      showToast('Order Created successfully','success')
       navigate('/orders');
     } catch (error) {
       console.error("Error creating order:", error);
-      alert("Failed to create order. Check console for details.");
+      showToast('Failed to create order','erorr')
     }
   };
   
@@ -1212,10 +1212,11 @@ const handleOrderChange = async () => {
       await updateOrderVariants(orderId, payload);
     }
 
-    alert("Order updated successfully!");
+    showToast('Order Updated successfully','success')
+    
   } catch (err) {
     console.error(err);
-    alert("Failed to update order.");
+    showToast('Failed to update order','erorr')
   }
 };
 
@@ -1280,10 +1281,6 @@ const handleReject = (variant) => {
   closeReturnModal();
 };
 
-
-
-console.log(orderDetails)  
-console.log(selectedAddress)
 
 
   return (

@@ -17,6 +17,17 @@ const UserPage = () => {
     const navigate = useNavigate()
     const [users,setUsers] =useState([])
     const [filteredData, setFilteredData] = useState([]);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentPageData = filteredData.slice(startIndex, endIndex);
+
+
     useEffect(() => {
         const fetchData = async () => {
           try {
@@ -40,17 +51,6 @@ const UserPage = () => {
         setUsers([users[index],...users]);
       };
 
-
-      
-    let active = 2;
-    let items = [];
-    for (let number = 1; number <= 5; number++) {
-        items.push(
-        <Pagination.Item key={number} active={number === active}>
-            {number}
-        </Pagination.Item>,
-        );
-    }
         
     const handleRowClick = (index) => {
       console.log(index,users)
@@ -71,6 +71,17 @@ const UserPage = () => {
       setFilteredData(filtered);
       };
   
+
+      const paginationItems = [];
+
+for (let number = 1; number <= totalPages; number++) {
+  paginationItems.push(
+    <Pagination.Item key={number} active={number === currentPage} onClick={() => setCurrentPage(number)}>
+      {number}
+    </Pagination.Item>
+  );
+}
+
 
   return (
     <div className='user-page'>
@@ -115,80 +126,92 @@ const UserPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredData.map((user, index) => (
-                        <tr key={index}  
-                        onClick={() => handleRowClick(index)}
-                        style={{cursor:'pointer'}}
-                         >
-                        <td style={{ verticalAlign: 'middle'}} >{user.firstName +" "+user.lastName}</td>
-                        <td style={{ verticalAlign: 'middle'}} >{user.email}</td>
-                        <td style={{ justifyItems: 'center', alignContent:'center'}}>
-                        <div
+                  {currentPageData.map((user, index) => {
+                    const originalIndex = startIndex + index;
+
+                    return (
+                      <tr
+                        key={originalIndex}
+                        onClick={() => handleRowClick(originalIndex)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <td style={{ verticalAlign: 'middle' }}>{user.firstName + " " + user.lastName}</td>
+                        <td style={{ verticalAlign: 'middle' }}>{user.email}</td>
+                        <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+                          <div
                             style={{
-                                width: '6rem',
-                                padding: '4px',
-                                border: '1px solid',
-                                borderRadius: '0.2rem',
-                                textAlign: 'center',
-                                backgroundColor:
-                                   user.role.toLowerCase() === 'owner'
-                                    ? '#FEDBDC'
-                                    :  user.role.toLowerCase() === 'admin'
-                                    ? '#DBEAFE'
-                                    :  user.role.toLowerCase() === 'sales'
-                                    ? '#FFECFA'
-                                    : '#FFFFFF', // Default background color if none match
-                                borderColor:
-                                   user.role.toLowerCase() === 'owner'
-                                    ? '#FD9395'
-                                    :  user.role.toLowerCase() === 'admin'
-                                    ? '#93C5FD'
-                                    :  user.role.toLowerCase() === 'sales'
-                                    ? '#F75FFF'
-                                    : '#CCCCCC', // Default border color if none match
-                                color:
-                                   user.role.toLowerCase() === 'owner'
-                                    ? '#B91C1C' // Red text for Owner
-                                    :  user.role.toLowerCase() === 'admin'
-                                    ? '#1E40AF' // Blue text for Admin
-                                    :  user.role.toLowerCase() === 'sales'
-                                    ? '#7A1E7A' // Purple text for Sales
-                                    : '#000000', // Default text color if none match
-                              }}
-                        >
-                            {
-                             user.role}
-                        </div>
+                              width: '6rem',
+                              padding: '4px',
+                              border: '1px solid',
+                              borderRadius: '0.2rem',
+                              textAlign: 'center',
+                              backgroundColor:
+                                user.role.toLowerCase() === 'owner'
+                                  ? '#FEDBDC'
+                                  : user.role.toLowerCase() === 'admin'
+                                  ? '#DBEAFE'
+                                  : user.role.toLowerCase() === 'sales'
+                                  ? '#FFECFA'
+                                  : '#FFFFFF',
+                              borderColor:
+                                user.role.toLowerCase() === 'owner'
+                                  ? '#FD9395'
+                                  : user.role.toLowerCase() === 'admin'
+                                  ? '#93C5FD'
+                                  : user.role.toLowerCase() === 'sales'
+                                  ? '#F75FFF'
+                                  : '#CCCCCC',
+                              color:
+                                user.role.toLowerCase() === 'owner'
+                                  ? '#B91C1C'
+                                  : user.role.toLowerCase() === 'admin'
+                                  ? '#1E40AF'
+                                  : user.role.toLowerCase() === 'sales'
+                                  ? '#7A1E7A'
+                                  : '#000000',
+                            }}
+                          >
+                            {user.role}
+                          </div>
                         </td>
-                        <td style={{ justifyItems: 'center', alignContent:'center'}}>
-                        <div style={{backgroundColor:user.userStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:user.userStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
-                        {user.userStatus}
-                        </div>
+                        <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+                          <div
+                            style={{
+                              backgroundColor:
+                                user.userStatus.toLowerCase() === 'active' ? '#D1FAE5' : '#F3F4F6',
+                              border: '1px solid',
+                              borderColor:
+                                user.userStatus.toLowerCase() === 'active' ? '#6EE7B7' : '#D1D5DB',
+                              borderRadius: '0.2rem',
+                              textAlign: 'center',
+                              width: '6rem',
+                              padding: '4px',
+                            }}
+                          >
+                            {user.userStatus}
+                          </div>
                         </td>
-                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                          {new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}
+                        </td>
                         <td>
-                        <Dropdown align="end" style={{ zIndex: 10 }}>
-                            <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
-                            <BsThreeDotsVertical />
+                          <Dropdown align="end" style={{ zIndex: 10 }}>
+                            <Dropdown.Toggle variant="light" id="dropdown-basic" className="border border-0">
+                              <BsThreeDotsVertical />
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>
+                              <Dropdown.Item onClick={() => handleDuplicate(originalIndex)}>Duplicate</Dropdown.Item>
+                              <Dropdown.Item onClick={() => handleDelete(originalIndex)}>Delete</Dropdown.Item>
                             </Dropdown.Menu>
-                        </Dropdown>
+                          </Dropdown>
                         </td>
-                        </tr>
-                    ))}
-                    </tbody>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+
             </Table>
-
-
-            <div className='d-flex justify-content-end mt-2 pagination'>
-            <Pagination>{items}</Pagination>
-            </div>
-
-
 
             <div className="data-cards">
             {filteredData.map((user,index) => (
@@ -247,6 +270,11 @@ const UserPage = () => {
       </div>
 
         </div>
+
+        <div className="d-flex justify-content-end mt-2 pagination">
+        <Pagination>{paginationItems}</Pagination>
+      </div>
+
 
 
     </div>
