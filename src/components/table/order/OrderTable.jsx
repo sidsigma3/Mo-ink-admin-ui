@@ -1,4 +1,4 @@
-import React, { useState , useEffect ,forwardRef, useRef ,useImperativeHandle } from "react";
+import React, { useState , useEffect ,forwardRef, useRef ,useImperativeHandle , useMemo } from "react";
 import "./OrderTable.css";
 import { useOrderContext } from "../../Context/OrderContext";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +28,17 @@ const OrderTable = forwardRef(({data}, ref) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
   const [toasts, setToasts] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  const paginatedOrders = useMemo(() => {
+    const reversedOrders = [...orders].reverse();
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return reversedOrders.slice(startIndex, endIndex);
+  }, [orders, currentPage]);
+
 
   const createOrderRef = useRef(null);
 
@@ -310,6 +321,7 @@ console.log(istDate);
   };
   
   return (
+    <div>
     <div className="order-table table-ctn-order">
       <Table hover>
         <thead>
@@ -346,15 +358,13 @@ console.log(istDate);
           </tr>
         </thead>
 
-        <tbody>
-        {[...orders]
-        .reverse()
-       .map((order) => (
-    <tr
-      key={order.orderId}
-      style={{ cursor: "pointer" }}
-      onClick={() => handleRowClick(order)}
-    >
+          <tbody>
+              {paginatedOrders.map((order) => (
+            <tr
+              key={order.orderId}
+              style={{ cursor: "pointer" }}
+              onClick={() => handleRowClick(order)}
+            >
 
               <td style={{ verticalAlign: 'middle', fontWeight: 500 }}>{order.orderId}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
@@ -401,26 +411,16 @@ console.log(istDate);
                       : "yellow"
                   }
                   value={order.payment.paymentStatus}
-                  onChange={async (e) => {
-                    const newStatus = e.target.value;
-                    setModalData({
-                      isOpen: true,
-                      type: 'payment',
-                      status: newStatus,
-                      orderId: order.orderId,
-                    });
+                  onChange={(e) => {
+                  const newStatus = e.target.value;
+                  setModalData({
+                    isOpen: true,
+                    type: 'payment',
+                    status: newStatus,
+                    orderId: order.orderId,
+                  });
+                }}
 
-                    try {
-                      await updateOrderPaymentStatuses(order.orderId, {
-                        paymentStatus: newStatus,
-                      });
-
-                      // ✅ Update local state to reflect changes immediately
-                      handlePaymentStatusChange(order.orderId, newStatus); 
-                    } catch (error) {
-                      console.error("Failed to update payment status:", error);
-                    }
-                  }}
                 >
                   {[
                     { label: "Unpaid", value: "UNPAID" },
@@ -449,24 +449,6 @@ console.log(istDate);
                   </div>
             </td>
 
-           
-              {/* <td>
-                <div className="manufacturer">
-                  {order.manufacturer ? (
-                    <div>Assigned</div>
-                  ) : (
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowModalAssign(true);
-                      }}
-                      className="assign-button w-75"
-                    >
-                      Not Assigned
-                    </div>
-                  )}
-                </div>
-              </td> */}
               <td>
                 <button
                 className="border-0 btn"
@@ -496,9 +478,8 @@ console.log(istDate);
       {renderModal()}
 
 
-      <div className="d-flex justify-content-end mt-2 pagination">
-        <Pagination>{items}</Pagination>
-      </div>
+     
+
 
       <ModalAssign
         show={showModalAssign}
@@ -641,6 +622,28 @@ console.log(istDate);
                     />
                 ))}
             </div>
+
+    </div>
+
+    <Pagination className="mt-4 d-flex justify-content-end pagination">
+      <Pagination.Prev
+        onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+        disabled={currentPage === 1}
+      />
+      {[...Array(Math.ceil(orders.length / rowsPerPage)).keys()].map((number) => (
+        <Pagination.Item
+          key={number + 1}
+          active={number + 1 === currentPage}
+          onClick={() => setCurrentPage(number + 1)}
+        >
+          {number + 1}
+        </Pagination.Item>
+      ))}
+      <Pagination.Next
+        onClick={() => setCurrentPage((p) => Math.min(p + 1, Math.ceil(orders.length / rowsPerPage)))}
+        disabled={currentPage === Math.ceil(orders.length / rowsPerPage)}
+      />
+    </Pagination>
 
     </div>
   );

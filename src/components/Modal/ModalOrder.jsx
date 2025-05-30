@@ -13,6 +13,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
   const [selectedSize, setSelectedSize] = useState({});
   const [showCatalogue, setShowCatalogue] = useState(false);
   const [currentVariant, setCurrentVariant] = useState(null);
+  const [productImage,setProductImage] = useState([])
   const [selectedColors, setSelectedColors] = useState({});
   const [currentId,setCurrentId] = useState('')
 
@@ -32,10 +33,11 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
   };
 
  
-  const openCatalogue = (variant,id) => {
+  const openCatalogue = (variant,id,imageUrl) => {
     setCurrentId(id)
     setCurrentVariant(variant);
     setShowCatalogue(true);
+    setProductImage(imageUrl)
   };
 
  
@@ -55,7 +57,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
   
   
 
-  console.log(selectedColors)
+
   
   const handleOrderCreation = () => {
     const order = Object.entries(selectedColors).flatMap(([productId, sizes]) =>
@@ -103,6 +105,9 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
     handleClose();
   };
   
+
+
+  console.log(products)
 
 
   return (
@@ -176,7 +181,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
 
 
 
-                        <span onClick={() => openCatalogue(variant,product.productId)} className="d-flex align-items-center">
+                        <span onClick={() => openCatalogue(variant,product.productId,product.productImage)} className="d-flex align-items-center">
                         <img src="./color-wheel.png" alt="Color Selector" />
                       </span>
 
@@ -188,7 +193,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
           ))
         ) : (
           // Show Catalogue Page inside the modal
-          <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} id={currentId}/>
+          <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} id={currentId} imageUrl={productImage}/>
         )}
       </Modal.Body>
       <Modal.Footer className="flex justify-content-between" style={{ display: showCatalogue === true ? 'none' : 'flex'}}>

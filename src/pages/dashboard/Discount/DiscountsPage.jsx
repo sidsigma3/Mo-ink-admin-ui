@@ -27,6 +27,8 @@ const DiscountsPage = () => {
   const [endDate, setEndDate] = useState(null);
   const [toasts, setToasts] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
 
   const [discountData , setDiscountData] = useState([])
@@ -51,16 +53,6 @@ const DiscountsPage = () => {
   const handleRowClick = (index) => {
     navigate('/add-discount', { state: { index , discountData} });
   };
-
-  let active = 2;
-  let items = [];
-  for (let number = 1; number <= 5; number++) {
-    items.push(
-      <Pagination.Item key={number} active={number === active}>
-        {number}
-      </Pagination.Item>,
-    );
-  }
 
 
   const handleDelete = (index) => {
@@ -165,6 +157,46 @@ const DiscountsPage = () => {
   const isAllProducts = allProducts.length === selectedProducts.length;
   const selectedProductText = isAllProducts ? "all products" : "selected products";
 
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedDiscounts = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const paginationItems = [];
+
+if (totalPages >=1) {
+  paginationItems.push(
+    <Pagination.Prev
+      key="prev"
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+    />
+  );
+
+  for (let number = 1; number <= totalPages; number++) {
+    paginationItems.push(
+      <Pagination.Item
+        key={number}
+        active={number === currentPage}
+        onClick={() => setCurrentPage(number)}
+      >
+        {number}
+      </Pagination.Item>
+    );
+  }
+
+  paginationItems.push(
+    <Pagination.Next
+      key="next"
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+    />
+  );
+}
+
+
   return (
     <div className='discounts'>
         <div className='top d-flex justify-content-between mb-2'>
@@ -210,7 +242,7 @@ const DiscountsPage = () => {
             </thead>
 
             <tbody>
-            {filteredData.map((discount, index) => (
+            {paginatedDiscounts.map((discount, index) => (
             <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
               <td>
                 <div>
@@ -265,11 +297,7 @@ const DiscountsPage = () => {
 
           </Table>
 
-          <div className='d-flex justify-content-end mt-2 pagination'>
-          <Pagination>{items}</Pagination>
-          </div>
-          
-
+      
 
           <div className="data-cards">
         {filteredData.map((discount,index) => (
@@ -349,6 +377,9 @@ const DiscountsPage = () => {
                 ))}
             </div>
 
+                  <div className='d-flex justify-content-end mt-2 pagination'>
+          <Pagination>{paginationItems}</Pagination>
+        </div>
 
     </div>
   )

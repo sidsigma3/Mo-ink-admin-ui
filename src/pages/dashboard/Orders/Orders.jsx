@@ -24,15 +24,12 @@ import { enIN } from "date-fns/locale";
 import "react-date-range/dist/styles.css"; // Main styles
 import "react-date-range/dist/theme/default.css"; // Theme styles
 import OrderFilter from '../../../components/Filter/OrderFilter/OrderFilter';
-
-const TabPanel = ({ children, value, index }) => {
-    return value === index ? <div>{children}</div> : null;
-  };
-  
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 
 const Orders = () => {
-    const [value, setValue] = useState(0);
+   
     const orderTableRef = useRef(null);
     const [orders,setOrders] = useState([])
 
@@ -50,17 +47,14 @@ const Orders = () => {
     const [selectedStatus, setSelectedStatus] = useState([]); // Start with no status selected
 
 
-    const [dateRange, setDateRange] = useState([
-        {
-          startDate: null,
-          endDate: null,
-          key: "selection",
-        },
-      ]);
-      const [showDatePicker, setShowDatePicker] = useState(false);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+     const [showPicker, setShowPicker] = useState(false);
       const [selectedFilter, setSelectedFilter] = useState("");
       const [searchValue, setSearchValue] = useState("");
-    
+ 
+      
+      
       // Function to adjust to Indian Standard Time (IST)
       const toIST = (date) => {
         return new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
@@ -124,33 +118,29 @@ const Orders = () => {
 
 
 
-    const handleChange = (event, newValue) => {
-      setValue(newValue);
-    };
-
-
-    const handleStatusChange = (status) => {
-      setSelectedStatus(status);
-      applyFilters(selectedFilter, searchValue, dateRange[0].startDate, dateRange[0].endDate, status);
-    };
-
-
 
 // ✅ Call applyFilters every time selectedStatus changes
     useEffect(() => {
-      applyFilters(selectedFilter, searchValue, dateRange[0].startDate, dateRange[0].endDate, selectedStatus);
+      applyFilters(selectedFilter, searchValue, startDate, endDate, selectedStatus);
     }, [selectedStatus]);
 
-    const handleFilterChange = (filter, value) => {
-      setSelectedFilter(filter);
-      setSearchValue(value.toLowerCase());
-      applyFilters(filter, value.toLowerCase(), dateRange[0].startDate, dateRange[0].endDate, selectedStatus);
-    };
 
-    const handleDateChange = (ranges) => {
-      setDateRange([ranges.selection]);
-      applyFilters(selectedFilter, searchValue, ranges.selection.startDate, ranges.selection.endDate, selectedStatus);
-    };
+   const handleFilterChange = (filter, value) => {
+  setSelectedFilter(filter);
+  setSearchValue(value.toLowerCase());
+  applyFilters(filter, value.toLowerCase(), startDate, endDate, selectedStatus);
+};
+
+
+  const handleDateChange = (dates) => {
+  const [start, end] = dates;
+  setStartDate(start);
+  setEndDate(end);
+  if (start && end) {
+    applyFilters(selectedFilter, searchValue, start, end, selectedStatus);
+  }
+};
+
 
     
       // Apply both date and product filters
@@ -191,18 +181,18 @@ const Orders = () => {
       useEffect(() => {
           const handleClickOutside = (event) => {
               if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
-                  setShowDatePicker(false);
+                  setShowPicker(false);
               }
           };
   
-          if (showDatePicker) {
+          if (showPicker) {
               document.addEventListener("mousedown", handleClickOutside);
           }
   
           return () => {
               document.removeEventListener("mousedown", handleClickOutside);
           };
-      }, [showDatePicker]);
+      }, [showPicker]);
 
 
     const formatNumber = (num) => {
@@ -224,27 +214,29 @@ const Orders = () => {
 
             <div className='btn-ctn'>
             <div className="date-filter position-relative">
-                <button
-                    className="border rounded bg-white"
-                    onClick={() => setShowDatePicker((prev) => !prev)}
-                >
-                    {dateRange[0].startDate && dateRange[0].endDate
-                    ? `${format(toIST(dateRange[0].startDate), "dd MMM yyyy")} - ${format(toIST(dateRange[0].endDate), "dd MMM yyyy")}`
-                    : "Select Date Range"}
-                </button>
+      <button
+        className="border rounded bg-white px-3 py-1"
+        onClick={() => setShowPicker(!showPicker)}
+      >
+        {startDate && endDate
+          ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+          : "Select Date Range"}
+      </button>
 
-                {showDatePicker && (
-                    <div ref={datePickerRef}   className="position-absolute" style={{zIndex:'1000'}}>
-                    <DateRangePicker
-                        ranges={dateRange}
-                        onChange={handleDateChange}
-                        locale={enIN}
-                        moveRangeOnFirstSelection={false}
-                        editableDateInputs={true}
-                    />
-                    </div>
-                )}
-            </div>
+      {showPicker && (
+        <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute" }}>
+          <DatePicker
+            selected={startDate}
+            onChange={handleDateChange}
+            startDate={startDate}
+            endDate={endDate}
+            selectsRange
+            inline
+            dateFormat="dd MMM yyyy"
+          />
+        </div>
+      )}
+    </div>
               
                 {/* <Filter></Filter> */}
 
@@ -308,34 +300,11 @@ const Orders = () => {
               <OrderFilter status={selectedStatus} onStatusChange={setSelectedStatus} />
 
         </div>
-{/* 
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" > */}
-            {/* <Tab className="text-capitalize" label="Order Dashboard" /> */}
-            {/* <Tab className="text-capitalize" label="Bulk Assign" />
-            <Tab className="text-capitalize" label="Order Cart" /> */}
-            {/* </Tabs> */}
-        {/* </Box> */}
 
-        {/* Tab Panels */}
-        <TabPanel value={value} index={0}>
+        
             <div className="order-table-ctn mt-4">
             <OrderTable ref={orderTableRef} data={filteredData}/>
             </div>
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-            <div className="bulk-assign-ctn">
-          
-           <BulkAssignPage setOrders={setOrders}></BulkAssignPage>
-            </div>
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-            <div className="order-cart-ctn">     
-                <OrderCart orders={orders}></OrderCart>
-            </div>
-        </TabPanel>
-
-       
 
     </div>
   )

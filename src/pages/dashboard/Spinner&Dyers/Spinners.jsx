@@ -35,6 +35,11 @@ const Spinners = () => {
     const [toasts, setToasts] = useState([]);
     const [vendorOrdersMap, setVendorOrdersMap] = useState({});
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -105,16 +110,7 @@ const Spinners = () => {
 
 
   
-  let active = 2;
-  let items = [];
-  for (let number = 1; number <= 5; number++) {
-    items.push(
-      <Pagination.Item key={number} active={number === active}>
-        {number}
-      </Pagination.Item>,
-    );
-  }
-
+  
 
   const handleDelete = (index) => {
     setData(data.filter((_, i) => i !== index));
@@ -232,6 +228,23 @@ const formatToIST = (utcDateString) => {
   });
 };
 
+const startIndex = (currentPage - 1) * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const currentPageData = filteredData.slice(startIndex, endIndex);
+
+const paginationItems = [];
+
+for (let page = 1; page <= totalPages; page++) {
+  paginationItems.push(
+    <Pagination.Item
+      key={page}
+      active={page === currentPage}
+      onClick={() => setCurrentPage(page)}
+    >
+      {page}
+    </Pagination.Item>
+  );
+}
 
 
   return (
@@ -292,58 +305,81 @@ const formatToIST = (utcDateString) => {
                         <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
-                <tbody>
-          {filteredData.map((customer, index) => (
-            <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-              <td style={{ verticalAlign: 'middle'}} >{customer.firstName} {customer.lastName}</td>
-              <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.city}</td>
-              <td style={{ justifyItems: 'center', alignContent:'center'}}>
-                <div 
-                style={{
-                    padding:'4px',
-                    border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem',
-                    backgroundColor:customer.vendorType === 'SPINNER' ? '#DBEAFE' : '#FEF3C7',
-                    borderColor:customer.vendorType === 'SPINNER' ? '#93C5FD' : '#FCD34D' ,
-                    color : customer.vendorType === 'SPINNER' ? '#1E40AF' : '#92400E' ,
-                }}
+         <tbody>
+            {currentPageData.map((customer, index) => {
+              const originalIndex = startIndex + index;
+              return (
+                <tr
+                  key={originalIndex}
+                  onClick={(e) =>
+                    !e.target.closest('.dropdown') && handleRowClick(originalIndex)
+                  }
+                  style={{ cursor: "pointer" }}
                 >
-               {customer.vendorType}
-               </div>
-              </td>
-
-             <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                {vendorOrdersMap[customer.vendorId]?.length || 'No order'}
-              </td>
-
-            <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-              {vendorOrdersMap[customer.vendorId]?.length
-                ? formatToIST(vendorOrdersMap[customer.vendorId].at(-1).orderDate)
-                : 'No order'}
-            </td>
-
-
-
-
-              <td>
+                  <td style={{ verticalAlign: 'middle' }}>
+                    {customer.firstName} {customer.lastName}
+                  </td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                    {customer.city}
+                  </td>
+                  <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+                    <div
+                      style={{
+                        padding: '4px',
+                        border: '1px solid',
+                        borderRadius: '0.2rem',
+                        textAlign: 'center',
+                        width: '6rem',
+                        backgroundColor:
+                          customer.vendorType === 'SPINNER' ? '#DBEAFE' : '#FEF3C7',
+                        borderColor:
+                          customer.vendorType === 'SPINNER' ? '#93C5FD' : '#FCD34D',
+                        color: customer.vendorType === 'SPINNER'
+                          ? '#1E40AF'
+                          : '#92400E',
+                      }}
+                    >
+                      {customer.vendorType}
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                    {vendorOrdersMap[customer.vendorId]?.length || 'No order'}
+                  </td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                    {vendorOrdersMap[customer.vendorId]?.length
+                      ? formatToIST(
+                          vendorOrdersMap[customer.vendorId].at(-1).orderDate
+                        )
+                      : 'No order'}
+                  </td>
+                  <td>
                     <Dropdown align="end" style={{ zIndex: 10 }}>
-                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0'>
+                      <Dropdown.Toggle
+                        variant="light"
+                        id="dropdown-basic"
+                        className="border border-0"
+                      >
                         <BsThreeDotsVertical />
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => handleDuplicate(index)}>Duplicate</Dropdown.Item>
-                        <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>
-                        </Dropdown.Menu>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => handleDuplicate(originalIndex)}>
+                          Duplicate
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleDelete(originalIndex)}>
+                          Delete
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
                     </Dropdown>
-                    </td>
-            </tr>
-          ))}
-        </tbody>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+
                 </Table>
 
-            <div className='d-flex justify-content-end mt-2'>
-            <Pagination>{items}</Pagination>
-            </div>
+           
+
 
 
                 <div className="data-cards">
@@ -380,6 +416,10 @@ const formatToIST = (utcDateString) => {
       </div>
 
         </div>
+
+         <div className="d-flex justify-content-end mt-2">
+            <Pagination>{paginationItems}</Pagination>
+          </div>
 
           {/* Toast Notification */}
      <div className="fixed top-4 right-4 z-50 space-y-2">

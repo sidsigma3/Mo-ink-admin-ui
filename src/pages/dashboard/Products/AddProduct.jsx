@@ -73,6 +73,7 @@ const AddProduct = () => {
           price: variant.price,
           markupPricePerKg: variant.markupPricePerKg,
           id: variant.id,
+          availableStatus:variant.availableStatus,
         })),
       }));
   
@@ -219,7 +220,7 @@ console.log(formData)
                 availableWeight: Number(variant.available),
                 pricePerKg: Number(variant.price),
                 markupPricePerKg: Number(variant.markupPricePerKg || 0),
-                availableStatus : "ACTIVE"
+                availableStatus : variant.availableStatus || "ACTIVE"
             }));
         });
     });
@@ -1376,25 +1377,20 @@ console.log(sizeColorMap)
                              placeholder="Type"
                            />
                          </td>
-                         <td>
-                          <button
-                            onClick={() => {
-                              const newStatus =
-                                variant.availableStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+                        <td>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={variant.availableStatus === "ACTIVE"}
+                            onChange={() => {
+                              const newStatus = variant.availableStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
                               updateVariantField(sizeIndex, colorIndex, variantIndex, "availableStatus", newStatus);
                             }}
-                            style={{
-                              padding: "4px 8px",
-                              backgroundColor: variant.availableStatus === "ACTIVE" ? "#dc2626" : "#16a34a",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            {variant.availableStatus === "ACTIVE" ? "Disable" : "Enable"}
-                          </button>
-                        </td>
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </td>
+
 
                          {/* <td>
                            <button

@@ -19,6 +19,8 @@ const ProductsTable = forwardRef(({data},ref) => {
 const [toasts, setToasts] = useState([]);
 
   const [productData,setProductData] = useState([])
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
 
 
   useEffect(() => {
@@ -57,7 +59,7 @@ const [toasts, setToasts] = useState([]);
   const aggregateProductData = (productData) => {
     return productData.map((product) => {
       const groupedVariants = product.variants.reduce((acc, variant) => {
-        const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType } = variant;
+        const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType , availableStatus} = variant;
   
         if (!acc[size]) {
           acc[size] = {
@@ -88,6 +90,7 @@ const [toasts, setToasts] = useState([]);
           price: pricePerKg,
           id,
           markupPricePerKg,
+          availableStatus,
         });
   
         acc[size].totalWeight += Number(availableWeight);
@@ -113,9 +116,45 @@ const [toasts, setToasts] = useState([]);
 
   const finalData = aggregateProductData(data)
 
+const flattenedData = finalData.flatMap((product, productIndex) =>
+  product.groupedVariants.map((variantGroup, variantIndex) => ({
+    productId: product.productId,
+    productName: product.productName,
+    gstOnProduct: product.gstOnProduct,
+    availableStatus: product.availableStatus,
+    size: variantGroup.size,
+    totalWeight: variantGroup.totalWeight,
+    variants: variantGroup.variants.flatMap((v) =>
+      v.variants.map((variant) => ({
+        colorName: v.colorName,
+        hexCode: v.hexCode,
+        ...variant,
+      }))
+    ),
+    productIndex,
+    variantIndex,
+  }))
+);
 
-  console.log(data)
-  console.log(finalData)
+
+const totalRows = flattenedData.length;
+const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+const indexOfLastRow = currentPage * rowsPerPage;
+const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+
+const currentRows = flattenedData.slice(indexOfFirstRow, indexOfLastRow);
+
+const paginationItems = [];
+
+for (let i = 1; i <= totalPages; i++) {
+  paginationItems.push(
+    <Pagination.Item key={i} active={i === currentPage} onClick={() => setCurrentPage(i)}>
+      {i}
+    </Pagination.Item>
+  );
+}
+
 
   useImperativeHandle(ref, () => ({
     exportToExcel: () => {
@@ -151,65 +190,54 @@ const [toasts, setToasts] = useState([]);
   }));
 
   return (
+    <div>
     <div className="product-table">
-      <Table hover>
-        <thead className='z-1'>
+    <Table hover>
+      <thead className='z-1'>
+        <tr>
+          <th style={{ textAlign: 'start', verticalAlign: 'middle' }}>Product Name</th>
+          <th>Counter</th>
+          <th>Color Variant</th>
+          <th>Color</th>
+          <th>Available</th>
+          <th>GST</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {currentRows.map((item, index) => (
+          <tr
+            key={`${item.productId}-${item.variantIndex}`}
+            onClick={() => handleRowClick(item.productIndex, item.variantIndex)}
+            style={{ cursor: "pointer" }}
+          >
+            <td style={{ textAlign: 'start', verticalAlign: 'middle' }}>{item.productName}</td>
 
-          <tr>
-            <th style={{ textAlign: 'start', verticalAlign: 'middle'}}>Product Name</th>
-            <th>Counter</th>
-            <th>Color Variant</th>
-            <th>Color</th>
-            <th>Available</th>
-            <th>GST</th>
-            <th>Status</th>
-          </tr>
-
-        </thead>
-        <tbody>
-          {finalData.map((product, index) => (
-            product.groupedVariants.map((item, ix) => (
-              <tr 
-                key={`${product.productId}-${ix}`} 
-                onClick={() => handleRowClick(index,ix)} 
-                style={{ cursor: "pointer" }}
+            <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+              <div
+                className='size'
+                style={{
+                  padding: '0.3rem 0.5rem',
+                  backgroundColor: '#EFEFEF',
+                  border: '1px solid #B9C0CD',
+                  borderRadius: '0.9rem',
+                  justifyContent: 'center',
+                  width: '45%',
+                  textAlign: 'center'
+                }}
               >
-                <td style={{ textAlign: 'start', verticalAlign: 'middle' }}>{product.productName}</td>
-                <td style={{ justifyItems: 'center', alignContent:'center'}} >
-                  <div className='size'
-                    style={{
-                      padding: '0.3rem 0.5rem', 
-                      backgroundColor: '#EFEFEF', 
-                      border: '1px solid #B9C0CD', 
-                      borderRadius: '0.9rem', 
-                      justifyContent: 'center',             
-                      width: '45%', 
-                      textAlign: 'center'
-                    }}
-                  >
-                    {item.size}
-                  </div>
-                </td>
+                {item.size}
+              </div>
+            </td>
 
-  <td style={{verticalAlign: 'middle' }}>
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',     // horizontal center
-      alignItems: 'center',         // vertical center
-      height: '100%',               // fills the td vertically
-      width: '100%',                // fills the td horizontally
-    }}
-  >
-    {item.variants.length}
-  </div>
-</td>
+            <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>
+              {item.variants.length}
+            </td>
 
-                <td style={{verticalAlign: 'middle' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>
-
-                    <div style={{ display: 'flex', marginLeft: '10px', position: 'relative' }}>
-                      {item.variants.slice(0, 3).map((color, colorIndex) => (
+            <td style={{ verticalAlign: 'middle' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', marginLeft: '10px', position: 'relative' }}>
+                    {item.variants.slice(0, 3).map((color, colorIndex) => (
                         <div
                           key={colorIndex}
                           style={{
@@ -222,64 +250,52 @@ const [toasts, setToasts] = useState([]);
                           }}
                         ></div>
                       ))}
-                      {item.variants.length > 1 && (
-                        <div
-                          // style={{
-                          //   width: '25px',
-                          //   height: '25px',
-                          //   borderRadius: '50%',
-                          //   marginLeft: '-10px',
-                          //   backgroundColor: '#ccc',
-                          //   display: 'flex',
-                          //   alignItems: 'center',
-                          //   justifyContent: 'center',
-                          //   fontSize: '18px',
-                          //   color: '#000',
-                          //   border: '1px solid #fff',
-                          // }}
-                          style={{
-                            position:'absolute',
-                            right:-22,
-                          }}
-                        >
-                          {/* +{item.variants.length - 3} */}
-                          +30
-                        </div>
-                      )}
+                  {item.variants.length > 3 && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        right: -22,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      +{item.variants.length - 3}
                     </div>
-                  </div>
-                </td>
+                  )}
+                </div>
+              </div>
+            </td>
 
-                <td style={{verticalAlign: 'middle' }}>{item.totalWeight}Kgs</td>
-                <td style={{verticalAlign: 'middle' }}>{product.gstOnProduct}%</td>
-                <td style={{ justifyItems: 'center', alignContent:'center'}} >
-  <div 
-    style={{
-      color: product.availableStatus === 'ACTIVE' ? '#065F46' : '#991B1B',
-      backgroundColor: product.availableStatus === 'ACTIVE' ? '#D1FAE5' : '#FEE2E2',
-      border: '1px solid',
-      borderColor: product.availableStatus === 'ACTIVE' ? '#6EE7B7' : '#FCA5A5',
-      borderRadius: '0.2rem',
-      padding: '4px',
-      width: '6rem',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    {product.availableStatus}
-  </div>
-</td>
+            <td style={{ verticalAlign: 'middle' }}>{item.totalWeight}Kgs</td>
+            <td style={{ verticalAlign: 'middle' }}>{item.gstOnProduct}%</td>
 
-              </tr>
-            ))
-          ))}
-        </tbody>
-      </Table>
+            <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+              <div
+                style={{
+                  color: item.availableStatus === 'ACTIVE' ? '#065F46' : '#991B1B',
+                  backgroundColor: item.availableStatus === 'ACTIVE' ? '#D1FAE5' : '#FEE2E2',
+                  border: '1px solid',
+                  borderColor: item.availableStatus === 'ACTIVE' ? '#6EE7B7' : '#FCA5A5',
+                  borderRadius: '0.2rem',
+                  padding: '4px',
+                  width: '6rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                {item.availableStatus}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
 
-      <div className='d-flex justify-content-end mt-2'>
-        <Pagination className='z-index-n1'>{items}</Pagination>
-      </div>
+    
+
 
       <div className="product-cards">
 
@@ -348,6 +364,10 @@ const [toasts, setToasts] = useState([]);
                 ))}
             </div>
 
+    </div>
+     <div className="d-flex justify-content-end mt-2 pagination">
+        <Pagination className="z-index-n1">{paginationItems}</Pagination>
+      </div>
     </div>
   );
 });

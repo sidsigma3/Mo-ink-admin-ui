@@ -4,8 +4,9 @@ import { getProductById , updateProduct } from "../../services/ProductService";
 import ModalAddColor from "./ModalAddColor";
 import Toast from "../Toast/Toast";
 
+const backendUrl = process.env.REACT_APP_IMAGE_URL
 
-const CataloguePage = ({ onColorSelect, onClose,variant ,id}) => {
+const CataloguePage = ({ onColorSelect, onClose,variant ,id,imageUrl}) => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddingColor, setIsAddingColor] = useState(false);
@@ -192,12 +193,7 @@ setIsAddingColor(false);
     setSearchColor(e.target.value.toLowerCase());
   };
 
-  const filteredVariants = variant.variants.filter(
-    (item) =>
-      item.colorName.toLowerCase().includes(searchColor) ||
-      item.hexCode.toLowerCase().includes(searchColor)
-  );
-
+ 
 
 const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
   const baseKey = `${variant.colorName}-${variant.hexCode.toLowerCase()}`;
@@ -217,12 +213,6 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
   return acc;
 }, {});
 
-
-
-  console.log(customColors)
-  console.log(tempCustomColors)
-  console.log(selectedColors)
-  console.log(variant)
 
   return (
     <div className="text-center" >
@@ -319,26 +309,59 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
             <h4 className="h6 fw-semibold mt-4">Preset Catalogue</h4>
             <div className="container" style={{height:"16rem", overflow:"auto"}}>
             <div className="d-flex justify-content-start flex-wrap gap-3" style={{ height: 'auto' }}>
-            {Object.values(groupedByColorAndType).map((colorData, index) => (
-              <div
+            {Object.values(groupedByColorAndType)
+              .filter((colorData) =>
+                colorData.colorName.toLowerCase().includes(searchColor) ||
+                colorData.hexCode.toLowerCase().includes(searchColor)
+              )
+              .map((colorData, index) => (
+             <div
                 key={index}
-                className={`col-3 border rounded p-2 ${selectedColors.some((c) => c.hexCode === colorData.hexCode && c.variantType === colorData.variantType) ? "border-primary" : ""}`}
+                className={`col-3 border rounded p-2 ${
+                  selectedColors.some(
+                    (c) => c.hexCode === colorData.hexCode && c.variantType === colorData.variantType
+                  )
+                    ? "border-primary"
+                    : ""
+                }`}
                 onClick={() => handleColorClick(colorData)}
                 style={{ cursor: "pointer" }}
               >
-                <div className="position-relative w-100" style={{ height: '5.5rem' }}>
-                  <img src="/wool-item-1.png" className="img-fluid" alt="Product" />
-                  <div className="position-absolute top-0 start-0 w-100"
-                      style={{ backgroundColor: colorData.hexCode, height: '5.5rem', mixBlendMode: 'multiply', opacity: 0.5 }} />
+                <div className="position-relative w-100 overflow-hidden" style={{ height: "5.5rem", borderRadius: "6px" }}>
+                  <img
+                    src={
+                      imageUrl?.find((url) =>
+                        url.toLowerCase().includes(`/${colorData.variantType.toLowerCase()}/`)
+                      )
+                        ? `${backendUrl}${imageUrl.find((url) =>
+                            url.toLowerCase().includes(`/${colorData.variantType.toLowerCase()}/`)
+                          )}`
+                        : "/fallback-image.png"
+                    }
+                    className="w-100 h-100"
+                    style={{ objectFit: "cover" }}
+                    alt={`${colorData.colorName} - ${colorData.variantType}`}
+                  />
+
+                  <div
+                    className="position-absolute top-0 start-0 w-100 h-100"
+                    style={{
+                      backgroundColor: colorData.hexCode,
+                      mixBlendMode: "multiply",
+                      opacity: 0.5,
+                      borderRadius: "6px",
+                    }}
+                  />
                 </div>
+
                 <div className="text-center mt-2">
                   <h5 className="fw-bold" style={{ fontSize: "0.8rem" }}>{colorData.colorName}</h5>
                   <h6 className="text-muted" style={{ fontSize: "0.8rem" }}>{colorData.hexCode}</h6>
-                  <div style={{ fontSize: "0.8rem", color: '#555' }}>
-                      {colorData.variantType}
-                  </div>
+                  <div style={{ fontSize: "0.8rem", color: "#555" }}>{colorData.variantType}</div>
                 </div>
               </div>
+
+
             ))}
 
 

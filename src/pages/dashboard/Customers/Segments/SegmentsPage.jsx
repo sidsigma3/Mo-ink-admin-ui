@@ -23,6 +23,12 @@ const SegmentsPage = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [statusFilter, setStatusFilter] = useState('Active');
     const [filterText, setFilterText] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+
     
       useEffect(() => {
           const fetchData = async () => {
@@ -113,16 +119,7 @@ const SegmentsPage = () => {
       };
       
 
-      let active = 2;
-        let items = [];
-        for (let number = 1; number <= 5; number++) {
-            items.push(
-            <Pagination.Item key={number} active={number === active}>
-                {number}
-            </Pagination.Item>,
-            );
-        }
-
+      
         const formatSegmentCondition = (conditionString) => {
           try {
               const conditions = JSON.parse(conditionString); // Convert string back to array
@@ -163,6 +160,27 @@ const SegmentsPage = () => {
       };
       
 
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const currentPageData = filteredData.slice(startIndex, endIndex);
+
+      const paginationItems = [];
+
+      for (let page = 1; page <= totalPages; page++) {
+        paginationItems.push(
+          <Pagination.Item
+            key={page}
+            active={page === currentPage}
+            onClick={() => setCurrentPage(page)}
+          >
+            {page}
+          </Pagination.Item>
+        );
+      }
+        
+
+
+
   return (
     <div className='segments-page'>
          <div className='top d-flex justify-content-between mb-2'>
@@ -194,31 +212,54 @@ const SegmentsPage = () => {
         </div>
 
         <div className='table-ctn'>
-            <Table>
-                <thead>
-                <tr>
-                     <th>Title</th>
-                     <th style={{ textAlign: 'center' }}>Type</th>
-                     <th style={{ textAlign: 'center' }}>Customers</th>
-                     <th style={{ textAlign: 'center' }}>Conditions</th>
-                     <th style={{ textAlign: 'center' }}>Status</th>
-                     <th style={{ textAlign: 'center'}}> </th> {/* Actions column, e.g., Edit/Delete */}
-                </tr>
-                </thead>
-                <tbody>
-                {filteredData.map((row, index) => (
-                    <tr key={index} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)} style={{ cursor: "pointer" }}>
-                    <td style={{ verticalAlign: 'middle'}} >{row.segmentTitle}</td>
-                    <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{row.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</td>
-                    <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{row.customerCount}</td>
-                    <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{formatSegmentCondition(row.segmentCondition)}</td>
-                    <td style={{ justifyItems: 'center', alignContent:'center'}}  >
-                    <div
+           <Table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th style={{ textAlign: 'center' }}>Type</th>
+                <th style={{ textAlign: 'center' }}>Customers</th>
+                <th style={{ textAlign: 'center' }}>Conditions</th>
+                <th style={{ textAlign: 'center' }}>Status</th>
+                <th style={{ textAlign: 'center' }}> </th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentPageData.map((row, index) => {
+                const originalIndex = startIndex + index;
+                return (
+                  <tr
+                    key={originalIndex}
+                    onClick={(e) =>
+                      !e.target.closest('.dropdown') && handleRowClick(originalIndex)
+                    }
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td style={{ verticalAlign: 'middle' }}>{row.segmentTitle}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                      {row.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}
+                    </td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                      {row.customerCount}
+                    </td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                      {formatSegmentCondition(row.segmentCondition)}
+                    </td>
+                    <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+                      <div
                         style={{
-                          color: row.segmentStatus.toLowerCase() === 'active' ? '#065F46' : '#991B1B',
-                          backgroundColor: row.segmentStatus.toLowerCase() === 'active' ? '#D1FAE5' : '#FEE2E2',
+                          color:
+                            row.segmentStatus.toLowerCase() === 'active'
+                              ? '#065F46'
+                              : '#991B1B',
+                          backgroundColor:
+                            row.segmentStatus.toLowerCase() === 'active'
+                              ? '#D1FAE5'
+                              : '#FEE2E2',
                           border: '1px solid',
-                          borderColor: row.segmentStatus.toLowerCase() === 'active' ? '#6EE7B7' : '#FCA5A5',
+                          borderColor:
+                            row.segmentStatus.toLowerCase() === 'active'
+                              ? '#6EE7B7'
+                              : '#FCA5A5',
                           borderRadius: '0.2rem',
                           textAlign: 'center',
                           width: '6rem',
@@ -227,30 +268,35 @@ const SegmentsPage = () => {
                       >
                         {row.segmentStatus}
                       </div>
-
                     </td>
                     <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                    
-                        <Dropdown align="end" style={{ zIndex: 10 }}>
-                        <Dropdown.Toggle variant="light" id="dropdown-basic" className='border border-0 ms-auto' style={{ marginRight: '10px'}}>
-                        <BsThreeDotsVertical />
+                      <Dropdown align="end" style={{ zIndex: 10 }}>
+                        <Dropdown.Toggle
+                          variant="light"
+                          id="dropdown-basic"
+                          className="border border-0 ms-auto"
+                          style={{ marginRight: '10px' }}
+                        >
+                          <BsThreeDotsVertical />
                         </Dropdown.Toggle>
-
                         <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => handleEdit(index)}>Edit</Dropdown.Item>
-                        <Dropdown.Item onClick={() => handleDelete(index)}>Delete</Dropdown.Item>
+                          <Dropdown.Item onClick={() => handleEdit(originalIndex)}>
+                            Edit
+                          </Dropdown.Item>
+                          <Dropdown.Item onClick={() => handleDelete(originalIndex)}>
+                            Delete
+                          </Dropdown.Item>
                         </Dropdown.Menu>
-                    </Dropdown>
+                      </Dropdown>
                     </td>
-                    </tr>
-                ))}
-                </tbody>
-            </Table>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
 
+         
 
-            <div className='d-flex justify-content-end mt-2'>
-            <Pagination>{items}</Pagination>
-            </div>
 
 
             <div className="data-cards">
@@ -290,7 +336,9 @@ const SegmentsPage = () => {
         </div>
 
 
-
+         <div className="d-flex justify-content-end mt-2">
+            <Pagination>{paginationItems}</Pagination>
+          </div>
 
     </div>
   )

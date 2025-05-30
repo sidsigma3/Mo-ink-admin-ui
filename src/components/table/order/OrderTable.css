@@ -265,6 +265,11 @@
         display: none;
     }
 
+    .pagination {
+        display: none !important;
+    }
+
+
     .order-table .order-cards{
         display: block;
     }

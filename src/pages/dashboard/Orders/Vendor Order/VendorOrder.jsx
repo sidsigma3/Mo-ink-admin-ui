@@ -15,6 +15,7 @@ import { downloadVendorInvoice } from '../../../../services/InvoiceServices'
 import * as XLSX from "xlsx";
 import VendorOrderFilter from '../../../../components/Filter/OrderFilter/VendorOrderFilter'
 import DashboardBox from '../../../../components/DashboardBox/DashboardBox'
+import { Pagination } from 'react-bootstrap';
 
 const VendorOrder = () => {
 
@@ -28,6 +29,8 @@ const VendorOrder = () => {
 
 
     const [filteredData, setFilteredData] = useState([]); 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10; 
 
 
     const handleRowClick = (correlationId) => {
@@ -172,10 +175,50 @@ filteredData.forEach((order) => {
 const uniquePOs = Array.from(uniquePOMap.values());
 
 const totalOrders = uniquePOs.length;
-const totalQuantity = uniquePOs.reduce((sum, order) => sum + order.weight, 0).toFixed(2);
-const totalAmount = uniquePOs.reduce((sum, order) => sum + order.amount, 0).toFixed(2);
+const totalQuantity = uniquePOs.reduce((sum, order) => sum + order.weight, 0).toFixed(0);
+const totalAmount = uniquePOs.reduce((sum, order) => sum + order.amount, 0).toFixed(0);
 const totalReceived = uniquePOs.filter(order => order.status === 'RECEIVED').length;
 const totalPending = uniquePOs.filter(order => order.status === 'CONFIRMED').length;
+
+
+
+const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+const paginatedData = filteredData
+  .slice()
+  .reverse()
+  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+const paginationItems = [];
+
+if (totalPages > 1) {
+  paginationItems.push(
+    <Pagination.Prev
+      key="prev"
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+    />
+  );
+
+  for (let number = 1; number <= totalPages; number++) {
+    paginationItems.push(
+      <Pagination.Item
+        key={number}
+        active={number === currentPage}
+        onClick={() => setCurrentPage(number)}
+      >
+        {number}
+      </Pagination.Item>
+    );
+  }
+
+  paginationItems.push(
+    <Pagination.Next
+      key="next"
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+    />
+  );
+}
 
 
 
@@ -238,54 +281,6 @@ const totalPending = uniquePOs.filter(order => order.status === 'CONFIRMED').len
 
         </div>
 
-        {/* <div className="table-responsive mt-3 table-ctn">
-      <Table hover bordered>
-        <thead className="thead-dark">
-          <tr>
-            <th>V.O ID</th>
-            <th style={{ textAlign: 'center' }}>Date</th>
-            <th style={{ textAlign: 'center' }}>Order For</th>
-            <th style={{ textAlign: 'center' }}>Vendor</th>
-            <th style={{ textAlign: 'center' }}>Weight</th>
-            <th style={{ textAlign: 'center' }}>Amount</th>
-            <th style={{ textAlign: 'center' }}>Payment</th>
-            <th style={{ textAlign: 'center' }}>Invoice</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.length === 0 ? (
-            <tr>
-              <td colSpan="8" style={{ textAlign: 'center' }}>
-                No orders found.
-              </td>
-            </tr>
-          ) : (
-            orders.map((order) => {
-              const totalWeight = order.vendorOrderVariantResponse.reduce(
-                (sum, variant) => sum + variant.vendorOrderWeight,
-                0
-              );
-
-              return (
-                <tr key={order.vendorOrderId} onClick={() => handleRowClick(order.correlationId)} style={{ cursor: 'pointer' }}>
-              
-                  <td>{order.vendorOrderId}</td>
-                  <td style={{ textAlign: 'center' }}>{formatDate(order.orderDate)}</td>
-                  <td style={{ textAlign: 'center' }}>{order.vendorType}</td>
-                  <td style={{ textAlign: 'center' }}>{order.vendorName}</td>
-                  <td style={{ textAlign: 'center' }}>{totalWeight.toFixed(2)} kg</td>
-                  <td style={{ textAlign: 'center' }}>₹ {order.totalAmount.toFixed(2)}</td>
-                  <td style={{ textAlign: 'center' }}>{order.status}</td>
-                  <td style={{ textAlign: 'center' }}>{order.correlationId || '-'}</td>
-                </tr>
-              );
-            })
-          )}
-        </tbody>
-      </Table>
-    </div> */}
-
-
         <div className="table-responsive mt-3 table-ctn">
         <Table hover>
           <thead className="thead-dark">
@@ -310,7 +305,7 @@ const totalPending = uniquePOs.filter(order => order.status === 'CONFIRMED').len
               </td>
             </tr>
           ) : (
-            filteredData.slice().reverse().map((order) => {
+           paginatedData.map((order) => {
               const totalWeight = order.vendorOrderVariantResponse.reduce(
                 (sum, variant) => sum + variant.vendorOrderWeight,
                 0
@@ -368,6 +363,10 @@ const totalPending = uniquePOs.filter(order => order.status === 'CONFIRMED').len
           </tbody>
             </Table>
       </div>
+    <div className="d-flex justify-content-end mt-2 pagination">
+      <Pagination className="z-index-n1">{paginationItems}</Pagination>
+    </div>
+
 
 
     </div>
