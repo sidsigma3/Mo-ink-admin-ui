@@ -9,6 +9,9 @@ import { getAllOrders } from "../../services/OrderService";
 import { DateRangePicker } from "react-date-range";
 import { format } from "date-fns";
 import { enIN } from "date-fns/locale";
+import DatePicker from "react-datepicker";
+import { getAllInventory } from "../../services/InventoryService";
+import { getAllProduct } from "../../services/ProductService";
 
 const Dashboard = () => {
 
@@ -19,12 +22,16 @@ const Dashboard = () => {
       key: "selection",
     },
   ]);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const [showPicker, setShowPicker] = useState(false);
   const datePickerRef = useRef(null);
   
 
   const [totalCustomers, setTotalCustomers] = useState(0);
-  const [totalOrders, setTotalOrders] = useState(0);
+  const [ totalOrders, setTotalOrders] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalWeightSold, setTotalWeightSold] = useState(0);
   const [toDispatch,setToDispatch] = useState(0)
@@ -32,87 +39,177 @@ const Dashboard = () => {
   const [fromVendor,setFromVendor] = useState(0)
   const [newOrder,setNewOrder] = useState(0)
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  const [paymentReceivable, setPaymentReceivable] = useState(0);
+  const [newOrderWeight, setNewOrderWeight] = useState(0);
+  const [inventoryLeft, setInventoryLeft] = useState(0);
+  const [productSoldData, setProductSoldData] = useState({});
+  const [productList, setProductList] = useState([]);
+  const [productListLoaded, setProductListLoaded] = useState(false);
 
-  const handleDateChange = (ranges) => {
-    setDateRange([ranges.selection]);
-    setShowDatePicker(false)
+
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const data = await getAllProduct();
+      setProductList(data.data);
+      setProductListLoaded(true);  // Set flag when loaded
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
   };
+
+  fetchData();
+}, []);
+
+useEffect(() => {
+  if (productListLoaded) {
+    fetchDashboardData();
+  }
+}, [productListLoaded, startDate, endDate]);
+
+
+
+
 
    useEffect(() => {
             const handleClickOutside = (event) => {
                 if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
-                    setShowDatePicker(false);
+                    setShowPicker(false);
                 }
             };
     
-            if (showDatePicker) {
+            if (showPicker) {
                 document.addEventListener("mousedown", handleClickOutside);
             }
     
             return () => {
                 document.removeEventListener("mousedown", handleClickOutside);
             };
-        }, [showDatePicker]);
+        }, [showPicker]);
 
 
   const fetchDashboardData = async () => {
-    try {
-      const customerRes = await getAllCustomer();
-      setTotalCustomers(customerRes.data.length);
+  try {
+ 
+    const customerRes = await getAllCustomer();
+    setTotalCustomers(customerRes?.data?.length || 0);
 
-      const orders = await getAllOrders();
-      const start = dateRange[0].startDate;
-      const end = dateRange[0].endDate;
+   
+    const orders = await getAllOrders();
 
-      let revenue = 0;
-      let weight = 0;
-      let newOrder = 0;
-      let toDispatch = 0;
-      let toVendor = 0;
-      let fromVendor = 0;
+    let revenue = 0;
+    let weight = 0;
+    let newOrder = 0;
+    let toDispatch = 0;
+    let toVendor = 0;
+    let fromVendor = 0;
+    let receivable = 0;
+    let newOrderKgs = 0;
 
-      const filteredOrders = orders.filter(order => {
-        const orderDate = new Date(order.date);
-        return orderDate >= start && orderDate <= end;
-      });
+   
+    const filteredOrders = (startDate && endDate)
+      ? orders.filter(order => {
+          const orderDate = new Date(order.createdAt);
+          return orderDate >= startDate && orderDate <= endDate;
+        })
+      : orders;
 
-      filteredOrders.forEach(order => {
-        revenue += order.totalAmount || 0;
-        weight += order.totalWeight || 0;
+      let productSoldMap = {};
 
-        switch (order.status) {
-          case "New Order":
-            newOrder += 1;
-            break;
-          case "Send to Vendor":
-            toVendor += 1;
-            break;
-          case "Dispatch from Vendor":
-            fromVendor += 1;
-            break;
-          default:
-            if (order.status !== "Delivered" && order.status !== "Order Cancelled") {
-              toDispatch += 1;
-            }
-            break;
+   const productIdToNameMap = {};
+    productList.forEach(p => {
+      productIdToNameMap[p.id] = p.productName;
+    });
+
+    filteredOrders.forEach(order => {
+      if (Array.isArray(order.orderVariantResponse)) {
+        order.orderVariantResponse.forEach(variant => {
+          const productId = variant.productId;
+          const productName = productIdToNameMap[productId] || 'Unknown';
+          const weight = Number(variant.orderWeight) || 0;
+
+          if (!productSoldMap[productName]) {
+            productSoldMap[productName] = 0;
+          }
+          productSoldMap[productName] += weight;
+        });
+      }
+    });
+
+
+   
+    setProductSoldData(productSoldMap);
+
+
+
+    filteredOrders.forEach(order => {
+      const orderAmount = order.totalAmount || 0;
+     
+      const orderWeight = Array.isArray(order.orderVariantResponse)
+      ? order.orderVariantResponse.reduce((sum, item) => sum + Number(item.orderWeight || 0), 0)
+      : 0;
+
+
+      revenue += orderAmount;
+      weight += orderWeight;
+
+  
+      if (["PENDING", "PARTIALLY_PAID"].includes(order.status)) {
+        receivable += order.payment.codAmount || 0; // Or use another field like `remainingAmount`
+      }
+
+      if (order.status === "NEW") {
+        newOrder += 1;
+        newOrderKgs += orderWeight;
+      }
+
+    
+      switch (order.status) {
+        case "CONFIRMED":
+          toVendor += 1;
+          break;
+        case "MANUFACTURING":
+          fromVendor += 1;
+          break;
+        default:
+          if (!["DELIVERED", "CANCELLED", "RETURNED", "PENDING"].includes(order.status)) {
+            toDispatch += 1;
+          }
+          break;
+      }
+    });
+
+
+   const inventoryRes = await getAllInventory();
+    let totalRemainingWeight = 0;
+
+    console.log(inventoryRes);
+
+    if (Array.isArray(inventoryRes?.data?.product)) {
+      inventoryRes.data.product.forEach(entry => {
+        if (Array.isArray(entry?.variant)) {
+          entry.variant.forEach(item => {
+            totalRemainingWeight += item.availableWeight || 0;
+          });
         }
       });
-
-      setNewOrder(newOrder);
-      setFromVendor(fromVendor);
-      setToVendor(toVendor);
-      setToDispatch(toDispatch);
-      setTotalOrders(filteredOrders.length);
-      setTotalRevenue(revenue);
-      setTotalWeightSold(weight);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
     }
-  };
 
+
+    setTotalOrders(filteredOrders.length);
+    setTotalRevenue(revenue);
+    setTotalWeightSold(weight);
+    setNewOrder(newOrder);
+    setFromVendor(fromVendor);
+    setToVendor(toVendor);
+    setToDispatch(toDispatch);
+    setPaymentReceivable(receivable);
+    setNewOrderWeight(newOrderKgs);
+    setInventoryLeft(totalRemainingWeight);
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+  }
+};
 
 
   const formatNumber = (num) => {
@@ -138,23 +235,49 @@ const Dashboard = () => {
                         </div> */}
                         {/* <Filter></Filter> */}
 
-                        <button className="border rounded bg-white p-1" onClick={() => setShowDatePicker(!showDatePicker)}>
-                          {dateRange[0].startDate && dateRange[0].endDate
-                            ? `${format(dateRange[0].startDate, "dd MMM yyyy")} - ${format(dateRange[0].endDate, "dd MMM yyyy")}`
+                       <div style={{ position: "relative" }} className="d-flex">
+                        <button
+                          className="border rounded bg-white px-3 py-1"
+                          onClick={() => setShowPicker(!showPicker)}
+                        >
+                          {startDate && endDate
+                            ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
                             : "Select Date Range"}
                         </button>
 
-                        {showDatePicker && (
-                          <div ref={datePickerRef} className="position-absolute" style={{ zIndex: 1000 }}>
-                            <DateRangePicker
-                              ranges={dateRange}
-                              onChange={handleDateChange}
-                              locale={enIN}
-                              moveRangeOnFirstSelection={false}
-                              editableDateInputs={true}
+                        {startDate && endDate && (
+                          <button
+                            className="ms-2 btn btn-sm btn-outline-secondary"
+                            onClick={() => {
+                              setStartDate(null);
+                              setEndDate(null);
+                              fetchDashboardData(); // refresh with all data
+                            }}
+                          >
+                            Clear
+                          </button>
+                        )}
+
+                        {showPicker && (
+                          <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute", right: "0" }}>
+                            <DatePicker
+                              selected={startDate}
+                              onChange={(dates) => {
+                                const [start, end] = dates;
+                                setStartDate(start);
+                                setEndDate(end);
+                              }}
+                              startDate={startDate}
+                              endDate={endDate}
+                              selectsRange
+                              inline
+                              dateFormat="dd MMM yyyy"
                             />
                           </div>
                         )}
+                      </div>
+
+
                     </div>
 
                     <div className="info-ctn row">
@@ -178,7 +301,8 @@ const Dashboard = () => {
       <div className="bg-white graph-ctn shadow-sm p-3">
         <h5 style={{fontSize:'1.2rem'}}>Product Sold (Kgs)</h5>
        <h5 className="mb-3" style={{fontSize:'1rem'}}> <span className="text-success me-1">+3.4%</span>from last period</h5>
-       <ProductSoldGraph></ProductSoldGraph>
+      <ProductSoldGraph productData={productSoldData} />
+
       </div>
 
 
@@ -201,14 +325,25 @@ const Dashboard = () => {
       <div className="current-status-ctn row">
        
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
-          <DashboardBox  heading={'Payment Receivable'} number={'2.056 Lacs'}/>
+        <DashboardBox
+          heading={'Payment Receivable'}
+          number={`₹ ${formatNumber((paymentReceivable / 100000).toFixed(2))} Lacs`}
+        />
         </div>
-        <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
-          <DashboardBox heading={'New Order Received'} number={'48Kgs'}/>
-        </div>
-        <div className="dashboardBox-ctn col-12 col-md-4 col-lg">
-          <DashboardBox heading={'Total Inventory Left'} number={'200 Kgs'}/>
-        </div>
+
+      <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+        <DashboardBox
+          heading={'New Order Received'}
+          number={`${formatNumber(newOrderWeight)} Kgs`}
+        />
+      </div>
+
+       <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+        <DashboardBox
+          heading={'Total Inventory Left'}
+          number={`${formatNumber(inventoryLeft)} Kgs`}
+        />
+      </div>
        
       </div>
     </div>
