@@ -1222,9 +1222,8 @@ const handleOrderChange = async () => {
 
 
 
-
 const billingAddress = order?.billingAddress 
-? getStateFromBillingAddress(order.shippingAddress)
+? getStateFromBillingAddress(order.billingAddress)
 : selectedCustomer?.addresses?.find((addr) => addr.addressType === "HOME").state.toLowerCase();
 
 const isOdisha = billingAddress === "odisha";
@@ -1787,7 +1786,7 @@ const handleReject = (variant) => {
                         {isViewMode && (
                             <div className="flex-grow-1">
                             <h4>Billing Address</h4>
-                              <p className="text-gray-600 whitespace-pre-line">{order.shippingAddress}</p>
+                              <p className="text-gray-600 whitespace-pre-line">{order.billingAddress}</p>
                           </div>
                         )}
                     
