@@ -294,7 +294,7 @@ useEffect(() => {
                         <DashboardBox heading={'Total Revenue (Lacs)'} number={"₹ "+formatNumber(totalRevenue)}/>
                         </div>
                         <div className="dashboardBox-ctn col-12 col-md-4 col-lg-4 col-xl">
-                        <DashboardBox heading={'Total Weight Sold'} number={'2250 Kgs'}/>
+                        <DashboardBox heading={'Total Weight Sold'} number={totalWeightSold}/>
                         </div>
                     </div>
 
