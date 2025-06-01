@@ -1355,7 +1355,7 @@ const handleReject = (variant) => {
                                     <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Discount</th>
                                     <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Total</th>
                                     <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>CGST</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>SGST</th>
+                                    <th style={{ textAlign: 'end', verticalAlign: 'middle'}} className='fw-medium'>SGST</th>
                                     {isViewMode && (
                                     <th  style={{ textAlign: 'center', verticalAlign: 'middle'}}   className='fw-medium'>Status</th>
                                     )}
@@ -2107,7 +2107,7 @@ const handleReject = (variant) => {
                       <td className="fw-medium pt-4 ">Advance Paid</td>
                       <td>{onlinePercentage}%</td>
                       {isViewMode === true ? (
-                         <td className="text-end">₹{order?.payment.onlineAmount.toFixed(0)}</td>
+                         <td className="text-end">₹{order?.payment.totalAmountPaid.toFixed(0)}</td>
                       ):(
                         <td className="text-end">₹{((toPay * onlinePercentage) / 100).toFixed(0)}</td>
                       )}
@@ -2119,7 +2119,7 @@ const handleReject = (variant) => {
                       <td className="pt-2">{codPercentage}%</td>
 
                       {isViewMode === true ? (
-                          <td className="text-end">₹{order?.payment.codAmount.toFixed(0)-order?.payment.totalAdjustedAmount.toFixed(0)}</td>
+                          <td className="text-end">₹{order?.payment.pendingAmount.toFixed(0)-order?.payment.totalAdjustedAmount.toFixed(0)}</td>
                         ):(
                           <td className="text-end pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td>
                         )
