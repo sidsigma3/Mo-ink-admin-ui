@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from '../../../../services/LoginService'
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import Toast from '../../../../components/Toast/Toast';
 
 import "./LoginPage.css";
 
@@ -14,9 +15,11 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const [toasts, setToasts] = useState([]);
   
     const handleLogin = async () => {
         const response = await loginUser(username, password);
+        console.log(response)
     
         if (response.success) {
           localStorage.setItem("isAuthenticated", "true");
@@ -24,10 +27,16 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
           setAuthStatus(true);
           navigate("/dashboard");
         } else {
-          setError(response.message);
+          console.log(response)
+          showToast(response.message.data.message, "error");
+          
         }
       };
 
+      const showToast = (message, type = "error") => {
+        setToasts([{ message, type }]);
+        setTimeout(() => setToasts([]), 3000);
+      };
 
       // const [user, setUser] = useState(null);
 
@@ -143,6 +152,18 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
           </div>
         </form>
       </div>
+                  <div className="fixed top-4 right-4 z-50 space-y-2">
+                      {toasts.map((toast) => (
+                          <Toast
+                              key={toast.id}
+                              message={toast.message}
+                              type={toast.type}
+                              onClose={() =>
+                                  setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                              }
+                          />
+                      ))}
+                  </div>
     </div>
   );
 };

@@ -29,8 +29,6 @@ const CustomersPage = () => {
     const [orders, setOrders] = useState([]); 
     const [filteredData, setFilteredData] = useState([]);
     const [toasts, setToasts] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
 
 
     useEffect(() => {
@@ -53,7 +51,15 @@ const CustomersPage = () => {
         navigate('/add-customer', { state: { index ,customers} });
       };
 
-    
+      let active = 2;
+  let items = [];
+  for (let number = 1; number <= 5; number++) {
+    items.push(
+      <Pagination.Item key={number} active={number === active}>
+        {number}
+      </Pagination.Item>,
+    );
+  }
 
 
 
@@ -195,47 +201,6 @@ const handleFilterChange = (filter, value) => {
   setFilteredData(filtered);
   };
 
- // Pagination logic
-const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-const paginatedCustomers = filteredData.slice(
-  (currentPage - 1) * itemsPerPage,
-  currentPage * itemsPerPage
-);
-
-const paginationItems = [];
-
-if (totalPages >= 1) {
-  paginationItems.push(
-    <Pagination.Prev
-      key="prev"
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-    />
-  );
-
-  for (let number = 1; number <= totalPages; number++) {
-    paginationItems.push(
-      <Pagination.Item
-        key={number}
-        active={number === currentPage}
-        onClick={() => setCurrentPage(number)}
-      >
-        {number}
-      </Pagination.Item>
-    );
-  }
-
-  paginationItems.push(
-    <Pagination.Next
-      key="next"
-      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={currentPage === totalPages}
-    />
-  );
-}
-
-
   return (
     <div className='customer-page'>
           <div className='top d-flex justify-content-between mb-2'>
@@ -285,7 +250,7 @@ if (totalPages >= 1) {
                     </tr>
                 </thead>
                 <tbody>
-            {paginatedCustomers.map((customer, index) => {
+            {filteredData.map((customer, index) => {
               const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
 
               return (
@@ -325,6 +290,11 @@ if (totalPages >= 1) {
             
             </Table>
 
+            <div className='d-flex justify-content-end mt-2'>
+            <Pagination>{items}</Pagination>
+            </div>
+
+
             <div className="data-cards">
          {filteredData.map((customer,index) => {
             const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
@@ -361,10 +331,7 @@ if (totalPages >= 1) {
 
 
         </div>
- 
-         
-
-
+ {/* Toast Notification */}
      <div className="fixed top-4 right-4 z-50 space-y-2">
                 {toasts.map((toast) => (
                     <Toast
@@ -378,9 +345,7 @@ if (totalPages >= 1) {
                 ))}
             </div>
 
-          <div className='d-flex justify-content-end mt-2'>
-           <Pagination>{paginationItems}</Pagination>
-          </div>
+
 
     </div>
   )

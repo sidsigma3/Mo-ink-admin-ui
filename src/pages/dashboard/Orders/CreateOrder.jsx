@@ -602,7 +602,7 @@ useEffect(() => {
       let totalFinalTotal = 0;
     
       for (const order of orderDetails) {
-        if (!order || !order.color || order.color.status === 'CANCELLED') continue;
+        if (!order || !order.status|| order.status === 'CANCELLED') continue;
     
         const weight = parseFloat(order.color.weight) || 0;
         const price = order.price || 0;
@@ -1004,7 +1004,7 @@ useEffect(() => {
     const ratePerKg = state === "odisha" ? 3 : 5;
   
     const totalWeight = orderDetails.reduce((acc, item) => {
-      if (item.color?.status === 'CANCELLED') return acc;
+      if (item.status === 'CANCELLED') return acc;
       return acc + (Number(item.color?.weight) || 0);
     }, 0);
   
@@ -1959,7 +1959,7 @@ const handleReject = (variant) => {
                       <td>
                         {
                           orderDetails.reduce((acc, item) => {
-                            return acc + (item.color?.status !== 'CANCELLED' ? 1 : 0);
+                            return acc + (item.status !== 'CANCELLED' ? 1 : 0);
                           }, 0)
                         } items
                       </td>

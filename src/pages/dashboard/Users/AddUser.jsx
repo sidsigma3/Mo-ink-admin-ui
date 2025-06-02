@@ -10,6 +10,7 @@ import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import StatusInput from '../../../components/StatusInput/StatusInput';
 import Toast from '../../../components/Toast/Toast';
 import { uploadProductImage } from '../../../services/ProductService';
+import { activeNewUser } from '../../../services/UserService';
 
 const AddUser = () => {
     const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -17,9 +18,9 @@ const AddUser = () => {
     const { index, users} = state || {};
     const navigate = useNavigate();
     const [toasts, setToasts] = useState([]);
-
+    const [isLoading, setIsLoading] = useState(false);
    
-
+    const master = JSON.parse(localStorage.getItem('userData'))
     const customer = state?.index !== undefined ? users[index] : null;
 
     const isViewMode = !!state
@@ -173,6 +174,32 @@ const AddUser = () => {
                   // showToast('Cheque photo upload failed. Please try again.', 'error');
                 }
         };
+
+        const handleStatusChange = async (newStatus) => {
+            console.log(formData.status)
+            if (formData.status.toUpperCase() === "PENDING") {
+            try {
+                setIsLoading(true);
+                const res = await activeNewUser(customer.userId, master.userId);
+                setFormData((prev) => ({ ...prev, status: newStatus }));
+                showToast('User access granted','success')
+            } catch (err) {
+                showToast('Unable to grant access','erorr')
+            } finally {
+                setIsLoading(false);
+            }
+            }
+            else{
+                 setFormData((prev) => ({ ...prev, status: newStatus }));
+                 showToast('Status changed successfully',"success")
+            }
+        };
+
+           const showToast = (message, type = "error") => {
+                setToasts([{ message, type }]);
+                setTimeout(() => setToasts([]), 3000);
+            };
+
 
   return (
     <div className='add-user'>
@@ -365,9 +392,8 @@ const AddUser = () => {
                 <h5 className='mb-3'>Status</h5>
 
                 <StatusInput status={formData.status} 
-                onStatusChange={(newStatus) =>
-                setFormData((prev) => ({ ...prev, status: newStatus }))
-                }></StatusInput>
+                  onStatusChange={handleStatusChange}
+                ></StatusInput>
             </div>
 
         <div className='bg-white p-3 rounded mt-2'>
@@ -379,7 +405,7 @@ const AddUser = () => {
 
                 <Dropdown.Menu>
                     <Dropdown.Item eventKey="SALES">Sales</Dropdown.Item>
-                    <Dropdown.Item eventKey="ADMIN">Admin</Dropdown.Item>
+                    <Dropdown.Item eventKey="MASTER">Master Admin</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
         </div>
