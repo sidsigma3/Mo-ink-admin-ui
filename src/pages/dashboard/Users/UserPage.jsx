@@ -27,6 +27,7 @@ const UserPage = () => {
     const endIndex = startIndex + itemsPerPage;
     const currentPageData = filteredData.slice(startIndex, endIndex);
 
+    const userData = JSON.parse(localStorage.getItem('userData'))
 
     useEffect(() => {
         const fetchData = async () => {
@@ -88,7 +89,8 @@ for (let number = 1; number <= totalPages; number++) {
          <div className='top d-flex justify-content-between mb-2'>
             <h4 style={{fontSize:'1.2rem'}}>Users</h4>
 
-            <div className='d-flex gap-2'>
+            {userData.role === "MASTER" && (
+              <div className='d-flex gap-2'>
                 {/* <ExportBtn></ExportBtn> */}
 
                
@@ -97,6 +99,8 @@ for (let number = 1; number <= totalPages; number++) {
                 <AddBtn text={"Add User"}></AddBtn>
                 </Link>
             </div>
+            )}
+            
         </div>
 
 

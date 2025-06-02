@@ -57,3 +57,16 @@ export const getAllUser = async () => {
       throw error;
     }
   };
+
+
+  
+  export const activeNewUser = async (userId, masterId) => {
+    try {
+      const response = await axios.put(`${BASE_URL}/user/approve/${userId}?masterUserId=${masterId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating User:', error);
+      throw error;
+    }
+  };
+  
