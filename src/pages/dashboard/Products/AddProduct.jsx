@@ -130,7 +130,7 @@ const [formData, setFormData] = useState({
   mediaCone: coneImage,
 });
 
-
+console.log(product);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -155,7 +155,7 @@ const handleMediaChange = async (e, type) => {
       [`media${type.charAt(0).toUpperCase() + type.slice(1)}`]: uploadedUrl, // mediaHank or mediaCone
     }));
   } catch (error) {
-    showToast('Image upload failed. Please try again.', 'error');
+    showToast('Image upload failed due to image file size.', 'error');
   }
 };
 
@@ -203,8 +203,8 @@ console.log(formData)
         return;
     }
 
-    console.log(product);
-
+  
+    
     const plainTextDescription = formData.description.replace(/<\/?[^>]+(>|$)/g, "");
 
     // Create variants with calculated prices and availability
