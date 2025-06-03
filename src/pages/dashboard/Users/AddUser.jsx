@@ -11,6 +11,8 @@ import StatusInput from '../../../components/StatusInput/StatusInput';
 import Toast from '../../../components/Toast/Toast';
 import { uploadProductImage } from '../../../services/ProductService';
 import { activeNewUser } from '../../../services/UserService';
+import SelectState from '../../../components/SelectState/SelectState';
+import StatusChangeModal from '../../../components/Modal/StatusChangeModal';
 
 const AddUser = () => {
     const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -19,7 +21,9 @@ const AddUser = () => {
     const navigate = useNavigate();
     const [toasts, setToasts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-   
+    const [modalOpen, setModalOpen] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState(null);
+
     const master = JSON.parse(localStorage.getItem('userData'))
     const customer = state?.index !== undefined ? users[index] : null;
 
@@ -171,29 +175,35 @@ const AddUser = () => {
                     chequePhoto: uploadedUrl,
                   }));
                 } catch (error) {
-                  // showToast('Cheque photo upload failed. Please try again.', 'error');
+                  showToast('Cheque photo upload failed. Please try again.', 'error');
                 }
         };
 
-        const handleStatusChange = async (newStatus) => {
-            console.log(formData.status)
-            if (formData.status.toUpperCase() === "PENDING") {
-            try {
-                setIsLoading(true);
-                const res = await activeNewUser(customer.userId, master.userId);
-                setFormData((prev) => ({ ...prev, status: newStatus }));
-                showToast('User access granted','success')
-            } catch (err) {
-                showToast('Unable to grant access','erorr')
-            } finally {
-                setIsLoading(false);
-            }
-            }
-            else{
-                 setFormData((prev) => ({ ...prev, status: newStatus }));
-                 showToast('Status changed successfully',"success")
-            }
+        const handleStatusChange = (newStatus) => {
+            setPendingStatus(newStatus);
+            setModalOpen(true); // show modal
         };
+
+    const confirmStatusChange = async () => {
+        setModalOpen(false);
+
+        if (formData.status.toUpperCase() === "PENDING") {
+        try {
+            setIsLoading(true);
+            const res = await activeNewUser(customer.userId, master.userId);
+            setFormData((prev) => ({ ...prev, status: pendingStatus }));
+            showToast("User access granted", "success");
+        } catch (err) {
+            showToast("Unable to grant access", "error");
+        } finally {
+            setIsLoading(false);
+        }
+        } else {
+        setFormData((prev) => ({ ...prev, status: pendingStatus }));
+        showToast("Status changed successfully", "success");
+        }
+    };
+
 
            const showToast = (message, type = "error") => {
                 setToasts([{ message, type }]);
@@ -258,7 +268,13 @@ const AddUser = () => {
         </div>
         )}
 
-    
+        
+        <StatusChangeModal
+            isOpen={modalOpen}
+            newStatus={pendingStatus}
+            onCancel={() => setModalOpen(false)}
+              onConfirm={confirmStatusChange}
+        ></StatusChangeModal>
 
       <div className='bottom d-flex gap-3'>
         <div className='left'>
@@ -355,7 +371,8 @@ const AddUser = () => {
 
             <div className="col-md-6 d-flex flex-column">
                 <label>State</label>
-                <input type="text" name="state" value={formData.state} onChange={handleChange} />
+                {/* <input type="text" name="state" value={formData.state} onChange={handleChange} /> */}
+                <SelectState value={formData.state} onChange={handleChange}></SelectState>
                 {formErrors.state && <div className="invalid-feedback d-block">{formErrors.state}</div>}
             </div>
 

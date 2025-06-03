@@ -308,18 +308,21 @@ console.log(istDate);
   };
   
   const formatDateToIST = (dateStr) => {
-    const utcDate = new Date(dateStr);
-    return utcDate.toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
+  // Trim microseconds to avoid browser inconsistencies
+  const trimmedDateStr = dateStr.split('.')[0] + 'Z'; // ensures it's treated as UTC
+  const utcDate = new Date(trimmedDateStr);
   
+  return utcDate.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+};
+
   return (
     <div>
     <div className="order-table table-ctn-order">
@@ -398,7 +401,7 @@ console.log(istDate);
 
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                ₹{order.status === 'CANCELLED' ? '0' : order.totalAmount.toFixed(0)}
+                ₹{(order.payment.totalAmount-order.payment.totalAdjustedAmount).toFixed(0)}
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>

@@ -14,7 +14,7 @@ const StatusInput = ({ status ,onStatusChange }) => {
   return (
     <Dropdown onSelect={handleSelect}  size="sm" className='status'>
       <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100">
-        <p className="m-0">{selectedStatus}</p>
+        <p className="m-0">{status}</p>
       </Dropdown.Toggle>
 
       <Dropdown.Menu className='w-100'>
