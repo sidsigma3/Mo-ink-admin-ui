@@ -546,7 +546,7 @@ useEffect(() => {
     };
 
 
-  
+  console.log(walletDeduction)
 
     const calculateGrandTotal = (orderDetails = []) => {
       if (!Array.isArray(orderDetails)) return 0; // Ensure orderDetails is an array
@@ -602,7 +602,7 @@ useEffect(() => {
       let totalFinalTotal = 0;
     
       for (const order of orderDetails) {
-        if (!order || !order.status|| order.status === 'CANCELLED') continue;
+        if (!order ||  order.status === 'CANCELLED') continue;
     
         const weight = parseFloat(order.color.weight) || 0;
         const price = order.price || 0;
@@ -814,7 +814,7 @@ useEffect(() => {
         return;
       }
   
-      const walletUsed = Math.min(walletDeduction || 0, totalAmount);
+      const walletUsed = walletDeduction || 0;
   
       const billingAddress = selectedCustomer.addresses?.find(
         (addr) => addr.addressType === "HOME"
@@ -843,7 +843,7 @@ useEffect(() => {
           transactionId: "TXN" + Date.now(),
           paidAmount: onlineAmt.toFixed(2),
           pendingAmount: codAmt.toFixed(2),
-          paymentStatus: "UNPAID",
+          paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTIALLY_PAID",
           totalDiscount: grandTotals.totalDiscount,
           totalSgst: isOdisha ? grandTotals.sgst.toFixed(2) : "0.00",
           totalCgst: isOdisha ? grandTotals.cgst.toFixed(2) : "0.00",
@@ -852,10 +852,8 @@ useEffect(() => {
         orderVariants
       };
   
-   
       const response = await createOrder(orderData);
     
-  
       showToast('Order Created successfully','success')
       navigate('/orders');
     } catch (error) {
@@ -2104,15 +2102,22 @@ const handleReject = (variant) => {
                     </tr>
 
                     <tr>
-                      <td className="fw-medium pt-4 ">Advance Paid</td>
+                      <td className="fw-medium pt-4">Advance Paid</td>
                       <td>{onlinePercentage}%</td>
                       {isViewMode === true ? (
-                         <td className="text-end">₹{order?.payment.totalAmountPaid.toFixed(0)}</td>
-                      ):(
+                        order?.createdByUser ? (
+                          // If order created by admin, show actual onlineAmount paid
+                          <td className="text-end">₹{order?.payment.onlineAmount.toFixed(0)}</td>
+                        ) : (
+                          // Otherwise show total amount paid
+                          <td className="text-end">₹{order?.payment.totalAmountPaid.toFixed(0)}</td>
+                        )
+                      ) : (
+                        // In edit mode, calculate based on percentage
                         <td className="text-end">₹{((toPay * onlinePercentage) / 100).toFixed(0)}</td>
                       )}
-                    
                     </tr>
+
 
                     <tr>
                       <td className="fw-medium py-2">Balance Due</td>
@@ -2126,6 +2131,15 @@ const handleReject = (variant) => {
                       }
                      
                     </tr>
+
+                      {order.payment.totalRefundAmount > 0 &&(
+                         <tr>
+                       <td className="fw-medium py-2">Refund amount</td>
+                      <td className="pt-2"></td>
+                      <td className="text-end text-success">- ₹{order.payment.totalRefundAmount.toFixed(0)}</td>
+                    </tr>
+                      )}
+                   
 
                    
                    
