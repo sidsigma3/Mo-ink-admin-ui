@@ -2132,11 +2132,11 @@ const handleReject = (variant) => {
                      
                     </tr>
 
-                      {order.payment.totalRefundAmount > 0 &&(
+                      {order?.payment?.totalRefundAmount > 0 &&(
                          <tr>
                        <td className="fw-medium py-2">Refund amount</td>
                       <td className="pt-2"></td>
-                      <td className="text-end text-success">- ₹{order.payment.totalRefundAmount.toFixed(0)}</td>
+                      <td className="text-end text-success">- ₹{order?.payment.totalRefundAmount.toFixed(0)}</td>
                     </tr>
                       )}
                    
