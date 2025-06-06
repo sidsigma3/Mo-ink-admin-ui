@@ -44,7 +44,7 @@ const OrderTable = forwardRef(({data}, ref) => {
 
   const [modalData, setModalData] = useState({
     isOpen: false,
-    type: null, // 'order' or 'payment'
+    type: null,
     status: null,
     orderId: null,
     variantId: null,
@@ -250,7 +250,7 @@ console.log(istDate);
  const showToast = (message, type = "error") => {
             setToasts([{ message, type }]);
             setTimeout(() => setToasts([]), 3000);
-          };
+ };
 
     const result = await downloadInvoice(orderId);
     if (!result.success) {
@@ -401,7 +401,7 @@ console.log(istDate);
 
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                ₹{(order.payment.totalAmount-order.payment.totalAdjustedAmount).toFixed(0)}
+                ₹{(order.payment.totalAmount-order.payment.totalAdjustedAmount-order.payment.totalRefundAmount).toFixed(0)}
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>
@@ -416,6 +416,17 @@ console.log(istDate);
                   value={order.payment.paymentStatus}
                   onChange={(e) => {
                   const newStatus = e.target.value;
+
+                   const showToast = (message, type = "error") => {
+                      setToasts([{ message, type }]);
+                      setTimeout(() => setToasts([]), 3000);
+                  };
+                  
+                  if (order.status !== "SHIPPED") {
+                    showToast("Payment status can only be changed after order has been shipped", "error");
+                    return;
+                  }
+
                   setModalData({
                     isOpen: true,
                     type: 'payment',

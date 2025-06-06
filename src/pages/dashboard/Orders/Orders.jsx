@@ -101,7 +101,7 @@ const Orders = () => {
         const paymentStatus = order.payment?.paymentStatus;
 
         if (paymentStatus === "FULLY_PAID") {
-          received += order.totalAmount || 0;
+          received += order.totalAmount - order.payment.totalAdjustedAmount - order.payment.totalRefundAmount|| 0;
         } else if (paymentStatus === "PARTIALLY_PAID") {
           received += order.payment?.totalAmountPaid || 0;
         }
@@ -139,6 +139,13 @@ const Orders = () => {
   if (start && end) {
     applyFilters(selectedFilter, searchValue, start, end, selectedStatus);
   }
+};
+
+const handleClearDateFilter = () => {
+  setStartDate(null);
+  setEndDate(null);
+  setShowPicker(false);
+  applyFilters(selectedFilter, searchValue, null, null, selectedStatus);
 };
 
 
@@ -214,29 +221,38 @@ const Orders = () => {
 
             <div className='btn-ctn'>
             <div className="date-filter position-relative">
-      <button
-        className="border rounded bg-white px-3 py-1"
-        onClick={() => setShowPicker(!showPicker)}
-      >
-        {startDate && endDate
-          ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-          : "Select Date Range"}
-      </button>
+                    <button
+                      className="border rounded bg-white px-3 py-1"
+                      onClick={() => setShowPicker(!showPicker)}
+                    >
+                      {startDate && endDate
+                        ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+                        : "Select Date Range"}
+                    </button>
 
-      {showPicker && (
-        <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute" }}>
-          <DatePicker
-            selected={startDate}
-            onChange={handleDateChange}
-            startDate={startDate}
-            endDate={endDate}
-            selectsRange
-            inline
-            dateFormat="dd MMM yyyy"
-          />
-        </div>
-      )}
-    </div>
+                     {startDate && endDate && (
+                          <button
+                            className="ms-2 p-2 btn btn-sm btn-outline-secondary"
+                            onClick={handleClearDateFilter}
+                          >
+                            Clear
+                          </button>
+                        )}
+
+                    {showPicker && (
+                      <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute" }}>
+                        <DatePicker
+                          selected={startDate}
+                          onChange={handleDateChange}
+                          startDate={startDate}
+                          endDate={endDate}
+                          selectsRange
+                          inline
+                          dateFormat="dd MMM yyyy"
+                        />
+                      </div>
+                    )}
+                  </div>
               
                 {/* <Filter></Filter> */}
 
