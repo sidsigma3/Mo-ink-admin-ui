@@ -776,12 +776,13 @@ useEffect(() => {
         .filter(order => order.variantId && order.color?.weight > 0)
         .map(order => {
           const breakdown = calculatePriceBreakdown(
-            order,
-            order.color,
+            { ...order.color,gstOnProduct:order.gstOnProduct,price:order.price, },
             selectedDiscountValue,
             discountPercentage,
             selectedDiscountData
           );
+
+          console.log(breakdown)
   
           const gstRate = breakdown.gstRate || 0;
           const gstAmount = breakdown.gstAmount || 0;
@@ -794,17 +795,19 @@ useEffect(() => {
             variantId: order.variantId,
             orderWeight: weight,
             variantType: order.variantType || "Cone",
-            orderVariantCgst: isOdisha ? (gstAmount / 2).toFixed(1) : "0.0",
-            orderVariantSgst: isOdisha ? (gstAmount / 2).toFixed(1) : "0.0",
-            orderVariantIgst: isOdisha ? "0.0" : gstAmount.toFixed(1),
-            orderVariantDiscount: breakdown.discountAmount?.toFixed(1) || "0.0",
+            orderVariantCgst: Number(isOdisha ? (gstAmount / 2).toFixed(1) : "0.0"),
+            orderVariantSgst: Number(isOdisha ? (gstAmount / 2).toFixed(1) : "0.0"),
+            orderVariantIgst: Number(isOdisha ? "0.0" : gstAmount.toFixed(1)),
+            orderVariantDiscount: Number(breakdown.discountAmount?.toFixed(1)) || "0.0",
             orderVariantHandlingCharges: proportionalHandlingCharge,
-            orderVariantTotalAmount: (breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(1),
+            orderVariantTotalAmount: Number((breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(1)),
             status: "NEW",
             statusReason: null,
             statusRemark: null
           };
         });
+
+      console.log(orderVariants)
   
       const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
       const totalAmount = Number(calculateTotalAmount());
@@ -829,25 +832,28 @@ useEffect(() => {
       const orderData = {
         customer: formattedCustomer,
         status: "NEW",
-        totalAmount: toPay,
+        totalAmount: Number(toPay.toFixed(2)),
         discountId: selectedDiscountId || null,
-        walletAmount: walletUsed,
         quantity: totalQuantity,
         paymentTypeDiscount: selectedPayment || "",
         createdByUserId:user.userId,
         payment: {
           paymentId: Date.now(),
-          totalAmount: toPay,
-          codAmount: codAmt.toFixed(2),
-          onlineAmount: onlineAmt.toFixed(2),
+          totalAmount: Number(toPay.toFixed(2)),
+          codAmount: Number(codAmt.toFixed(2)),
+          onlineAmount: Number(onlineAmt.toFixed(2)),
           transactionId: "TXN" + Date.now(),
-          paidAmount: onlineAmt.toFixed(2),
-          pendingAmount: codAmt.toFixed(2),
+          paidAmount: Number(onlineAmt.toFixed(2)),
+          pendingAmount: Number(codAmt.toFixed(2)),
           paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTIALLY_PAID",
-          totalDiscount: grandTotals.totalDiscount,
-          totalSgst: isOdisha ? grandTotals.sgst.toFixed(2) : "0.00",
-          totalCgst: isOdisha ? grandTotals.cgst.toFixed(2) : "0.00",
-          totalIgst: isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(2)
+          totalDiscount: Number(grandTotals.totalDiscount.toFixed(2)),
+          totalSgst: Number(isOdisha ? grandTotals.sgst.toFixed(2) : "0.00"),
+          totalCgst: Number(isOdisha ? grandTotals.cgst.toFixed(2) : "0.00"),
+          totalIgst: Number(isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(2)),
+          walletAmount: walletUsed,
+          totalHandlingCharges:handlingCharges,
+
+
         },
         orderVariants
       };
@@ -930,6 +936,8 @@ useEffect(() => {
       const price = variant.price || 0;
       const baseTotal = weight * price;
       const gstRate = variant.gstOnProduct || 0;
+
+      console.log(weight,price,gstRate)
     
       // Discount calculation
       let productDiscountPercent = 0;
@@ -950,6 +958,8 @@ useEffect(() => {
       const discountedBase = baseTotal - discount;
       const gstAmount = (discountedBase * gstRate) / 100;
       const finalTotal = discountedBase + gstAmount;
+
+      console.log(baseTotal,gstAmount,discountAmount,finalTotal,gstRate,combinedDiscountPercent)
     
       return {
         baseTotal: isNaN(baseTotal) ? 0 : baseTotal,
@@ -2132,11 +2142,11 @@ const handleReject = (variant) => {
                      
                     </tr>
 
-                      {order?.payment?.totalRefundAmount > 0 &&(
+                      {order?.payment?.returnRefundAmount > 0 &&(
                          <tr>
                        <td className="fw-medium py-2">Refund amount</td>
                       <td className="pt-2"></td>
-                      <td className="text-end text-success">- ₹{order?.payment.totalRefundAmount.toFixed(0)}</td>
+                      <td className="text-end text-success">- ₹{order?.payment.returnRefundAmount.toFixed(0)}</td>
                     </tr>
                       )}
                    

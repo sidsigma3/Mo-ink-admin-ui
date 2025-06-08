@@ -121,3 +121,12 @@ export const getVendorOrdersByVendorId= async (vendorId) => {
 };
 
 
+
+export const fetchPaginatedOrders = async ({ page, size }) => {
+  const params = {
+    page,
+    size,
+  };
+  const response = await axios.get(`${BASE_URL}/orders/paginated`, { params });
+  return response.data; 
+};
