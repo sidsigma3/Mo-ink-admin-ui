@@ -45,7 +45,9 @@ const Header = () => {
       </div>
       
       <div className="myAcc-ctn d-flex align-items-center justify-content-center gap-4 position-relative">
+         {userDetails.role === "MASTER" && (
         <Notifications />
+          )}
 
         <button className="avatar-mob" onClick={handleClick}>
           <img src="./profile-pic.png" alt="Profile" />
