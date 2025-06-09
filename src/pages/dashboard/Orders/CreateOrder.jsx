@@ -805,12 +805,12 @@ useEffect(() => {
             variantId: order.variantId,
             orderWeight: weight,
             variantType: order.variantType || "Cone",
-            orderVariantCgst: Number(isOdisha ? (gstAmount / 2).toFixed(1) : "0.0"),
-            orderVariantSgst: Number(isOdisha ? (gstAmount / 2).toFixed(1) : "0.0"),
-            orderVariantIgst: Number(isOdisha ? "0.0" : gstAmount.toFixed(1)),
-            orderVariantDiscount: Number(breakdown.discountAmount?.toFixed(1)) || "0.0",
+            orderVariantCgst: Number(isOdisha ? (gstAmount / 2).toFixed(0) : "0.0"),
+            orderVariantSgst: Number(isOdisha ? (gstAmount / 2).toFixed(0) : "0.0"),
+            orderVariantIgst: Number(isOdisha ? "0.0" : gstAmount.toFixed(0)),
+            orderVariantDiscount: Number(breakdown.discountAmount?.toFixed(0)) || "0.0",
             orderVariantHandlingCharges: proportionalHandlingCharge,
-            orderVariantTotalAmount: Number((breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(1)),
+            orderVariantTotalAmount: Number((breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(0)),
             status: "NEW",
             statusReason: null,
             statusRemark: null
@@ -842,24 +842,24 @@ useEffect(() => {
       const orderData = {
         customer: formattedCustomer,
         status: "NEW",
-        totalAmount: Number(toPay.toFixed(2)),
+        totalAmount: Number(toPay.toFixed(0)),
         discountId: selectedDiscountId || null,
         quantity: totalQuantity,
         paymentTypeDiscount: selectedPayment || "",
         createdByUserId:user.userId,
         payment: {
           paymentId: Date.now(),
-          totalAmount: Number(toPay.toFixed(2)),
-          codAmount: Number(codAmt.toFixed(2)),
-          onlineAmount: Number(onlineAmt.toFixed(2)),
+          totalAmount: Number(toPay.toFixed(0)),
+          codAmount: Number(codAmt.toFixed(0)),
+          onlineAmount: Number(onlineAmt.toFixed(0)),
           transactionId: "TXN" + Date.now(),
-          paidAmount: Number(onlineAmt.toFixed(2)),
-          pendingAmount: Number(codAmt.toFixed(2)),
+          paidAmount: Number(onlineAmt.toFixed(0)),
+          pendingAmount: Number(codAmt.toFixed(0)),
           paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTIALLY_PAID",
-          totalDiscount: Number(grandTotals.totalDiscount.toFixed(2)),
-          totalSgst: Number(isOdisha ? grandTotals.sgst.toFixed(2) : "0.00"),
-          totalCgst: Number(isOdisha ? grandTotals.cgst.toFixed(2) : "0.00"),
-          totalIgst: Number(isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(2)),
+          totalDiscount: Number(grandTotals.totalDiscount.toFixed(0)),
+          totalSgst: Number(isOdisha ? grandTotals.sgst.toFixed(0) : "0.00"),
+          totalCgst: Number(isOdisha ? grandTotals.cgst.toFixed(0) : "0.00"),
+          totalIgst: Number(isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(0)),
           walletAmount: walletUsed,
           totalHandlingCharges:handlingCharges,
         },
@@ -1207,12 +1207,12 @@ const handleOrderChange = async () => {
     const singlePayload = {
       orderVariantId: variantId,
       orderWeight,
-      orderVariantCgst: Number(cgst.toFixed(2)),
-      orderVariantSgst: Number(sgst.toFixed(2)),
-      orderVariantIgst: Number(igst.toFixed(2)),
-      orderVariantDiscount: Number(discount.toFixed(2)),
-      orderVariantHandlingCharges: Number(handling.toFixed(2)),
-      orderVariantTotalAmount: Number(total.toFixed(2))
+      orderVariantCgst: Number(cgst.toFixed(0)),
+      orderVariantSgst: Number(sgst.toFixed(0)),
+      orderVariantIgst: Number(igst.toFixed(0)),
+      orderVariantDiscount: Number(discount.toFixed(0)),
+      orderVariantHandlingCharges: Number(handling.toFixed(0)),
+      orderVariantTotalAmount: Number(total.toFixed(0))
     };
 
     updatedVariants.push({ orderId, payload: singlePayload });
@@ -2150,11 +2150,11 @@ const handleReject = (variant) => {
                      
                     </tr>
 
-                      {order?.payment?.returnRefundAmount > 0 &&(
+                      {order?.payment?.cancelRefundAmount > 0 &&(
                          <tr>
                        <td className="fw-medium py-2">Refund amount</td>
                       <td className="pt-2"></td>
-                      <td className="text-end text-success">- ₹{order?.payment.returnRefundAmount.toFixed(0)}</td>
+                      <td className="text-end text-success">- ₹{order?.payment.cancelRefundAmount.toFixed(0)}</td>
                     </tr>
                       )}
                    

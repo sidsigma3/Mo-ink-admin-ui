@@ -335,7 +335,9 @@ console.log(istDate);
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Date</th>
 
-              <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Source</th>
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Source</th>
+
+            <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Customer ID</th>
 
             <th style={{ textAlign: 'center', verticalAlign: 'middle'}}  >Customer</th>
 
@@ -383,6 +385,8 @@ console.log(istDate);
                 )}
             </td>
 
+             <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.id}</td>
+
               <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.customer.customerName}</td>
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                 {
@@ -401,7 +405,7 @@ console.log(istDate);
 
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                ₹{(order.payment.totalAmount-order.payment.totalAdjustedAmount-order.payment.returnRefundAmount).toFixed(2)}
+                ₹{(order.payment.totalAmount-order.payment.totalAdjustedAmount-order.payment.returnRefundAmount-order.payment.cancelRefundAmount).toFixed(0)}
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>
