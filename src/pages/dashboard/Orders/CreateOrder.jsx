@@ -126,11 +126,15 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
    const user = JSON.parse(localStorage.getItem('userData'));
 
 
-    // Filter customers based on search input
-    const filteredCustomers = customers.filter((customer) =>
-      (customer?.customerName?.toLowerCase()?.includes(searchTerm.toLowerCase()) || 
-       customer?.phoneNumber?.includes(searchTerm))
+   
+   const filteredCustomers = customers.filter((customer) =>
+      customer?.customerStatus === "ACTIVE" &&
+      (
+        customer?.customerName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+        customer?.phoneNumber?.includes(searchTerm)
+      )
     );
+
 
     const [modalData, setModalData] = useState({
       isOpen: false,
@@ -503,7 +507,13 @@ useEffect(() => {
 
    
     const [walletBalances, setWalletBalances] = useState(0);
-    const [walletDeduction, setWalletDeduction] = useState(order?.walletAmount || 0);
+    const walletAmount = order?.payment?.walletAmount || 0;
+    const cancelRefundAmount = order?.payment?.cancelRefundAmount || 0;
+
+    const [walletDeduction, setWalletDeduction] = useState(
+      walletAmount > cancelRefundAmount ? walletAmount - cancelRefundAmount : 0
+    );
+
 
     useEffect(() => {
       const fetchWallets = async () => {
@@ -852,8 +862,6 @@ useEffect(() => {
           totalIgst: Number(isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(2)),
           walletAmount: walletUsed,
           totalHandlingCharges:handlingCharges,
-
-
         },
         orderVariants
       };
@@ -1713,7 +1721,7 @@ const handleReject = (variant) => {
 
                       {searchTerm.trim() !== "" && filteredCustomers.length > 0 && (
                         <div className="customer-list mt-3">
-                          <h4>Results</h4>
+                        
                           <ul>
                             {filteredCustomers.map((customer, index) => (
                               <li
@@ -2078,7 +2086,7 @@ const handleReject = (variant) => {
                       <td style={{ textAlign: "end" }} className="pb-3 text-success pt-2">
                       <span className="mr-1 font-semibold">-</span> ₹ {isViewMode ? (
                               // Show plain text in view mode
-                              <span>{walletDeduction ? `${walletDeduction}` : "0"}</span>
+                              <span>{walletDeduction ? `${walletDeduction.toFixed(0)}` : "0"}</span>
                           ) : (
                               // Show input field in edit mode
                               <input
