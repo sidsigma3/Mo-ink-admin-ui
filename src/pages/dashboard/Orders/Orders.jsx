@@ -49,16 +49,16 @@ const Orders = () => {
 
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-     const [showPicker, setShowPicker] = useState(false);
-      const [selectedFilter, setSelectedFilter] = useState("");
-      const [searchValue, setSearchValue] = useState("");
+    const [showPicker, setShowPicker] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState("");
+    const [searchValue, setSearchValue] = useState("");
  
       
       
       // Function to adjust to Indian Standard Time (IST)
-      const toIST = (date) => {
-        return new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
-      };
+    const toIST = (date) => {
+      return new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+    };
 
     const deliveryStatuses = ['CONFIRMED', 'MANUFACTURING', 'SHIPPED'];
 
@@ -89,7 +89,7 @@ const Orders = () => {
       let received = 0;
 
       data.forEach(order => {
-        // Total order amount and weight (regardless of payment status)
+       
         revenue += order.totalAmount || 0;
         weight += order.orderVariantResponse.reduce(
           (total, variant) => total + (Number(variant.orderWeight) || 0), 
@@ -97,7 +97,7 @@ const Orders = () => {
         );
         quantity += order.orderVariantResponse.length || 0;
 
-        // Received amount based on payment status
+   
         const paymentStatus = order.payment?.paymentStatus;
 
         if (paymentStatus === "FULLY_PAID") {

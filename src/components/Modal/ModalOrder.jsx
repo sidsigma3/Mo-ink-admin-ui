@@ -117,7 +117,9 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
       </Modal.Header>
       <Modal.Body>
         {!showCatalogue ? (
-          products.map((product) => (
+          products
+            .filter((product) => product.availableStatus === "ACTIVE")
+            .map((product) => (
             <div key={product.productId}>
               <div
                 className="mb-4 d-flex justify-content-between align-items-center"

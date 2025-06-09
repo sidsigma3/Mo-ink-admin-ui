@@ -64,63 +64,70 @@ const BulkAssignPage = () => {
       console.log(spinnerList,dyerList)
 
     // Replicate the same product aggregation from CreateOrder
-    const aggregateProductData = (productData) => {
-        return productData.map((product) => {
-          const groupedVariants = product.variants.reduce((acc, variant) => {
-            const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType } = variant;
-      
-            if (!acc[size]) {
-              acc[size] = {
-                id,
-                size,
-                variants: [],
-                totalWeight: 0,
-              };
-            }
-      
-            const hex = color.hexCode?.toLowerCase() || "#ccc";
-            const colorKey = `${color.colorName}-${hex}`;
-      
-            let colorGroup = acc[size].variants.find((v) => `${v.colorName}-${v.hexCode?.toLowerCase()}` === colorKey);
-      
-            if (!colorGroup) {
-              colorGroup = {
-                colorName: color.colorName,
-                hexCode: hex,
-                variants: [],
-              };
-              acc[size].variants.push(colorGroup);
-            }
-      
-            colorGroup.variants.push({
-              variantType: variantType?.toLowerCase() || "unknown",
-              available: availableWeight,
-              price: pricePerKg,
-              id,
-              markupPricePerKg,
-            });
-      
-            acc[size].totalWeight += Number(availableWeight);
-      
-            return acc;
-          }, {});
-      
-          return {
-            productId: product.id,
-            productName: product.productName,
-            productDescription: product.productDescription,
-            productImage: product.productImage,
-            compareAtPrice: product.productPrice?.compareAtPrice,
-            costPerItemPerKg: product.productPrice?.costPerItemPerKg,
-            gstOnProduct: product.gstOnProduct,
-            pricePerKg: product.productPrice?.pricePerKg,
-            availableStatus: product.availableStatus,
-            groupedVariants: Object.values(groupedVariants),
-          };
-        });
-      };
+   const aggregateProductData = (productData, orderFor) => {
+  return productData.map((product) => {
+    const groupedVariants = product.variants.reduce((acc, variant) => {
+      const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType } = variant;
 
-    const finalData = useMemo(() => aggregateProductData(productData), [productData]);
+      // 🧠 FILTER: Only keep greige colors if Spinner
+      if (orderFor === "Spinner" && color.colorName.toLowerCase() !== "greige") return acc;
+
+      if (!acc[size]) {
+        acc[size] = {
+          id,
+          size,
+          variants: [],
+          totalWeight: 0,
+        };
+      }
+
+      const hex = color.hexCode?.toLowerCase() || "#ccc";
+      const colorKey = `${color.colorName}-${hex}`;
+
+      let colorGroup = acc[size].variants.find(
+        (v) => `${v.colorName}-${v.hexCode?.toLowerCase()}` === colorKey
+      );
+
+      if (!colorGroup) {
+        colorGroup = {
+          colorName: color.colorName,
+          hexCode: hex,
+          variants: [],
+        };
+        acc[size].variants.push(colorGroup);
+      }
+
+      colorGroup.variants.push({
+        variantType: variantType?.toLowerCase() || "unknown",
+        available: availableWeight,
+        price: pricePerKg,
+        id,
+        markupPricePerKg,
+      });
+
+      acc[size].totalWeight += Number(availableWeight);
+
+      return acc;
+    }, {});
+
+    return {
+      productId: product.id,
+      productName: product.productName,
+      productDescription: product.productDescription,
+      productImage: product.productImage,
+      compareAtPrice: product.productPrice?.compareAtPrice,
+      costPerItemPerKg: product.productPrice?.costPerItemPerKg,
+      gstOnProduct: product.gstOnProduct,
+      pricePerKg: product.productPrice?.pricePerKg,
+      availableStatus: product.availableStatus,
+      groupedVariants: Object.values(groupedVariants),
+    };
+  });
+};
+
+
+    const finalData = useMemo(() => aggregateProductData(productData, orderFor), [productData, orderFor]);
+
 
 
     console.log(finalData)
@@ -270,16 +277,20 @@ const BulkAssignPage = () => {
 
 
     
-
       const filteredSpinners = spinnerList.filter(v =>
-        v.company.toLowerCase().includes(spinnerSearch.toLowerCase()) ||
-        v.firstName.toLowerCase().includes(spinnerSearch.toLowerCase())
+        v.status === "ACTIVE" &&
+        (
+          v.company.toLowerCase().includes(spinnerSearch.toLowerCase()) ||
+          v.firstName.toLowerCase().includes(spinnerSearch.toLowerCase())
+        )
       );
-    
+
       const filteredDyers = dyerList.filter(v =>
-        v.company.toLowerCase().includes(dyerSearch.toLowerCase()) ||
-        v.firstName.toLowerCase().includes(dyerSearch.toLowerCase())
-        
+        v.status === "ACTIVE" &&
+        (
+          v.company.toLowerCase().includes(dyerSearch.toLowerCase()) ||
+          v.firstName.toLowerCase().includes(dyerSearch.toLowerCase())
+        )
       );
 
 
