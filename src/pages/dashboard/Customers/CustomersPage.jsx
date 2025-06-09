@@ -272,7 +272,7 @@ if (totalPages >= 1) {
             <Table hover>
                 <thead>
                     <tr>
-
+                        <th style={{ verticalAlign: 'middle'}}>#ID</th>
                         <th style={{ verticalAlign: 'middle'}} >Name</th>
                         <th style={{ verticalAlign: 'middle'}} >Email</th>
                         <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Location</th>
@@ -290,7 +290,7 @@ if (totalPages >= 1) {
 
               return (
                 <tr key={index} style={{ cursor: "pointer" }} onClick={() => handleRowClick(index)}>
-
+                  <td style={{ verticalAlign: 'middle'}}>{customer.customerId}</td>
                   <td style={{ verticalAlign: 'middle'}} >{customer.customerName}</td>
                   <td style={{ verticalAlign: 'middle'}} >{customer.email}</td>
                   <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.addresses[0]?.city || ""}</td>
