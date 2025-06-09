@@ -405,7 +405,7 @@ console.log(istDate);
 
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                ₹{(order.payment.totalAmount-order.payment.totalAdjustedAmount-order.payment.returnRefundAmount-order.payment.cancelRefundAmount).toFixed(0)}
+                ₹{(order.payment.totalAmount + order.payment.walletAmount - order.payment.totalAdjustedAmount - order.payment.returnRefundAmount - order.payment.cancelRefundAmount).toFixed(0)}
               </td>
 
               <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>
