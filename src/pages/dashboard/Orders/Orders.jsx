@@ -26,16 +26,17 @@ import "react-date-range/dist/theme/default.css"; // Theme styles
 import OrderFilter from '../../../components/Filter/OrderFilter/OrderFilter';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import { fetchPaginatedOrders } from '../../../services/OrderService';
+import { fetchOrderAnalytics } from '../../../services/OrderService';
 
 const Orders = () => {
    
     const orderTableRef = useRef(null);
-    const [orders,setOrders] = useState([])
-
+    const [ordersAll,setOrdersAll] = useState([])
+    const [currentPage, setCurrentPage] = useState(1);
     const [ordersData,setOrdersData] = useState([])
     const [filteredData, setFilteredData] = useState([]); 
-
+    const [totalPages, setTotalPages] = useState(1);
     const [totalCustomers, setTotalCustomers] = useState(0);
     const [totalOrders, setTotalOrders] = useState(0);
     const [totalRevenue, setTotalRevenue] = useState(0);
@@ -43,8 +44,9 @@ const Orders = () => {
     const [totalOrderWeight, setTotalOrderWeight] = useState(0);
     const [totalQuantity,setTotalQuantity] =useState(0)
     const [totalReceivedAmount, setTotalReceivedAmount] = useState(0);
+    const [ordersToDeliver,setOrdersToDeliver] = useState(0)
 
-    const [selectedStatus, setSelectedStatus] = useState([]); // Start with no status selected
+    const [selectedStatus, setSelectedStatus] = useState([]);
 
 
     const [startDate, setStartDate] = useState(null);
@@ -66,20 +68,72 @@ const Orders = () => {
       deliveryStatuses.includes(order.status)
     ).length;
 
-    useEffect(() => {
-        fetchDashboardData();
-      }, []);
+    // useEffect(() => {
+    //     fetchAllOrders()
+    //     // fetchDashboardData();
+    // }, []);
+
+    //  const fetchAllOrders = async () => {
+    //   try {
+    //     const data = await getAllOrders();
+    //     setOrdersAll(data);
+    //     const total = Math.ceil(data.length / 10);
+    //     setTotalPages(total);
+    //   } catch (error) {
+    //     console.error("Error fetching all orders:", error);
+    //   }
+    // };
+
+
 
       const fetchDashboardData = async () => {
-        try {
-          const data = await getAllOrders();
-          setOrdersData(data);
-          setFilteredData(data);
-          calculateDashboardStats(data); // ✅ Calculate stats for full data
-        } catch (error) {
-          console.error("Error fetching dashboard data:", error);
-        }
-      };
+      try {
+        const payload = {
+          page: currentPage,
+          size: 10,
+          status: selectedStatus,
+          orderId: selectedFilter === 'Order Id' ? searchValue : undefined,
+          startDate: startDate ? startDate.toISOString().split('T')[0] : undefined,
+          endDate: endDate ? endDate.toISOString().split('T')[0] : undefined,
+        };
+
+        const data = await fetchPaginatedOrders(payload);
+        setOrdersData(data);  
+      
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+
+    const fetchDashboardAnalytics = async () => {
+      try {
+        const payload = {
+          status: selectedStatus,
+          orderId: selectedFilter === "Order Id" ? searchValue : undefined,
+          startDate,
+          endDate,
+        };
+
+        const res = await fetchOrderAnalytics(payload);
+
+        const analyticsData = res.data
+
+        if (!analyticsData) return;
+
+        setTotalOrders(analyticsData.totalOrders || 0);
+        setTotalRevenue(analyticsData.orderedAmount || 0);
+        setTotalOrderWeight(analyticsData.totalOrderWeight || 0); // assuming same
+        setTotalQuantity(analyticsData.orderedQuantity || 0);
+        setTotalReceivedAmount(analyticsData.receivedAmount || 0);
+        setOrdersToDeliver(analyticsData.orderToDeliver)
+        const total = Math.ceil(analyticsData.totalOrders / 10);
+        setTotalPages(total);
+      } catch (error) {
+        console.error("Error in dashboard analytics:", error);
+      }
+    };
+
 
 
    const calculateDashboardStats = (data) => {
@@ -120,33 +174,39 @@ const Orders = () => {
 
 
 // ✅ Call applyFilters every time selectedStatus changes
-    useEffect(() => {
-      applyFilters(selectedFilter, searchValue, startDate, endDate, selectedStatus);
-    }, [selectedStatus]);
-
-
-   const handleFilterChange = (filter, value) => {
+const handleFilterChange = (filter, value) => {
   setSelectedFilter(filter);
   setSearchValue(value.toLowerCase());
-  applyFilters(filter, value.toLowerCase(), startDate, endDate, selectedStatus);
+  setCurrentPage(1); // Reset to first page
 };
 
-
-  const handleDateChange = (dates) => {
+const handleDateChange = (dates) => {
   const [start, end] = dates;
   setStartDate(start);
   setEndDate(end);
-  if (start && end) {
-    applyFilters(selectedFilter, searchValue, start, end, selectedStatus);
-  }
+  setCurrentPage(1);
 };
 
 const handleClearDateFilter = () => {
   setStartDate(null);
   setEndDate(null);
-  setShowPicker(false);
-  applyFilters(selectedFilter, searchValue, null, null, selectedStatus);
+  setCurrentPage(1);
 };
+
+const handleStatusChange = (status) => {
+  setSelectedStatus(status);
+  setCurrentPage(1);
+};
+
+
+useEffect(() => {
+  fetchDashboardAnalytics();
+}, [selectedStatus, selectedFilter, searchValue, startDate, endDate]);
+
+
+useEffect(() => {
+  fetchDashboardData();
+}, [currentPage, selectedFilter, searchValue, startDate, endDate, selectedStatus]);
 
 
     
@@ -299,7 +359,7 @@ const handleClearDateFilter = () => {
                 </li>
 
                 <li className='col-lg col-md-6 col-sm-12 col-12'>
-                <DashboardBox heading={'Order to Deliver'} number={ordersToDeliverCount}></DashboardBox>
+                <DashboardBox heading={'Order to Deliver'} number={ordersToDeliver}></DashboardBox>
                    
                 </li>
             </ul>
@@ -313,13 +373,34 @@ const handleClearDateFilter = () => {
             />
           
                 {/* <StatusFilter status={"Active"}></StatusFilter> */}
-              <OrderFilter status={selectedStatus} onStatusChange={setSelectedStatus} />
+              <OrderFilter status={selectedStatus} onStatusChange={handleStatusChange} />
 
         </div>
 
         
             <div className="order-table-ctn mt-4">
-            <OrderTable ref={orderTableRef} data={filteredData}/>
+            <OrderTable ref={orderTableRef} data={ordersData}/>
+
+            <Pagination className="mt-4 d-flex justify-content-end pagination">
+              <Pagination.Prev
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+              />
+              {[...Array(totalPages).keys()].map((number) => (
+                <Pagination.Item
+                  key={number + 1}
+                  active={number + 1 === currentPage}
+                  onClick={() => setCurrentPage(number + 1)}
+                >
+                  {number + 1}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              />
+            </Pagination>
+
             </div>
 
     </div>

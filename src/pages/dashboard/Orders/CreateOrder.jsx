@@ -2138,7 +2138,7 @@ const handleReject = (variant) => {
 
 
                     <tr>
-                      <td className="fw-medium py-2">Balance Due</td>
+                      <td className="fw-medium pb-3 pt-2">Balance Due</td>
                       <td className="pt-2">{codPercentage}%</td>
 
                       {isViewMode === true ? (
@@ -2151,10 +2151,10 @@ const handleReject = (variant) => {
                     </tr>
 
                       {order?.payment?.cancelRefundAmount > 0 &&(
-                         <tr>
-                       <td className="fw-medium py-2">Refund amount</td>
+                         <tr className='border-top'>
+                       <td className="fw-medium py-2">Refunded amount</td>
                       <td className="pt-2"></td>
-                      <td className="text-end text-success">- ₹{order?.payment.cancelRefundAmount.toFixed(0)}</td>
+                      <td className="text-end text-success">₹{order?.payment.cancelRefundAmount.toFixed(0)}</td>
                     </tr>
                       )}
                    

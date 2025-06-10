@@ -8,7 +8,7 @@ import {
 
 const TABS = ['All', 'Orders', 'Users'];
 const userData = JSON.parse(localStorage.getItem('userData'))
-const USER_ID = userData.userId;
+const USER_ID = userData?.userId;
 
 
 const NotificationPage = () => {
