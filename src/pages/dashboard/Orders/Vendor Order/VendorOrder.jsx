@@ -1,4 +1,4 @@
-import React ,{useState , useEffect }from 'react'
+import React ,{useState , useEffect , useRef }from 'react'
 import ImportBtn from '../../../../components/Buttons/Import/ImportBtn'
 import ExportBtn from '../../../../components/Buttons/Export/ExportBtn'
 import ProductFilter from '../../../../components/Filter/DayFilter/ProductFilter/ProductFilter'
@@ -16,6 +16,9 @@ import * as XLSX from "xlsx";
 import VendorOrderFilter from '../../../../components/Filter/OrderFilter/VendorOrderFilter'
 import DashboardBox from '../../../../components/DashboardBox/DashboardBox'
 import { Pagination } from 'react-bootstrap';
+import { format, parseISO } from "date-fns";
+import DatePicker from "react-datepicker";
+import { fetchPaginatedVendorOrders , fetchVendorOrderAnalytics} from '../../../../services/OrderService'
 
 const VendorOrder = () => {
 
@@ -26,11 +29,17 @@ const VendorOrder = () => {
     
     const [searchFilter, setSearchFilter] = useState({ filter: "", value: "" });
     const [statusFilter, setStatusFilter] = useState([]);
-
-
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [showPicker, setShowPicker] = useState(false);
     const [filteredData, setFilteredData] = useState([]); 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; 
+    const [totalOrders , setTotalOrders ] = useState(0)
+    const [totalQuantity, setTotalQuantity] = useState(0)
+    const [totalAmount, setTotalAmount] = useState(0)
+    const [totalReceived , setTotalReceived] = useState(0)
+    const [totalPending, setTotalPending] = useState(0)
 
 
     const handleRowClick = (correlationId) => {
@@ -38,36 +47,92 @@ const VendorOrder = () => {
       navigate(`/vendor-order-details/${correlationId}`, { state: { relatedOrders } });
     };
     
-const statusClassMap = {
-    PLACED: "vendor blue",
-    CONFIRMED: "vendor yellow",
-    RECEIVED: "vendor green",
-    RETURNED: "vendor grey",
-    REPLACED: "vendor purple",
-    CANCELLED: "vendor red",
-  };
+    const statusClassMap = {
+        PLACED: "vendor blue",
+        CONFIRMED: "vendor yellow",
+        RECEIVED: "vendor green",
+        RETURNED: "vendor grey",
+        REPLACED: "vendor purple",
+        CANCELLED: "vendor red",
+      };
 
-  const statusOption = [
-  "PLACED",
-  "CONFIRMED",
-  "RECEIVED",
-  "RETURNED",
-  "REPLACED",
-  "CANCELLED",
-];
+      const statusOption = [
+      "PLACED",
+      "CONFIRMED",
+      "RECEIVED",
+      "RETURNED",
+      "REPLACED",
+      "CANCELLED",
+    ];
 
-  
+    const fetchVendorOrders = async () => {
+      try {
+        const payload = {
+          page: currentPage,
+          size: itemsPerPage,
+          status: statusFilter,
+          orderId: searchFilter?.filter === "Order Id" ? searchFilter?.value : undefined,
+          startDate,
+          endDate,
+        };
 
-
-    const handleFilterChange = (filter, value) => {
-      setSearchFilter({ filter, value });
-      applyCombinedFilters({ filter, value }, statusFilter);
+        const data = await fetchPaginatedVendorOrders(payload);
+        setOrders(data);
+      } catch (error) {
+        console.error("Failed to fetch vendor orders:", error);
+      }
     };
 
- const handleStatusChange = (newStatuses) => {
-  setStatusFilter(newStatuses); // This is now an array
-  applyCombinedFilters(searchFilter, newStatuses);
+
+const fetchVendorAnalytics = async () => {
+  try {
+    const payload = {
+      status: statusFilter,
+      orderId: searchFilter?.filter === "Order Id" ? searchFilter?.value : undefined,
+      startDate,
+      endDate,
+    };
+
+    const res = await fetchVendorOrderAnalytics(payload);
+
+    const data = res.data
+    // assuming response contains:
+    // { totalOrders, totalQuantity, totalAmount, totalReceived, totalPending }
+
+    setTotalOrders(data.totalOrders || 0);
+    setTotalQuantity(data.orderedQuantity || 0);
+    setTotalAmount(data.totalAmount || 0);
+    setTotalReceived(data.totalReceived || 0);
+    setTotalPending(data.totalPending || 0);
+  } catch (error) {
+    console.error("Failed to fetch vendor analytics:", error);
+  }
 };
+
+
+    const handleDateChange = (dates) => {
+      const [start, end] = dates;
+      setStartDate(start);
+      setEndDate(end);
+      setCurrentPage(1);
+    };
+
+    const handleClearDateFilter = () => {
+      setStartDate(null);
+      setEndDate(null);
+      setCurrentPage(1);
+    };
+
+  const handleFilterChange = (filter, value) => {
+    setSearchFilter({ filter, value });
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (newStatuses) => {
+    setStatusFilter(newStatuses);
+    setCurrentPage(1);
+  };
+
 
  const applyCombinedFilters = (search, statusArray) => {
   let filtered = orders;
@@ -92,21 +157,38 @@ const statusClassMap = {
 };
 
 
+      const datePickerRef = useRef(null);
 
+      // Close date picker when clicking outside
+      useEffect(() => {
+          const handleClickOutside = (event) => {
+              if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+                  setShowPicker(false);
+              }
+          };
+  
+          if (showPicker) {
+              document.addEventListener("mousedown", handleClickOutside);
+          }
+  
+          return () => {
+              document.removeEventListener("mousedown", handleClickOutside);
+          };
+      }, [showPicker]);
+
+
+     
 
       useEffect(() => {
-        const fetchOrders = async () => {
-          try {
-            const data = await getVendorOrder();
-            setOrders(data);
-            setFilteredData(data)
-          } catch (error) {
-            console.error("Failed to fetch vendor orders:", error);
-          }
-        };
-    
-        fetchOrders();
-      }, []);
+        fetchVendorAnalytics();
+      }, [startDate, endDate, statusFilter, searchFilter]);
+      
+      
+      useEffect(() => {
+        fetchVendorOrders();
+      }, [currentPage, startDate, endDate, statusFilter, searchFilter]);
+      
+
 
       const formatDateToIST = (dateStr) => {
         // Force it to be treated as UTC
@@ -174,19 +256,20 @@ filteredData.forEach((order) => {
 
 const uniquePOs = Array.from(uniquePOMap.values());
 
-const totalOrders = uniquePOs.length;
-const totalQuantity = uniquePOs.reduce((sum, order) => sum + order.weight, 0).toFixed(0);
-const totalAmount = uniquePOs.reduce((sum, order) => sum + order.amount, 0).toFixed(0);
-const totalReceived = uniquePOs.filter(order => order.status === 'RECEIVED').length;
-const totalPending = uniquePOs.filter(order => order.status === 'CONFIRMED').length;
+// const totalOrders = uniquePOs.length;
+// const totalQuantity = uniquePOs.reduce((sum, order) => sum + order.weight, 0).toFixed(0);
+// const totalAmount = uniquePOs.reduce((sum, order) => sum + order.amount, 0).toFixed(0);
+// const totalReceived = uniquePOs.filter(order => order.status === 'RECEIVED').length;
+// const totalPending = uniquePOs.filter(order => order.status === 'CONFIRMED').length;
 
 
 
-const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-const paginatedData = filteredData
-  .slice()
-  .reverse()
-  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+const totalPages = Math.ceil(totalOrders / itemsPerPage); 
+
+// const paginatedData = filteredData
+//   .slice()
+//   .reverse()
+//   .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
 const paginationItems = [];
 
@@ -228,7 +311,39 @@ if (totalPages > 1) {
             <h3>Vendor Orders</h3>
 
             <div className='btn-ctn d-flex gap-2'>
-              
+                 <div className="date-filter position-relative">
+                      <button
+                        className="border rounded bg-white px-3 py-1"
+                        onClick={() => setShowPicker(!showPicker)}
+                      >
+                        {startDate && endDate
+                          ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+                          : "Select Date Range"}
+                      </button>
+  
+                        {startDate && endDate && (
+                            <button
+                              className="ms-2 p-2 btn btn-sm btn-outline-secondary"
+                              onClick={handleClearDateFilter}
+                            >
+                              Clear
+                            </button>
+                          )}
+  
+                      {showPicker && (
+                        <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute" }}>
+                          <DatePicker
+                            selected={startDate}
+                            onChange={handleDateChange}
+                            startDate={startDate}
+                            endDate={endDate}
+                            selectsRange
+                            inline
+                            dateFormat="dd MMM yyyy"
+                          />
+                        </div>
+                      )}
+                    </div>
 
                 <ExportBtn onClick={handleExport}></ExportBtn>
 
@@ -254,7 +369,7 @@ if (totalPages > 1) {
             </li>
 
             <li className='col-lg col-md-4 col-sm-6 col-6'>
-              <DashboardBox heading={'Total Amount'} number={`₹${totalAmount}`} />
+              <DashboardBox heading={'Total Amount'} number={`₹${totalAmount.toFixed(0)}`} />
             </li>
 
             <li className='col-lg col-md-4 col-sm-6 col-6'>
@@ -272,7 +387,7 @@ if (totalPages > 1) {
         <div className='order-filter-ctn d-flex gap-2 mb-2 w-50 mt-3'>
           
           <ProductFilter 
-                filterOptions={["PO", "Vendor"]} 
+                filterOptions={["Order Id", "Vendor"]} 
                 onFilterChange={handleFilterChange} 
           />
     
@@ -305,7 +420,7 @@ if (totalPages > 1) {
               </td>
             </tr>
           ) : (
-           paginatedData.map((order) => {
+           orders.map((order) => {
               const totalWeight = order.vendorOrderVariantResponse.reduce(
                 (sum, variant) => sum + variant.vendorOrderWeight,
                 0

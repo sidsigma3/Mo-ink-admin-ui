@@ -122,11 +122,122 @@ export const getVendorOrdersByVendorId= async (vendorId) => {
 
 
 
-export const fetchPaginatedOrders = async ({ page, size }) => {
-  const params = {
-    page,
-    size,
-  };
-  const response = await axios.get(`${BASE_URL}/orders/paginated`, { params });
-  return response.data; 
+export const fetchPaginatedOrders = async ({
+  page,
+  size,
+  status,
+  orderId,
+  startDate,
+  endDate,
+}) => {
+  try {
+    const params = {
+      page,
+      size,
+    };
+
+    if (status && status.length > 0) params.status = status.join(',');
+    if (orderId) params.orderId = orderId;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await axios.get(`${BASE_URL}/paginated`, { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching paginated orders:', error);
+    throw error;
+  }
+};
+
+
+
+export const fetchOrderAnalytics = async ({ status, orderId, startDate, endDate }) => {
+  try {
+    const params = {};
+
+    if (status && status.length > 0) {
+      params.status = status.join(",");
+    }
+
+    if (orderId) {
+      params.orderId = orderId;
+    }
+
+    if (startDate) {
+      params.startDate = startDate.toISOString().split("T")[0];
+    }
+
+    if (endDate) {
+      params.endDate = endDate.toISOString().split("T")[0];
+    }
+
+    const response = await axios.get(`${BASE_URL}/analytics`, { params });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching order analytics:", error);
+    return null;
+  }
+};
+
+
+// services/vendorOrderService.js
+
+export const fetchPaginatedVendorOrders = async ({ page, size, status, orderId, startDate, endDate }) => {
+  try {
+    const params = {
+      page,
+      size,
+    };
+
+    if (status && status.length > 0) {
+      params.status = status.join(",");
+    }
+
+    if (orderId) {
+      params.vendorOrderId = orderId;
+    }
+
+    if (startDate) {
+      params.startDate = startDate.toISOString().split("T")[0];
+    }
+
+    if (endDate) {
+      params.endDate = endDate.toISOString().split("T")[0];
+    }
+
+    const response = await axios.get(`${URL}/vendor-orders/paginated`, { params });
+    return response.data; // expected to be an array of vendor orders
+  } catch (error) {
+    console.error("Error fetching paginated vendor orders:", error);
+    return [];
+  }
+};
+
+
+export const fetchVendorOrderAnalytics = async ({ status, orderId, startDate, endDate }) => {
+  try {
+    const params = {};
+
+    if (status && status.length > 0) {
+      params.status = status.join(",");
+    }
+
+    if (orderId) {
+      params.orderId = orderId;
+    }
+
+    if (startDate) {
+      params.startDate = startDate.toISOString().split("T")[0];
+    }
+
+    if (endDate) {
+      params.endDate = endDate.toISOString().split("T")[0];
+    }
+
+    const response = await axios.get(`${URL}/vendor-orders/analytics`, { params });
+    return response.data; // expected to include revenue, weight, quantity, etc.
+  } catch (error) {
+    console.error("Error fetching vendor order analytics:", error);
+    return null;
+  }
 };

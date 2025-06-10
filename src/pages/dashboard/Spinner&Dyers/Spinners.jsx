@@ -302,6 +302,7 @@ for (let page = 1; page <= totalPages; page++) {
                         <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Tag</th>
                         <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Total Orders</th>
                         <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Last Order</th>
+                        <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Status</th>
                         <th style={{width:'1rem'}}></th>
                     </tr>
                 </thead>
@@ -351,6 +352,11 @@ for (let page = 1; page <= totalPages; page++) {
                           vendorOrdersMap[customer.vendorId].at(-1).orderDate
                         )
                       : 'No order'}
+                  </td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle' , justifyItems:'center'}}>
+                    <div style={{backgroundColor:customer.status.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:customer.status.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
+                    {customer.status}
+                    </div>
                   </td>
                   <td>
                     <Dropdown align="end" style={{ zIndex: 10 }}>

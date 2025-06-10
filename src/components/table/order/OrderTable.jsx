@@ -32,12 +32,12 @@ const OrderTable = forwardRef(({data}, ref) => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
-  const paginatedOrders = useMemo(() => {
-    const reversedOrders = [...orders].reverse();
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return reversedOrders.slice(startIndex, endIndex);
-  }, [orders, currentPage]);
+  // const paginatedOrders = useMemo(() => {
+  //   const reversedOrders = [...orders].reverse();
+  //   const startIndex = (currentPage - 1) * rowsPerPage;
+  //   const endIndex = startIndex + rowsPerPage;
+  //   return reversedOrders.slice(startIndex, endIndex);
+  // }, [orders, currentPage]);
 
 
   const createOrderRef = useRef(null);
@@ -116,7 +116,7 @@ const OrderTable = forwardRef(({data}, ref) => {
         };
 
         await updateOrder(orderId, updatedOrderData);
-        fetchOrders();
+        // fetchOrders();
 
       showToast("Order status updated successfully.", "success");
     } catch (error) {
@@ -126,18 +126,18 @@ const OrderTable = forwardRef(({data}, ref) => {
 
 
 
-const fetchOrders = async () => {
-  try {
-      const data = await getAllOrders();
-      setOrders(data);
-  } catch (error) {
-      console.error("Failed to fetch orders", error);
-  }
-};
+// const fetchOrders = async () => {
+//   try {
+//       const data = await getAllOrders();
+//       setOrders(data);
+//   } catch (error) {
+//       console.error("Failed to fetch orders", error);
+//   }
+// };
 
-useEffect(() => {
-  fetchOrders();
-}, []);
+// useEffect(() => {
+//   fetchOrders();
+// }, []);
 
 
 
@@ -186,19 +186,19 @@ const handleRowClick = (order) => {
     const formattedData = orders.map((order) => {
      const rawInput = order.createdAt; // get timestamp string
 
-const rawDate = new Date(rawInput); // parse to Date object
+        const rawDate = new Date(rawInput); // parse to Date object
 
-const istDate = new Intl.DateTimeFormat('en-IN', {
-  timeZone: 'Asia/Kolkata',
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-  hour: 'numeric',
-  minute: '2-digit',
-  hour12: true
-}).format(rawDate);
+        const istDate = new Intl.DateTimeFormat('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }).format(rawDate);
 
-console.log(istDate);
+        console.log(istDate);
 
 
     
@@ -364,7 +364,7 @@ console.log(istDate);
         </thead>
 
           <tbody>
-              {paginatedOrders.map((order) => (
+              {orders.map((order) => (
             <tr
               key={order.orderId}
               style={{ cursor: "pointer" }}
@@ -643,7 +643,7 @@ console.log(istDate);
 
     </div>
 
-    <Pagination className="mt-4 d-flex justify-content-end pagination">
+    {/* <Pagination className="mt-4 d-flex justify-content-end pagination">
       <Pagination.Prev
         onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
         disabled={currentPage === 1}
@@ -661,7 +661,7 @@ console.log(istDate);
         onClick={() => setCurrentPage((p) => Math.min(p + 1, Math.ceil(orders.length / rowsPerPage)))}
         disabled={currentPage === Math.ceil(orders.length / rowsPerPage)}
       />
-    </Pagination>
+    </Pagination> */}
 
     </div>
   );
