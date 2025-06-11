@@ -79,6 +79,8 @@ const SideBar = () => {
       setSelected("dashboard");
     } else if (location.pathname.includes("/products") || location.pathname.includes("/add-product")) {
       setSelected("products");
+    } else if (location.pathname.includes("/colorlibrary") || location.pathname.includes("/colorlibrary")) {
+      setSelected("colorlibrary");
     }else if (location.pathname.includes("/analytics")) {
       setSelected("analytics");
     }else if (location.pathname.includes("/products") || location.pathname.includes("/add-product")) {
@@ -218,6 +220,14 @@ const SideBar = () => {
     </Link>
   </li>
 
+
+  <li className={selected === 'colorlibrary' ? 'selected' : 'not-selected'}>
+    <Link to={'/colorlibrary'}>
+      <button onClick={() => setSelected('colorlibrary')}>
+        <span className='icon'><TbClipboardList size={24} /></span>Color Library
+      </button>
+    </Link>
+  </li>
 
   {/* {(hoverSelected === 'products' || selected === 'inventory') && (
     <div className={selected === 'inventory' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>

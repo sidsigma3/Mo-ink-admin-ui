@@ -44,6 +44,7 @@ import InventoryDetails from './pages/dashboard/Products/InventoryDetails';
 import ReportBug from './pages/dashboard/Report Bug/ReportBug';
 import NotificationPage from './pages/dashboard/Notification Page/NotificationPage';
 import BulkAssignPage from './pages/dashboard/Orders/BulkAssign/BulkAssignPage';
+import ColorLibrary from './pages/dashboard/Color Library/ColorLibrary';
 
 function App() {
 
@@ -126,6 +127,9 @@ function App() {
                                       <Route path="/reportbug" element={<ReportBug></ReportBug>} />
                                       <Route path="/notificationpage" element={<NotificationPage></NotificationPage> } />
                                       <Route path="/bulkassignpage" element={<BulkAssignPage></BulkAssignPage>} />
+                                      <Route path="/colorlibrary" element={<ColorLibrary></ColorLibrary>} />
+
+
 
                                     
                               
