@@ -86,53 +86,66 @@ const Orders = () => {
 
 
 
-      const fetchDashboardData = async () => {
+    const fetchDashboardData = async () => {
       try {
+        const adjustedStartDate = startDate
+          ? new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+          : undefined;
+
+        const adjustedEndDate = endDate
+          ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+          : undefined;
+
         const payload = {
           page: currentPage,
           size: 10,
           status: selectedStatus,
-          orderId: selectedFilter === 'Order Id' ? searchValue : undefined,
-          startDate: startDate ? startDate.toISOString().split('T')[0] : undefined,
-          endDate: endDate ? endDate.toISOString().split('T')[0] : undefined,
+          orderId: selectedFilter === "Order Id" ? searchValue : undefined,
+          startDate: adjustedStartDate,
+          endDate: adjustedEndDate,
         };
 
         const data = await fetchPaginatedOrders(payload);
-        setOrdersData(data);  
-      
+        setOrdersData(data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
     };
 
 
-    const fetchDashboardAnalytics = async () => {
-      try {
-        const payload = {
-          status: selectedStatus,
-          orderId: selectedFilter === "Order Id" ? searchValue : undefined,
-          startDate,
-          endDate,
-        };
 
-        const res = await fetchOrderAnalytics(payload);
-
-        const analyticsData = res.data
-
-        if (!analyticsData) return;
-
-        setTotalOrders(analyticsData.totalOrders || 0);
-        setTotalRevenue(analyticsData.orderedAmount || 0);
-        setTotalOrderWeight(analyticsData.totalOrderWeight || 0); // assuming same
-        setTotalQuantity(analyticsData.orderedQuantity || 0);
-        setTotalReceivedAmount(analyticsData.receivedAmount || 0);
-        setOrdersToDeliver(analyticsData.orderToDeliver)
-        const total = Math.ceil(analyticsData.totalOrders / 10);
-        setTotalPages(total);
-      } catch (error) {
-        console.error("Error in dashboard analytics:", error);
-      }
+   const fetchDashboardAnalytics = async () => {
+  try {
+    const adjustDate = (date) => {
+      return date ? new Date(date.getTime() + 24 * 60 * 60 * 1000) : undefined;
     };
+
+    const payload = {
+      status: selectedStatus,
+      orderId: selectedFilter === "Order Id" ? searchValue : undefined,
+      startDate: adjustDate(startDate),
+      endDate: adjustDate(endDate),
+    };
+
+    const res = await fetchOrderAnalytics(payload);
+
+    const analyticsData = res?.data;
+    if (!analyticsData) return;
+
+    setTotalOrders(analyticsData.totalOrders || 0);
+    setTotalRevenue(analyticsData.orderedAmount || 0);
+    setTotalOrderWeight(analyticsData.totalOrderWeight || 0);
+    setTotalQuantity(analyticsData.orderedQuantity || 0);
+    setTotalReceivedAmount(analyticsData.receivedAmount || 0);
+    setOrdersToDeliver(analyticsData.orderToDeliver);
+
+    const total = Math.ceil(analyticsData.totalOrders / 10);
+    setTotalPages(total);
+  } catch (error) {
+    console.error("Error in dashboard analytics:", error);
+  }
+};
+
 
 
 
@@ -182,6 +195,7 @@ const handleFilterChange = (filter, value) => {
 
 const handleDateChange = (dates) => {
   const [start, end] = dates;
+  console.log(dates)
   setStartDate(start);
   setEndDate(end);
   setCurrentPage(1);
