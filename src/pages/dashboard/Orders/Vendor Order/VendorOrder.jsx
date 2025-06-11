@@ -67,13 +67,15 @@ const VendorOrder = () => {
 
     const fetchVendorOrders = async () => {
       try {
+        const adjustDate = (date) => date ? new Date(date.getTime() + 24 * 60 * 60 * 1000) : undefined;
+
         const payload = {
           page: currentPage,
           size: itemsPerPage,
           status: statusFilter,
           orderId: searchFilter?.filter === "Order Id" ? searchFilter?.value : undefined,
-          startDate,
-          endDate,
+          startDate: adjustDate(startDate),
+          endDate: adjustDate(endDate),
         };
 
         const data = await fetchPaginatedVendorOrders(payload);
@@ -84,20 +86,22 @@ const VendorOrder = () => {
     };
 
 
+
 const fetchVendorAnalytics = async () => {
   try {
+    const adjustDate = (date) => date ? new Date(date.getTime() + 24 * 60 * 60 * 1000) : undefined;
+
     const payload = {
       status: statusFilter,
       orderId: searchFilter?.filter === "Order Id" ? searchFilter?.value : undefined,
-      startDate,
-      endDate,
+      startDate: adjustDate(startDate),
+      endDate: adjustDate(endDate),
     };
 
     const res = await fetchVendorOrderAnalytics(payload);
 
-    const data = res.data
-    // assuming response contains:
-    // { totalOrders, totalQuantity, totalAmount, totalReceived, totalPending }
+    const data = res?.data;
+    if (!data) return;
 
     setTotalOrders(data.totalOrders || 0);
     setTotalQuantity(data.orderedQuantity || 0);
@@ -108,6 +112,7 @@ const fetchVendorAnalytics = async () => {
     console.error("Failed to fetch vendor analytics:", error);
   }
 };
+
 
 
     const handleDateChange = (dates) => {
