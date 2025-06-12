@@ -25,6 +25,7 @@ import { IconContext } from "react-icons";
 import { useLocation } from 'react-router-dom';
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoPricetagOutline } from "react-icons/io5";
+import { IoColorPaletteOutline } from "react-icons/io5";
 import ModalLogout from '../Modal/ModalLogout';
 
 
@@ -222,9 +223,9 @@ const SideBar = () => {
 
 
   <li className={selected === 'colorlibrary' ? 'selected' : 'not-selected'}>
-    <Link to={'/colorlibrary'}>
+    <Link to={'/colorlibrary-products'}>
       <button onClick={() => setSelected('colorlibrary')}>
-        <span className='icon'><TbClipboardList size={24} /></span>Color Library
+        <span className='icon'><IoColorPaletteOutline  size={24} /></span>Color Library
       </button>
     </Link>
   </li>
