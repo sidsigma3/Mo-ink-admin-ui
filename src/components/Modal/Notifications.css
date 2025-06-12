@@ -157,6 +157,13 @@
   margin-top: 0;
 }
 
+
+.unread-notification {
+  background-color: #e0f2ff; /* light blue background for unread */
+  border: 1px solid #3b82f6; /* blue border */
+}
+
+
 .notification-dropdown::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
