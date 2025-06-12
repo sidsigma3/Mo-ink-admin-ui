@@ -32,6 +32,7 @@ export default function Notifications() {
   const fetchNotifications = async () => {
     try {
       const data = await getUserNotifications(userId);
+      console.log(data)
       setNotifications(data || []);
     } catch (err) {
       console.error('Failed to fetch notifications:', err);
@@ -41,7 +42,7 @@ export default function Notifications() {
   const fetchUnreadCount = async () => {
     try {
       const data = await getUnreadCount(userId);
-      setUnreadCount(data.count || 0);
+      setUnreadCount(data.data || 0);
     } catch (err) {
       console.error('Failed to fetch unread count:', err);
     }
@@ -80,7 +81,7 @@ export default function Notifications() {
       <div className="notification-button" onClick={() => setIsOpen(!isOpen)} ref={dropdownRef}>
         <button className="bell-icon">
           <Bell className="w-6 h-6" />
-          {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
+          {unreadCount > 0 && <span className="notification-badge"></span>}
         </button>
 
         {isOpen && (
@@ -107,14 +108,22 @@ export default function Notifications() {
             <div className="notification-list">
               {notifications.map((notification) => (
                 <div
-                  key={notification.id}
-                  className={`notification-item ${notification.read ? '' : 'unread-notification'}`}
-                  onClick={async () => {
-                    await markNotificationRead(notification.id);
-                    fetchNotifications();
-                    fetchUnreadCount();
-                  }}
-                >
+                    key={notification.id}
+                    className={`notification-item ${notification.read ? '' : 'unread-notification'}`}
+                     onClick={async () => {
+                      try {
+                        if (!notification.read) {
+                          await markNotificationRead(notification.id);
+                          fetchUnreadCount(); // optional, to update badge count
+                        }
+
+                        navigate('/notificationpage'); // redirect after marking as read
+                      } catch (error) {
+                        console.error("Error handling notification click:", error);
+                      }
+                    }}
+                  >
+
                   <div className="notification-icon">{notification.icon || '🔔'}</div>
                   <div className="notification-content">
                     <p className="notification-title">{notification.title}</p>

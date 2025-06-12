@@ -6,13 +6,13 @@ import {
   markAllUserNotificationsRead
 } from '../../../services/NoatificationService';
 
-const TABS = ['All', 'Orders', 'Users'];
+const TABS = ['Inventory', 'User', 'Return'];
 const userData = JSON.parse(localStorage.getItem('userData'))
 const USER_ID = userData?.userId;
 
 
 const NotificationPage = () => {
-  const [activeTab, setActiveTab] = useState('All');
+  const [activeTab, setActiveTab] = useState('Inventory');
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,19 +45,29 @@ const NotificationPage = () => {
     }
   };
 
-  const handleMarkSingleRead = async (id) => {
-    try {
-      await markNotificationRead(id);
-      fetchNotifications();
-    } catch (error) {
-      console.error("Failed to mark as read:", error);
-    }
-  };
+const handleMarkSingleRead = async (id) => {
+  try {
+    await markNotificationRead(id);
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      )
+    );
+  } catch (error) {
+    console.error("Failed to mark as read:", error);
+  }
+};
 
-  const filtered = activeTab === 'All'
-    ? notifications
-    : notifications.filter((n) => n.type === activeTab.toLowerCase());
 
+  const filtered = notifications.filter((n) => {
+    const title = n.title?.toLowerCase();
+
+    if (activeTab === 'Inventory') return title === 'inventory alert';
+    if (activeTab === 'User') return title === 'new admin account pending approval';
+    if (activeTab === 'Return') return title === 'order return requested';
+
+    return false;
+  });
 
 
 
@@ -103,12 +113,13 @@ const NotificationPage = () => {
         <div className="text-center p-4">No notifications available.</div>
       ) : (
         <div className="notifications-list">
-          {filtered.map(({ id, icon = '🔔', title, message, createdAt, isRead }) => (
+          {filtered.map(({ id, icon = '🔔', title, message, createdAt, read }) => (
             <div
-              className={`notification-card ${isRead ? '' : 'unread'}`}
+              className={`notification-card ${read ? '' : 'unread'}`}
               key={id}
               onClick={() => handleMarkSingleRead(id)}
             >
+
               <div className="icon">{icon}</div>
               <div className="details">
                 <div className="title">{title}</div>
