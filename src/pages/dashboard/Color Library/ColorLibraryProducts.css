@@ -1,0 +1,131 @@
+.colorlibrary-table-ctn {
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+  
+    overflow: auto;
+    margin-top: 1rem;
+  }
+
+.zoom-img {
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.zoom-img:hover {
+  transform: scale(1.03);
+}
+
+
+  
+  .colorlibrary-table-ctn table {
+    width: 100%;
+    background-color: white;
+    text-align: left;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  .colorlibrary-table-ctn table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f9fafb;
+  }
+
+  .colorlibrary-table-ctn table thead tr th{
+    background-color: #f9fafb; ;
+    font-size: 0.8rem;
+  }
+  
+  .colorlibrary-table-ctn th,
+  .colorlibrary-table-ctn td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .colorlibrary-table-ctn th {
+    font-weight: 600
+  }
+  
+  .colorlibrary-table-ctn tbody td {
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    h5{
+      font-size: 1rem;
+    }
+  }
+  
+  .colorlibrary-table-ctn  .data-cards {
+    display: none;
+    
+  }
+
+  .colorlibrarys .filter-sec{
+    width: 50% !important;
+}
+
+
+.colorlibrary-table-ctn{
+    
+  .dropdown-toggle::after {
+    display: none !important; 
+  }
+}
+
+  @media (max-width: 1024px) {
+    .colorlibrary-table-ctn{
+     
+      overflow: auto;
+    }
+
+    .colorlibrary-table-ctn table{
+      width: 110vw;
+    }
+
+    .colorlibrarys .filter-sec{
+      width: 70%;
+  }
+  }
+
+
+  
+  @media (max-width: 768px) {
+    .colorlibrary-table-ctn table {
+      display: none;
+    }
+
+    .colorlibrary-table-ctn .pagination{
+        display: none;
+    }
+  
+    .colorlibrary-table-ctn .data-cards {
+      display: block;
+    }
+  
+    .colorlibrary-table-ctn .data-card {
+      background-color: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
+    }
+  
+    .colorlibrary-table-ctn .data-card h3 {
+      margin: 0 0 0.5rem;
+    }
+  
+    .colorlibrary-table-ctn .data-card p {
+      margin: 0.2rem 0;
+      font-size: 1rem;
+    }
+
+    .colorlibrarys .filter-sec{
+        width: 100% !important;
+  }
+
+  .colorlibrary-table-ctn {
+    border: none;
+  }
+}
+  
+

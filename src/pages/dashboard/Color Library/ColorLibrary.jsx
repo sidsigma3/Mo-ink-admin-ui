@@ -17,6 +17,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Toast from '../../../components/Toast/Toast'
 import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
+import { IoArrowBackOutline } from 'react-icons/io5'
+
 
 const ColorLibrary =  ({setDemoData }) => {
 
@@ -29,6 +31,11 @@ const ColorLibrary =  ({setDemoData }) => {
       updatedData[index].imageUrl = URL.createObjectURL(file); // preview only
       setDemoData(updatedData);
     }
+  };
+  const [isChecked, setIsChecked] = useState(true);
+
+  const handleChange = () => {
+    setIsChecked(!isChecked);
   };
 
 const demoData = [
@@ -259,14 +266,17 @@ if (totalPages >=1) {
 
   return (
     <div className='colorlibrary'>
-        <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.2rem'}}>Color Library</h4>
-
-            <div className='d-flex gap-2'>
+      <div className='top d-flex  justify-content-between mb-2 mt-2' style={{cursor:'pointer'}}>
+                <div className='d-flex gap-3'>
+                <span onClick={() => navigate('/colorlibrary-products')}><IoArrowBackOutline size={25}/></span>
+                <h5 style={{fontSize:'1.2rem'}}>Color Details</h5>
+               </div>
+             <div className='d-flex gap-2'>
                  <ExportBtn onClick={() => exportToExcel(filteredData)}></ExportBtn>
                  <ImportBtn></ImportBtn>
+            </div>             
             </div>
-        </div>
+
 
         <div className='d-flex gap-2 filter-sec'>
             <div className='w-75'>
@@ -337,18 +347,14 @@ if (totalPages >=1) {
             )}
           </td>
           <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-            <button
-              style={{
-                padding: "6px 12px",
-                backgroundColor: item.status === "Active" ? "#10B981" : "#E5E7EB",
-                color: item.status === "Active" ? "white" : "#374151",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "default",
-              }}
-            >
-              {item.status}
-            </button>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={handleChange}
+              />
+              <span className="slider round"></span>
+            </label>
           </td>
         </tr>
       ))}
