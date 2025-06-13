@@ -115,3 +115,24 @@
   font-weight: 500;              /* Matches Status Buttons */
   color: #6b7280;
 }
+
+
+.mark-all-container {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.mark-all-btn {
+  padding: 8px 16px;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mark-all-btn:hover {
+  background-color: #0a5bd4;
+}

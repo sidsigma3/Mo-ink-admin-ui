@@ -102,9 +102,11 @@ const handleMarkSingleRead = async (id) => {
             </button>
           ))}
         </div>
-        {/* <button className="mark-all-btn" onClick={handleMarkAllRead}>
-          Mark All as Read
-        </button> */}
+          <div className="mark-all-container">
+            <button className="mark-all-btn" onClick={handleMarkAllRead}>
+              Mark All as Read
+            </button>
+         </div>
       </div>
 
       {loading ? (
