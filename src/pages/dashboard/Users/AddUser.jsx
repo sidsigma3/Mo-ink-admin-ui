@@ -27,6 +27,14 @@ const AddUser = () => {
     const master = JSON.parse(localStorage.getItem('userData'))
     const customer = state?.index !== undefined ? users[index] : null;
 
+    const isOwnAccount = master?.userId === customer?.userId;
+    const isMaster = master?.role?.toUpperCase() === "MASTER";
+    const targetIsMaster = customer?.role?.toUpperCase() === "MASTER";
+
+
+    const canEdit = isOwnAccount || (isMaster && !targetIsMaster);
+
+
     const isViewMode = !!state
     
     const [formData, setFormData] = useState({
@@ -71,7 +79,10 @@ const AddUser = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log('hello')
+        if (!canEdit) {
+            showToast("You are not authorized to edit this user", "error");
+            return;
+        }
     
         let validationErrors = {};
     
@@ -185,6 +196,12 @@ const AddUser = () => {
         };
 
     const confirmStatusChange = async () => {
+        if (!canEdit) {
+        showToast("Not authorized to change status", "error");
+        return;
+        }
+
+
         setModalOpen(false);
 
         if (formData.status.toUpperCase() === "PENDING") {
@@ -427,34 +444,7 @@ const AddUser = () => {
             </Dropdown>
         </div>
 
-            {/* <div className='bg-white p-3 rounded mt-2 d-flex'>
-               
-                <div className="d-flex gap-3 position-relative" style={{ width: '100px', height: '100px' }}>
-                        <svg width="100" height="100" viewBox="0 0 100 100">
-                            <circle
-                            cx="50"
-                            cy="50"
-                            r="35"
-                            stroke="#B9C0CD"
-                            stroke-width="5"
-                            fill="none"
-                            stroke-dasharray="240"
-                            stroke-dashoffset="70"
-                            />
-                        </svg>
-
-                       
-                        <div
-                            className="position-absolute d-flex justify-content-center align-items-center text-secondary"
-                            style={{ top: 0, left: 0, width: '100%', height: '100%' }}
-                        >
-                            <FiShoppingCart size={23}/>
-                        </div>
-                        </div>
-
-
-                        <h5>Total sales</h5>
-            </div> */}
+           
         </div>
 
       </div>
