@@ -178,14 +178,22 @@ for (let number = 1; number <= totalPages; number++) {
                             {user.role}
                           </div>
                         </td>
-                        <td style={{ justifyItems: 'center', alignContent: 'center' }}>
+                       <td style={{ justifyItems: 'center', alignContent: 'center' }}>
                           <div
                             style={{
                               backgroundColor:
-                                user.userStatus.toLowerCase() === 'active' ? '#D1FAE5' : '#F3F4F6',
+                                user.userStatus.toLowerCase() === 'active'
+                                  ? '#D1FAE5'
+                                  : user.userStatus.toLowerCase() === 'pending'
+                                  ? '#FEF3C7'
+                                  : '#F3F4F6',
                               border: '1px solid',
                               borderColor:
-                                user.userStatus.toLowerCase() === 'active' ? '#6EE7B7' : '#D1D5DB',
+                                user.userStatus.toLowerCase() === 'active'
+                                  ? '#6EE7B7'
+                                  : user.userStatus.toLowerCase() === 'pending'
+                                  ? '#FBBF24'
+                                  : '#D1D5DB',
                               borderRadius: '0.2rem',
                               textAlign: 'center',
                               width: '6rem',
@@ -195,6 +203,7 @@ for (let number = 1; number <= totalPages; number++) {
                             {user.userStatus}
                           </div>
                         </td>
+
                         <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                           {new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}
                         </td>

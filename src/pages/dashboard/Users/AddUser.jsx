@@ -24,6 +24,8 @@ const AddUser = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [pendingStatus, setPendingStatus] = useState(null);
 
+    const isViewMode = !!state
+
     const master = JSON.parse(localStorage.getItem('userData'))
     const customer = state?.index !== undefined ? users[index] : null;
 
@@ -31,11 +33,11 @@ const AddUser = () => {
     const isMaster = master?.role?.toUpperCase() === "MASTER";
     const targetIsMaster = customer?.role?.toUpperCase() === "MASTER";
 
-
+    const canDelete = isViewMode && customer?.role?.toUpperCase() !== "ADMIN" && (!targetIsMaster || isMaster);
     const canEdit = isOwnAccount || (isMaster && !targetIsMaster);
 
 
-    const isViewMode = !!state
+   
     
     const [formData, setFormData] = useState({
         firstName: customer?.firstName || "",
@@ -96,17 +98,16 @@ const AddUser = () => {
         if (!formData.whatsapp.trim()) validationErrors.whatsapp = "WhatsApp number is required";
         if (!/^\d{10}$/.test(formData.whatsapp)) validationErrors.whatsapp = "WhatsApp number must be 10 digits";
         if (!formData.pinCode.trim()) validationErrors.pinCode = "PIN Code is required";
-        if (!/^\d{6}$/.test(formData.pinCode)) validationErrors.pinCode = "PIN Code must be 6 digits";
+        // if (!/^\d{6}$/.test(formData.pinCode)) validationErrors.pinCode = "PIN Code must be 6 digits";
         // if (!formData.password.trim()) validationErrors.password = "Password is required";
         if (!formData.company.trim()) validationErrors.company = "Comapany is required";
-        if (!formData.address.trim()) validationErrors.address = "Address is required";
+        // if (!formData.address.trim()) validationErrors.address = "Address is required";
         if (!formData.adharNumber.trim()) validationErrors.adharNumber = "Addhar is required";
-        if (!formData.country.trim()) validationErrors.country = "Country is required";
-        if (!formData.state.trim()) validationErrors.state = "State is required";
-        if (!formData.city.trim()) validationErrors.city = "City is required";
-        if (!formData.apartment.trim()) validationErrors.apartment = "Street/Apartment is required";
+        // if (!formData.country.trim()) validationErrors.country = "Country is required";
+        // if (!formData.state.trim()) validationErrors.state = "State is required";
+        // if (!formData.city.trim()) validationErrors.city = "City is required";
+        // if (!formData.apartment.trim()) validationErrors.apartment = "Street/Apartment is required";
 
-        console.log(validationErrors)
     
         // If errors exist, stop submission
         if (Object.keys(validationErrors).length > 0) {
@@ -147,10 +148,18 @@ const AddUser = () => {
                 }
             } else {
                 await addUser(newUser);
+            showToast(
+                "Mail has been sent to Master admin for approval. You can access your account post approval",
+                "success"
+            );
             }
-            navigate('/users');
+            setTimeout(() => {
+                navigate('/users');
+            }, 3000);
+           
         } catch (error) {
             console.error("Error submitting user:", error);
+            showToast(error.response.data.message,'erorr')
         }
     };
 
@@ -356,7 +365,7 @@ const AddUser = () => {
             <div className="media-input-ctn mt-5 p-2 col-md-12">
                 <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
                 <input type="file" accept="image/*"  name="chequePhoto" onChange={handleChequePhotoChange} />
-                <h4>Add photo of a business PAN</h4>
+                <h4>Add photo of a Aadhaar card</h4>
                 </div>
                 {formErrors.chequePhoto && <div className="invalid-feedback d-block">{formErrors.chequePhoto}</div>}
 
@@ -409,14 +418,14 @@ const AddUser = () => {
 
             </div>
 
-            <div className='d-flex justify-content-between my-4'>
-            {customer?.role?.toUpperCase() !== "ADMIN" && (
+          <div className='d-flex justify-content-between my-4'>
+            {canDelete && (
                 <DeleteBtn clickFunction={() => handleDelete(customer.userId)} />
             )}
 
-           
-            <SubmitBtn text={'Save'} clickFunction={handleSubmit}></SubmitBtn>
+            <SubmitBtn text={'Save'} clickFunction={handleSubmit} />
             </div>
+
     
 
         </div>
@@ -430,19 +439,27 @@ const AddUser = () => {
                 ></StatusInput>
             </div>
 
-        <div className='bg-white p-3 rounded mt-2'>
-            <h5>Role</h5>
-            <Dropdown onSelect={handleRole}>
-                <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1">
-                    {formData.role || "Select Role"}
-                </Dropdown.Toggle>
+       <div className='bg-white p-3 rounded mt-2'>
+        <h5>Role</h5>
+        <Dropdown onSelect={handleRole}>
+            <Dropdown.Toggle
+            variant="light"
+            id="dropdown-basic"
+            className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1"
+            >
+            {formData.role || "Select Role"}
+            </Dropdown.Toggle>
 
-                <Dropdown.Menu>
-                    <Dropdown.Item eventKey="SALES">Sales</Dropdown.Item>
-                    <Dropdown.Item eventKey="MASTER">Master Admin</Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
+            <Dropdown.Menu>
+            <Dropdown.Item eventKey="SALES">Sales</Dropdown.Item>
+            <Dropdown.Item eventKey="ADMIN">Admin</Dropdown.Item>
+            {isMaster && (
+                <Dropdown.Item eventKey="MASTER">Master Admin</Dropdown.Item>
+            )}
+            </Dropdown.Menu>
+        </Dropdown>
         </div>
+
 
            
         </div>

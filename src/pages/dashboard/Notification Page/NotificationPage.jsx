@@ -60,14 +60,16 @@ const handleMarkSingleRead = async (id) => {
 
 
   const filtered = notifications.filter((n) => {
-    const title = n.title?.toLowerCase();
+  const title = n.title?.toLowerCase();
 
-    if (activeTab === 'Inventory') return title === 'inventory alert';
-    if (activeTab === 'User') return title === 'new admin account pending approval';
-    if (activeTab === 'Return') return title === 'order return requested';
+  if (activeTab === 'Inventory') return title === 'inventory alert';
+  if (activeTab === 'User')
+    return title === 'new admin account pending approval' || title === 'new sales account pending';
+  if (activeTab === 'Return') return title === 'order return requested';
 
-    return false;
-  });
+  return false;
+});
+
 
 
 
