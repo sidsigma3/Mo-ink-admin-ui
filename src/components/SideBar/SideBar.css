@@ -1,6 +1,7 @@
 .sideBar{
     border-radius: 0.8rem;
     background-color: var(--White, #FFF);
+    overflow-y: auto; 
     height: 100%;
     padding: 0.5rem 0.5rem;
     display: flex;
@@ -113,6 +114,8 @@ dl, ol, ul {
 }
 
 
+
+ 
 @media (max-width: 768px) {
     .sideBar .menu .on-mobile{
        display: flex;
