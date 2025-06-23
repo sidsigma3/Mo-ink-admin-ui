@@ -41,3 +41,16 @@ export const markAllUserNotificationsRead = async (userId) => {
     throw error;
   }
 };
+
+
+export const getPaginatedUserNotifications = async (userId, type, page = 1, size = 10) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/USER/${userId}/${type}/paginated?page=${page}&size=${size}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching paginated notifications:', error);
+    throw error;
+  }
+};

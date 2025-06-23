@@ -81,7 +81,7 @@ const BulkAssignPage = () => {
         };
       }
 
-      const hex = color.hexCode?.toLowerCase() || "#ccc";
+      const hex = color.colorCode?.toLowerCase() || "#ccc";
       const colorKey = `${color.colorName}-${hex}`;
 
       let colorGroup = acc[size].variants.find(

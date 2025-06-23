@@ -40,6 +40,8 @@ const AddProduct = () => {
   const isViewMode = !!state
 
   const product = (typeof index === 'number' && finalData) ? finalData[index] : null;
+
+  console.log(product)
  
   const transformProductData = (product) => {
     if (!product || !product.groupedVariants) return { variants: [], sizeColorMap: [] };
@@ -159,8 +161,6 @@ const handleMediaChange = async (e, type) => {
   }
 };
 
-  
-console.log(formData)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -214,7 +214,7 @@ console.log(formData)
                 size,
                 color: {
                     colorName: color.color,
-                    hexCode: color.hex,
+                    colorCode: color.hex,
                 },
                 variantType: variant.variantType.toUpperCase(),
                 availableWeight: Number(variant.available),
@@ -243,6 +243,8 @@ console.log(formData)
         deletedVariantIds: [], // No deleted variants are tracked now
     };
 
+    console.log(formattedData)
+
     try {
         if (state?.index !== undefined) {
             const productId = product.productId;
@@ -256,7 +258,7 @@ console.log(formData)
                 const matchColor = matchSizeGroup?.variants.find(
                     old =>
                         old.colorName === newVar.color.colorName &&
-                        old.hexCode.toLowerCase() === newVar.color.hexCode.toLowerCase() &&
+                        old.hexCode.toLowerCase() === newVar.color.colorCode.toLowerCase() &&
                         old.variantType === newVar.variantType
                 );
 

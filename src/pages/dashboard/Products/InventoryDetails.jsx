@@ -222,7 +222,7 @@ const InventoryDetails = () => {
       <BsDot size="1.8rem" color="#6c757d" />
       <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.type}</h5>
       <BsDot size="1.8rem" color="#6c757d" />
-      <span className="rounded-circle d-inline-block"style={{ width: 25, height: 25, backgroundColor: item.color.hexCode }}></span>
+      <span className="rounded-circle d-inline-block"style={{ width: 25, height: 25, backgroundColor: item.color.colorCode }}></span>
       <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.raw.color.colorName}</h5>
 
 

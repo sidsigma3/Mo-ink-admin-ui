@@ -89,17 +89,14 @@ for (let number = 1; number <= totalPages; number++) {
          <div className='top d-flex justify-content-between mb-2'>
             <h4 style={{fontSize:'1.2rem'}}>Users</h4>
 
-            {userData.role === "MASTER" && (
-              <div className='d-flex gap-2'>
-                {/* <ExportBtn></ExportBtn> */}
+            {(userData.role === "MASTER") && (
+                <div className='d-flex gap-2'>
+                  <Link to={'/add-user'}>
+                    <AddBtn text={"Add User"} />
+                  </Link>
+                </div>
+              )}
 
-               
-
-                <Link to={'/add-user'}>
-                <AddBtn text={"Add User"}></AddBtn>
-                </Link>
-            </div>
-            )}
             
         </div>
 

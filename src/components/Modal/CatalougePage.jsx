@@ -206,6 +206,7 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
         colorName: variant.colorName,
         hexCode: variant.hexCode,
         variantType: innerVariant.variantType,
+        colorImage:variant.colorImage
       };
     }
   });
@@ -329,15 +330,16 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
               >
                 <div className="position-relative w-100 overflow-hidden" style={{ height: "5.5rem", borderRadius: "6px" }}>
                   <img
-                    src={
-                      imageUrl?.find((url) =>
-                        url.toLowerCase().includes(`/${colorData.variantType.toLowerCase()}/`)
-                      )
-                        ? `${backendUrl}${imageUrl.find((url) =>
-                            url.toLowerCase().includes(`/${colorData.variantType.toLowerCase()}/`)
-                          )}`
-                        : "/fallback-image.png"
-                    }
+                    src={`${backendUrl}${colorData.colorImage}`}
+                    // src={
+                    //   imageUrl?.find((url) =>
+                    //     url.toLowerCase().includes(`/${colorData.variantType.toLowerCase()}/`)
+                    //   )
+                    //     ? `${backendUrl}${imageUrl.find((url) =>
+                    //         url.toLowerCase().includes(`/${colorData.variantType.toLowerCase()}/`)
+                    //       )}`
+                    //     : "/fallback-image.png"
+                    // }
                     className="w-100 h-100"
                     style={{ objectFit: "cover" }}
                     alt={`${colorData.colorName} - ${colorData.variantType}`}
@@ -346,7 +348,7 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
                   <div
                     className="position-absolute top-0 start-0 w-100 h-100"
                     style={{
-                      backgroundColor: colorData.hexCode,
+                      // backgroundColor: colorData.hexCode,
                       mixBlendMode: "multiply",
                       opacity: 0.5,
                       borderRadius: "6px",

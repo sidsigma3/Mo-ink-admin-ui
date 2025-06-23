@@ -437,7 +437,7 @@ const handleTag = (value) =>{
           product.variant.forEach((variant) => {
             rateMap[variant.variantId] = {
               ratePerKg: variant.ratePerKg,
-              gstOnProduct: product.gstOnProduct, // <-- GST is from the product
+              gstOnProduct: product.gstOnProduct, 
             };
           });
         }
@@ -455,7 +455,7 @@ const handleTag = (value) =>{
               "Variant ID": variant.id,
               "Size": variant.size,
               "Color Name": variant.color?.colorName || "",
-              "Color Hex Code": variant.color?.hexCode || "",
+              "Color Hex Code": variant.color?.colorCode || "",
               "Variant Type": variant.variantType,
               "Available Weight (Kg)": variant.availableWeight || "",
               "Rate Per Kg": rateInfo.ratePerKg?.toFixed(0) || "",
@@ -728,7 +728,7 @@ const handleTag = (value) =>{
                                                   <div className="d-flex justify-content-center align-items-center gap-2">
                                                     <div
                                                       style={{
-                                                        backgroundColor: row.color.hexCode,
+                                                        backgroundColor: row.color.colorCode || row.color.hexCode,
                                                         width: "20px",
                                                         height: "20px",
                                                         borderRadius: "50%",

@@ -162,19 +162,19 @@ const toggleType = (product, size, type) => {
          }
      };
 
-  const renderColorDot = (color) => (
-    <div
-      title={color?.colorName}
-      style={{
-        backgroundColor: color?.hexCode,
-        width: 20,
-        height: 20,
-        borderRadius: '50%',
-        display: 'inline-block',
-        border: '1px solid #999',
-      }}
-    />
-  );
+    const renderColorDot = (color) => (
+      <div
+        title={color?.colorName}
+        style={{
+          backgroundColor: color?.colorCode,
+          width: 20,
+          height: 20,
+          borderRadius: '50%',
+          display: 'inline-block',
+          border: '1px solid #999',
+        }}
+      />
+    );
   
  
     const exportToExcel = (data) => {

@@ -13,6 +13,7 @@ import { uploadProductImage } from '../../../services/ProductService';
 import { activeNewUser } from '../../../services/UserService';
 import SelectState from '../../../components/SelectState/SelectState';
 import StatusChangeModal from '../../../components/Modal/StatusChangeModal';
+import ModalDeleteUser from '../../../components/Modal/ModalDeleteUser';
 
 const AddUser = () => {
     const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -23,6 +24,8 @@ const AddUser = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [pendingStatus, setPendingStatus] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
 
     const isViewMode = !!state
 
@@ -33,7 +36,7 @@ const AddUser = () => {
     const isMaster = master?.role?.toUpperCase() === "MASTER";
     const targetIsMaster = customer?.role?.toUpperCase() === "MASTER";
 
-    const canDelete = isViewMode && customer?.role?.toUpperCase() !== "ADMIN" && (!targetIsMaster || isMaster);
+    const canDelete = isViewMode && customer?.role?.toUpperCase() !== "ADMIN" && customer?.role?.toUpperCase() !== "MASTER";
     const canEdit = isOwnAccount || (isMaster && !targetIsMaster);
 
 
@@ -97,7 +100,7 @@ const AddUser = () => {
         if (!/^\d{10}$/.test(formData.phone)) validationErrors.phone = "Phone number must be 10 digits";
         if (!formData.whatsapp.trim()) validationErrors.whatsapp = "WhatsApp number is required";
         if (!/^\d{10}$/.test(formData.whatsapp)) validationErrors.whatsapp = "WhatsApp number must be 10 digits";
-        if (!formData.pinCode.trim()) validationErrors.pinCode = "PIN Code is required";
+        // if (!formData.pinCode.trim()) validationErrors.pinCode = "PIN Code is required";
         // if (!/^\d{6}$/.test(formData.pinCode)) validationErrors.pinCode = "PIN Code must be 6 digits";
         // if (!formData.password.trim()) validationErrors.password = "Password is required";
         if (!formData.company.trim()) validationErrors.company = "Comapany is required";
@@ -164,23 +167,23 @@ const AddUser = () => {
     };
 
 
-    const handleDelete = async (userId) => {
-         const showToast = (message, type = "error") => {
-            setToasts([{ message, type }]);
-            setTimeout(() => setToasts([]), 3000);
-          };
+    const handleDelete = (userId) => {
+        setUserToDelete(userId);
+        setShowDeleteModal(true);
+        };
 
-        if (window.confirm("Are you sure you want to delete this user?")) {
-          try {
-            await deleteUser(userId);
+        const confirmDelete = async () => {
+        try {
+            await deleteUser(userToDelete);
             showToast("User deleted successfully!", "success");
-            navigate("/users")
-          } catch (error) {
-            console.error("Error deleting user:", error);
+            navigate("/users");
+        } catch (error) {
             showToast("Failed to delete user.", "error");
-          }
+        } finally {
+            setShowDeleteModal(false);
+            setUserToDelete(null);
         }
-      };
+        };
 
        const handleChequePhotoChange = async (e) => {
                 const file = e.target.files[0];
@@ -306,51 +309,51 @@ const AddUser = () => {
         <div className='left'>
         <div className='customer-overview rounded row bg-white p-3 gy-2'>
             <div className="col-md-6 d-flex flex-column">
-                <label>First Name</label>
+                <label>First Name <span style={{ color: 'red' }}>*</span> </label>
                 <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
                 {formErrors.firstName && <div className="invalid-feedback d-block">{formErrors.firstName}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>Last Name</label>
+                <label>Last Name <span style={{ color: 'red' }}>*</span></label>
                 <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
                 {formErrors.lastName && <div className="invalid-feedback d-block">{formErrors.lastName}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>WhatsApp No.</label>
-                <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
+                <label>WhatsApp No. <span style={{ color: 'red' }}>*</span></label>
+                <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} disabled = {isViewMode}/>
                 {formErrors.whatsapp && <div className="invalid-feedback d-block">{formErrors.whatsapp}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>Calling No.</label>
-                <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
+                <label>Calling No. <span style={{ color: 'red' }}>*</span></label>
+                <input type="text" name="phone" value={formData.phone} onChange={handleChange} disabled = {isViewMode}/>
                 {formErrors.phone && <div className="invalid-feedback d-block">{formErrors.phone}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>Email</label>
-                <input type="text" name="email" value={formData.email} onChange={handleChange} />
+                <label>Email <span style={{ color: 'red' }}>*</span></label>
+                <input type="text" name="email" value={formData.email} onChange={handleChange} disabled = {isViewMode}/>
                 {formErrors.email && <div className="invalid-feedback d-block">{formErrors.email}</div>}
             </div>
 
             {!isViewMode &&(
                  <div className="col-md-6 d-flex flex-column">
-                 <label>Password</label>
-                 <input type="text" name="password" value={formData.password} onChange={handleChange} />
+                 <label>Password <span style={{ color: 'red' }}>*</span></label>
+                 <input type="text" name="password" value={formData.password} onChange={handleChange} disabled = {isViewMode}/>
                  {formErrors.password && <div className="invalid-feedback d-block">{formErrors.password}</div>}
              </div>
             )}
 
             <div className="col-md-6 d-flex flex-column">
-                <label>Company</label>
+                <label>Company <span style={{ color: 'red' }}>*</span></label>
                 <input type="text" name="company" value={formData.company} onChange={handleChange} />
                 {formErrors.company && <div className="invalid-feedback d-block">{formErrors.company}</div>}
             </div>
 
             <div className="col-md-6 d-flex flex-column">
-                <label>Adhaar No.</label>
+                <label>Adhaar No. <span style={{ color: 'red' }}>*</span></label>
                 <input
                 className="ps-2"
                 type="text"
@@ -358,6 +361,7 @@ const AddUser = () => {
                 value={formData.adharNumber}
                 placeholder="Add Adhaar No. to authenticate"
                 onChange={handleChange}
+                disabled = {isViewMode}
                 />
                 {formErrors.adharNumber && <div className="invalid-feedback d-block">{formErrors.adharNumber}</div>}
             </div>
@@ -424,7 +428,14 @@ const AddUser = () => {
             )}
 
             <SubmitBtn text={'Save'} clickFunction={handleSubmit} />
-            </div>
+        </div>
+
+        <ModalDeleteUser
+        isOpen={showDeleteModal}
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        />
+
 
     
 
@@ -439,26 +450,29 @@ const AddUser = () => {
                 ></StatusInput>
             </div>
 
-       <div className='bg-white p-3 rounded mt-2'>
-        <h5>Role</h5>
-        <Dropdown onSelect={handleRole}>
+      {!(targetIsMaster ) && (
+        <div className='bg-white p-3 rounded mt-2'>
+            <h5>Role</h5>
+            <Dropdown onSelect={handleRole}>
             <Dropdown.Toggle
-            variant="light"
-            id="dropdown-basic"
-            className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1"
+                variant="light"
+                id="dropdown-basic"
+                className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1"
             >
-            {formData.role || "Select Role"}
+                {formData.role || "Select Role"}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-            <Dropdown.Item eventKey="SALES">Sales</Dropdown.Item>
-            <Dropdown.Item eventKey="ADMIN">Admin</Dropdown.Item>
-            {isMaster && (
+                <Dropdown.Item eventKey="SALES">Sales</Dropdown.Item>
+                <Dropdown.Item eventKey="ADMIN">Admin</Dropdown.Item>
+                {isMaster || !isViewMode && (
                 <Dropdown.Item eventKey="MASTER">Master Admin</Dropdown.Item>
-            )}
+                )}
             </Dropdown.Menu>
-        </Dropdown>
+            </Dropdown>
         </div>
+        )}
+
 
 
            

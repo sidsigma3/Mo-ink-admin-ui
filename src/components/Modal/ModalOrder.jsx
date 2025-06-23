@@ -88,6 +88,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
             color: {
               name: colorData.colorName,
               hex: colorData.hexCode,
+              colorImage:colorData.colorImage,
             },
             variantType: matchingVariant.variantType,
             price: matchingVariant.price,
@@ -105,10 +106,6 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
     handleClose();
   };
   
-
-
-  console.log(products)
-
 
   return (
     <Modal className="modal" show={show} onHide={handleClose} centered>
@@ -164,7 +161,8 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                             }, {})
                           ).map((color, index) => (
                             <div key={index} className="d-flex flex-column gap-2 align-items-center">
-                              <div
+                              <span style={{fontSize:'0.8rem' , fontWeight:'bold'}}>{color.hexCode}</span>
+                              {/* <div
                                 style={{
                                   width: "30px",
                                   height: "30px",
@@ -172,7 +170,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                                   backgroundColor: color.hexCode.trim(),
                                   border: "1px solid #ccc",
                                 }}
-                              />
+                              /> */}
                               <span style={{ fontSize: '0.7rem', width: '2.5rem', textAlign: 'center' }}>
                                 {color.colorName}
                               </span>
