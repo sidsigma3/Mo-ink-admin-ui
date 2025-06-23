@@ -236,7 +236,7 @@ const getProductNameById = (productId) => {
               gst: product.gstOnProduct || 0,
               productName: product.productName || "",
               colorName: variant.color?.colorName || "",
-              colorHex: variant.color?.hexCode || "",
+              colorHex: variant.color?.colorCode || "",
             };
           }
         }

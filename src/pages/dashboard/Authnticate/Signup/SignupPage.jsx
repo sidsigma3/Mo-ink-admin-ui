@@ -47,7 +47,7 @@ const SignupPage = ({ togglePage, isLogin }) => {
       whatsappNumber: formData.get('whatsappNumber'),
       email: formData.get('email'),
       password: formData.get('password'),
-      company: formData.get('company'),
+      // company: formData.get('company'),
       adharNumber: formData.get('adharNumber'),
       userAddress: '',
       city: '',
@@ -55,20 +55,20 @@ const SignupPage = ({ togglePage, isLogin }) => {
       country: '',
       zipcode: '',
       userStatus: 'ACTIVE',
-      role: 'SALES',
+      role: formData.get('role'),
     };
 
     try {
       const response = await addUser(signupData);
       if (response) {
-        showToast('Signup successful!', 'success');
+        showToast('Mail has been sent to Master Admin for approval. You can access your account post approval.', 'success');
         e.target.reset();
         togglePage()
         // sendEmail(signupData.email, signupData.firstName);
       }
     } catch (error) {
       console.error('Signup Error:', error);
-      showToast('An error occurred during signup. Please try again.', 'error');
+      showToast(error.response.data.data.message, 'error');
     }
   };
 
@@ -196,15 +196,18 @@ const SignupPage = ({ togglePage, isLogin }) => {
 
           <div className="row g-3 mb-3">
             <div className="col-md">
-              <label className="fs-6 fw-normal text-white form-label">Company</label>
-              <input
-                name="company"
-                type="text"
-                placeholder="Enter your Company"
+              <label className="fs-6 fw-normal text-white form-label">User Type</label>
+              <select
+                name="role"
                 className="fs-6 fw-light form-control rounded-pill px-4"
+                defaultValue="SALES"
                 required
-              />
+              >
+                <option value="SALES">Sales</option>
+                <option value="ADMIN">Admin</option>
+              </select>
             </div>
+
             <div className="col-md">
               <label className="fs-6 fw-normal text-white form-label">Aadhar No.</label>
               <input

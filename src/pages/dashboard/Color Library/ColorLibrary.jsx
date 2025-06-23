@@ -1,4 +1,4 @@
-import React, {useState , useEffect} from 'react'
+import React, {useState , useEffect , useRef} from 'react'
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn'
 import AddBtn from '../../../components/Buttons/Add/AddBtn'
 import ProductFilter from '../../../components/Filter/DayFilter/ProductFilter/ProductFilter'
@@ -7,7 +7,7 @@ import { Table } from 'react-bootstrap'
 import "./ColorLibrary.css"
 import { Link } from 'react-router-dom'
 import { useDiscounts } from '../../../components/Context/DiscountContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate , useLocation} from 'react-router-dom'
 import { LuDot } from "react-icons/lu";
 import { Pagination } from 'react-bootstrap'
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -18,25 +18,173 @@ import { saveAs } from "file-saver";
 import Toast from '../../../components/Toast/Toast'
 import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
 import { IoArrowBackOutline } from 'react-icons/io5'
+import { getColorsByProductId , updateColorsByProductId , uploadColorLibraryImage} from '../../../services/ColorService'
 
+const backendUrl = process.env.REACT_APP_IMAGE_URL
 
 const ColorLibrary =  ({setDemoData }) => {
 
   const navigate = useNavigate ()
 
-  const handleImageUpload = (e, index) => {
-    const file = e.target.files[0];
-    if (file) {
-      const updatedData = [...demoData];
-      updatedData[index].imageUrl = URL.createObjectURL(file); // preview only
-      setDemoData(updatedData);
-    }
-  };
+  const location = useLocation();
+  const { productId } = location.state || {};
+  const [colors, setColors] = useState([]);
   const [isChecked, setIsChecked] = useState(true);
+  const [colorStatus, setColorStatus] = useState({});
+  const [newColors, setNewColors] = useState([]);
 
+
+ const handleImageUpload = async (e, index, imageIndex) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const type = imageIndex === 0 ? 'product-color-cone' : 'product-color-hank';
+
+  try {
+    const uploadedPath = await uploadColorLibraryImage(file, type); // returns { data: "/colors/xyz.jpg" }
+
+    setColors(prev => {
+      const updated = [...prev];
+      const color = { ...updated[index] };
+
+      const updatedImages = Array.isArray(color.colorImage) ? [...color.colorImage] : [];
+      updatedImages[imageIndex] = uploadedPath.data; // Replace at cone (0) or hank (1)
+
+      updated[index] = {
+        ...color,
+        colorImage: updatedImages,
+        [`localPreview${imageIndex}`]: URL.createObjectURL(file), // for preview
+      };
+
+      return updated;
+    });
+  } catch (err) {
+    console.error("Upload failed", err);
+  }
+};
+
+
+
+const handleAddColor = () => {
+    setNewColors(prev => [
+      ...prev,
+      {
+        id: `new-${Date.now()}`,
+        colorName: '',
+        colorCode: '',
+        colorImage: [],
+        status: 'ACTIVE',
+        localPreview0: '',
+        localPreview1: '',
+      }
+    ]);
+  };
+
+
+ 
   const handleChange = () => {
     setIsChecked(!isChecked);
   };
+
+  useEffect(() => {
+    if (productId) {
+      fetchColors();
+    }
+  }, [productId]);
+
+  const fetchColors = async () => {
+  try {
+    const data = await getColorsByProductId(productId);
+    setColors(data);
+
+    // Set initial checked status for each color (fallback to true if null)
+    const statusMap = {};
+    data.forEach((color) => {
+      statusMap[color.id] = color.status === 'ACTIVE';
+    });
+    setColorStatus(statusMap);
+  } catch (error) {
+    console.error("Failed to fetch colors:", error);
+  }
+};
+
+
+const handleSaveColors = async () => {
+  try {
+    const updatedColors = [
+      ...colors.map((color) => ({
+        id: color.id,
+        colorName: color.colorName,
+        colorCode: color.colorCode,
+        colorImage: color.colorImage,
+        status: colorStatus[color.id] ? 'ACTIVE' : 'INACTIVE',
+      })),
+      ...newColors.map((color) => ({
+        id: null,
+        colorName: color.colorName,
+        colorCode: color.colorCode,
+        colorImage: color.colorImage,
+        status: color.status || 'INACTIVE',
+      }))
+    ];
+
+    await updateColorsByProductId(productId, updatedColors);
+
+    // ✅ Clear new rows and refetch full list
+    setNewColors([]);  // if you were tracking new rows separately
+    await fetchColors();  // reuses your existing logic
+
+    setToasts(prev => [
+      ...prev,
+      { id: Date.now(), message: 'Colors updated successfully!', type: 'success' },
+    ]);
+  } catch (error) {
+    console.error("Save failed", error);
+    setToasts(prev => [
+      ...prev,
+      { id: Date.now(), message: 'Failed to update colors.', type: 'error' },
+    ]);
+  }
+};
+
+
+const handleNewColorChange = (index, field, value) => {
+  setNewColors(prev => {
+    const updated = [...prev];
+    updated[index][field] = value;
+    return updated;
+  });
+};
+
+const handleNewImageUpload = async (e, index, imageIndex) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const type = imageIndex === 0 ? 'product-color-cone' : 'product-color-hank';
+
+  try {
+    const res = await uploadColorLibraryImage(file, type); // returns { data: '/colors/abc.jpg' }
+
+    setNewColors(prev => {
+      const updated = [...prev];
+      const item = { ...updated[index] };
+
+      const colorImage = Array.isArray(item.colorImage) ? [...item.colorImage] : [];
+      colorImage[imageIndex] = res.data;
+
+      updated[index] = {
+        ...item,
+        colorImage,
+        [`localPreview${imageIndex}`]: URL.createObjectURL(file),
+      };
+
+      return updated;
+    });
+  } catch (err) {
+    console.error("Image upload failed", err);
+  }
+};
+
 
 const demoData = [
   {
@@ -180,44 +328,61 @@ const demoData = [
   };
   
 
-    const exportToExcel = (discounts) => {
-       const showToast = (message, type = "error") => {
-            setToasts([{ message, type }]);
-            setTimeout(() => setToasts([]), 3000);
-          };
-      if (!discounts || !discounts.length) {
-        showToast("No discounts available for export.", "error");
-        return;
-      }
-    
-      const worksheet = XLSX.utils.json_to_sheet(
-        discounts.map((discount) => {
-          const applicableProduct = discount?.applicableProducts[0]?.productName || "N/A";
-          const discountInfo =
-            discount.discountType === "Percentage"
-              ? `${discount.discountValue}% off on ${applicableProduct}`
-              : `₹${discount.discountValue} off on ${applicableProduct}`;
-          return {
-            "Title": discount.discountCode,
-            "Status": discount.discountStatus,
-            "Method": discount.discountMethod,
-            "Eligible Customers": discount.eligibleCustomers.length,
-            "Used": discount.used,
-            "Discount Details": discountInfo,
-            "Minimum Purchase Requirement": discount.minPurchaseRequirement || "N/A"
-          };
-        })
-      );
-    
+  const exportToExcel = (colors, colorStatus, fileName = 'colors.xlsx') => {
+      const data = colors.map((item) => ({
+        ColorName: item.colorName,
+        ColorCode: item.colorCode,
+        Status: colorStatus[item.id] ? 'ACTIVE' : 'INACTIVE',
+        ImageURL: item.colorImage || '',  // Optional
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Discounts");
-    
-      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-      const dataBlob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(dataBlob, "Discounts_List.xlsx");
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Colors');
+      XLSX.writeFile(workbook, fileName);
     };
+
+
+ const importFromExcel = (file, callback) => {
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    const data = new Uint8Array(event.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+    const formatted = jsonData.map((row) => ({
+      id: null,
+      colorName: row.ColorName || '',
+      colorCode: row.ColorCode || '',
+      colorImage: row.ImageURL || '',  // ← use the image URL from the sheet
+      localPreview: row.ImageURL || '', // optional: also set preview if you use it
+      status: row.Status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+    }));
+
+    callback(formatted);
+  };
+
+  reader.readAsArrayBuffer(file);
+};
+
+
+ const fileInputRef = useRef();
+
+  const handleFileChange = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  importFromExcel(file, (importedColors) => {
+    setNewColors(importedColors); // ✅ replaces the new color table
+    setColors([]);                // ✅ optionally clear old colors (if needed)
+  });
+};
+
+
 
   const allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
   const selectedProducts = discountData?.applicableProducts || [];
@@ -272,9 +437,17 @@ if (totalPages >=1) {
                 <h5 style={{fontSize:'1.2rem'}}>Color Details</h5>
                </div>
              <div className='d-flex gap-2'>
-                 <ExportBtn onClick={() => exportToExcel(filteredData)}></ExportBtn>
-                 <ImportBtn></ImportBtn>
-            </div>             
+                <ExportBtn onClick={() => exportToExcel(colors, colorStatus)} />
+                <ImportBtn onClick={() => fileInputRef.current?.click()} />
+                   <input
+                    type="file"
+                    accept=".xlsx, .csv"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+              </div>
+            
             </div>
 
 
@@ -291,79 +464,247 @@ if (totalPages >=1) {
             </div>
         </div>
 
+        <div className='d-flex justify-content-end mb-2'>
+          <button className="btn btn-sm btn-primary" onClick={handleAddColor}>
+            ➕ Add Color
+          </button>
+        </div>
+
 
         <div className='colorlibrary-table-ctn'>
           <Table hover>
-            <thead>
-              <tr>
-                <th>Color Name</th>
+        <thead>
+          <tr>
+            <th>Color Name</th>
+            <th style={{ textAlign: "center", verticalAlign: "middle" }}>
+              Color Code
+            </th>
+            <th style={{ textAlign: "center", verticalAlign: "middle" }}>
+              Cone Image
+            </th>
+            <th style={{ textAlign: "center", verticalAlign: "middle" }}>
+              Hank Image
+            </th>
+            <th style={{ textAlign: "center", verticalAlign: "middle" }}>
+              Status
+            </th>
+            <th style={{ width: "1rem" }}></th>
+          </tr>
+        </thead>
+        <tbody>
+          {colors.map((item, index) => (
+            <tr key={item.id}>
+              <td style={{ verticalAlign: "middle" }}>{item.colorName}</td>
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                {item.colorCode}
+              </td>
+          {/* Cone Image TD */}
+                <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label
+                      htmlFor={`upload-cone-${index}`}
+                      style={{
+                        cursor: "pointer",
+                        display: "inline-block",
+                        borderRadius: "8px",
+                        border:
+                          item[`localPreview0`] || item.colorImage?.[0] ? "1px solid #ccc" : "1px dashed gray",
+                        padding: item[`localPreview0`] || item.colorImage?.[0] ? 0 : "10px",
+                      }}
+                      title="Click to upload Cone image"
+                    >
+                      {item[`localPreview0`] || item.colorImage?.[0] ? (
+                        <img
+                          src={item[`localPreview0`] || `${backendUrl}${item.colorImage[0]}`}
+                          alt="Cone"
+                          width="40"
+                          height="40"
+                          style={{ borderRadius: "8px", display: "block" }}
+                        />
+                      ) : (
+                        "➕"
+                      )}
+                    </label>
+                    <input
+                      type="file"
+                      id={`upload-cone-${index}`}
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleImageUpload(e, index, 0)} // imageIndex 0 for cone
+                    />
+                  </div>
+                </td>
 
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Color Code</th>
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Image</th>
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
-                <th style={{width:'1rem'}}></th>
-              </tr>
-            </thead>
+                {/* Hank Image TD */}
+                <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label
+                      htmlFor={`upload-hank-${index}`}
+                      style={{
+                        cursor: "pointer",
+                        display: "inline-block",
+                        borderRadius: "8px",
+                        border:
+                          item[`localPreview1`] || item.colorImage?.[1] ? "1px solid #ccc" : "1px dashed gray",
+                        padding: item[`localPreview1`] || item.colorImage?.[1] ? 0 : "10px",
+                      }}
+                      title="Click to upload Hank image"
+                    >
+                      {item[`localPreview1`] || item.colorImage?.[1] ? (
+                        <img
+                          src={item[`localPreview1`] || `${backendUrl}${item.colorImage[1]}`}
+                          alt="Hank"
+                          width="40"
+                          height="40"
+                          style={{ borderRadius: "8px", display: "block" }}
+                        />
+                      ) : (
+                        "➕"
+                      )}
+                    </label>
+                    <input
+                      type="file"
+                      id={`upload-hank-${index}`}
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleImageUpload(e, index, 1)} // imageIndex 1 for hank
+                    />
+                  </div>
+                </td>
 
-            <tbody>
-             <>
-      {demoData.map((item, index) => (
-        <tr key={index}>
-          <td style={{ verticalAlign: "middle" }}>{item.colorName}</td>
-          <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-            {item.colorCode}
-          </td>
-          <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={item.colorName}
-                width="40"
-                height="40"
-                style={{ borderRadius: "8px" }}
-              />
-            ) : (
-              <>
-                <label
-                  htmlFor={`upload-${index}`}
-                  style={{
-                    cursor: "pointer",
-                    padding: "10px",
-                    border: "1px dashed gray",
-                    borderRadius: "8px",
-                    display: "inline-block",
-                  }}
-                >
-                  ➕
+
+
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={colorStatus[item.id] || false}
+                    onChange={() => {
+                      setColorStatus(prev => ({
+                        ...prev,
+                        [item.id]: !prev[item.id]
+                      }));
+                      // Optionally call API here to persist the status toggle
+                    }}
+                  />
+                  <span className="slider round"></span>
                 </label>
+              </td>
+
+            </tr>
+          ))}
+
+          {newColors.map((item, index) => (
+            <tr key={item.id}>
+              <td>
                 <input
-                  type="file"
-                  id={`upload-${index}`}
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={(e) => handleImageUpload(e, index)}
+                  className="form-control"
+                  placeholder="Enter Color Name"
+                  value={item.colorName}
+                  onChange={(e) => handleNewColorChange(index, 'colorName', e.target.value)}
                 />
-              </>
-            )}
-          </td>
-          <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={handleChange}
-              />
-              <span className="slider round"></span>
-            </label>
-          </td>
-        </tr>
-      ))}
-    </>
-            </tbody>
+              </td>
+              <td style={{ textAlign: "center" }}>
+                <input
+                  className="form-control text-center"
+                  placeholder="Enter Color Code"
+                  value={item.colorCode}
+                  onChange={(e) => handleNewColorChange(index, 'colorCode', e.target.value)}
+                />
+              </td>
 
-          </Table>
+              {/* Cone Image Upload */}
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <label
+                    htmlFor={`new-upload-cone-${index}`}
+                    style={{
+                      cursor: "pointer",
+                      display: "inline-block",
+                      borderRadius: "8px",
+                      border:
+                        item.localPreview0 || item.colorImage?.[0] ? "1px solid #ccc" : "1px dashed gray",
+                      padding: item.localPreview0 || item.colorImage?.[0] ? 0 : "10px",
+                    }}
+                    title="Upload Cone Image"
+                  >
+                    {item.localPreview0 || item.colorImage?.[0] ? (
+                      <img
+                        src={item.localPreview0 || `${backendUrl}${item.colorImage[0]}`}
+                        alt="Cone"
+                        width="40"
+                        height="40"
+                        style={{ borderRadius: "8px", display: "block" }}
+                      />
+                    ) : (
+                      "➕"
+                    )}
+                  </label>
+                  <input
+                    type="file"
+                    id={`new-upload-cone-${index}`}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleNewImageUpload(e, index, 0)}
+                  />
+                </div>
+              </td>
 
-      
+              {/* Hank Image Upload */}
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <label
+                    htmlFor={`new-upload-hank-${index}`}
+                    style={{
+                      cursor: "pointer",
+                      display: "inline-block",
+                      borderRadius: "8px",
+                      border:
+                        item.localPreview1 || item.colorImage?.[1] ? "1px solid #ccc" : "1px dashed gray",
+                      padding: item.localPreview1 || item.colorImage?.[1] ? 0 : "10px",
+                    }}
+                    title="Upload Hank Image"
+                  >
+                    {item.localPreview1 || item.colorImage?.[1] ? (
+                      <img
+                        src={item.localPreview1 || `${backendUrl}${item.colorImage[1]}`}
+                        alt="Hank"
+                        width="40"
+                        height="40"
+                        style={{ borderRadius: "8px", display: "block" }}
+                      />
+                    ) : (
+                      "➕"
+                    )}
+                  </label>
+                  <input
+                    type="file"
+                    id={`new-upload-hank-${index}`}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleNewImageUpload(e, index, 1)}
+                  />
+                </div>
+              </td>
+
+              {/* Status Toggle */}
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={item.status === 'ACTIVE'}
+                    onChange={() =>
+                      handleNewColorChange(index, 'status', item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                    }
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </td>
+            </tr>
+          ))}
+
+        </tbody>
+      </Table>
 
           <div className="data-cards">
         {filteredData.map((discount,index) => (
@@ -428,6 +769,10 @@ if (totalPages >=1) {
 
 
         </div>
+
+          <button className="btn btn-primary mt-3" onClick={handleSaveColors}>
+        Save Changes
+      </button>
 
        {/* Toast Notification */}
      <div className="fixed top-4 right-4 z-50 space-y-2">

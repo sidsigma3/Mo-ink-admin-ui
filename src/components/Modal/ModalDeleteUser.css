@@ -1,0 +1,75 @@
+.modal-delete-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-delete-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-delete-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-delete-icon span {
+  font-size: 48px;
+  color: #dc3545;
+}
+
+.modal-delete-title {
+  margin-top: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.modal-delete-message {
+  margin: 15px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.modal-delete-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.modal-delete-actions .btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.modal-delete-actions .btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+}
+
+.modal-delete-actions .btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+}
