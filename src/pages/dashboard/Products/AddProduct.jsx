@@ -215,6 +215,7 @@ const handleMediaChange = async (e, type) => {
                 color: {
                     colorName: color.color,
                     colorCode: color.hex,
+                    status: "ACTIVE",
                 },
                 variantType: variant.variantType.toUpperCase(),
                 availableWeight: Number(variant.available),
