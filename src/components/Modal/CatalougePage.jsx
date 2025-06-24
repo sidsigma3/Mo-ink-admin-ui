@@ -206,7 +206,7 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
         colorName: variant.colorName,
         hexCode: variant.hexCode,
         variantType: innerVariant.variantType,
-        colorImage:variant.colorImage
+        colorImage:innerVariant.colorImage
       };
     }
   });

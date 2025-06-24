@@ -105,6 +105,8 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
     onOrderCreate(order);
     handleClose();
   };
+
+  console.log(products)
   
 
   return (

@@ -313,7 +313,7 @@ const toggleType = (product, size, type) => {
                           <td></td>
                           <td></td>
                           <td></td>
-                          <td>{renderColorDot(item.color)}</td>
+                          <td>{item.color.colorCode}</td>
                           <td>{item.color.colorName}</td>
                           <td>{item.customerOrder} Kgs</td>
                           <td className=''>
