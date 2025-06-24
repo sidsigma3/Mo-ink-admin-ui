@@ -289,7 +289,6 @@ useEffect(() => {
                     colorGroup = {
                       colorName: color.colorName,
                       hexCode: hex,
-                      colorImage:color.colorImage,
                       variants: [],
                     };
                     acc[size].variants.push(colorGroup);
@@ -301,6 +300,7 @@ useEffect(() => {
                     price: pricePerKg,
                     id,
                     markupPricePerKg,
+                    colorImage:color.colorImage,
                   });
             
                   acc[size].totalWeight += Number(availableWeight);

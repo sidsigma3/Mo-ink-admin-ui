@@ -215,7 +215,7 @@ const handleMediaChange = async (e, type) => {
                 color: {
                     colorName: color.color,
                     colorCode: color.hex,
-                    status: "ACTIVE",
+                    status: "ACTIVE"
                 },
                 variantType: variant.variantType.toUpperCase(),
                 availableWeight: Number(variant.available),
@@ -639,7 +639,8 @@ const parseSizeColorData = (data) => {
         colorMap.set(hexCode, {
           color: colorName,
           hex: hexCode,
-          variants: []
+          variants: [],
+          
         });
       }
 
@@ -648,6 +649,7 @@ const parseSizeColorData = (data) => {
         available,
         price,
         markupPricePerKg,
+        availableStatus:'ACTIVE'
       };
 
       colorMap.get(hexCode).variants.push(variantEntry);
@@ -995,7 +997,7 @@ console.log(sizeColorMap)
                                
                              }}
                            >
-                                <div
+                                {/* <div
                                   style={{
                                     backgroundColor: value.hex,
                                     width: "25px",
@@ -1004,7 +1006,19 @@ console.log(sizeColorMap)
                                     border: "1px solid #ccc",
                                     marginBottom: "5px",
                                   }}
-                                ></div>
+                                ></div> */}
+                                <h4
+                                  style={{
+                                  marginBottom: "10px",
+                                  listStyle: "none",
+                                  padding: "0.3rem 0.8rem",
+                                  background: "#f0f0f0",
+                                  borderRadius: "1rem",
+                                  width:"5rem",
+                                  display:"flex",
+                                  justifyContent:"center"
+                                }}
+                                >{value.hex}</h4>
                                  <span>{value.color}</span>
                            </li>
                         ))}
@@ -1293,7 +1307,7 @@ console.log(sizeColorMap)
                          <td>
                            {variantIndex === 0 && (
                              <div className="d-flex align-items-center gap-2">
-                               <div
+                               {/* <div
                                  style={{
                                    backgroundColor: color.hex,
                                    width: "20px",
@@ -1302,9 +1316,9 @@ console.log(sizeColorMap)
                                    border: "1px solid #ccc",
                                    marginRight: "10px",
                                  }}
-                               ></div>
+                               ></div> */}
                                <input
-                                 className="w-50"
+                                 className="w-50 ms-2"
                                  type="text"
                                  value={color.hex || ""}
                                  onChange={(e) =>

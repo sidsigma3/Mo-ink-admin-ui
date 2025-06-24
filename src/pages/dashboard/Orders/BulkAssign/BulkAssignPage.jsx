@@ -103,6 +103,7 @@ const BulkAssignPage = () => {
         price: pricePerKg,
         id,
         markupPricePerKg,
+        colorImage:color.colorImage,
       });
 
       acc[size].totalWeight += Number(availableWeight);
@@ -130,7 +131,7 @@ const BulkAssignPage = () => {
 
 
 
-    console.log(finalData)
+   
 
     useEffect(() => {
         const fetchProducts = async () => {

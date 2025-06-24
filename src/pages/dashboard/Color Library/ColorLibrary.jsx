@@ -138,6 +138,13 @@ const handleSaveColors = async () => {
       ...prev,
       { id: Date.now(), message: 'Colors updated successfully!', type: 'success' },
     ]);
+
+    navigate('/colorlibrary-products')
+
+    // setTimeout(() => {
+    //   navigate('colorlibrary-products');
+    // }, 1500);
+
   } catch (error) {
     console.error("Save failed", error);
     setToasts(prev => [
