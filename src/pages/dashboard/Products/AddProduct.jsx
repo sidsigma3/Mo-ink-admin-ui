@@ -1303,121 +1303,112 @@ console.log(sizeColorMap)
                  {expandedRow === sizeIndex &&
                    entry.colors.map((color, colorIndex) =>
                      color.variants?.map((variant, variantIndex) => (
-                       <tr key={`${colorIndex}-${variantIndex}`}>
-                         <td>
-                           {variantIndex === 0 && (
-                             <div className="d-flex align-items-center gap-2">
-                               {/* <div
-                                 style={{
-                                   backgroundColor: color.hex,
-                                   width: "20px",
-                                   height: "20px",
-                                   borderRadius: "50%",
-                                   border: "1px solid #ccc",
-                                   marginRight: "10px",
-                                 }}
-                               ></div> */}
-                               <input
-                                 className="w-50 ms-2"
-                                 type="text"
-                                 value={color.hex || ""}
-                                 onChange={(e) =>
-                                   handleVariantValueChangeTable(sizeIndex, colorIndex, "hex", e.target.value)
-                                 }
-                                 placeholder="Hex Code"
-                               />
-                             </div>
-                           )}
-                         </td>
-                         <td>
-                           {variantIndex === 0 && (
-                             <input
-                               className="w-75"
-                               type="text"
-                               value={color.color || ""}
-                               onChange={(e) =>
-                                 handleVariantValueChangeTable(sizeIndex, colorIndex, "color", e.target.value)
-                               }
-                               placeholder="Color Name"
-                             />
-                           )}
-                         </td>
-                         <td>
-                           <input
-                             type="number"
-                             value={variant.available || ""}
-                             onChange={(e) =>
-                               updateVariantField(sizeIndex, colorIndex, variantIndex, "available", e.target.value)
-                             }
-                             placeholder="Available"
-                             disabled={isViewMode}
-                           />
-                         </td>
-                         {/* <td>
-                           <input
-                             type="number"
-                             value={variant.costPerKg || ""}
-                             onChange={(e) =>
-                               updateVariantField(sizeIndex, colorIndex, variantIndex, "costPerKg", e.target.value)
-                             }
-                             placeholder="Cost/Kg"
-                           />
-                         </td> */}
-                         <td>
-                           <input
-                             type="number"
-                             value={variant.price || ""}
-                             onChange={(e) =>
-                               updateVariantField(sizeIndex, colorIndex, variantIndex, "price", e.target.value)
-                             }
-                             placeholder="Price/Kg"
-                           />
-                         </td>
-                         <td>
-                           <input
-                             type="number"
-                             value={variant.markupPricePerKg || ""}
-                             onChange={(e) =>
-                               updateVariantField(sizeIndex, colorIndex, variantIndex, "markupPricePerKg", e.target.value)
-                             }
-                             placeholder="Markup/Kg"
-                           />
-                         </td>
-                         <td>
-                           <input
-                             className="w-50"
-                             type="text"
-                             value={variant.variantType || ""}
-                             onChange={(e) =>
-                               updateVariantField(sizeIndex, colorIndex, variantIndex, "variantType", e.target.value)
-                             }
-                             placeholder="Type"
-                           />
-                         </td>
-                        <td>
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={variant.availableStatus === "ACTIVE"}
-                            onChange={() => {
-                              const newStatus = variant.availableStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-                              updateVariantField(sizeIndex, colorIndex, variantIndex, "availableStatus", newStatus);
-                            }}
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </td>
+                       <React.Fragment key={`${colorIndex}-${variantIndex}`}>
+                          <tr className="align-top border-0">
+                            <td style={{ borderBottom: "none" }}>
+                              {variantIndex === 0 && (
+                                <div className="d-flex align-items-center gap-2">
+                                  <input
+                                    className="w-50 ms-2"
+                                    type="text"
+                                    value={color.hex || ""}
+                                    onChange={(e) =>
+                                      handleVariantValueChangeTable(sizeIndex, colorIndex, "hex", e.target.value)
+                                    }
+                                    placeholder="Hex Code"
+                                  />
+                                </div>
+                              )}
+                            </td>
+                            <td style={{ borderBottom: "none" }}>
+                              {variantIndex === 0 && (
+                                <input
+                                  className="w-75"
+                                  type="text"
+                                  value={color.color || ""}
+                                  onChange={(e) =>
+                                    handleVariantValueChangeTable(sizeIndex, colorIndex, "color", e.target.value)
+                                  }
+                                  placeholder="Color Name"
+                                />
+                              )}
+                            </td>
+                            <td style={{ borderBottom: "none" }}>
+                              <input
+                                type="number"
+                                value={variant.available || ""}
+                                onChange={(e) =>
+                                  updateVariantField(sizeIndex, colorIndex, variantIndex, "available", e.target.value)
+                                }
+                                placeholder="Available"
+                                disabled={isViewMode}
+                              />
+                            </td>
+                            <td style={{ borderBottom: "none" }}>
+                              <input
+                                type="number"
+                                value={variant.price || ""}
+                                onChange={(e) =>
+                                  updateVariantField(sizeIndex, colorIndex, variantIndex, "price", e.target.value)
+                                }
+                                placeholder="Price/Kg"
+                              />
+                            </td>
+                            <td style={{ borderBottom: "none" }}>
+                              <input
+                                type="number"
+                                value={variant.markupPricePerKg || ""}
+                                onChange={(e) =>
+                                  updateVariantField(sizeIndex, colorIndex, variantIndex, "markupPricePerKg", e.target.value)
+                                }
+                                placeholder="Markup/Kg"
+                              />
+                            </td>
+                            <td style={{ borderBottom: "none" }}>
+                              <input
+                                className="w-50"
+                                type="text"
+                                value={variant.variantType || ""}
+                                onChange={(e) =>
+                                  updateVariantField(sizeIndex, colorIndex, variantIndex, "variantType", e.target.value)
+                                }
+                                placeholder="Type"
+                              />
+                            </td>
+                            <td style={{ borderBottom: "none" }}>
+                              <label className="switch">
+                                <input
+                                  type="checkbox"
+                                  checked={variant.availableStatus === "ACTIVE"}
+                                  onChange={() => {
+                                    const newStatus = variant.availableStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+                                    updateVariantField(sizeIndex, colorIndex, variantIndex, "availableStatus", newStatus);
+                                  }}
+                                />
+                                <span className="slider"></span>
+                              </label>
+                            </td>
+                          </tr>
 
+                          
+                        <tr>
+                          <td></td> 
+                          <td></td> 
+                          <td colSpan={5}>
+                            <input
+                              type="text"
+                              className="form-control mt-1 w-100"
+                              placeholder="Description"
+                              value={variant.description || ""}
+                              onChange={(e) =>
+                                updateVariantField(sizeIndex, colorIndex, variantIndex, "description", e.target.value)
+                              }
+                            />
+                          </td>
+                        </tr>
 
-                         {/* <td>
-                           <button
-                             onClick={() => removeVariant(sizeIndex, colorIndex, variantIndex)}
-                             style={{ padding: "5px", background: "none", border: "none", color: "#FF3232" }}
-                           >
-                             <MdDeleteOutline size={20} />
-                           </button>
-                         </td> */}
-                       </tr>
+                        </React.Fragment>
+
                      ))
                    )}
                </React.Fragment>

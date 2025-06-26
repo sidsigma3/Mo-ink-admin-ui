@@ -260,7 +260,7 @@ const toggleType = (product, size, type) => {
       <th className="text-start py-3">Product</th>
       <th className="py-3">Count</th>
       <th className="py-3">Type</th>
-      <th className="py-3">Color</th>
+      <th className="py-3">Color Code</th>
       <th className="py-3">Color Name</th>
       <th className="py-3">Customer Order</th>
       <th className="py-3">Available Weight</th>
