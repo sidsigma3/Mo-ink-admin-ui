@@ -523,7 +523,8 @@ const getProductNameById = (productId) => {
           <th  className="thtable">Product</th>
           <th  className="thtable text-center">Size</th>
           <th  className="thtable text-center">Variant</th>
-          <th  className="thtable text-center">Color</th>
+          <th  className="thtable text-center">Color Name</th>
+          <th  className="thtable text-center">Color Code</th>
           <th  className="thtable text-center">Weight</th>
           <th  className="thtable text-center">Rate</th>
           {extractStateFromAddress(dyerOrder?.vendorAddress) === "odisha" ?(
@@ -568,17 +569,9 @@ const getProductNameById = (productId) => {
               <td className=" text-center">{getProductNameById(item.productId)}</td>
               <td className=" text-center">{item.size}</td>
               <td className=" text-center">{item.variantType}</td>
+               <td className=" text-center">{colorHex}</td>
               <td>
                 <div className="d-flex justify-content-center align-items-center gap-2">
-                  <span
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      borderRadius: "50%",
-                      backgroundColor: colorHex,
-                      border: "1px solid #ddd",
-                    }}
-                  ></span>
                   {colorName}
                 </div>
               </td>
