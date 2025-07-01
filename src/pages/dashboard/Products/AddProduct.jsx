@@ -43,56 +43,70 @@ const AddProduct = () => {
 
   console.log(product)
  
-  const transformProductData = (product) => {
-    if (!product || !product.groupedVariants) return { variants: [], sizeColorMap: [] };
-  
-    const groupedVariants = product.groupedVariants;
-  
-    const sizes = groupedVariants.map((group) => ({ value: group.size }));
-  
-    const colorHexMap = new Map();
-    groupedVariants.forEach((group) => {
-      group.variants.forEach((colorGroup) => {
-        const hexKey = colorGroup.hexCode?.toLowerCase();
-        if (hexKey && !colorHexMap.has(hexKey)) {
-          colorHexMap.set(hexKey, {
-            value: colorGroup.colorName,
-            color: colorGroup.colorName,
-            hex: colorGroup.hexCode,
-            id: colorGroup.variants[0]?.id,
-          });
-        }
-      });
+ const transformProductData = (product) => {
+  if (!product || !product.groupedVariants) return { variants: [], sizeColorMap: [] };
+
+  const groupedVariants = product.groupedVariants;
+
+  const sizes = groupedVariants.map((group) => ({ value: group.size }));
+
+  const colorHexMap = new Map();
+  groupedVariants.forEach((group) => {
+    group.variants.forEach((colorGroup) => {
+      const hexKey = colorGroup.hexCode?.toLowerCase();
+      if (hexKey && !colorHexMap.has(hexKey)) {
+        colorHexMap.set(hexKey, {
+          value: colorGroup.colorName,
+          color: colorGroup.colorName,
+          hex: colorGroup.hexCode,
+          id: colorGroup.variants[0]?.id,
+        });
+      }
     });
-  
-    const sizeColorMap = groupedVariants.map((group) => {
-      const colors = group.variants.map((colorGroup) => ({
-        color: colorGroup.colorName,
-        hex: colorGroup.hexCode,
-        variants: colorGroup.variants.map((variant) => ({
-          variantType: variant.variantType,
-          available: variant.available,
-          price: variant.price,
-          markupPricePerKg: variant.markupPricePerKg,
-          id: variant.id,
-          availableStatus:variant.availableStatus,
-        })),
-      }));
-  
-      return {
-        size: group.size,
-        colors,
-      };
-    });
-  
-    const variants = [
-      { name: "size", values: sizes },
-      { name: "color", values: [...colorHexMap.values()] },
-    ];
-  
-    return { variants, sizeColorMap };
-  };
-  
+  });
+
+  const sizeColorMap = groupedVariants.map((group) => {
+    const coneVariant = group.variants
+      .flatMap((colorGroup) => colorGroup.variants)
+      .find((v) => v.variantType === "cone");
+
+    const hankVariant = group.variants
+      .flatMap((colorGroup) => colorGroup.variants)
+      .find((v) => v.variantType === "hank");
+
+    const coneDescription = coneVariant?.variantDescription || "";
+    const hankDescription = hankVariant?.variantDescription || "";
+
+    const colors = group.variants.map((colorGroup) => ({
+      color: colorGroup.colorName,
+      hex: colorGroup.hexCode,
+      variants: colorGroup.variants.map((variant) => ({
+      variantType: variant.variantType,
+      available: variant.available,
+      price: variant.price,
+      markupPricePerKg: variant.markupPricePerKg,
+      id: variant.id,
+      availableStatus: variant.availableStatus,
+      variantDescription: variant.variantDescription || "",
+      })),
+    }));
+
+    return {
+      size: group.size,
+      coneDescription,
+      hankDescription,
+      colors,
+    };
+  });
+
+  const variants = [
+    { name: "size", values: sizes },
+    { name: "color", values: [...colorHexMap.values()] },
+  ];
+
+  return { variants, sizeColorMap };
+};
+
 
 
 
@@ -140,9 +154,17 @@ console.log(product);
   };
 
 
-  const handleDescriptionChange = (value) => {
-    setFormData({ ...formData, description: value });
-  };
+ const handleDescriptionChange = (sizeIndex, variantType, value) => {
+  const newData = [...sizeColorMap];
+  if (variantType === "CONE") {
+    newData[sizeIndex].coneDescription = value;
+  } else if (variantType === "HANK") {
+    newData[sizeIndex].hankDescription = value;
+  }
+  setSizeColorMap(newData);
+};
+
+
 
 const handleMediaChange = async (e, type) => {
   const file = e.target.files[0];
@@ -208,23 +230,28 @@ const handleMediaChange = async (e, type) => {
     const plainTextDescription = formData.description.replace(/<\/?[^>]+(>|$)/g, "");
 
     // Create variants with calculated prices and availability
-    const newVariants = sizeColorMap.flatMap(({ size, colors }) => {
-        return colors.flatMap((color) => {
-            return (color.variants || []).map(variant => ({
-                size,
-                color: {
-                    colorName: color.color,
-                    colorCode: color.hex,
-                    status: "ACTIVE"
-                },
-                variantType: variant.variantType.toUpperCase(),
-                availableWeight: Number(variant.available),
-                pricePerKg: Number(variant.price),
-                markupPricePerKg: Number(variant.markupPricePerKg || 0),
-                availableStatus : variant.availableStatus || "ACTIVE"
-            }));
-        });
-    });
+    const newVariants = sizeColorMap.flatMap(({ size, colors, coneDescription, hankDescription }) =>
+      colors.flatMap((color) =>
+        (color.variants || []).map((variant) => ({
+          size,
+          color: {
+            colorName: color.color,
+            colorCode: color.hex,
+            status: "ACTIVE",
+          },
+          variantType: variant.variantType.toUpperCase(),
+          availableWeight: Number(variant.available),
+          pricePerKg: Number(variant.price),
+          markupPricePerKg: Number(variant.markupPricePerKg || 0),
+          availableStatus: variant.availableStatus || "ACTIVE",
+          variantDescription:
+            variant.variantType.toUpperCase() === "CONE"
+              ? coneDescription || ""
+              : hankDescription || "",
+        }))
+      )
+    );
+
 
     const averagePrice = sizeColorMap.reduce(
         (acc, { colors }) => {
@@ -619,6 +646,7 @@ const handleUpload = () => {
 
 const parseSizeColorData = (data) => {
   const sizeColorMap = new Map();
+  const descriptionMap = new Map();
 
   data.forEach((row) => {
     const size = row.Size?.trim();
@@ -628,10 +656,24 @@ const parseSizeColorData = (data) => {
     const available = Number(row.Availability) || 0;
     const price = Number(row.PricePerKg) || 0;
     const markupPricePerKg = Number(row.markupPricePerKg) || 0;
+    const coneDesc = row.ConeDescription?.trim();
+    const hankDesc = row.HankDescription?.trim();
 
     if (size && colorName && hexCode && variantType) {
       if (!sizeColorMap.has(size)) {
         sizeColorMap.set(size, new Map());
+        descriptionMap.set(size, {
+          coneDescription: "",
+          hankDescription: ""
+        });
+      }
+
+      if (coneDesc && variantType === "cone") {
+        descriptionMap.get(size).coneDescription = coneDesc;
+      }
+
+      if (hankDesc && variantType === "hank") {
+        descriptionMap.get(size).hankDescription = hankDesc;
       }
 
       const colorMap = sizeColorMap.get(size);
@@ -640,25 +682,24 @@ const parseSizeColorData = (data) => {
           color: colorName,
           hex: hexCode,
           variants: [],
-          
         });
       }
 
-      const variantEntry = {
+      colorMap.get(hexCode).variants.push({
         variantType,
         available,
         price,
         markupPricePerKg,
-        availableStatus:'ACTIVE'
-      };
-
-      colorMap.get(hexCode).variants.push(variantEntry);
+        availableStatus: "ACTIVE",
+      });
     }
   });
 
   const formatted = [...sizeColorMap.entries()].map(([size, colorMap]) => ({
     size,
-    colors: [...colorMap.values()]
+    colors: [...colorMap.values()],
+    coneDescription: descriptionMap.get(size)?.coneDescription || "",
+    hankDescription: descriptionMap.get(size)?.hankDescription || "",
   }));
 
   setVariants([
@@ -668,7 +709,7 @@ const parseSizeColorData = (data) => {
       values: Array.from(
         new Map(
           formatted.flatMap((e) => e.colors).map((color) => [color.hex, color])
-        ).values()
+        ).values(),
       ),
     },
   ]);
@@ -684,13 +725,16 @@ const handleExport = () => {
   };
 
   if (!sizeColorMap || sizeColorMap.length === 0) {
-    showToast("No data available to export.", "error");
+    showToast("No data available to export.");
     return;
   }
 
   const exportData = [];
 
-  sizeColorMap.forEach(({ size, colors }) => {
+  sizeColorMap.forEach(({ size, colors, coneDescription, hankDescription }) => {
+    let coneAdded = false;
+    let hankAdded = false;
+
     colors.forEach(({ color, hex, variants }) => {
       variants?.forEach((variant) => {
         exportData.push({
@@ -701,13 +745,24 @@ const handleExport = () => {
           Availability: variant.available ?? "",
           PricePerKg: variant.price ?? "",
           markupPricePerKg: variant.markupPricePerKg ?? "",
+          ConeDescription:
+            variant.variantType?.toUpperCase() === "CONE" && !coneAdded
+              ? coneDescription || ""
+              : "",
+          HankDescription:
+            variant.variantType?.toUpperCase() === "HANK" && !hankAdded
+              ? hankDescription || ""
+              : "",
         });
+
+        if (variant.variantType?.toUpperCase() === "CONE") coneAdded = true;
+        if (variant.variantType?.toUpperCase() === "HANK") hankAdded = true;
       });
     });
   });
 
   if (exportData.length === 0) {
-    showToast("No variant data to export.", "error");
+    showToast("No variant data to export.");
     return;
   }
 
@@ -717,9 +772,9 @@ const handleExport = () => {
 
   const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-
-  saveAs(data, product.productName+"_data.xlsx");
+  saveAs(data, product.productName + "_data.xlsx");
 };
+
 
 
 const updateVariantField = (sizeIndex, colorIndex, variantIndex, field, value) => {
@@ -769,7 +824,7 @@ console.log(sizeColorMap)
             <ReactQuill
               theme="snow"
               value={formData.description}
-              onChange={handleDescriptionChange}
+              // onChange={handleDescriptionChange}
               placeholder="Write your description here..."
               modules={{
                 toolbar: [
@@ -937,9 +992,9 @@ console.log(sizeColorMap)
             </div>
             </div>
      
-      {variants.map((variant, variantIndex) => (
+      {/* {variants.map((variant, variantIndex) => (
         <div className="variant-add" key={variantIndex} style={{ marginBottom: "20px" }}>
-          {/* Collapsible Header */}
+        
          
           {expandedVariant != variantIndex && (
           <div
@@ -949,14 +1004,14 @@ console.log(sizeColorMap)
               padding: "10px",
               borderRadius: "5px",
             }}
-            // onClick={() => toggleExpand(variantIndex)}
+            onClick={() => toggleExpand(variantIndex)}
           >
             <div className="d-flex justify-content-between w-100">
             <h4>
               {variant.name || "New Variant"} 
             </h4>
 
-            {/* <button className="delete-btn p-2" onClick={() => removeVariant(variantIndex)}> <MdDeleteOutline  size={20}/></button> */}
+            <button className="delete-btn p-2" onClick={() => removeVariant(variantIndex)}> <MdDeleteOutline  size={20}/></button>
             </div>
             <div>
             {variant.name.toLowerCase() === "size" && (
@@ -997,16 +1052,7 @@ console.log(sizeColorMap)
                                
                              }}
                            >
-                                {/* <div
-                                  style={{
-                                    backgroundColor: value.hex,
-                                    width: "25px",
-                                    height: "25px",
-                                    borderRadius: "50%",
-                                    border: "1px solid #ccc",
-                                    marginBottom: "5px",
-                                  }}
-                                ></div> */}
+                              
                                 <h4
                                   style={{
                                   marginBottom: "10px",
@@ -1028,7 +1074,7 @@ console.log(sizeColorMap)
           </div>
           )}
 
-          {/* Collapsible Content */}
+        
           {expandedVariant === variantIndex && (
             <div className="size-sec mt-2"  
             onClick={() => toggleExpand(variantIndex)} 
@@ -1075,22 +1121,6 @@ console.log(sizeColorMap)
                         placeholder="Counter"
                       />
 
-                      {/* <input
-                        className="flex-grow-1"
-                         onClick={(e) => e.stopPropagation()}
-                         onChange={(e) =>
-                        handleVariantValueChange(
-                          variantIndex,
-                          valueIndex,
-                          "hex",
-                          e.target.value
-                        )
-                      }
-                      type="text"
-                      placeholder="description"
-                      >
-                      
-                      </input> */}
 
                         <button
 
@@ -1193,7 +1223,7 @@ console.log(sizeColorMap)
           
         </div>
         
-      ))}
+      ))} */}
 
 
                     {/* {variants.length > 0 && (
@@ -1299,13 +1329,33 @@ console.log(sizeColorMap)
                      </button>
                    </td>
                  </tr>
+                  <tr>
+                    <td colSpan={7} style={{ borderTop: "none" }}>
+                      <div className="d-flex gap-2 mt-2">
+                        <input
+                          type="text"
+                          className="form-control w-50"
+                          placeholder="Description for CONE"
+                          value={entry.coneDescription || ""}
+                          onChange={(e) => handleDescriptionChange(sizeIndex, "CONE", e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          className="form-control w-50"
+                          placeholder="Description for HANK"
+                          value={entry.hankDescription || ""}
+                          onChange={(e) => handleDescriptionChange(sizeIndex, "HANK", e.target.value)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
    
                  {expandedRow === sizeIndex &&
                    entry.colors.map((color, colorIndex) =>
                      color.variants?.map((variant, variantIndex) => (
                        <React.Fragment key={`${colorIndex}-${variantIndex}`}>
                           <tr className="align-top border-0">
-                            <td style={{ borderBottom: "none" }}>
+                            <td>
                               {variantIndex === 0 && (
                                 <div className="d-flex align-items-center gap-2">
                                   <input
@@ -1320,7 +1370,7 @@ console.log(sizeColorMap)
                                 </div>
                               )}
                             </td>
-                            <td style={{ borderBottom: "none" }}>
+                            <td>
                               {variantIndex === 0 && (
                                 <input
                                   className="w-75"
@@ -1333,7 +1383,7 @@ console.log(sizeColorMap)
                                 />
                               )}
                             </td>
-                            <td style={{ borderBottom: "none" }}>
+                            <td>
                               <input
                                 type="number"
                                 value={variant.available || ""}
@@ -1344,7 +1394,7 @@ console.log(sizeColorMap)
                                 disabled={isViewMode}
                               />
                             </td>
-                            <td style={{ borderBottom: "none" }}>
+                            <td>
                               <input
                                 type="number"
                                 value={variant.price || ""}
@@ -1354,7 +1404,7 @@ console.log(sizeColorMap)
                                 placeholder="Price/Kg"
                               />
                             </td>
-                            <td style={{ borderBottom: "none" }}>
+                            <td>
                               <input
                                 type="number"
                                 value={variant.markupPricePerKg || ""}
@@ -1364,7 +1414,7 @@ console.log(sizeColorMap)
                                 placeholder="Markup/Kg"
                               />
                             </td>
-                            <td style={{ borderBottom: "none" }}>
+                            <td>
                               <input
                                 className="w-50"
                                 type="text"
@@ -1375,7 +1425,7 @@ console.log(sizeColorMap)
                                 placeholder="Type"
                               />
                             </td>
-                            <td style={{ borderBottom: "none" }}>
+                            <td>
                               <label className="switch">
                                 <input
                                   type="checkbox"
@@ -1391,26 +1441,14 @@ console.log(sizeColorMap)
                           </tr>
 
                           
-                        <tr>
-                          <td></td> 
-                          <td></td> 
-                          <td colSpan={5}>
-                            <input
-                              type="text"
-                              className="form-control mt-1 w-100"
-                              placeholder="Description"
-                              value={variant.description || ""}
-                              onChange={(e) =>
-                                updateVariantField(sizeIndex, colorIndex, variantIndex, "description", e.target.value)
-                              }
-                            />
-                          </td>
-                        </tr>
+                       
 
                         </React.Fragment>
 
                      ))
                    )}
+
+                  
                </React.Fragment>
              ))}
            </tbody>

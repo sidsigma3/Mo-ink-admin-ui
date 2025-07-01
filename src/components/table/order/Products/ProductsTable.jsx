@@ -59,7 +59,7 @@ const [toasts, setToasts] = useState([]);
   const aggregateProductData = (productData) => {
     return productData.map((product) => {
       const groupedVariants = product.variants.reduce((acc, variant) => {
-        const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType , availableStatus} = variant;
+        const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType , availableStatus , variantDescription } = variant;
   
         if (!acc[size]) {
           acc[size] = {
@@ -91,6 +91,7 @@ const [toasts, setToasts] = useState([]);
           id,
           markupPricePerKg,
           availableStatus,
+          variantDescription,
         });
   
         acc[size].totalWeight += Number(availableWeight);

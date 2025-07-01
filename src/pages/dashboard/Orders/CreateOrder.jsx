@@ -249,6 +249,16 @@ useEffect(() => {
         fetchData(); 
       }, []);
 
+      const refreshAllProducts = async () => {
+        try {
+          const data = await getAllProduct();
+          setProductData(data.data); // update all products
+        } catch (error) {
+          console.error("Failed to refresh all products", error);
+        }
+      };
+
+
       const [discountData , setDiscountData] = useState([])
         
             useEffect(() => {
@@ -1336,6 +1346,7 @@ const handleReject = (variant) => {
              products={finalData}
              addToCart={addToCart}
              onOrderCreate={handleReceiveOrder}
+            onProductUpdate={refreshAllProducts}
         >
 
         </ModalOrder>
