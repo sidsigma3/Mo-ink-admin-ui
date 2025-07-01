@@ -56,3 +56,17 @@ export const uploadColorLibraryImage = async (file,type) => {
     throw error;
   }
 };
+
+
+export const getUnusedActiveColors = async (productId, size, variantType) => {
+  const response = await axios.get(
+    `${BASE_URL}/product/${productId}/variant/unused-active-colors`,
+    {
+      params: {
+        size,
+        variantType,
+      },
+    }
+  );
+  return response.data?.data?.colors || [];
+};
