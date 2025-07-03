@@ -439,7 +439,7 @@ const groupedByColorAndType = variant.variants.reduce((acc, variant) => {
                   return (
                     <div
                       key={index}
-                      className={`col-3 border rounded p-2 ${isSelected ? "border-primary" : ""}`}
+                      className={`grid-6 col-md-3  border rounded p-2 ${isSelected ? "border-primary" : ""}`}
                       onClick={() => handleColorClick(colorData)}
                       style={{ cursor: "pointer" }}
                     >

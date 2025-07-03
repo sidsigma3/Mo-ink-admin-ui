@@ -121,6 +121,38 @@
 
 
 
+
+.date-btn{
+    height: 40px;
+    padding: 0.2rem 2rem;
+    font-size: 0.8rem;
+    background-color: #F3F4F6 !important;
+    border: 2px solid #D1D5DB;
+    color: #3f3c3c !important;
+  }
+
+.sm-bttn{
+    display: none;
+}
+
+
+@media(max-width:768px){
+    .sm-bttn{
+        display: grid;
+        padding: 0.1rem 0.1rem !important;
+        width: 2.2rem !important;
+        height: 2.2rem !important;
+        border-radius: 50%;
+        align-items: center;
+        justify-items: center;
+    }
+
+
+    .lg-btn{
+        display: none;
+    }
+}
+
 @media (max-width: 1024px) {
 
     /* .order .info-ctn ul li::before {
