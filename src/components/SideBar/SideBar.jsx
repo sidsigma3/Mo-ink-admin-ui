@@ -50,26 +50,19 @@ const SideBar = () => {
     const buttonRef = useRef(null);
 
 
-  // Close the menu if clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
 
-        if (
-            menuRef.current && !menuRef.current.contains(event.target) && 
-            buttonRef.current && !buttonRef.current.contains(event.target)
-          ) {
-            setMoreMenuOpen(false); // Close the menu
-          }
-    };
+      useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (menuRef.current && !menuRef.current.contains(event.target) && 
+            buttonRef.current && !buttonRef.current.contains(event.target)) {
+          setMoreMenuOpen(false);
+        }
+      };
 
-    // Add event listener to the document body
-    document.body.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
-    return () => {
-      // Cleanup the listener
-      document.body.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     if (location.pathname.includes("/vendor-order")) {
@@ -137,298 +130,278 @@ const SideBar = () => {
   return (
     <div className='sideBar shadow'>
 
-        <div className='menu'>
-        <ul className='on-mobile'>
-            <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
-                <Link to={'/dashboard'}>
-                <button onClick={()=>setSelected('dashboard')}><span className='icon'><LuHome size={22} /></span>Dashboard</button>
-                </Link>
-            </li>
+       <div className='menu'>
 
-
-            {/* <div  
-                onMouseEnter={() => setHoverSelected('orders')}  
-                onMouseLeave={() => {
-                  if (selected !== 'vendors') setHoverSelected(null);
-                }}
-              > */}
-                <li className={selected === 'orders' ? 'selected' : 'not-selected'}>
-                  <Link to={'/orders'}>
-                    <button onClick={() => setSelected('orders')}>
-                      <span className='icon'><LuShoppingCart size={22} /></span>Orders
-                    </button>
-                  </Link>
-                </li>
-
-                <li className={selected === 'vendors' ? 'selected' : 'not-selected'}>
-                  <Link to={'/vendor-order'}>
-                    <button onClick={() => setSelected('vendors')}>
-                      <span className='icon'><TbBuildingFactory size={24} /></span>Vendor Orders
-                    </button>
-                  </Link>
-                </li>
-{/* 
-                {(hoverSelected === 'orders' || selected === 'vendors') && (
-                  <div className={selected === 'vendors' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
-                    <Link to={'/vendor-order'}>
-                      <button 
-                        onClick={() => {
-                        
-                          setSelected('vendors');
-                          setHoverSelected('orders'); // Keep it open
-                        }} 
-                        className='d-flex gap-3' 
-                        style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
-                      >
-                        <span><BsArrowReturnRight /></span>Vendor Orders
-                      </button>
-                    </Link>
-                  </div>
-                )}
-              </div> */}
-
-            {/* <li className={selected === 'profile' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
-               
-                <button 
-                 onClick={()=>{
-                    setSelected('profile')
-                    navigate('/profile')
-                }}><span className='icon'><MdOutlinePersonOutline  size={28}/></span>Profile</button>
-                
-            </li> */}
-
-            {/* <div  
-  onMouseEnter={() => setHoverSelected('products')}  
-  onMouseLeave={() => {
-    if (selected !== 'inventory') setHoverSelected(null);
-  }}
-> */}
-
-
-  <li className={selected === 'products' ? 'selected' : 'not-selected'}>
-    <Link to={'/products'}>
-      <button onClick={() => setSelected('products')}>
-        <span className='icon'><LuPackage size={22} /></span>Product
-      </button>
-    </Link>
-  </li>
-
-  <li className={selected === 'inventory' ? 'selected' : 'not-selected'}>
-    <Link to={'/inventory'}>
-      <button onClick={() => setSelected('inventory')}>
-        <span className='icon'><TbClipboardList size={24} /></span>Inventory
-      </button>
-    </Link>
-  </li>
-
-
-  <li className={selected === 'colorlibrary' ? 'selected' : 'not-selected'}>
-    <Link to={'/colorlibrary-products'}>
-      <button onClick={() => setSelected('colorlibrary')}>
-        <span className='icon'><IoColorPaletteOutline  size={24} /></span>Color Library
-      </button>
-    </Link>
-  </li>
-
-  {/* {(hoverSelected === 'products' || selected === 'inventory') && (
-    <div className={selected === 'inventory' ? 'selected mt-2 ps-4 mb-2' : 'not-selected mt-2 ps-4 mb-2'}>
-      <Link to={'/inventory'}>
-        <button 
-          onClick={() => {
-            setSelected('inventory');
-            setHoverSelected('products'); // Keep it open
-          }} 
-          className='d-flex gap-3' 
-          style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
-        >
-          <span><BsArrowReturnRight /></span>Inventory
-        </button>
-      </Link>
-    </div>
-  )}
-</div> */}
-
-
-
-            <li className={selected === 'analytics' ? 'selected' : 'not-selected'}>
-                <Link to={'/analytics'}>
-                <button  onClick={()=>setSelected('analytics')}>
-              
-                    <span className='icon'>
-                        <GoGraph  size={22} style={{ strokeWidth: '0.4'}}/>
-                    </span>
-             
-                    Analytics</button>
-                </Link>
-            </li>
-
-            <li className={selected === 'more' ? 'selected show-on-mobile' : 'not-selected show-on-mobile'}>
-                <button   ref={buttonRef} onClick={() => {
-                    setMoreMenuOpen(!isMoreMenuOpen)
-                    setSelected('more')
-                    }}><span className='icon'><TfiMenuAlt  size={28}/></span>More</button>
-            </li>
-
-
-            {isMoreMenuOpen && (
-        <div className="more-menu" ref={menuRef}>
-            <ul>
-          {/* <li
-            className={`${
-              selected === 'analytics' ? 'selected' : 'not-selected'
-            }`}
-          >
-            <Link to={'/analytics'}>
-              <button onClick={() => setSelected('analytics')}>
-                <span className="icon">
-                  <GoGraph size={22} style={{ strokeWidth: '0.4' }} />
-                </span>
-                Analytics
-              </button>
+       {/* Mobile menu */}
+        <ul className="on-mobile d-md-none bg-gray-600 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] rounded-t-2xl">
+          {/* Always visible on mobile */}
+          <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
+            <Link to={'/dashboard'}>
+              <button onClick={()=>setSelected('dashboard')}><span className='icon'><LuHome size={22} /></span>Dashboard</button>
             </Link>
-          </li> */}
+          </li>
 
-          <li
-            className={`${
-              selected === 'discount' ? 'selected' : 'not-selected'
-            }`}
-          > 
-            <Link to={'/discounts'}>
-              <button onClick={() => setSelected('discount')}>
-                <span className="icon">
-                  <TbRosetteDiscount size={27} />
-                </span>
-                Discount
+          <li className={selected === 'orders' ? 'selected' : 'not-selected'}>
+            <Link to={'/orders'}>
+              <button onClick={() => setSelected('orders')}>
+                <span className='icon'><LuShoppingCart size={22} /></span>Orders
               </button>
             </Link>
           </li>
 
+          <li className={selected === 'products' ? 'selected' : 'not-selected'}>
+            <Link to={'/products'}>
+              <button onClick={() => setSelected('products')}>
+                <span className='icon'><LuPackage size={22} /></span>Product
+              </button>
+            </Link>
+          </li>
 
-          <div  
-              onMouseEnter={() => setHoverSelected('customers')}  
-              onMouseLeave={() => {
-                if (selected !== 'segments') setHoverSelected(null);
+          <li className={selected === 'discount' ? 'selected' : 'not-selected'}> 
+            <Link to={'/discounts'}>
+              <button onClick={()=>setSelected('discount')}><span className='icon'><TbRosetteDiscount size={27}/></span>Discount</button>
+            </Link>
+          </li>
+
+          {/* More menu button - always visible on mobile */}
+         <li className={selected === 'more' ? 'selected' : 'not-selected'}>
+          <button 
+            ref={buttonRef}
+            onClick={(e) => {
+              e.stopPropagation();
+              setMoreMenuOpen(!isMoreMenuOpen);
+              setSelected('more');
+            }}
+          >
+            <span className='icon'><TfiMenuAlt size={28}/></span>More
+          </button>
+        </li>
+
+
+            {isMoreMenuOpen && (
+            <div
+              ref={menuRef}
+              className="more-menu position-fixed bg-white shadow rounded-3 p-2 border"
+              style={{
+                bottom: '70px',       
+                right: '16px',       
+                zIndex: 9999,
+                width: '220px',
+                animation: 'slideUp 0.3s ease-out'
               }}
             >
-              <li 
-                className={selected === 'customers' ? 'selected' : 'not-selected'}  
-              >
-                <Link to={'/customers'}>
-                  <button  
-                    onClick={() => setSelected('customers')} 
-                    style={{ fontSize: "1rem" }} // Ensure font size applies
+              <ul className="list-unstyled mb-0">
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/vendor-order"
+                    onClick={() => setSelected('vendors')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'vendors' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
                   >
-                    <span className='icon'>
-                      <GoPeople size={22} style={{ strokeWidth: '0.4' }} />
-                    </span>
-                    Customers
-                  </button>
-                </Link>
-              </li>
-
-              {/* Submenu stays visible when either hovered or selected */}
-              {(hoverSelected === 'customers' || selected === 'segments') && (
-                <div 
-                  className="mt-2 ps-4 mb-2"
-                  onMouseEnter={() => setHoverSelected('customers')}  
-                  onMouseLeave={() => {
-                    if (selected !== 'segments') setHoverSelected(null);
-                  }}
-                >
-                  <Link to={'/segments'}>
-                    <button 
-                      onClick={() => {
-                        setSelected('segments');
-                        // setHoverSelected('customers'); 
-                      }} 
-                      className="d-flex gap-3" 
-                      style={{ 
-                        border: 'none', 
-                        background: 'none', 
-                        textDecoration: 'none', 
-                        fontSize: "0.85rem" // Ensure font size applies
-                      }}
-                    >
-                      <span><BsArrowReturnRight /></span>Segments
-                    </button>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-
-            <li className={selected === 'manufactures' ? 'selected' : 'not-selected'}>
-                <Link to={'/spinners-and-dyers'}>
-                <button  onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={22}/></span><div>Spinners &</div><div> Dyers</div></button>
-                </Link>
-            </li>
-
-            <li>
-                <Link to={'/users'}>
-                <button  onClick={()=>setSelected('users')}><span className='icon'><RiUserSettingsLine  size={22}/></span>Users</button>
-                </Link>
-            </li>
-          </ul>
-        </div>
-      )}
-
-
-
-           
-
-            <li className={selected === 'discount' ? 'selected hide-on-mobile' : 'not-selected hide-on-mobile'}> 
-                <Link to={'/discounts'}>
-                <button  onClick={()=>setSelected('discount')}><span className='icon'><TbRosetteDiscount  size={27}/></span>Discount</button>
-                </Link>
-            </li>
-        </ul>
-
-        <ul className='hide-on-mobile'>
-          <div  
-              onMouseEnter={() => setHoverSelected('customers')}  
-              onMouseLeave={() => {
-                if (selected !== 'segments') setHoverSelected(null); // Keep open if "segments" is selected
-              }}
-            >
-            <li className={selected === 'customers' ? 'selected' : 'not-selected'} >
-                <Link to={'/customers'}>
-                <button  onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={22} style={{ strokeWidth: '0.4'}}/></span>Customers</button>
-                </Link>
-                
-            </li>
-           
-                <li className={selected === 'segments' ? 'selected mt-3 ' : 'not-selected mt-3 '}>
-                  <Link to={'/segments'}>
-                    <button 
-                      onClick={() => {
-                        setSelected('segments');
-                      }} 
-                      className='d-flex ' 
-                      style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
-                    >
-                      <span><IoPricetagOutline size={22}/></span>Segments
-                    </button>
+                    <TbBuildingFactory size={20} />
+                    Vendor Orders
                   </Link>
                 </li>
-              
 
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/inventory"
+                    onClick={() => setSelected('inventory')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'inventory' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
+                  >
+                    <TbClipboardList size={20} />
+                    Inventory
+                  </Link>
+                </li>
+
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/colorlibrary-products"
+                    onClick={() => setSelected('colorlibrary')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'colorlibrary' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
+                  >
+                    <IoColorPaletteOutline size={20} />
+                    Color Library
+                  </Link>
+                </li>
+
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/analytics"
+                    onClick={() => setSelected('analytics')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'analytics' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
+                  >
+                    <GoGraph size={20} style={{ strokeWidth: '0.4' }} />
+                    Analytics
+                  </Link>
+                </li>
+
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/customers"
+                    onClick={() => setSelected('customers')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'customers' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
+                  >
+                    <GoPeople size={20} style={{ strokeWidth: '0.4' }} />
+                    Customers
+                  </Link>
+                </li>
+
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/segments"
+                    onClick={() => setSelected('segments')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'segments' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
+                  >
+                    <IoPricetagOutline size={20} />
+                    Segments
+                  </Link>
+                </li>
+
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/spinners-and-dyers"
+                    onClick={() => setSelected('manufactures')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'manufactures' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
+                  >
+                    <LuFactory size={20} />
+                    Spinners & Dyers
+                  </Link>
+                </li>
+
+                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
+                  <Link
+                    to="/users"
+                    onClick={() => setSelected('users')}
+                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
+                      selected === 'users' ? 'fw-semibold text-brand' : 'text-dark'
+                    }`}
+                  >
+                    <RiUserSettingsLine size={20} />
+                    Users
+                  </Link>
+                </li>
+              </ul>
             </div>
-
-            <li className={selected === 'manufactures' ? 'selected' : 'not-selected'}>
-                <Link to={'/spinners-and-dyers'}>
-                <button  onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={22}/></span>Spinners & Dyers</button>
-                </Link>
-            </li>
-
-            <li className={selected === 'users' ? 'selected' : 'not-selected'}>
-                <Link to={'/users'}>
-                <button  onClick={()=>setSelected('users')}><span className='icon'><RiUserSettingsLine  size={22}/></span>Users</button>
-                </Link>
-            </li>
+          )}
 
         </ul>
 
-        </div>
+        {/* Desktop menu */}
+        <ul className='hide-on-mobile '>
+          <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
+            <Link to={'/dashboard'}>
+              <button onClick={()=>setSelected('dashboard')}><span className='icon'><LuHome size={22} /></span>Dashboard</button>
+            </Link>
+          </li>
+
+          <li className={selected === 'orders' ? 'selected' : 'not-selected'}>
+            <Link to={'/orders'}>
+              <button onClick={() => setSelected('orders')}>
+                <span className='icon'><LuShoppingCart size={22} /></span>Orders
+              </button>
+            </Link>
+          </li>
+
+          <li className={selected === 'vendors' ? 'selected' : 'not-selected'}>
+            <Link to={'/vendor-order'}>
+              <button onClick={() => setSelected('vendors')}>
+                <span className='icon'><TbBuildingFactory size={24} /></span>Vendor Orders
+              </button>
+            </Link>
+          </li>
+
+          <li className={selected === 'products' ? 'selected' : 'not-selected'}>
+            <Link to={'/products'}>
+              <button onClick={() => setSelected('products')}>
+                <span className='icon'><LuPackage size={22} /></span>Product
+              </button>
+            </Link>
+          </li>
+
+          <li className={selected === 'inventory' ? 'selected' : 'not-selected'}>
+            <Link to={'/inventory'}>
+              <button onClick={() => setSelected('inventory')}>
+                <span className='icon'><TbClipboardList size={24} /></span>Inventory
+              </button>
+            </Link>
+          </li>
+
+          <li className={selected === 'colorlibrary' ? 'selected' : 'not-selected'}>
+            <Link to={'/colorlibrary-products'}>
+              <button onClick={() => setSelected('colorlibrary')}>
+                <span className='icon'><IoColorPaletteOutline size={24} /></span>Color Library
+              </button>
+            </Link>
+          </li>
+
+          <li className={selected === 'analytics' ? 'selected' : 'not-selected'}>
+            <Link to={'/analytics'}>
+              <button onClick={()=>setSelected('analytics')}>
+                <span className='icon'><GoGraph size={22} style={{ strokeWidth: '0.4'}}/></span>Analytics
+              </button>
+            </Link>
+          </li>
+
+          <li className={selected === 'discount' ? 'selected' : 'not-selected'}> 
+            <Link to={'/discounts'}>
+              <button onClick={()=>setSelected('discount')}><span className='icon'><TbRosetteDiscount size={27}/></span>Discount</button>
+            </Link>
+          </li>
+
+          <div  
+            onMouseEnter={() => setHoverSelected('customers')}  
+            onMouseLeave={() => {
+              if (selected !== 'segments') setHoverSelected(null);
+            }}
+          >
+            <li className={selected === 'customers' ? 'selected' : 'not-selected'} >
+              <Link to={'/customers'}>
+                <button onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={22} style={{ strokeWidth: '0.4'}}/></span>Customers</button>
+              </Link>
+            </li>
+          
+            <li className={selected === 'segments' ? 'selected mt-3 ' : 'not-selected mt-3 '}>
+              <Link to={'/segments'}>
+                <button 
+                  onClick={() => {
+                    setSelected('segments');
+                  }} 
+                  className='d-flex ' 
+                  style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
+                >
+                  <span><IoPricetagOutline size={22}/></span>Segments
+                </button>
+              </Link>
+            </li>
+          </div>
+
+          <li className={selected === 'manufactures' ? 'selected' : 'not-selected'}>
+            <Link to={'/spinners-and-dyers'}>
+              <button onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={22}/></span>Spinners & Dyers</button>
+            </Link>
+          </li>
+
+          <li className={selected === 'users' ? 'selected' : 'not-selected'}>
+            <Link to={'/users'}>
+              <button onClick={()=>setSelected('users')}><span className='icon'><RiUserSettingsLine size={22}/></span>Users</button>
+            </Link>
+          </li>
+        </ul>
+      </div>
 
         
         <ul className='hide-on-mobile'>

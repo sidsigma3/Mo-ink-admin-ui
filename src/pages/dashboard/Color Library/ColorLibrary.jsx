@@ -292,142 +292,158 @@ if (totalPages >=1) {
         </div>
 
 
-        <div className='colorlibrary-table-ctn'>
-          <Table hover>
-            <thead>
-              <tr>
-                <th>Color Name</th>
+<div className="colorlibrary-table-ctn">
 
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Color Code</th>
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Image</th>
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
-                <th style={{width:'1rem'}}></th>
-              </tr>
-            </thead>
-
-            <tbody>
-             <>
-      {demoData.map((item, index) => (
-        <tr key={index}>
-          <td style={{ verticalAlign: "middle" }}>{item.colorName}</td>
-          <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-            {item.colorCode}
-          </td>
-          <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={item.colorName}
-                width="40"
-                height="40"
-                style={{ borderRadius: "8px" }}
-              />
-            ) : (
-              <>
-                <label
-                  htmlFor={`upload-${index}`}
-                  style={{
-                    cursor: "pointer",
-                    padding: "10px",
-                    border: "1px dashed gray",
-                    borderRadius: "8px",
-                    display: "inline-block",
-                  }}
-                >
-                  ➕
-                </label>
-                <input
-                  type="file"
-                  id={`upload-${index}`}
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={(e) => handleImageUpload(e, index)}
-                />
-              </>
-            )}
-          </td>
-          <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={handleChange}
-              />
-              <span className="slider round"></span>
-            </label>
-          </td>
+  {/* ✅ Table View - visible on md and above */}
+  <div className="d-none d-md-block">
+    <Table hover>
+      <thead>
+        <tr>
+          <th>Color Name</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Color Code</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Image</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}>Status</th>
+          <th style={{ width: '1rem' }}></th>
         </tr>
-      ))}
-    </>
-            </tbody>
-
-          </Table>
-
-      
-
-          <div className="data-cards">
-        {filteredData.map((discount,index) => (
-          <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
-
-            <div className='d-flex justify-content-between'>
-                 <h3>{discount.discountCode}</h3>
-                 <p> 
-                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
-                  {discount.discountStatus}
-                </div>
-                </p>
-            </div>
-
-            <div className='d-flex mt-3'>
-            
-            <p className="text-muted m-0">
-                  {discount.discountType === "Percentage"
-                    ? `${discount.discountValue}% off on ${discount?.applicableProducts[0]?.productName}`
-                    : `₹${discount.discountValue} off on cotton yarn`}
-              </p>
-
-            <span><LuDot  size={25}/></span>
-
-            <p><strong></strong> {discount.minPurchaseRequirement}</p>
-
-            {/* <div style={{ display: 'flex', alignItems: 'center' }}>
-           
-            <div style={{ display: 'flex' }}>
-                {product.colorVariants.map((color, index) => (
-                <div
-                    key={index}
+      </thead>
+      <tbody>
+        {demoData.map((item, index) => (
+          <tr key={index}>
+            <td style={{ verticalAlign: "middle" }}>{item.colorName}</td>
+            <td style={{ textAlign: "center", verticalAlign: "middle" }}>{item.colorCode}</td>
+            <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+              {item.imageUrl ? (
+                <img
+                  src={item.imageUrl}
+                  alt={item.colorName}
+                  width="40"
+                  height="40"
+                  style={{ borderRadius: "8px" }}
+                />
+              ) : (
+                <>
+                  <label
+                    htmlFor={`upload-${index}`}
                     style={{
-                    width: '35px',
-                    height: '35px',
-                    backgroundColor: color,
-                    borderRadius: '50%',
-                    marginLeft: index === 0 ? '0' : '-10px',
-                    border: '1px solid #fff',
+                      cursor: "pointer",
+                      padding: "10px",
+                      border: "1px dashed gray",
+                      borderRadius: "8px",
+                      display: "inline-block",
                     }}
-                 
-                ></div>
-                ))}
-            </div>
-            </div> */}
-            </div>
-
-            {/* <div className='d-flex justify-content-between mt-2 pe-4'>
-                 <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
-                    {product.status}
-                    </div>
-                </p>
-                 <p>{product.stock} Kgs</p>
-            </div> */}
-          </div>
+                  >
+                    ➕
+                  </label>
+                  <input
+                    type="file"
+                    id={`upload-${index}`}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleImageUpload(e, index)}
+                  />
+                </>
+              )}
+            </td>
+            <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={handleChange}
+                />
+                <span className="slider round"></span>
+              </label>
+            </td>
+          </tr>
         ))}
-      </div>
+      </tbody>
+    </Table>
+  </div>
+
+            {/* ✅ Card View - visible on mobile only */}
+            <div className="d-md-none">
+              <div className="row g-3">
+                {demoData.map((item, index) => (
+                  <div className="col-12" key={index}>
+                    <div className="card shadow-sm border rounded-4 p-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <span className="fw-semibold">{item.colorName}</span>
+
+              <span
+                className="badge"
+                style={{
+                  backgroundColor: "#f1f1f1",
+                  color: "#333",
+                  fontWeight: "500",
+                  borderRadius: "6px",
+                  padding: "5px 10px",
+                  fontSize: "0.8rem",
+                  border: "1px solid #ccc",
+                  fontFamily: "monospace",
+                  alignItems:"center"
+                }}
+              >
+                {item.colorCode}
+              </span>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              {item.imageUrl ? (
+                <img
+                  src={item.imageUrl}
+                  alt={item.colorName}
+                  width="60"
+                  height="60"
+                  style={{ borderRadius: "8px" }}
+                />
+              ) : (
+                <>
+                <label
+                    htmlFor={`upload-card-${index}`}
+                    className="d-flex flex-column align-items-center justify-content-center text-muted"
+                    style={{
+                      width: "60px",
+                      height: "60px",
+                      border: "1px dashed gray",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      textAlign: "center",
+                      lineHeight: "1.2",
+                    }}
+                  >
+                    <div style={{ fontSize: "20px", marginBottom: "2px" }}>➕</div>
+                    <div>Upload</div>
+                  </label>
 
 
+                  <input
+                    type="file"
+                    id={`upload-card-${index}`}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleImageUpload(e, index)}
+                  />
+                </>
+              )}
 
+              <label className="switch mb-0">
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={handleChange}
+                />
+                <span className="slider round"></span>
+              </label>
+            </div>
+          </div>
 
-
+            </div>
+          ))}
         </div>
+      </div>
+    </div>
+
 
        {/* Toast Notification */}
      <div className="fixed top-4 right-4 z-50 space-y-2">

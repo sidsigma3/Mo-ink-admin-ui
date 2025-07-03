@@ -19,6 +19,8 @@ import { Pagination } from 'react-bootstrap';
 import { format, parseISO } from "date-fns";
 import DatePicker from "react-datepicker";
 import { fetchPaginatedVendorOrders , fetchVendorOrderAnalytics} from '../../../../services/OrderService'
+import { FiCalendar } from "react-icons/fi";
+
 
 const VendorOrder = () => {
 
@@ -312,43 +314,53 @@ if (totalPages > 1) {
 
   return (
     <div className='vendor-order'>
-         <div className='top d-flex justify-content-between'>
+         <div className='top d-flex justify-content-between align-items-center'>
             <h3>Vendor Orders</h3>
 
-            <div className='btn-ctn d-flex gap-2'>
+            <div className='btn-ctn d-flex justify-content-center align-items-center gap-2'>
                  <div className="date-filter position-relative">
-                      <button
-                        className="border rounded bg-white px-3 py-1"
-                        onClick={() => setShowPicker(!showPicker)}
-                      >
-                        {startDate && endDate
-                          ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                          : "Select Date Range"}
-                      </button>
-  
-                        {startDate && endDate && (
-                            <button
-                              className="ms-2 p-2 btn btn-sm btn-outline-secondary"
-                              onClick={handleClearDateFilter}
-                            >
-                              Clear
-                            </button>
-                          )}
-  
-                      {showPicker && (
-                        <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute" }}>
-                          <DatePicker
-                            selected={startDate}
-                            onChange={handleDateChange}
-                            startDate={startDate}
-                            endDate={endDate}
-                            selectsRange
-                            inline
-                            dateFormat="dd MMM yyyy"
-                          />
-                        </div>
-                      )}
-                    </div>
+                                      <button
+                                       className="border rounded bg-white px-2 py-1 d-flex align-items-center"
+                                       onClick={() => setShowPicker(!showPicker)}
+                                     >
+                                       <span className="d-none d-sm-inline">
+                                         {startDate && endDate
+                                           ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+                                           : "Select Date Range"}
+                                       </span>
+                                       <FiCalendar className="d-sm-none " size={20} />
+                                     </button>
+                 
+                                      {startDate && endDate && (
+                                           <button
+                                             className="ms-2 p-2 btn btn-sm btn-outline-secondary"
+                                             onClick={handleClearDateFilter}
+                                           >
+                                             Clear
+                                           </button>
+                                         )}
+                 
+                                     {showPicker && (
+                                       <div ref={datePickerRef} style={{
+                                           zIndex: 1000,
+                                           position: "absolute",
+                                           right: 0,
+                                           width: "max-content",
+                                           maxWidth: "90vw", 
+                                           backgroundColor: "white",
+                                           boxShadow: "0 4px 16px rgba(0,0,0,0.1)", }}>
+                                         <DatePicker
+                                           selected={startDate}
+                                           onChange={handleDateChange}
+                                           startDate={startDate}
+                                           endDate={endDate}
+                                           selectsRange
+                                           inline
+                                           dateFormat="dd MMM yyyy"
+                                         />
+                                       </div>
+                                     )}
+                                   </div>
 
                 <ExportBtn onClick={handleExport}></ExportBtn>
 
@@ -389,7 +401,7 @@ if (totalPages > 1) {
 
 
 
-        <div className='order-filter-ctn d-flex gap-2 mb-2 w-50 mt-3'>
+        <div className='order-filter-ctn d-flex gap-2 mb-2 w-30 mt-3'>
           
           <ProductFilter 
                 filterOptions={["Order Id", "Vendor"]} 

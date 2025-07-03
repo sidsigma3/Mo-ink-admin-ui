@@ -12,6 +12,8 @@ import { enIN } from "date-fns/locale";
 import DatePicker from "react-datepicker";
 import { getAllInventory } from "../../services/InventoryService";
 import { getAllProduct } from "../../services/ProductService";
+import { FiCalendar } from "react-icons/fi";
+
 
 const Dashboard = () => {
 
@@ -235,14 +237,18 @@ useEffect(() => {
                         </div> */}
                         {/* <Filter></Filter> */}
 
-                       <div style={{ position: "relative" }} className="d-flex">
+                        <div className='btn-ctn'>
+            <div className="date-filter position-relative">
                         <button
-                          className="border rounded bg-white px-3 py-1"
+                          className="border rounded bg-white px-2 py-1 d-flex align-items-center"
                           onClick={() => setShowPicker(!showPicker)}
                         >
-                          {startDate && endDate
-                            ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                            : "Select Date Range"}
+                          <span className="d-none d-sm-inline">
+                            {startDate && endDate
+                              ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+                              : "Select Date Range"}
+                          </span>
+                          <FiCalendar className="d-sm-none " size={20} />
                         </button>
 
                         {startDate && endDate && (
@@ -275,6 +281,7 @@ useEffect(() => {
                             />
                           </div>
                         )}
+                      </div>
                       </div>
 
 
