@@ -1331,22 +1331,23 @@ console.log(sizeColorMap)
                  </tr>
                   <tr>
                     <td colSpan={7} style={{ borderTop: "none" }}>
-                      <div className="d-flex gap-2 mt-2">
-                        <input
-                          type="text"
+                     <div className="d-flex gap-2 mt-2">
+                        <textarea
                           className="form-control w-50"
+                          rows={6}
                           placeholder="Description for CONE"
                           value={entry.coneDescription || ""}
                           onChange={(e) => handleDescriptionChange(sizeIndex, "CONE", e.target.value)}
                         />
-                        <input
-                          type="text"
+                        <textarea
                           className="form-control w-50"
+                          rows={6}
                           placeholder="Description for HANK"
                           value={entry.hankDescription || ""}
                           onChange={(e) => handleDescriptionChange(sizeIndex, "HANK", e.target.value)}
                         />
                       </div>
+
                     </td>
                   </tr>
    

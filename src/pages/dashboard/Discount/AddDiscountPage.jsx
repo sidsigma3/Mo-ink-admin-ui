@@ -598,7 +598,7 @@ const handleMaxUsageChange = (field1,field2) => {
                   <Dropdown.Item eventKey="Percentage">
                     Percentage
                   </Dropdown.Item>
-                  <Dropdown.Item eventKey="FixedAmount" disabled>
+                  <Dropdown.Item eventKey="FixedAmount">
                     Fixed Amount
                   </Dropdown.Item>
                 </Dropdown.Menu>
