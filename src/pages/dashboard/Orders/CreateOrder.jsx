@@ -37,6 +37,9 @@ import Tooltip from '../../../components/Tooltip/Tooltip';
 import ModalSendInvoice from '../../../components/Modal/ModalSendInvoice';
 import Toast from "../../../components/Toast/Toast";
 
+
+const backendUrl = process.env.REACT_APP_IMAGE_URL
+
 const ConfirmWeightChangeModal = ({ onConfirm, onCancel }) => (
   <div className="sorder-overlay">
     <div className="sorder-box">
@@ -246,6 +249,16 @@ useEffect(() => {
         fetchData(); 
       }, []);
 
+      const refreshAllProducts = async () => {
+        try {
+          const data = await getAllProduct();
+          setProductData(data.data); // update all products
+        } catch (error) {
+          console.error("Failed to refresh all products", error);
+        }
+      };
+
+
       const [discountData , setDiscountData] = useState([])
         
             useEffect(() => {
@@ -277,7 +290,7 @@ useEffect(() => {
                     };
                   }
             
-                  const hex = color.hexCode?.toLowerCase() || "#ccc";
+                  const hex = color.colorCode?.toLowerCase() || "#ccc";
                   const colorKey = `${color.colorName}-${hex}`;
             
                   let colorGroup = acc[size].variants.find((v) => `${v.colorName}-${v.hexCode?.toLowerCase()}` === colorKey);
@@ -297,6 +310,7 @@ useEffect(() => {
                     price: pricePerKg,
                     id,
                     markupPricePerKg,
+                    colorImage:color.colorImage,
                   });
             
                   acc[size].totalWeight += Number(availableWeight);
@@ -325,6 +339,8 @@ useEffect(() => {
       return aggregateProductData(productData);
     }, [productData]);
     
+
+    console.log(finalData)
   
     const handleReceiveOrder = (order) => {
       console.log(order)
@@ -385,10 +401,6 @@ useEffect(() => {
         setOrderDetails(updatedOrderDetails);
       };
       
-      
-      
-      
-      
 
       const variantToProductMap = {};
           finalData.forEach((p) => {
@@ -428,7 +440,7 @@ useEffect(() => {
             if (!sizeGroup) return;
     
             // Find matching color in the size group
-            const matchingColor = sizeGroup?.variants?.find(c => c.hexCode?.toLowerCase() === color.hexCode?.toLowerCase());
+            const matchingColor = sizeGroup?.variants?.find(c => c.hexCode?.toLowerCase() === color.colorCode?.toLowerCase());
             if (!matchingColor) return;
     
             // Find the specific variant for the variantType (e.g., 'cone' or 'hank')
@@ -442,7 +454,8 @@ useEffect(() => {
                 color: {
                     id: color.id,
                     name: color.colorName,
-                    hex: color.hexCode,
+                    hex: color.colorCode,
+                    colorImage:color.colorImage,
                     weight: parseFloat(orderWeight) || 0,
                 },
                 variantType,
@@ -1333,6 +1346,7 @@ const handleReject = (variant) => {
              products={finalData}
              addToCart={addToCart}
              onOrderCreate={handleReceiveOrder}
+            onProductUpdate={refreshAllProducts}
         >
 
         </ModalOrder>
@@ -1412,19 +1426,27 @@ const handleReject = (variant) => {
                                               </div>
                                           </td>
 
-                                          {/* Colors Column */}
+                                         
                                           <td style={{ justifyItems: 'center'}}>
                                             <div className="d-flex flex-column gap-1">
-                                              <div
+                                              <span>{order.color.hex}</span>
+                                              <img
+                                                src={`${backendUrl}${order.color.colorImage}`}
+                                                alt={order.color.colorName}
+                                                width="40"
+                                                height="40"
+                                                style={{ borderRadius: "8px", border: "1px solid #ccc" }}
+                                              />
+                                              {/* <div
                                                 style={{
-                                                  backgroundColor: order.color.hex, // use order.color.hex
+                                                  backgroundColor: order.color.hex, 
                                                   width: '25px',
                                                   height: '25px',
                                                   borderRadius: '50%',
                                                   border: '2px solid #ccc',
                                                   margin: '5px',
                                                 }}
-                                              ></div>
+                                              ></div> */}
                                             </div>
                                           </td>
 

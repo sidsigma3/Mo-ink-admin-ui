@@ -59,7 +59,7 @@ const [toasts, setToasts] = useState([]);
   const aggregateProductData = (productData) => {
     return productData.map((product) => {
       const groupedVariants = product.variants.reduce((acc, variant) => {
-        const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType , availableStatus} = variant;
+        const { size, color, availableWeight, id, pricePerKg, markupPricePerKg, variantType , availableStatus , variantDescription } = variant;
   
         if (!acc[size]) {
           acc[size] = {
@@ -70,7 +70,7 @@ const [toasts, setToasts] = useState([]);
           };
         }
   
-        const hex = color.hexCode?.toLowerCase() || "#ccc";
+        const hex = color.colorCode?.toLowerCase() || "#ccc";
         const colorKey = `${color.colorName}-${hex}`;
   
         let colorGroup = acc[size].variants.find((v) => `${v.colorName}-${v.hexCode?.toLowerCase()}` === colorKey);
@@ -91,6 +91,7 @@ const [toasts, setToasts] = useState([]);
           id,
           markupPricePerKg,
           availableStatus,
+          variantDescription,
         });
   
         acc[size].totalWeight += Number(availableWeight);

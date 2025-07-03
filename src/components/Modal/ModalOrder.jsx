@@ -7,7 +7,7 @@ import { IoMdAdd } from "react-icons/io";
 import "./ModalOrder.css"
 import CataloguePage from "./CatalougePage";
 
-const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) => {
+const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate , onProductUpdate}) => {
  
   const [openProductId, setOpenProductId] = useState(null);
   const [selectedSize, setSelectedSize] = useState({});
@@ -42,6 +42,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
 
  
   const handleColorSelection = (selectedColorArray) => {
+    console.log(selectedColorArray)
     if (!currentVariant) return;
   
     setSelectedColors((prev) => ({
@@ -57,58 +58,64 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
   
   
 
-
+  console.log(selectedColors)
   
   const handleOrderCreation = () => {
-    const order = Object.entries(selectedColors).flatMap(([productId, sizes]) =>
-      Object.entries(sizes).flatMap(([size, colorArray]) => {
-        const product = products.find((p) => p.productId === Number(productId));
-        if (!product) return [];
-  
-        const sizeGroup = product.groupedVariants.find((group) => group.size === size);
-        if (!sizeGroup) return [];
-  
-        return colorArray.flatMap((colorData) => {
-          const colorGroup = sizeGroup.variants.find(
-            (v) =>
-              v.colorName === colorData.colorName &&
-              v.hexCode.toLowerCase() === colorData.hexCode.toLowerCase()
-          );
-          if (!colorGroup) return [];
-  
-          const matchingVariant = colorGroup.variants.find(
-            (variant) => variant.variantType === colorData.variantType
-          );
-          if (!matchingVariant) return [];
-  
-          return {
-            productId: product.productId,
-            productName: product.productName,
-            size,
-            color: {
-              name: colorData.colorName,
-              hex: colorData.hexCode,
-            },
-            variantType: matchingVariant.variantType,
-            price: matchingVariant.price,
-            markupPricePerKg: matchingVariant.markupPricePerKg,
-            available: matchingVariant.available,
-            gstOnProduct: product.gstOnProduct,
-            productImage: product.productImage,
-            variantId: matchingVariant.id,
-          };
-        });
-      })
-    );
-  
-    onOrderCreate(order);
-    handleClose();
-  };
-  
+  const order = Object.entries(selectedColors).flatMap(([productId, sizes]) =>
+    Object.entries(sizes).flatMap(([size, colorArray]) => {
+      const product = products.find((p) => p.productId === Number(productId));
+      if (!product) return [];
 
+      const sizeGroup = product.groupedVariants.find((group) => group.size === size);
 
-  console.log(products)
+      if (!sizeGroup) return [];
 
+      return colorArray.flatMap((colorData) => {
+        const matchedColorGroup = sizeGroup.variants.find(
+          (v) =>
+            v.colorName?.toLowerCase() === colorData.colorName.toLowerCase() &&
+            v.hexCode?.toLowerCase() === colorData.hexCode.toLowerCase()
+        );
+
+        if (!matchedColorGroup) return [];
+
+        // This handles both new colors (flat) and existing (nested) structures
+        const variantsArray = matchedColorGroup.variants || [matchedColorGroup];
+
+        const matchingVariant = variantsArray.find(
+          (variant) =>
+            variant.variantType?.toLowerCase() === (colorData.variantType || "").toLowerCase()
+        );
+
+        if (!matchingVariant) return [];
+
+        return {
+          productId: product.productId,
+          productName: product.productName,
+          size,
+          color: {
+            name: colorData.colorName,
+            hex: colorData.hexCode,
+            colorImage: colorData.colorImage,
+          },
+          variantType: matchingVariant.variantType,
+          price: matchingVariant.price,
+          markupPricePerKg: matchingVariant.markupPricePerKg,
+          available: matchingVariant.available,
+          gstOnProduct: product.gstOnProduct,
+          productImage: product.productImage,
+          variantId: matchingVariant.id,
+        };
+      });
+    })
+  );
+
+  onOrderCreate(order);
+  handleClose();
+};
+
+  
+  
 
   return (
     <Modal className="modal" show={show} onHide={handleClose} centered>
@@ -164,7 +171,8 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                             }, {})
                           ).map((color, index) => (
                             <div key={index} className="d-flex flex-column gap-2 align-items-center">
-                              <div
+                              <span style={{fontSize:'0.8rem' , fontWeight:'bold'}}>{color.hexCode}</span>
+                              {/* <div
                                 style={{
                                   width: "30px",
                                   height: "30px",
@@ -172,7 +180,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
                                   backgroundColor: color.hexCode.trim(),
                                   border: "1px solid #ccc",
                                 }}
-                              />
+                              /> */}
                               <span style={{ fontSize: '0.7rem', width: '2.5rem', textAlign: 'center' }}>
                                 {color.colorName}
                               </span>
@@ -195,7 +203,7 @@ const ModalOrder = ({ show, handleClose, products, addToCart , onOrderCreate}) =
           ))
         ) : (
           // Show Catalogue Page inside the modal
-          <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} id={currentId} imageUrl={productImage}/>
+          <CataloguePage onColorSelect={handleColorSelection} onClose={() => setShowCatalogue(false)} variant={currentVariant} id={currentId} imageUrl={productImage} onProductUpdate={onProductUpdate}/>
         )}
       </Modal.Body>
       <Modal.Footer className="flex justify-content-between" style={{ display: showCatalogue === true ? 'none' : 'flex'}}>

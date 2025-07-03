@@ -2,8 +2,6 @@ import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-console.log(process.env)
-
 export const getAllCustomer = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/customer`);

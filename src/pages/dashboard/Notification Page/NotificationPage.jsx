@@ -3,7 +3,8 @@ import './NotificationPage.css';
 import {
   getUserNotifications,
   markNotificationRead,
-  markAllUserNotificationsRead
+  markAllUserNotificationsRead,
+  getPaginatedUserNotifications,
 } from '../../../services/NoatificationService';
 
 const TABS = ['Inventory', 'User', 'Return'];
@@ -16,25 +17,41 @@ const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+
   useEffect(() => {
     fetchNotifications();
   }, []);
 
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true);
-      const data = await getUserNotifications(USER_ID);
-      setNotifications(data || []);
-    } catch (error) {
-      console.error("Failed to load notifications:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchNotifications = async (selectedTab = activeTab, currentPage = page) => {
+  try {
+    setLoading(true);
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+    const type = selectedTab.toUpperCase(); // INVENTORY, USER, RETURN
+    const data = await getPaginatedUserNotifications(USER_ID, type, currentPage, 10);
+    
+    setNotifications(data?.content || []);
+    setTotalPages(data?.totalPages || 1);
+  } catch (error) {
+    console.error("Failed to load notifications:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+ const handleTabClick = (tab) => {
+  setActiveTab(tab);
+  setPage(1); // Reset to first page
+  fetchNotifications(tab, 1);
+};
+
+const handlePageChange = (newPage) => {
+  setPage(newPage);
+  fetchNotifications(activeTab, newPage);
+};
+
 
   const handleMarkAllRead = async () => {
     try {
@@ -59,17 +76,19 @@ const handleMarkSingleRead = async (id) => {
 };
 
 
-  const filtered = notifications.filter((n) => {
+ const filtered = notifications.filter((n) => {
   const title = n.title?.toLowerCase();
 
   if (activeTab === 'Inventory') return title === 'inventory alert';
   if (activeTab === 'User')
-    return title === 'new admin account pending approval' || title === 'new sales account pending';
+    return (
+      title === 'new admin account pending approval' ||
+      title === 'new sales account pending approval'
+    );
   if (activeTab === 'Return') return title === 'order return requested';
 
   return false;
 });
-
 
 
 
@@ -134,6 +153,28 @@ const handleMarkSingleRead = async (id) => {
           ))}
         </div>
       )}
+
+      
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+          >
+            Prev
+          </button>
+
+          <span>Page {page} of {totalPages}</span>
+
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
+
     </div>
   );
 };

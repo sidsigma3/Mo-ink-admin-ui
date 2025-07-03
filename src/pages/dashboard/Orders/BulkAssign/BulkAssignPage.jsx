@@ -81,7 +81,7 @@ const BulkAssignPage = () => {
         };
       }
 
-      const hex = color.hexCode?.toLowerCase() || "#ccc";
+      const hex = color.colorCode?.toLowerCase() || "#ccc";
       const colorKey = `${color.colorName}-${hex}`;
 
       let colorGroup = acc[size].variants.find(
@@ -103,6 +103,7 @@ const BulkAssignPage = () => {
         price: pricePerKg,
         id,
         markupPricePerKg,
+        colorImage:color.colorImage,
       });
 
       acc[size].totalWeight += Number(availableWeight);
@@ -130,7 +131,7 @@ const BulkAssignPage = () => {
 
 
 
-    console.log(finalData)
+   
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -820,7 +821,8 @@ const BulkAssignPage = () => {
           <th>Product</th>
           <th>Size</th>
           <th>Variant</th>
-          <th>Color</th>
+          <th>Color Name</th>
+           <th>Color Code</th>
           <th>Weight</th>
           <th>Rate</th>
           {selectedDyer?.state.toLowerCase() === "odisha" ?(
@@ -863,18 +865,10 @@ const BulkAssignPage = () => {
               <td>{item.variantType}</td>
               <td>
                 <div className="d-flex align-items-center gap-2">
-                  <span
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      borderRadius: "50%",
-                      backgroundColor: item.color.hex,
-                      border: "1px solid #ddd",
-                    }}
-                  ></span>
                   {item.color.name}
                 </div>
               </td>
+               <td>{item.color.hex}</td>
               <td style={{width:"5rem"}}>
             {orderFor === "Dyer" ? (
                 <input

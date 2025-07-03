@@ -162,19 +162,19 @@ const toggleType = (product, size, type) => {
          }
      };
 
-  const renderColorDot = (color) => (
-    <div
-      title={color?.colorName}
-      style={{
-        backgroundColor: color?.hexCode,
-        width: 20,
-        height: 20,
-        borderRadius: '50%',
-        display: 'inline-block',
-        border: '1px solid #999',
-      }}
-    />
-  );
+    const renderColorDot = (color) => (
+      <div
+        title={color?.colorName}
+        style={{
+          backgroundColor: color?.colorCode,
+          width: 20,
+          height: 20,
+          borderRadius: '50%',
+          display: 'inline-block',
+          border: '1px solid #999',
+        }}
+      />
+    );
   
  
     const exportToExcel = (data) => {
@@ -260,7 +260,7 @@ const toggleType = (product, size, type) => {
       <th className="text-start py-3">Product</th>
       <th className="py-3">Count</th>
       <th className="py-3">Type</th>
-      <th className="py-3">Color</th>
+      <th className="py-3">Color Code</th>
       <th className="py-3">Color Name</th>
       <th className="py-3">Customer Order</th>
       <th className="py-3">Available Weight</th>
@@ -313,7 +313,7 @@ const toggleType = (product, size, type) => {
                           <td></td>
                           <td></td>
                           <td></td>
-                          <td>{renderColorDot(item.color)}</td>
+                          <td>{item.color.colorCode}</td>
                           <td>{item.color.colorName}</td>
                           <td>{item.customerOrder} Kgs</td>
                           <td className=''>
