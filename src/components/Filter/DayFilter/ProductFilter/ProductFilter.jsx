@@ -42,7 +42,7 @@ const ProductFilter = ({ filterOptions, onFilterChange }) => {
   
         {/* Search Input */}
         <div className="d-flex align-items-center justify-content-between w-100" style={{ width: "61%" }}>
-          <input type="text" placeholder={`Search by ${selectedFilter}`} value={searchTerm} onChange={handleSearch} />
+          <input type="text" placeholder={` Search`} value={searchTerm} onChange={handleSearch} />
           <span>
             <IoSearchOutline />
           </span>

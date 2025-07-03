@@ -478,7 +478,7 @@ if (totalPages >=1) {
         </div>
 
 
-        <div className='colorlibrary-table-ctn'>
+        <div className='colorlibrary-table-ctn d-none d-md-block'>
           <Table hover>
         <thead>
           <tr>
@@ -713,6 +713,9 @@ if (totalPages >=1) {
         </tbody>
       </Table>
 
+
+      
+
           <div className="data-cards">
         {filteredData.map((discount,index) => (
           <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
@@ -726,63 +729,56 @@ if (totalPages >=1) {
                 </p>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mb-2">
-              {item.imageUrl ? (
-                <img
-                  src={item.imageUrl}
-                  alt={item.colorName}
-                  width="60"
-                  height="60"
-                  style={{ borderRadius: "8px" }}
-                />
-              ) : (
-                <>
-                <label
-                    htmlFor={`upload-card-${index}`}
-                    className="d-flex flex-column align-items-center justify-content-center text-muted"
+            <div className='d-flex mt-3'>
+            
+            <p className="text-muted m-0">
+                  {discount.discountType === "Percentage"
+                    ? `${discount.discountValue}% off on ${discount?.applicableProducts[0]?.productName}`
+                    : `₹${discount.discountValue} off on cotton yarn`}
+              </p>
+
+            <span><LuDot  size={25}/></span>
+
+            <p><strong></strong> {discount.minPurchaseRequirement}</p>
+
+            {/* <div style={{ display: 'flex', alignItems: 'center' }}>
+           
+            <div style={{ display: 'flex' }}>
+                {product.colorVariants.map((color, index) => (
+                <div
+                    key={index}
                     style={{
-                      width: "60px",
-                      height: "60px",
-                      border: "1px dashed gray",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      textAlign: "center",
-                      lineHeight: "1.2",
+                    width: '35px',
+                    height: '35px',
+                    backgroundColor: color,
+                    borderRadius: '50%',
+                    marginLeft: index === 0 ? '0' : '-10px',
+                    border: '1px solid #fff',
                     }}
-                  >
-                    <div style={{ fontSize: "20px", marginBottom: "2px" }}>➕</div>
-                    <div>Upload</div>
-                  </label>
-
-
-                  <input
-                    type="file"
-                    id={`upload-card-${index}`}
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={(e) => handleImageUpload(e, index)}
-                  />
-                </>
-              )}
-
-              <label className="switch mb-0">
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={handleChange}
-                />
-                <span className="slider round"></span>
-              </label>
+                 
+                ></div>
+                ))}
             </div>
+            </div> */}
+            </div>
+
+            {/* <div className='d-flex justify-content-between mt-2 pe-4'>
+                 <p> 
+                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
+                    {product.status}
+                    </div>
+                </p>
+                 <p>{product.stock} Kgs</p>
+            </div> */}
           </div>
-
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
-    </div>
 
+
+
+
+
+        </div>
 
           <button className="btn btn-primary mt-3" onClick={handleSaveColors}>
         Save Changes

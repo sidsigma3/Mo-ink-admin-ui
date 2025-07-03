@@ -298,7 +298,7 @@ useEffect(() => {
             <div className='btn-ctn'>
             <div className="date-filter position-relative">
                      <button
-                      className="border rounded bg-white px-2 py-1 d-flex align-items-center"
+                      className=" date-btn btn lg-btn fw-medium "
                       onClick={() => setShowPicker(!showPicker)}
                     >
                       <span className="d-none d-sm-inline">
@@ -306,7 +306,11 @@ useEffect(() => {
                           ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
                           : "Select Date Range"}
                       </span>
-                      <FiCalendar className="d-sm-none " size={20} />
+                       </button>
+
+                        <button className="date-btn btn sm-bttn"
+                        onClick={() => setShowPicker(!showPicker)}>
+                      <FiCalendar className=" " size={20} />
                     </button>
 
                      {startDate && endDate && (

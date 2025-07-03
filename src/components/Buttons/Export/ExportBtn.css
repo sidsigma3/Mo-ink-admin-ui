@@ -7,18 +7,20 @@
     color: #9c7800 !important;
   }
 
-.sm-btn{
+.sm-bttn{
     display: none;
 }
 
 
 @media(max-width:768px){
-    .sm-btn{
+    .sm-bttn{
         display: grid;
-        padding: 0.5rem 0.5rem !important;
-        width: 2.5rem !important;
-        height: 2.5rem !important;
+        padding: 0.1rem 0.1rem !important;
+        width: 2.2rem !important;
+        height: 2.2rem !important;
         border-radius: 50%;
+        align-items: center;
+        justify-items: center;
     }
 
 
