@@ -611,70 +611,111 @@ useEffect(() => {
       
     };
 
-    const calculateGrandTotals = (
-      orderDetails = [],
-      paymentDiscount = 0,
-      couponDiscount = 0,
-      selectedDiscountData = {}
-    ) => {
-      let baseTotal = 0;
-      let totalGst = 0;
-      let totalDiscount = 0;
-      let totalPaymentTypeDiscount = 0;
-      let totalCouponTypeDiscount = 0;
-      let totalFinalTotal = 0;
-    
-      for (const order of orderDetails) {
-        if (!order ||  order.status === 'CANCELLED') continue;
-    
-        const weight = parseFloat(order.color.weight) || 0;
-        const price = order.price || 0;
-        const gstRate = order.gstOnProduct || 0;
-        const rawTotal = weight * price;
-    
-        // Apply coupon discount if applicable
-        const isCouponApplicable = selectedDiscountData?.applicableProducts?.some(
-          (product) => product.id === order.productId
-        );
-    
-        const couponDiscountAmount = isCouponApplicable
-          ? (rawTotal * couponDiscount) / 100
-          : 0;
-    
-        const subtotalAfterCoupon = rawTotal - couponDiscountAmount;
-    
-        // Apply payment discount
-        const paymentDiscountAmount = (subtotalAfterCoupon * paymentDiscount) / 100;
-    
-        const discountedTotal = subtotalAfterCoupon - paymentDiscountAmount;
-    
-        // GST on final discounted total
-        const gstAmount = (discountedTotal * gstRate) / 100;
-    
-        const finalTotal = discountedTotal + gstAmount;
-        const totalItemDiscount = couponDiscountAmount + paymentDiscountAmount;
-    
-        // Accumulate values
-        baseTotal += rawTotal;
-        totalCouponTypeDiscount += couponDiscountAmount;
-        totalPaymentTypeDiscount += paymentDiscountAmount;
-        totalDiscount += totalItemDiscount;
-        totalGst += gstAmount;
-        totalFinalTotal += finalTotal;
+   const calculateGrandTotals = (
+  orderDetails = [],
+  paymentDiscount = 0,
+  couponDiscount = 0,
+  selectedDiscountData = {}
+) => {
+  let baseTotal = 0;
+  let totalGst = 0;
+  let totalDiscount = 0;
+  let totalPaymentTypeDiscount = 0;
+  let totalCouponTypeDiscount = 0;
+  let totalFinalTotal = 0;
+  let totalWeight = 0;
+  let totalBaseTotal = 0;
+
+
+  for (const order of orderDetails) {
+    if (!order || order.status === 'CANCELLED') continue;
+    const weight = parseFloat(order.color.weight) || 0;
+    const price = order.price || 0;
+    totalBaseTotal += weight * price;
+    totalWeight += weight;
+  }
+
+  const minReq = selectedDiscountData?.minPurchaseRequirement || "";
+  let globalDiscountAllowed = true;
+
+  if (minReq.includes("Minimum purchase amount")) {
+    const amountMatch = minReq.match(/\₹\s?(\d+)/);
+    const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
+    globalDiscountAllowed = totalBaseTotal >= minAmount;
+  } else if (minReq.includes("Minimum quantity required")) {
+    const qtyMatch = minReq.match(/(\d+)/);
+    const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
+    globalDiscountAllowed = totalWeight >= minQty;
+  }
+
+
+  for (const order of orderDetails) {
+    if (!order || order.status === 'CANCELLED') continue;
+
+    const weight = parseFloat(order.color.weight) || 0;
+    const price = order.price || 0;
+    const gstRate = order.gstOnProduct || 0;
+    const rawTotal = weight * price;
+
+    const isCouponApplicable = selectedDiscountData?.applicableProducts?.some(
+      (product) => product.id === order.productId
+    );
+
+    // 🔥 Apply coupon discount based on type
+   // Parse and check min purchase requirement
+      const minReq = selectedDiscountData.minPurchaseRequirement || "";
+      let discountAllowed = true;
+
+      if (minReq.includes("Minimum purchase amount")) {
+        const amountMatch = minReq.match(/\₹\s?(\d+)/);
+        const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
+        discountAllowed = totalBaseTotal >= minAmount;
+      } else if (minReq.includes("Minimum quantity required")) {
+        const qtyMatch = minReq.match(/(\d+)/);
+        const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
+        discountAllowed = totalWeight >= minQty;
       }
-    
-      return {
-        baseTotal,
-        totalGst,
-        totalDiscount,
-        totalFinalTotal,
-        totalCouponTypeDiscount,
-        totalPaymentTypeDiscount,
-        cgst: totalGst / 2,
-        sgst: totalGst / 2,
-      };
-    };
-    
+
+// Then apply discount only if applicable and allowed
+    const couponDiscountAmount = isCouponApplicable && discountAllowed
+      ? selectedDiscountData.discountType === "FixedAmount"
+        ? Number(selectedDiscountData.discountValue)
+        : (rawTotal * couponDiscount) / 100
+      : 0;
+
+
+    const subtotalAfterCoupon = rawTotal - couponDiscountAmount;
+
+    // Apply payment method discount
+    const paymentDiscountAmount = (subtotalAfterCoupon * paymentDiscount) / 100;
+
+    const discountedTotal = subtotalAfterCoupon - paymentDiscountAmount;
+    const gstAmount = (discountedTotal * gstRate) / 100;
+
+    const finalTotal = discountedTotal + gstAmount;
+    const totalItemDiscount = couponDiscountAmount + paymentDiscountAmount;
+
+    // Accumulate totals
+    baseTotal += rawTotal;
+    totalCouponTypeDiscount += couponDiscountAmount;
+    totalPaymentTypeDiscount += paymentDiscountAmount;
+    totalDiscount += totalItemDiscount;
+    totalGst += gstAmount;
+    totalFinalTotal += finalTotal;
+  }
+
+  return {
+    baseTotal,
+    totalGst,
+    totalDiscount,
+    totalFinalTotal,
+    totalCouponTypeDiscount,
+    totalPaymentTypeDiscount,
+    cgst: totalGst / 2,
+    sgst: totalGst / 2,
+  };
+};
+
     
     
     
@@ -708,6 +749,8 @@ useEffect(() => {
             setSelectedDiscountId(selectedItem.discountId)
           }
       }
+
+      console.log(selectedDiscountData)
 
     
     const shippingCharge = (calculateGrandTotal(orderDetails) * 5) / 100;
@@ -933,65 +976,91 @@ useEffect(() => {
     const netPayable = (totalAfterDiscount - walletDeduction).toFixed(2);
     
     
-    const calculatePriceBreakdown = (
-      variant, 
-      selectedDiscount = 0,
-      paymentDiscount = 0,
-      selectedDiscountData = null
-    ) => {
-      if (!variant) {
-        return {
-          baseTotal: 0,
-          gstAmount: 0,
-          discountAmount: 0,
-          finalTotal: 0,
-          gstRate: 0,
-          discountPercent: 0,
-        };
-      }
-
-
-      console.log(variant)
-    
-      const weight = parseFloat(variant.weight) || 0;
-      const price = variant.price || 0;
-      const baseTotal = weight * price;
-      const gstRate = variant.gstOnProduct || 0;
-
-      console.log(weight,price,gstRate)
-    
-      // Discount calculation
-      let productDiscountPercent = 0;
-      if (selectedDiscountData && Array.isArray(selectedDiscountData.applicableProducts)) {
-        const isApplicable = selectedDiscountData.applicableProducts.some(
-          (p) => p.id === variant.productId
-        );
-        if (isApplicable) {
-          productDiscountPercent = Number(selectedDiscount);
-        }
-      }
-    
-      const paymentDiscountValue = Number(paymentDiscount);
-      const combinedDiscountPercent =
-        productDiscountPercent + paymentDiscountValue - (productDiscountPercent * paymentDiscountValue) / 100;
-    
-      const discount = baseTotal * (combinedDiscountPercent / 100);
-      const discountedBase = baseTotal - discount;
-      const gstAmount = (discountedBase * gstRate) / 100;
-      const finalTotal = discountedBase + gstAmount;
-
-      console.log(baseTotal,gstAmount,discountAmount,finalTotal,gstRate,combinedDiscountPercent)
-    
-      return {
-        baseTotal: isNaN(baseTotal) ? 0 : baseTotal,
-        gstAmount: isNaN(gstAmount) ? 0 : gstAmount,
-        discountAmount: isNaN(discount) ? 0 : discount,
-        finalTotal: isNaN(finalTotal) ? 0 : finalTotal,
-        gstRate: isNaN(gstRate) ? 0 : gstRate,
-        discountPercent: combinedDiscountPercent,
-        isProductDiscountApplied: productDiscountPercent > 0
-      };
+   const calculatePriceBreakdown = (
+  variant,
+  selectedDiscount = 0,
+  paymentDiscount = 0,
+  selectedDiscountData = null
+) => {
+  if (!variant) {
+    return {
+      baseTotal: 0,
+      gstAmount: 0,
+      discountAmount: 0,
+      finalTotal: 0,
+      gstRate: 0,
+      discountPercent: 0,
+      combinedDiscountPercent: 0,
     };
+  }
+
+  const weight = parseFloat(variant.weight) || 0;
+  const price = variant.price || 0;
+  const baseTotal = weight * price;
+  const gstRate = variant.gstOnProduct || 0;
+
+  let productDiscountAmount = 0;
+  let productDiscountPercent = 0;
+  let discountAllowed = true;
+
+  if (
+    selectedDiscountData &&
+    Array.isArray(selectedDiscountData.applicableProducts)
+  ) {
+    const isApplicable = selectedDiscountData.applicableProducts.some(
+      (p) => p.id === variant.productId
+    );
+
+    // ✅ Check minimum requirement
+    const minReq = selectedDiscountData.minPurchaseRequirement || "";
+    if (minReq.includes("Minimum purchase amount")) {
+      const amountMatch = minReq.match(/\₹\s?(\d+)/);
+      const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
+      discountAllowed = baseTotal >= minAmount;
+    } else if (minReq.includes("Minimum quantity required")) {
+      const qtyMatch = minReq.match(/(\d+)/);
+      const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
+      discountAllowed = weight >= minQty;
+    }
+
+    if (isApplicable && discountAllowed) {
+      if (selectedDiscountData.discountType === "Percentage") {
+        productDiscountPercent = Number(selectedDiscount);
+        productDiscountAmount = baseTotal * (productDiscountPercent / 100);
+      } else if (selectedDiscountData.discountType === "FixedAmount") {
+        productDiscountAmount = Number(selectedDiscountData.discountValue);
+        productDiscountPercent = (productDiscountAmount / baseTotal) * 100;
+      }
+    }
+  }
+  
+  // Payment discount
+  const paymentDiscountValue = Number(paymentDiscount);
+  let paymentDiscountAmount = 0;
+  if (paymentDiscountValue > 0) {
+    const afterProductDiscountBase = baseTotal - productDiscountAmount;
+    paymentDiscountAmount = afterProductDiscountBase * (paymentDiscountValue / 100);
+  }
+
+  const totalDiscountAmount = productDiscountAmount + paymentDiscountAmount;
+  const discountedBase = baseTotal - totalDiscountAmount;
+  const gstAmount = (discountedBase * gstRate) / 100;
+  const finalTotal = discountedBase + gstAmount;
+  const combinedDiscountPercent = (totalDiscountAmount / baseTotal) * 100;
+
+  return {
+    baseTotal,
+    gstAmount,
+    discountAmount: totalDiscountAmount,
+    finalTotal,
+    gstRate,
+    discountPercent: productDiscountPercent,
+    combinedDiscountPercent,
+    isProductDiscountApplied: productDiscountPercent > 0,
+  };
+};
+
+
     
 
   const paymentDescriptions = {
@@ -1504,53 +1573,39 @@ const handleReject = (variant) => {
                                                     gstAmount,
                                                     finalTotal,
                                                     gstRate,
-                                                    discountPercent
+                                                    discountAmount,
+                                                    discountPercent,
+                                                    combinedDiscountPercent,
                                                   } = calculatePriceBreakdown(
-                                                    { ...order.color, productId: order.productId,gstOnProduct:order.gstOnProduct,price:order.price, }, 
+                                                    {
+                                                      ...order.color,
+                                                      productId: order.productId,
+                                                      gstOnProduct: order.gstOnProduct,
+                                                      price: order.price,
+                                                    },
                                                     selectedDiscountValue,
                                                     discountPercentage,
                                                     selectedDiscountData
                                                   );
 
+                                                  const cgst = gstRate > 0 ? (gstRate / 2).toFixed(2) : "0.00";
+                                                  const sgst = gstRate > 0 ? (gstRate / 2).toFixed(2) : "0.00";
+
                                                   return (
                                                     <>
-                                                      <td style={{ textAlign: 'center' }}>
-                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          ₹{Math.round(baseTotal)}
-                                                        </span>
-                                                      </td>
 
-                                                      {/* Discount Column */}
-                                                      <td style={{ textAlign: 'center' }}>
-                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          {discountPercent.toFixed(2)}%
-                                                        </span>
-                                                      </td>
+                                                      <span> ₹{Math.round(baseTotal)}</span>
+                                                      <span> ₹{Math.round(discountAmount)} ({combinedDiscountPercent.toFixed(2)}%)</span>
+                                                      <span> ₹{Math.round(finalTotal)}</span>
+                                                      <span> {cgst}%</span>
+                                                      <span> {sgst}%</span>
 
-                                                      {/* Total Column */}
-                                                      <td style={{ textAlign: 'center' }}>
-                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          ₹{Math.round(finalTotal)}
-                                                        </span>
-                                                      </td>
-
-                                                      {/* CGST Column */}
-                                                      <td style={{ textAlign: 'center' }}>
-                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          {(gstRate / 2).toFixed(2)}%
-                                                        </span>
-                                                      </td>
-
-                                                      {/* SGST Column */}
-                                                      <td style={{ textAlign: 'center' }}>
-                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          {(gstRate / 2).toFixed(2)}%
-                                                        </span>
-                                                      </td>
+                                                    
                                                     </>
                                                   );
                                                 })()}
                                              
+
 
 
 
@@ -1906,9 +1961,12 @@ const handleReject = (variant) => {
                     className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
                   >
                     <p className="m-0 text-primary">
-                      {selectedDiscount
-                        ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
-                        : "Select Discount"}
+                     {selectedDiscountData?.discountType === 'Percentage'
+                      ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
+                      : selectedDiscountData?.discountType === 'FixedAmount'
+                      ? `${selectedDiscount} - ₹${selectedDiscountValue}`
+                      : "Select Discount"}
+
                     </p>
                   </Dropdown.Toggle>
 
@@ -1919,7 +1977,9 @@ const handleReject = (variant) => {
                           <strong>{item.discountCode}</strong>
                           <br />
                           <small>
-                            {item.discountValue}% off on{" "}
+                            {item.discountValue}
+                             {item.discountType==="Percentage" && (' %')}
+                              {" "}off on{" "}
                             {item.applicableProducts[0]?.productName || "this product"}
                           </small>
                         </div>

@@ -335,23 +335,22 @@ const demoData = [
   };
   
 
-  const exportToExcel = (colors, colorStatus, fileName = 'colors.xlsx') => {
-      const data = colors.map((item) => ({
-        ColorName: item.colorName,
-        ColorCode: item.colorCode,
-        Status: colorStatus[item.id] ? 'ACTIVE' : 'INACTIVE',
-        ImageURL: item.colorImage || '',  // Optional
-      }));
+const exportToExcel = (colors, colorStatus, fileName = 'colors.xlsx') => {
+  const data = colors.map((item) => ({
+    ColorName: item.colorName,
+    ColorCode: item.colorCode,
+    Status: colorStatus[item.id] ? 'ACTIVE' : 'INACTIVE',
+    ConeImageURL: item.colorImage?.[0] || '',
+    HankImageURL: item.colorImage?.[1] || '',
+  }));
 
-      const worksheet = XLSX.utils.json_to_sheet(data);
-      const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Colors');
+  XLSX.writeFile(workbook, fileName);
+};
 
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Colors');
-      XLSX.writeFile(workbook, fileName);
-    };
-
-
- const importFromExcel = (file, callback) => {
+const importFromExcel = (file, callback) => {
   const reader = new FileReader();
 
   reader.onload = (event) => {
@@ -365,8 +364,9 @@ const demoData = [
       id: null,
       colorName: row.ColorName || '',
       colorCode: row.ColorCode || '',
-      colorImage: row.ImageURL || '',  // ← use the image URL from the sheet
-      localPreview: row.ImageURL || '', // optional: also set preview if you use it
+      colorImage: [row.ConeImageURL || '', row.HankImageURL || ''],
+      localPreview0: row.ConeImageURL || '',
+      localPreview1: row.HankImageURL || '',
       status: row.Status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
     }));
 
@@ -376,16 +376,15 @@ const demoData = [
   reader.readAsArrayBuffer(file);
 };
 
+const fileInputRef = useRef();
 
- const fileInputRef = useRef();
-
-  const handleFileChange = (e) => {
+const handleFileChange = (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
 
   importFromExcel(file, (importedColors) => {
-    setNewColors(importedColors); // ✅ replaces the new color table
-    setColors([]);                // ✅ optionally clear old colors (if needed)
+    setNewColors(importedColors);
+    setColors([]);
   });
 };
 
