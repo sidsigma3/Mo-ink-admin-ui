@@ -477,7 +477,7 @@ if (totalPages >=1) {
         </div>
 
 
-        <div className='colorlibrary-table-ctn'>
+        <div className='colorlibrary-table-ctn d-none d-md-block'>
           <Table hover>
         <thead>
           <tr>
@@ -711,6 +711,9 @@ if (totalPages >=1) {
 
         </tbody>
       </Table>
+
+
+      
 
           <div className="data-cards">
         {filteredData.map((discount,index) => (

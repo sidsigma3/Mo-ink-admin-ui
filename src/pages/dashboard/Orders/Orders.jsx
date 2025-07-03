@@ -28,6 +28,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchPaginatedOrders } from '../../../services/OrderService';
 import { fetchOrderAnalytics } from '../../../services/OrderService';
+import { FiCalendar } from "react-icons/fi";
+
 
 const Orders = () => {
    
@@ -295,13 +297,20 @@ useEffect(() => {
 
             <div className='btn-ctn'>
             <div className="date-filter position-relative">
-                    <button
-                      className="border rounded bg-white px-3 py-1"
+                     <button
+                      className=" date-btn btn lg-btn fw-medium "
                       onClick={() => setShowPicker(!showPicker)}
                     >
-                      {startDate && endDate
-                        ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                        : "Select Date Range"}
+                      <span className="d-none d-sm-inline">
+                        {startDate && endDate
+                          ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+                          : "Select Date Range"}
+                      </span>
+                       </button>
+
+                        <button className="date-btn btn sm-bttn"
+                        onClick={() => setShowPicker(!showPicker)}>
+                      <FiCalendar className=" " size={20} />
                     </button>
 
                      {startDate && endDate && (
@@ -314,7 +323,14 @@ useEffect(() => {
                         )}
 
                     {showPicker && (
-                      <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute" }}>
+                      <div ref={datePickerRef} style={{
+                          zIndex: 1000,
+                          position: "absolute",
+                          right: 0,
+                          width: "max-content",
+                          maxWidth: "90vw", 
+                          backgroundColor: "white",
+                          boxShadow: "0 4px 16px rgba(0,0,0,0.1)", }}>
                         <DatePicker
                           selected={startDate}
                           onChange={handleDateChange}

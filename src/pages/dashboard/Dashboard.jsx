@@ -12,6 +12,8 @@ import { enIN } from "date-fns/locale";
 import DatePicker from "react-datepicker";
 import { getAllInventory } from "../../services/InventoryService";
 import { getAllProduct } from "../../services/ProductService";
+import { FiCalendar } from "react-icons/fi";
+
 
 const Dashboard = () => {
 
@@ -222,8 +224,8 @@ useEffect(() => {
 
   return (
     <div className="right-content w-100">
-                    <div className="top d-flex justify-content-between w-100 mb-2">
-                        <h3>Dashboard</h3>
+                    <div className="top d-flex align-items-center justify-content-between w-100 mb-2">
+                        <h3 className="mb-0">Dashboard</h3>
 
                         {/* <div className="filter-ctn d-flex">
                         <button>
@@ -235,16 +237,23 @@ useEffect(() => {
                         </div> */}
                         {/* <Filter></Filter> */}
 
-                       <div style={{ position: "relative" }} className="d-flex">
-                        <button
-                          className="border rounded bg-white px-3 py-1"
-                          onClick={() => setShowPicker(!showPicker)}
-                        >
-                          {startDate && endDate
-                            ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                            : "Select Date Range"}
-                        </button>
-
+                        <div className='btn-ctn'>
+                         <div className="date-filter position-relative">
+                              <button
+                              className=" date-btn btn lg-btn fw-medium "
+                              onClick={() => setShowPicker(!showPicker)}
+                            >
+                              <span className="d-none d-sm-inline">
+                                {startDate && endDate
+                                  ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+                                  : "Select Date Range"}
+                              </span>
+                                </button>
+        
+                                <button className="date-btn btn sm-bttn"
+                                onClick={() => setShowPicker(!showPicker)}>
+                              <FiCalendar className=" " size={20} />
+                            </button>
                         {startDate && endDate && (
                           <button
                             className="ms-2 btn btn-sm btn-outline-secondary"
@@ -275,6 +284,7 @@ useEffect(() => {
                             />
                           </div>
                         )}
+                      </div>
                       </div>
 
 

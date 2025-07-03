@@ -1442,30 +1442,28 @@ const handleReject = (variant) => {
                             {/* Table */}
                             <table className="table ">
                             {/* Table Header */}
-                            <thead>
-                                <tr>
-                                    <th className='fw-medium'>Product</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Count</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Color</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Name</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Type</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Weight (Kgs)</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Cost</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Discount</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>Total</th>
-                                    <th style={{ textAlign: 'center', verticalAlign: 'middle'}} className='fw-medium'>CGST</th>
-                                    <th style={{ textAlign: 'end', verticalAlign: 'middle'}} className='fw-medium'>SGST</th>
-                                    {isViewMode && (
-                                    <th  style={{ textAlign: 'center', verticalAlign: 'middle'}}   className='fw-medium'>Status</th>
-                                    )}
-                                     {isViewMode && (
-                                    <th className='fw-medium'></th>
-                                     )} 
-                                    <th></th>
-                                    {/* <th className='fw-medium' style={{textAlign:"center"}}>GST</th> */}
-                                    {/* <th className='fw-medium' style={{textAlign:"end"}}>Total</th> */}
-                                </tr>
-                            </thead>
+                             <thead>
+    <tr>
+      <th className='fw-medium' style={{ minWidth: '80px', width: '8%' }}>Product</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '120px', width: '12%' }} className='fw-medium'>Count</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '100px', width: '10%' }} className='fw-medium'>Color</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '100px', width: '10%' }} className='fw-medium'>Name</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>Type</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '100px', width: '10%' }} className='fw-medium'>Weight (Kgs)</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>Cost</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '90px', width: '9%' }} className='fw-medium'>Discount</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>Total</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>CGST</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>SGST</th>
+      {isViewMode && (
+        <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '120px', width: '12%' }} className='fw-medium'>Status</th>
+      )}
+      {isViewMode && (
+        <th className='fw-medium' style={{ minWidth: '60px', width: '6%' }}></th>
+      )}
+      <th style={{ minWidth: '50px', width: '5%' }}></th>
+    </tr>
+  </thead>
 
                             <tbody>
                               {orderDetails.map((order, index) => {
@@ -1477,19 +1475,24 @@ const handleReject = (variant) => {
                                   return (
                                       <tr key={index}>
                                           {/* Product Name */}
-                                          <td>{order.productName}</td>
+                                          <td className="fw-medium" style={{
+                                                fontSize: '0.8rem',
+                                                textAlign: 'start',
+                                                color: 'black'}}>{order.productName} </td>
 
                                           {/* Size */}
                                           <td style={{ textAlign: 'center'}}>
-                                              <div className="badge fw-normal" style={{
-                                                  width: '70%',
-                                                  fontSize: '1rem',
-                                                  padding: '0.5rem 0.6rem',
-                                                  borderRadius: '1rem',
-                                                  backgroundColor: '#EFEFEF',
-                                                  border: '1px solid #B9C0CD',
-                                                  textAlign: 'center',
-                                                  color: 'black',
+                                              <div className="fw-medium" style={{
+                                                fontSize: '0.8rem',
+                                                textAlign: 'center',
+                                                color: 'black',
+                                                // width: '70%',
+                                                // padding: '0.5rem 0.6rem',
+                                                // borderRadius: '10rem',
+                                                // backgroundColor: '#EFEFEF',
+                                                // border: '1px solid #B9C0CD',
+                                                whiteSpace: 'normal', 
+                                                wordWrap: 'break-word', 
                                               }}>
                                                   {order.size}
                                               </div>
@@ -1497,8 +1500,7 @@ const handleReject = (variant) => {
 
                                          
                                           <td style={{ justifyItems: 'center'}}>
-                                            <div className="d-flex flex-column gap-1">
-                                              <span>{order.color.hex}</span>
+                                            <div className="d-flex align-items-center flex-column gap-1">
                                               <img
                                                 src={`${backendUrl}${order.color.colorImage}`}
                                                 alt={order.color.colorName}
@@ -1506,6 +1508,7 @@ const handleReject = (variant) => {
                                                 height="40"
                                                 style={{ borderRadius: "8px", border: "1px solid #ccc" }}
                                               />
+                                              <span className="text-truncate" style={{ fontSize: '0.8rem' }}>{order.color.hex}</span>
                                               {/* <div
                                                 style={{
                                                   backgroundColor: order.color.hex, 
@@ -1519,14 +1522,22 @@ const handleReject = (variant) => {
                                             </div>
                                           </td>
 
-                                          <td style={{ textAlign: 'center'}}>
+                                          <td  className="fw-medium" style={{
+                                                fontSize: '0.8rem',
+                                                textAlign: 'center',
+                                                justifyItems: 'center',
+                                                color: 'black'}}>
                                             <div className="d-flex flex-column gap-3">
                                           
                                               <div>{order.color.name}</div> 
                                             </div>
                                           </td>
 
-                                          <td style={{ justifyItems: 'center' }}>
+                                          <td  className="fw-medium" style={{
+                                                fontSize: '0.8rem',
+                                                textAlign: 'center',
+                                                justifyItems: 'center',
+                                                color: 'black'}}>
                                             <div className="d-flex flex-column gap-3">
                                               <span className="w-75">
                                                 {order.variantType || 'Cone'} {/* Show type or default to 'Cone' */}
@@ -1556,9 +1567,6 @@ const handleReject = (variant) => {
 
 
                                           {/* Price Calculation */}
-                                          <td style={{ textAlign: 'center' }} colSpan="5">
-                                            <div className="d-flex flex-column" style={{ gap: '0.6rem' }}>
-                                              <div className="d-flex justify-content-between mb-3">
                                                 {(() => {
                                                   const {
                                                     baseTotal,
@@ -1585,18 +1593,18 @@ const handleReject = (variant) => {
 
                                                   return (
                                                     <>
+
                                                       <span> ₹{Math.round(baseTotal)}</span>
                                                       <span> ₹{Math.round(discountAmount)} ({combinedDiscountPercent.toFixed(2)}%)</span>
                                                       <span> ₹{Math.round(finalTotal)}</span>
                                                       <span> {cgst}%</span>
                                                       <span> {sgst}%</span>
+
+                                                    
                                                     </>
                                                   );
                                                 })()}
-                                              </div>
-                                            </div>
-                                          </td>
-
+                                             
 
 
 
@@ -2095,8 +2103,8 @@ const handleReject = (variant) => {
                       <td>
                         <div>
                           <p className=" fw-medium pt-2">Total Discount</p>
-                          <p className="text-black-50  fw-medium my-2 ps-5" >By Payment Type</p>
-                          <p className="text-black-50 fw-medium pb-2 ps-5">By Coupon Code</p>
+                          <p className="text-black-50  fw-medium my-2 ps-5" >Pay Type</p>
+                          <p className="text-black-50 fw-medium pb-2 ps-5">Coupon</p>
                         </div>
                       </td>
 
