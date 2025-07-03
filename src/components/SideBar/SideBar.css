@@ -86,6 +86,83 @@ dl, ol, ul {
 }
 
 
+
+.text-brand {
+  color: #0561FC !important;
+}
+
+
+/* Add these styles */
+.on-mobile {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 10px 0;
+  border-top: 1px solid #b9b9b9;
+  border-radius: 20px;
+  z-index: 1000;
+  margin: 0;
+ }
+
+.more-menu-dropdown {
+  width: 100%;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.more-menu{
+  z-index: 9999 !important;
+
+}
+
+.more-menu-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.more-menu-dropdown li {
+  padding: 12px 16px;
+}
+
+.more-menu-dropdown li button {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+}
+
+.more-menu-dropdown li button:hover {
+  background-color: #f5f5f5;
+}
+
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+
 @media (max-width: 1024px) {
 
     .sideBar{

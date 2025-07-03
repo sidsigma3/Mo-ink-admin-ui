@@ -199,7 +199,7 @@ for (let i = 1; i <= totalPages; i++) {
           <th style={{ textAlign: 'start', verticalAlign: 'middle' }}>Product Name</th>
           <th>Counter</th>
           <th>Color Variant</th>
-          <th>Color</th>
+          {/* <th>Color</th> */}
           <th>Available</th>
           <th>GST</th>
           <th>Status</th>
@@ -235,7 +235,7 @@ for (let i = 1; i <= totalPages; i++) {
               {item.variants.length}
             </td>
 
-            <td style={{ verticalAlign: 'middle' }}>
+            {/* <td style={{ verticalAlign: 'middle' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', marginLeft: '10px', position: 'relative' }}>
                     {item.variants.slice(0, 3).map((color, colorIndex) => (
@@ -267,7 +267,7 @@ for (let i = 1; i <= totalPages; i++) {
                   )}
                 </div>
               </div>
-            </td>
+            </td> */}
 
             <td style={{ verticalAlign: 'middle' }}>{item.totalWeight}Kgs</td>
             <td style={{ verticalAlign: 'middle' }}>{item.gstOnProduct}%</td>
@@ -312,13 +312,13 @@ for (let i = 1; i <= totalPages; i++) {
                  </div>
             </div>
 
-            <div className='d-flex mt-3'>
+            <div className='d-flex justify-content-between mt-3'>
             
             <p><strong></strong> {item.variants.length} Variants</p>
 
             <span><LuDot  size={25}/></span>
 
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            {/* <div style={{ display: 'flex', alignItems: 'center' }}>
            
             <div style={{ display: 'flex' }}>
                 {item.variants.map((color, index) => (
@@ -336,16 +336,16 @@ for (let i = 1; i <= totalPages; i++) {
                 ></div>
                 ))}
             </div>
-            </div>
-            </div>
+            </div> */}
 
-            <div className='d-flex justify-content-between mt-2 pe-4'>
+            {/* <div className='d-flex justify-content-between mt-2 pe-4'> */}
+                <p>{item.totalWeight} Kgs</p>
+                <span><LuDot  size={25}/></span>
                  <p> 
                    <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.availableStatus === 'ACTIVE'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.availableStatus==='ACTIVE' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
                     {product.availableStatus}
                     </div>
                 </p>
-                 <p>{item.totalWeight} Kgs</p>
             </div>
           </div>
         ))))}
