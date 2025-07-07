@@ -19,6 +19,7 @@ import Toast from '../../../components/Toast/Toast'
 import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
 import { IoArrowBackOutline } from 'react-icons/io5'
 import { getColorsByProductId , updateColorsByProductId , uploadColorLibraryImage} from '../../../services/ColorService'
+import Form from 'react-bootstrap/Form';
 
 const backendUrl = process.env.REACT_APP_IMAGE_URL
 
@@ -153,6 +154,13 @@ const handleSaveColors = async () => {
     ]);
   }
 };
+
+const handleColorChange = (index, field, value) => {
+  const updatedColors = [...colors];
+  updatedColors[index][field] = value;
+  setColors(updatedColors);
+};
+
 
 
 const handleNewColorChange = (index, field, value) => {
@@ -500,10 +508,20 @@ if (totalPages >=1) {
         <tbody>
           {colors.map((item, index) => (
             <tr key={item.id}>
-              <td style={{ verticalAlign: "middle" }}>{item.colorName}</td>
-              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-                {item.colorCode}
-              </td>
+               <td style={{ verticalAlign: "middle" }}>
+                  <Form.Control
+                    type="text"
+                    value={item.colorName}
+                    onChange={(e) => handleColorChange(index, "colorName", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                  <Form.Control
+                    type="text"
+                    value={item.colorCode}
+                    onChange={(e) => handleColorChange(index, "colorCode", e.target.value)}
+                  />
+                </td>
           {/* Cone Image TD */}
                 <td style={{ textAlign: "center", verticalAlign: "middle" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
