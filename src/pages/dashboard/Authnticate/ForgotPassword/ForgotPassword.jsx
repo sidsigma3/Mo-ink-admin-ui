@@ -44,7 +44,7 @@ const ForgotPassword = () => {
     </div>
 
     {/* Auth Box */}
-    <div className="forgot-card bg-opacity-40 border border-3 border-white p-4 p-sm-4 rounded-5 text-white position-relative z-2">
+    <div className="forgot-card bg-opacity-40 border border-3 border-white p-4 p-sm-4 rounded-4 text-white position-relative z-2">
     <button
         className="btn btn-link text-white fw-normal text-decoration-none p-0 mb-3"
         onClick={() => navigate("/")}
@@ -61,11 +61,11 @@ const ForgotPassword = () => {
       </p>
 
       <form onSubmit={handleSubmit}>
-        <label className="fs-6 fw-normal text-white form-label">Email Address</label>
+        {/* <label className="fs-6 fw-normal text-white form-label">Email Address</label> */}
         <input
           type="text"
           placeholder="Enter your email address"
-          className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
+          className="fs-6 fw-light form-control mb-4 rounded-pill px-4 py-1"
           value={email}
           onChange={(e) => setEmail(e.target.value)}    
           required  

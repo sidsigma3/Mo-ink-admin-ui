@@ -40,7 +40,7 @@
 }
 
 .add-product .desc-input-ctn .quill{
-    height: 8rem;
+    /* height: 8rem; */
     border-radius: 0.5rem;
 }
 
@@ -146,6 +146,58 @@
 
 }
 
+
+
+
+
+
+.media-upload-card {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.media-upload-card:hover {
+  border-color: #ced4da;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.upload-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+}
+
+.upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+  border-color: #adb5bd;
+  background-color: #f8f9fa;
+}
+
+.upload-button {
+  transition: all 0.2s ease;
+}
+
+.upload-button:hover {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.upload-hint {
+  font-size: 0.875rem;
+}
+
+.preview-container {
+  border-top: 1px solid #e9ecef;
+  padding-top: 1rem;
+}
 
 .variant-table-ctn{
     border: 1px solid #ddd;
@@ -257,4 +309,6 @@ font-weight: 500;
     .variant-add .size-sec input{
         width: 3rem;
     }
+
+    
 }

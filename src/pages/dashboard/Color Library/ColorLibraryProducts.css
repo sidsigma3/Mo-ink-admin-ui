@@ -15,6 +15,9 @@
   transform: scale(1.03);
 }
 
+.card{
+  z-index: 1050;
+}
 
   
   .colorlibrary-table-ctn table {

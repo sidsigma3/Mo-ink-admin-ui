@@ -303,16 +303,16 @@ for (let i = 1; i <= totalPages; i++) {
       {finalData.map((product, index) => (
           product.groupedVariants.map((item, ix) => (
 
-          <div className="product-card shadow-sm" key={ix} onClick={() => handleRowClick(index,ix)}>
+          <div className="product-card " key={ix} onClick={() => handleRowClick(index,ix)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3>{product.productName}</h3>
+                 <h3 className='fs-6 fw-medium	'>{product.productName}</h3>
                  <div style={{ justifyItems: 'center', alignContent:'center'}} >
-                 <p><strong></strong> {item.size}</p>
+                 <h3 className='fs-6 fw-medium	'> {item.size}</h3>
                  </div>
             </div>
 
-            <div className='d-flex justify-content-between mt-3'>
+            <div className='d-flex justify-content-between align-items-center mt-3'>
             
             <p><strong></strong> {item.variants.length} Variants</p>
 
@@ -342,9 +342,30 @@ for (let i = 1; i <= totalPages; i++) {
                 <p>{item.totalWeight} Kgs</p>
                 <span><LuDot  size={25}/></span>
                  <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.availableStatus === 'ACTIVE'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.availableStatus==='ACTIVE' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
+                   <div
+                    style={{
+                      padding: '0.2rem 0.2rem',
+                      fontSize: '0.8rem',
+                      width: '7rem',
+                      height: '2rem',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: '0',
+                      backgroundColor:
+                        product.availableStatus === 'ACTIVE' ? '#d1fae5' : '#F3F4F6',
+                      border: '1px solid',
+                      borderColor:
+                        product.availableStatus === 'ACTIVE' ? '#6ee7b7' : '#D1D5DB',
+                      borderRadius: '0.2rem',
+                      textAlign: 'center',
+                      color: product.availableStatus === 'ACTIVE' ? '#065f46' : '#DC2626',
+                      fontWeight: '500',
+                    }}
+                  >
                     {product.availableStatus}
-                    </div>
+                  </div>
+
                 </p>
             </div>
           </div>

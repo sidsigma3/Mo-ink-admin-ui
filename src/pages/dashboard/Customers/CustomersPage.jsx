@@ -16,6 +16,7 @@ import { Dropdown } from 'react-bootstrap'
 import { getAllCustomer , getWalletTransactions} from '../../../services/CustomerService'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { LuDot } from "react-icons/lu";
 import { getAllOrders } from '../../../services/OrderService'
 import Toast from '../../../components/Toast/Toast'
 
@@ -331,24 +332,38 @@ if (totalPages >= 1) {
           return(
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
-            <div className='d-flex justify-content-between'>
-                 <h3>{customer.customerName}</h3>
+            <div className='d-flex justify-content-between align-items-center'>
+                 <h3 className='fs-6 fw-medium	'>{customer.customerName}</h3>
                  <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:'#D1FAE5',border:'1px solid' ,borderColor:'#6EE7B7',borderRadius:'0.2rem',textAlign:'center',width:'4rem' ,color:'#00A65E'}}>
+                   <div style={{  padding: '0.2rem 0.2rem',
+                    fontSize: '0.8rem',
+                    width: '7rem',
+                    height: '2rem',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: '0', backgroundColor: '#d1fae5',
+                    border: '1px solid',
+                    borderColor: '#6ee7b7',
+                    borderRadius: '0.2rem',
+                    textAlign: 'center',
+                    color: '#065f46',
+                    fontWeight: '500'
+                    }}>
                       ₹ {walletBalances[customer.customerId] !== undefined ? walletBalances[customer.customerId] : "Loading..."} 
                     </div>
                 </p>
             </div>
 
-          
+          <div className="d-flex ">
+             <p className='fw-normal	'> {customer.phoneNumber}</p>
+             <span><LuDot size={25} /></span>
+             <p className="fw-normal"> {customer.addresses[0]?.city || "N/A"}</p>
             
-            <p><strong></strong> {customer.phoneNumber}</p>
-    
-         
+          </div>
 
-            <p className='fw-medium'><strong></strong> {customer.addresses[0]?.city || "N/A"}</p>
 
-            <p className='text-body-tertiary'>Last Order on {lastOrderDate}</p>
+            <p style={{ fontSize: '0.8rem', color: '#93A3AB', fontWeight: 500 }}>Last Order on {lastOrderDate}</p>
 
            
           </div>

@@ -106,7 +106,7 @@ dl, ol, ul {
   padding: 10px 0;
   border-top: 1px solid #b9b9b9;
   border-radius: 20px;
-  z-index: 1000;
+  z-index: 2147483647;
   margin: 0;
  }
 
@@ -114,6 +114,8 @@ dl, ol, ul {
   width: 100%;
   max-height: 70vh;
   overflow-y: auto;
+  z-index: 9999 !important;
+
 }
 
 .more-menu{

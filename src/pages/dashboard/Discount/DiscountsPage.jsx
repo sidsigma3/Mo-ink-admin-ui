@@ -301,14 +301,36 @@ if (totalPages >=1) {
 
           <div className="data-cards">
         {filteredData.map((discount,index) => (
-          <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
+          <div className="data-card " key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3>{discount.discountCode}</h3>
+                 <h3 className='fs-6 fw-medium	'>{discount.discountCode}</h3>
                  <p> 
-                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
-                  {discount.discountStatus}
+                 <div
+                  style={{
+                    padding: '0.2rem 0.2rem',
+                    fontSize: '0.8rem',
+                    width: '7rem',
+                    height: '2rem',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: '0',
+                    backgroundColor:
+                      discount.discountStatus.toLowerCase() === 'active' ? '#d1fae5' : '#F3F4F6',
+                    border: '1px solid',
+                    borderColor:
+                      discount.discountStatus.toLowerCase() === 'active' ? '#6ee7b7' : '#D1D5DB',
+                    borderRadius: '0.2rem',
+                    textAlign: 'center',
+                    color:
+                      discount.discountStatus.toLowerCase() === 'active' ? '#065f46' : '#DC2626',
+                    fontWeight: '500',
+                  }}
+                >
+                  {discount.discountStatus.toUpperCase()}
                 </div>
+
                 </p>
             </div>
 
@@ -322,7 +344,7 @@ if (totalPages >=1) {
 
             <span><LuDot  size={25}/></span>
 
-            <p><strong></strong> {discount.minPurchaseRequirement}</p>
+            <p className="text-muted"> {discount.minPurchaseRequirement}</p>
 
             {/* <div style={{ display: 'flex', alignItems: 'center' }}>
            

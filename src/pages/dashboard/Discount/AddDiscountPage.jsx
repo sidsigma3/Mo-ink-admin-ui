@@ -564,10 +564,10 @@ const handleMaxUsageChange = (field1,field2) => {
 
 
             <div className="d-flex flex-column">
-              <h5>Discount code</h5>
+              <h5 style={{fontSize:'1rem'}}>Discount code</h5>
 
               {isViewMode === true ? (
-                  <h4 style={{fontSize:'1.1rem'}}>{formData.discountCode}</h4>
+                  <h4 style={{fontSize:'1rem', color: '#0D6EFD'}}>{formData.discountCode}</h4>
               ):(
                 <input 
                 type="text"   
@@ -582,7 +582,7 @@ const handleMaxUsageChange = (field1,field2) => {
           </div>
 
           <div className="discount-value mt-2 p-3 bg-white rounded">
-            <h5>Discount Value</h5>
+            <h5 style={{fontSize:'1rem'}}>Discount Value</h5>
             <div className="d-flex gap-2">
               <Dropdown onSelect={handleDiscountTypeChange} size="sm" className="w-50 ">
                 <Dropdown.Toggle
@@ -590,6 +590,7 @@ const handleMaxUsageChange = (field1,field2) => {
                   variant="light"
                   id="dropdown-basic"
                   className="d-flex border border-secondary-subtle align-items-center justify-content-between gap-2 w-100 mt-1"
+                  style={{fontSize:'1rem',}}
                 >
                     {formData.discountType}
                 </Dropdown.Toggle>
@@ -625,7 +626,7 @@ const handleMaxUsageChange = (field1,field2) => {
             ></ModalProdcutSelect>
 
             <div className="mt-2">
-              <label>Applies to</label>
+              <label style={{fontSize:'1rem'}}>Applies to</label>
               <div className="d-flex gap-2 mb-3 mt-3 align-items-center">
                 <SearchBox></SearchBox>
                 <div>
@@ -639,21 +640,39 @@ const handleMaxUsageChange = (field1,field2) => {
               </div>
             </div>
 
-            <div className="product-select">
-            {productSelect.map((product,ix) => (
-                <ul> 
-                  <li key={ix}>
-                      {product.productName}
-                  </li>
-
-                </ul>
-            ))}
-            {errors.products && <p className="text-danger">{errors.products}</p>}
+          <div className="product-select mb-3">
+            <div className="d-flex flex-wrap gap-2">
+              {productSelect.map((product, ix) => (
+                <div
+                  key={ix}
+                  className="d-inline-flex align-items-center"
+                  style={{
+                    backgroundColor: '#f0f8ff',
+                    borderRadius: '16px',
+                    padding: '6px 14px',
+                    fontSize: '0.8rem',
+                    fontWeight: '500',
+                    color: '#0D6EFD',
+                    border: '1px solid #bfdbfe',
+                    lineHeight: '1.25',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                >
+                  {product.productName}
+                </div>
+              ))}
             </div>
+            {errors.products && (
+              <p className="text-danger mt-2 mb-0" style={{ fontSize: '0.8125rem' }}>
+                {errors.products}
+              </p>
+            )}
+          </div>
           </div>
 
           <div className="min-purchase mt-2">
-            <h5>Minimum purchase requirements</h5>
+            <h5 style={{fontSize:'1rem'}}>Minimum purchase requirements</h5>
             <ul>
               <li>
                 <input
@@ -661,7 +680,7 @@ const handleMaxUsageChange = (field1,field2) => {
                   checked={selectedOption === "No"}
                   onChange={() => handleSelection("No")}
                 />
-                <label>No minimum requirement</label>
+                <label style={{fontSize:'1rem'}}>No minimum requirement</label>
               </li>
               <li className="d-flex flex-column align-items-start">
                 <div className="d-flex align-items-center gap-2">
@@ -670,7 +689,7 @@ const handleMaxUsageChange = (field1,field2) => {
                     checked={selectedOption === "minPurchase"}
                     onChange={() => handleSelection("minPurchase")}
                   />
-                  <label>Minimum purchase amount (₹)</label>
+                  <label style={{fontSize:'1rem'}}>Minimum purchase amount (₹)</label>
                 </div>
                 {/* Render input field if 'min-purchase' is selected */}
                 {selectedOption === "minPurchase" && (
@@ -686,7 +705,7 @@ const handleMaxUsageChange = (field1,field2) => {
                     checked={selectedOption === "minQuantity"}
                     onChange={() => handleSelection("minQuantity")}
                   />
-                  <label>Minimum Quantity of items (kg)</label>
+                  <label style={{fontSize:'1rem'}}>Minimum Quantity of items (kg)</label>
                 </div>
                 {/* Render input field if 'min-quantity' is selected */}
                 {selectedOption === "minQuantity" && (
@@ -699,7 +718,7 @@ const handleMaxUsageChange = (field1,field2) => {
           </div>
 
           <div className="min-purchase mt-2">
-            <h5>Customer eleigibility</h5>
+            <h5 style={{fontSize:'1rem'}}>Customer eleigibility</h5>
 
             <ul>
               <li>
@@ -708,7 +727,7 @@ const handleMaxUsageChange = (field1,field2) => {
                  checked={selectedOptionCustomer === "All"}
                  onChange={() => handleSelectionCustomer("All")}
                 ></input>
-                <label>All customers</label>
+                <label style={{fontSize:'1rem'}}>All customers</label>
               </li>
               <li className="d-flex flex-column align-items-start">
                 <div className="d-flex align-items-center gap-2">
@@ -716,7 +735,7 @@ const handleMaxUsageChange = (field1,field2) => {
                  checked={selectedOptionCustomer === "specific-segment"}
                  onChange={() => handleSelectionCustomer("specific-segment")}
                 ></input>
-                <label>Specific customer sagements</label>
+                <label style={{fontSize:'1rem'}}>Specific customer sagements</label>
                 </div>
 
                 <ModalCustomerList
@@ -776,7 +795,7 @@ const handleMaxUsageChange = (field1,field2) => {
                  checked={selectedOptionCustomer === "specific-customer"}
                  onChange={() => handleSelectionCustomer("specific-customer")}
                 ></input>
-                <label>Specific customers</label>
+                <label style={{fontSize:'1rem'}}>Specific customers</label>
                 </div>
                 {selectedOptionCustomer === "specific-customer" && (
                     <div className="w-100 pe-3">
@@ -821,16 +840,16 @@ const handleMaxUsageChange = (field1,field2) => {
           </div>
 
           <div className="min-purchase mt-2">
-            <h5>Maximum discount usage</h5>
+            <h5 style={{fontSize:'1rem'}}>Maximum discount usage</h5>
             <ul>
               <li className="d-flex flex-column align-items-start">
-                <div className="d-flex align-items-center gap-2">
+                <div className="d-flex align-items-start gap-2">
                   <input
                     type="checkbox"
                     checked={formData.maxUsage.limitTotal === true}
                     onChange={() => handleMaxUsageChange("limitTotal", "limitPerCustomer")}
                   />
-                  <label>Limit number of times this discount can be used in total</label>
+                  <label style={{fontSize:'1rem'}}>Limit number of times this discount can be used in total</label>
                 </div>
 
                 {/* Show input only when limitTotal is selected */}
@@ -855,22 +874,22 @@ const handleMaxUsageChange = (field1,field2) => {
                   checked={formData.maxUsage.limitPerCustomer === true}
                   onChange={() => handleMaxUsageChange("limitPerCustomer", "limitTotal")}
                 />
-                <label>Limit to one use per customer</label>
+                <label style={{fontSize:'1rem'}}>Limit to one use per customer</label>
               </li>
             </ul>
           </div>
 
           <div className="bg-white rounded p-3 mt-2">
-            <h5>Active dates</h5>
+            <h5 style={{fontSize:'1rem'}}>Active dates</h5>
 
             <div className="d-flex gap-2">
               <div className="d-flex gap-2 flex-column flex-grow-1">
-                <label>Start date</label>
+                <label style={{fontSize:'1rem'}}>Start date</label>
                 <input type="date" value={formData.activeDates.startDate} onChange={(e)=>handleActiveDatesChange('startDate',e)}></input>
                 {errors.startDate && <p className="text-danger">{errors.startDate}</p>}
               </div>
               <div className="d-flex gap-2 flex-column flex-grow-1">
-                <label>Start time (IST)</label>
+                <label style={{fontSize:'1rem'}}>Start time (IST)</label>
                 <input type="time" value={formData.activeDates.startTime}  onChange={(e)=>handleActiveDatesChange('startTime',e)}></input>
                 {errors.startTime && <p className="text-danger">{errors.startTime}</p>}
               </div>
@@ -878,7 +897,7 @@ const handleMaxUsageChange = (field1,field2) => {
 
             <div className="d-flex align-items-center gap-2 mt-2">
               <input type="checkbox" checked={formData.activeDates.hasEndDate===true} onChange={(e)=>handleActiveDatesChange('hasEndDate',e)}></input>
-              <label>Set end date</label>
+              <label style={{fontSize:'1rem'}}>Set end date</label>
             </div>
 
             {formData.activeDates.hasEndDate===true && (
