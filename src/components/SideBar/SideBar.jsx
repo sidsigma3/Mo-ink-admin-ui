@@ -185,7 +185,7 @@ const SideBar = () => {
               style={{
                 bottom: '70px',       
                 right: '16px',       
-                zIndex: 9999,
+                zIndex: 2147483647 ,
                 width: '220px',
                 animation: 'slideUp 0.3s ease-out'
               }}

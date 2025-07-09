@@ -611,7 +611,7 @@ useEffect(() => {
       
     };
 
-  const calculateGrandTotals = (
+   const calculateGrandTotals = (
   orderDetails = [],
   paymentDiscount = 0,
   couponDiscount = 0,
@@ -626,7 +626,7 @@ useEffect(() => {
   let totalWeight = 0;
   let totalBaseTotal = 0;
 
-  // First pass: calculate total weight & total base total
+
   for (const order of orderDetails) {
     if (!order || order.status === 'CANCELLED') continue;
     const weight = parseFloat(order.color.weight) || 0;
@@ -635,19 +635,19 @@ useEffect(() => {
     totalWeight += weight;
   }
 
-  // Determine if coupon should be applied based on global min requirement
   const minReq = selectedDiscountData?.minPurchaseRequirement || "";
   let globalDiscountAllowed = true;
 
   if (minReq.includes("Minimum purchase amount")) {
-    const amountMatch = minReq.match(/(\d+)/); // ← captures 4321 from "Minimum purchase amount (₹) : 4321"
-    const minAmount = amountMatch ? Number(amountMatch[0]) : 0;
+    const amountMatch = minReq.match(/\₹\s?(\d+)/);
+    const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
     globalDiscountAllowed = totalBaseTotal >= minAmount;
   } else if (minReq.includes("Minimum quantity required")) {
     const qtyMatch = minReq.match(/(\d+)/);
-    const minQty = qtyMatch ? Number(qtyMatch[0]) : 0;
+    const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
     globalDiscountAllowed = totalWeight >= minQty;
   }
+
 
   for (const order of orderDetails) {
     if (!order || order.status === 'CANCELLED') continue;
@@ -661,12 +661,28 @@ useEffect(() => {
       (product) => product.id === order.productId
     );
 
-    // ✅ Apply coupon only if allowed and applicable
-    const couponDiscountAmount = isCouponApplicable && globalDiscountAllowed
+    // 🔥 Apply coupon discount based on type
+   // Parse and check min purchase requirement
+      const minReq = selectedDiscountData.minPurchaseRequirement || "";
+      let discountAllowed = true;
+
+      if (minReq.includes("Minimum purchase amount")) {
+        const amountMatch = minReq.match(/\₹\s?(\d+)/);
+        const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
+        discountAllowed = totalBaseTotal >= minAmount;
+      } else if (minReq.includes("Minimum quantity required")) {
+        const qtyMatch = minReq.match(/(\d+)/);
+        const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
+        discountAllowed = totalWeight >= minQty;
+      }
+
+// Then apply discount only if applicable and allowed
+    const couponDiscountAmount = isCouponApplicable && discountAllowed
       ? selectedDiscountData.discountType === "FixedAmount"
         ? Number(selectedDiscountData.discountValue)
         : (rawTotal * couponDiscount) / 100
       : 0;
+
 
     const subtotalAfterCoupon = rawTotal - couponDiscountAmount;
 
@@ -675,10 +691,11 @@ useEffect(() => {
 
     const discountedTotal = subtotalAfterCoupon - paymentDiscountAmount;
     const gstAmount = (discountedTotal * gstRate) / 100;
+
     const finalTotal = discountedTotal + gstAmount;
     const totalItemDiscount = couponDiscountAmount + paymentDiscountAmount;
 
-    // Accumulate all
+    // Accumulate totals
     baseTotal += rawTotal;
     totalCouponTypeDiscount += couponDiscountAmount;
     totalPaymentTypeDiscount += paymentDiscountAmount;
@@ -828,8 +845,7 @@ useEffect(() => {
             { ...order.color,gstOnProduct:order.gstOnProduct,price:order.price, },
             selectedDiscountValue,
             discountPercentage,
-            selectedDiscountData,
-            globalDiscountAllowed,
+            selectedDiscountData
           );
 
           console.log(breakdown)
@@ -964,8 +980,7 @@ useEffect(() => {
   variant,
   selectedDiscount = 0,
   paymentDiscount = 0,
-  selectedDiscountData = null,
-  globalDiscountAllowed = true // ✅ New param
+  selectedDiscountData = null
 ) => {
   if (!variant) {
     return {
@@ -986,6 +1001,7 @@ useEffect(() => {
 
   let productDiscountAmount = 0;
   let productDiscountPercent = 0;
+  let discountAllowed = true;
 
   if (
     selectedDiscountData &&
@@ -995,7 +1011,19 @@ useEffect(() => {
       (p) => p.id === variant.productId
     );
 
-    if (isApplicable && globalDiscountAllowed) {
+    // ✅ Check minimum requirement
+    const minReq = selectedDiscountData.minPurchaseRequirement || "";
+    if (minReq.includes("Minimum purchase amount")) {
+      const amountMatch = minReq.match(/\₹\s?(\d+)/);
+      const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
+      discountAllowed = baseTotal >= minAmount;
+    } else if (minReq.includes("Minimum quantity required")) {
+      const qtyMatch = minReq.match(/(\d+)/);
+      const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
+      discountAllowed = weight >= minQty;
+    }
+
+    if (isApplicable && discountAllowed) {
       if (selectedDiscountData.discountType === "Percentage") {
         productDiscountPercent = Number(selectedDiscount);
         productDiscountAmount = baseTotal * (productDiscountPercent / 100);
@@ -1005,7 +1033,8 @@ useEffect(() => {
       }
     }
   }
-
+  
+  // Payment discount
   const paymentDiscountValue = Number(paymentDiscount);
   let paymentDiscountAmount = 0;
   if (paymentDiscountValue > 0) {
@@ -1349,26 +1378,6 @@ const handleReject = (variant) => {
   closeReturnModal();
 };
 
-let totalBaseTotal = orderDetails.reduce((sum, order) => {
-  return sum + (parseFloat(order.color.weight || 0) * (order.price || 0));
-}, 0);
-
-let totalWeightTotal = orderDetails.reduce((sum, order) => {
-  return sum + (parseFloat(order.color.weight) || 0);
-}, 0);
-
-const minReq = selectedDiscountData?.minPurchaseRequirement || "";
-let globalDiscountAllowed = true;
-
-if (minReq.includes("Minimum purchase amount")) {
-  const amountMatch = minReq.match(/(\d+)/);
-  const minAmount = amountMatch ? Number(amountMatch[0]) : 0;
-  globalDiscountAllowed = totalBaseTotal >= minAmount;
-} else if (minReq.includes("Minimum quantity required")) {
-  const qtyMatch = minReq.match(/(\d+)/);
-  const minQty = qtyMatch ? Number(qtyMatch[0]) : 0;
-  globalDiscountAllowed = totalWeightTotal >= minQty;
-}
 
 
   return (
@@ -1558,9 +1567,6 @@ if (minReq.includes("Minimum purchase amount")) {
 
 
                                           {/* Price Calculation */}
-                                           <td style={{ textAlign: 'center' }} colSpan="5">
-                                            <div className="d-flex flex-column" style={{ gap: '0.6rem' }}>
-                                              <div className="d-flex justify-content-between mb-3">
                                                 {(() => {
                                                   const {
                                                     baseTotal,
@@ -1579,8 +1585,7 @@ if (minReq.includes("Minimum purchase amount")) {
                                                     },
                                                     selectedDiscountValue,
                                                     discountPercentage,
-                                                    selectedDiscountData,
-                                                    globalDiscountAllowed,
+                                                    selectedDiscountData
                                                   );
 
                                                   const cgst = gstRate > 0 ? (gstRate / 2).toFixed(2) : "0.00";
@@ -1589,19 +1594,36 @@ if (minReq.includes("Minimum purchase amount")) {
                                                   return (
                                                     <>
 
-                                                      <span> ₹{Math.round(baseTotal)}</span>
-                                                      <span> ₹{Math.round(discountAmount)} ({combinedDiscountPercent.toFixed(2)}%)</span>
-                                                      <span> ₹{Math.round(finalTotal)}</span>
-                                                      <span> {cgst}%</span>
-                                                      <span> {sgst}%</span>
-
-                                                    
+                                                       <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
+                                                          ₹{Math.round(baseTotal)}
+                                                        </span>
+                                                      </td>
+                                                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
+                                                          {discountPercent.toFixed(2)}%
+                                                        </span>
+                                                      </td>
+                                                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
+                                                          ₹{Math.round(finalTotal)}
+                                                        </span>
+                                                      </td>
+                                                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
+                                                          {(gstRate / 2).toFixed(2)}%
+                                                        </span>
+                                                      </td>
+                                                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
+                                                          {(gstRate / 2).toFixed(2)}%
+                                                        </span>
+                                                      </td>
+                                                  
                                                     </>
                                                   );
                                                 })()}
-                                             </div>
-                                             </div>
-                                             </td>
+                                             
 
 
 
@@ -1936,74 +1958,56 @@ if (minReq.includes("Minimum purchase amount")) {
         <div className="row mb-3 g-3">
           <div className="col-12 col-md-6">
             <div className="ctn bg-white rounded p-3">
-  <h5 style={{ fontSize: '1rem' }}>Discounts</h5>
+              <h5 style={{fontSize:'1rem'}}>Discounts</h5>
 
-  {isViewMode === true ? (
-    <div>
-      <p>
-        {selectedDiscount
-          ? selectedDiscountData?.discountType === 'Percentage'
-            ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
-            : `${selectedDiscount} - ₹${selectedDiscountValue} Off`
-          : "Select Discount"}
-      </p>
-      {selectedDiscountData?.minPurchaseRequirement && (
-        <p className="text-muted" style={{ fontSize: '0.85rem' }}>
-          <strong>Note:</strong> {selectedDiscountData.minPurchaseRequirement}
-        </p>
-      )}
-    </div>
-  ) : (
-    <>
-      <Dropdown
-        onSelect={handleSelectDiscount}
-        size="sm"
-        className="status mt-2"
-      >
-        <Dropdown.Toggle
-          variant="light"
-          id="dropdown-basic"
-          className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
-        >
-          <p className="m-0 text-primary">
-            {selectedDiscountData?.discountType === 'Percentage'
-              ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
-              : selectedDiscountData?.discountType === 'FixedAmount'
-              ? `${selectedDiscount} - ₹${selectedDiscountValue}`
-              : "Select Discount"}
-          </p>
-        </Dropdown.Toggle>
+              {isViewMode === true ? (
+                <div>
+                  <p>
+                    {selectedDiscount
+                      ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
+                      : "Select Discount"}
+                  </p>
+                </div>
+              ) : (
+                <Dropdown
+                  onSelect={handleSelectDiscount}
+                  size="sm"
+                  className="status mt-2"
+                >
+                  <Dropdown.Toggle
+                    variant="light"
+                    id="dropdown-basic"
+                    className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
+                  >
+                    <p className="m-0 text-primary">
+                     {selectedDiscountData?.discountType === 'Percentage'
+                      ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
+                      : selectedDiscountData?.discountType === 'FixedAmount'
+                      ? `${selectedDiscount} - ₹${selectedDiscountValue}`
+                      : "Select Discount"}
 
-        <Dropdown.Menu className="w-75">
-          {filteredDiscounts.map((item, index) => (
-            <Dropdown.Item key={index} eventKey={item.discountCode}>
-              <div>
-                <strong>{item.discountCode}</strong>
-                <br />
-                <small>
-                  {item.discountValue}
-                  {item.discountType === "Percentage" && " %"} off on{" "}
-                  {item.applicableProducts[0]?.productName || "this product"}
-                  <br />
-                  <span className="text-muted">
-                    {item.minPurchaseRequirement || "No minimum requirement"}
-                  </span>
-                </small>
-              </div>
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
+                    </p>
+                  </Dropdown.Toggle>
 
-      {selectedDiscountData?.minPurchaseRequirement && (
-        <p className="text-muted mt-2" style={{ fontSize: '0.85rem' }}>
-        {selectedDiscountData.minPurchaseRequirement}
-        </p>
-      )}
-    </>
-  )}
-</div>
-
+                  <Dropdown.Menu className="w-75">
+                    {filteredDiscounts.map((item, index) => (
+                      <Dropdown.Item key={index} eventKey={item.discountCode}>
+                        <div>
+                          <strong>{item.discountCode}</strong>
+                          <br />
+                          <small>
+                            {item.discountValue}
+                             {item.discountType==="Percentage" && (' %')}
+                              {" "}off on{" "}
+                            {item.applicableProducts[0]?.productName || "this product"}
+                          </small>
+                        </div>
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
+            </div>
           </div>
 
               <div className="col-12 col-md-6">
@@ -2114,61 +2118,43 @@ if (minReq.includes("Minimum purchase amount")) {
                     </tr>
 
                    
-                  <tr className='border-bottom'>
-  <td>
-    <div>
-      <p className="fw-medium pt-2">Total Discount</p>
-      <p className="text-black-50 fw-medium my-2 ps-5">Pay Type</p>
-      <p className="text-black-50 fw-medium pb-2 ps-5">Coupon</p>
-    </div>
-  </td>
+                    <tr className='border-bottom'>
+                      <td>
+                        <div>
+                          <p className=" fw-medium pt-2">Total Discount</p>
+                          <p className="text-black-50  fw-medium my-2 ps-5" >Pay Type</p>
+                          <p className="text-black-50 fw-medium pb-2 ps-5">Coupon</p>
+                        </div>
+                      </td>
 
-  <td>
-    <div>
-      <p>
-        {(
-          Number(discountPercentage || 0) +
-          (
-            selectedDiscountData?.discountType === "Percentage"
-              ? Number(selectedDiscountValue || 0)
-              : (
-                  (grandTotals.totalCouponTypeDiscount / grandTotals.baseTotal) * 100 || 0
-                )
-          ) -
-          (
-            (Number(discountPercentage || 0) *
-              (
-                selectedDiscountData?.discountType === "Percentage"
-                  ? Number(selectedDiscountValue || 0)
-                  : ((grandTotals.totalCouponTypeDiscount / grandTotals.baseTotal) * 100 || 0)
-              )) / 100
-          )
-        ).toFixed(2)}%
-      </p>
-      <p>{Number(discountPercentage || 0)}%</p>
-      <p className="text-gray-400">
-        {selectedDiscountData?.discountType === "Percentage"
-          ? `${Number(selectedDiscountValue || 0)}%`
-          : `₹${selectedDiscountData?.discountValue}`}
-      </p>
-    </div>
-  </td>
+                      <td>
+                      <div>
+                      <p>
+                          {(
+                            Number(discountPercentage) +
+                            Number(selectedDiscountValue || 0) -
+                            (Number(discountPercentage) * Number(selectedDiscountValue || 0)) / 100
+                          ).toFixed(2)}%
+                        </p>
+                        <p>{discountPercentage}%</p>
+                        <p className="text-gray-400">{selectedDiscountValue || 0}%</p>
+                      </div>
+                      </td>
 
-  <td>
-    <div>
-      <p className='text-end text-success'>
-        <span className="mr-1 font-semibold">-</span> ₹{grandTotals.totalDiscount.toFixed(0)}
-      </p>
-      <p className="text-gray-400 text-end">
-        ₹{grandTotals.totalPaymentTypeDiscount.toFixed(0)}
-      </p>
-      <p className="text-gray-400 text-end">
-        ₹{grandTotals.totalCouponTypeDiscount.toFixed(0)}
-      </p>
-    </div>
-  </td>
-</tr>
-
+                      <td>
+                        <div>
+                          <p className='text-end text-success'>
+                          <span className="mr-1 font-semibold">-</span> ₹{grandTotals.totalDiscount.toFixed(0)}
+                          </p>
+                          <p className="text-gray-400 text-end">
+                            ₹{(grandTotals.totalPaymentTypeDiscount).toFixed(0)}
+                          </p>
+                          <p className="text-gray-400 text-end">
+                            ₹{grandTotals.totalCouponTypeDiscount.toFixed(0)}
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
 
                     <tr>
                       <td className=" fw-medium pt-4">Final Cost</td>

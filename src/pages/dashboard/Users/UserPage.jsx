@@ -227,27 +227,34 @@ for (let number = 1; number <= totalPages; number++) {
             {filteredData.map((user,index) => (
           <div className="data-card" key={index}>
 
-            <div className='d-flex justify-content-between'   onClick={() => handleRowClick(index)}>
-                 <h3>{user.firstName +" "+user.lastName}</h3>
+            <div className='d-flex justify-content-between align-items-center'   onClick={() => handleRowClick(index)}>
+                 <h3 className='fs-6 fw-medium	'>{user.firstName +" "+user.lastName}</h3>
                  <p> 
                     <div
                       style={{
-                        width: '5rem',
-                        padding: '0.1rem 0.5rem',
-                        border: '1px solid',
-                        borderRadius: '0.2rem',
-                        textAlign: 'center',
+                        padding: '0.2rem 0.2rem',
+                        fontSize: '0.8rem',
+                        width: '7rem',
+                        height: '2rem',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginBottom: '0',
+                        fontWeight: '500',
+
                         backgroundColor:
                            user.role.toLowerCase() === 'owner'
-                            ? '#FEDBDC'
+                            ? '#F3F4F6'
                             :  user.role.toLowerCase() === 'admin'
                             ? '#DBEAFE'
                             :  user.role.toLowerCase() === 'sales'
                             ? '#FFECFA'
                             : '#FFFFFF', // Default background color if none match
+                            border: '1px solid',
+                            borderRadius: '0.2rem',
                         borderColor:
                            user.role.toLowerCase() === 'owner'
-                            ? '#FD9395'
+                            ? '#D1D5DB'
                             :  user.role.toLowerCase() === 'admin'
                             ? '#93C5FD'
                             :  user.role.toLowerCase() === 'sales'
@@ -255,7 +262,7 @@ for (let number = 1; number <= totalPages; number++) {
                             : '#CCCCCC', // Default border color if none match
                         color:
                            user.role.toLowerCase() === 'owner'
-                            ? '#B91C1C' // Red text for Owner
+                            ? '#3f3c3c' // Red text for Owner
                             :  user.role.toLowerCase() === 'admin'
                             ? '#1E40AF' // Blue text for Admin
                             :  user.role.toLowerCase() === 'sales'
@@ -268,12 +275,12 @@ for (let number = 1; number <= totalPages; number++) {
                 </p>
             </div>
 
-            <p><strong></strong> {user.email}</p>
+            <p className='fw-normal '><strong></strong> {user.email}</p>
     
 
-            <p className='fw-medium'><strong></strong></p>
+            <p style={{ fontSize: '0.8rem', color: '#93A3AB', fontWeight: 500 }}> Created on {new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}</p>            
 
-            <p className='text-body-tertiary'>{new Intl.DateTimeFormat('en-GB').format(new Date(user.createdAt))}</p>
+            
 
           </div>
         ))}

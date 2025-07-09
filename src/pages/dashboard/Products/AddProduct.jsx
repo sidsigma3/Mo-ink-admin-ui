@@ -808,8 +808,8 @@ console.log(sizeColorMap)
     <div className="add-product d-flex gap-2">
       <div className="left w-75 flex-grow-1">
         <div className="info-inputs-ctn p-3 rounded">
-          <div className="title-ctn d-flex flex-column p-2">
-            <label>Titile</label>
+          <div className="title-ctn d-flex flex-column mb-3 ">
+            <label style={{fontSize:'1rem'}}>Title</label>
             <input
               className="ps-1"
               name="productName"
@@ -819,13 +819,16 @@ console.log(sizeColorMap)
             {errors.productName && <p className="text-danger">{errors.productName}</p>}
           </div>
 
-          <div className="desc-input-ctn d-flex flex-column p-2">
-            <label>Description</label>
+
+           <div className="mb-3">
+          <div className="desc-input-ctn d-flex flex-column mb-5">
+            <label style={{fontSize:'1rem'}}>Description</label>
             <ReactQuill
               theme="snow"
               value={formData.description}
               // onChange={handleDescriptionChange}
               placeholder="Write your description here..."
+              style={{ height: 'auto' }}
               modules={{
                 toolbar: [
                   [{ header: [1, 2, 3, false] }], 
@@ -841,48 +844,96 @@ console.log(sizeColorMap)
             {errors.description && <p className="text-danger">{errors.description}</p>}
 
           </div>
+          </div>
          
-          <div className="media-input-ctn mt-5 p-2">
-              <label>Hank Image</label>
-              <div className="media-input d-flex flex-column justify-content-center align-items-center py-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleMediaChange(e, 'hank')}
-                />
-                <h6 className="mt-2">Accepts images only</h6>
-              </div>
-              {formData.mediaHank && (
-                <div className="mt-4">
-                  <img src={`${backendUrl}${formData.mediaHank}`} alt="Hank" width="120" />
-                </div>
-              )}
+      <div className="">
+  <div className=" row g-4">
+    {/* Hank Image Upload */}
+    <div className="col-md-6">
+      <div className="media-upload-card p-4 h-100">
+        <label className="upload-label mb-3"  style={{fontSize:'1rem'}}>Hank Image</label>
+        <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+          <input
+            type="file"
+            id="hank-upload"
+            accept="image/*"
+            onChange={(e) => handleMediaChange(e, 'hank')}
+            className="d-none"
+          />
+          <label 
+            htmlFor="hank-upload" 
+            className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+          >
+            <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+          </label>
+          <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+          
+          {formData.mediaHank && (
+            <div className="preview-container mt-4 text-center">
+              <img 
+                src={`${backendUrl}${formData.mediaHank}`} 
+                alt="Hank Preview" 
+                className="img-thumbnail rounded" 
+                style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+              />
+              {/* <button 
+                className="btn btn-sm btn-outline-danger mt-2"
+                onClick={() => handleMediaRemove('hank')}
+              >
+                Remove
+              </button> */}
             </div>
+          )}
+        </div>
+      </div>
+    </div>
 
-            <div className="media-input-ctn mt-4 p-2">
-              <label>Cone Image</label>
-              <div className="media-input d-flex flex-column justify-content-center align-items-center py-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleMediaChange(e, 'cone')}
-                />
-                <h6  className="mt-4">Accepts images only</h6>
-              </div>
-              {formData.mediaCone && (
-                <div className="mt-2">
-                  <img src={`${backendUrl}${formData.mediaCone}`} alt="Cone" width="120" />
-                </div>
-              )}
+    {/* Cone Image Upload */}
+    <div className="col-md-6">
+      <div className="media-upload-card p-4 h-100">
+        <label className="upload-label mb-3"  style={{fontSize:'1rem'}}>Cone Image</label>
+        <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+          <input
+            type="file"
+            id="cone-upload"
+            accept="image/*"
+            onChange={(e) => handleMediaChange(e, 'cone')}
+            className="d-none"
+          />
+          <label 
+            htmlFor="cone-upload" 
+            className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+          >
+            <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+          </label>
+          <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+          
+          {formData.mediaCone && (
+            <div className="preview-container mt-4 text-center">
+              <img 
+                src={`${backendUrl}${formData.mediaCone}`} 
+                alt="Cone Preview" 
+                className="img-thumbnail rounded" 
+                style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+              />
+              {/* <button 
+                className="btn btn-sm btn-outline-danger mt-2"
+                onClick={() => handleMediaRemove('cone')}
+              >
+                Remove
+              </button> */}
             </div>
-
-
-
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
         </div>
 
         <div className="pricing-ctn mt-2 p-3 rounded">
-          <h3 className="mb-3">GST</h3>
+          <h3 className="mb-3"  style={{fontSize:'1rem'}}>GST</h3>
           <div className="row">
             {/* <div className="d-flex flex-column col">
               <label>Price/Kg</label>
@@ -949,7 +1000,7 @@ console.log(sizeColorMap)
         <div className="variant-ctn mt-2 p-3 rounded">
             {errors.variants && <p className="text-danger">{errors.variants}</p>}
             <div className="top d-flex justify-content-between">
-                <h4>Variant</h4>
+                <h4 style={{fontSize:'1rem'}}>Variant</h4>
 
 
            

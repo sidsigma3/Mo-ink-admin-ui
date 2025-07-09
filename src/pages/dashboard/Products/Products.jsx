@@ -66,7 +66,7 @@ const Products = () => {
     <div className='products'>
         <div className='top d-flex justify-content-between'>
             <div>
-                <h4>Products</h4>
+                <h3 className='mb-0 ' style={{fontSize:'1.2rem'}}>Products</h3>
             </div>
 
             <div className='d-flex gap-2'>
