@@ -244,11 +244,11 @@ const AddUser = () => {
     <div className='add-user'>
 
         {state?.index !== undefined ? (
-             <div className='d-flex gap-3 mb-3'> 
+             <div className='d-flex gap-3 align-items-center mb-3'> 
                  <span onClick={() => navigate("/users")}>
                  <IoArrowBackOutline size={25} />
                  </span>
-             <h4 style={{fontSize:'1.2rem'}}>{formData.firstName + " "+formData.lastName}</h4>
+             <h4 className="m-0" style={{fontSize:'1.2rem'}}>{formData.firstName + " "+formData.lastName}</h4>
              <div
                      style={{
                          width: '5rem',
@@ -307,66 +307,94 @@ const AddUser = () => {
 
       <div className='bottom d-flex gap-3'>
         <div className='left'>
-        <div className='customer-overview rounded row bg-white p-3 gy-2'>
-            <div className="col-md-6 d-flex flex-column">
+        <div className='customer-overview rounded row bg-white p-2 gy-2'>
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>First Name <span style={{ color: 'red' }}>*</span> </label>
                 <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
                 {formErrors.firstName && <div className="invalid-feedback d-block">{formErrors.firstName}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>Last Name <span style={{ color: 'red' }}>*</span></label>
                 <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
                 {formErrors.lastName && <div className="invalid-feedback d-block">{formErrors.lastName}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>WhatsApp No. <span style={{ color: 'red' }}>*</span></label>
                 <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} disabled = {isViewMode}/>
                 {formErrors.whatsapp && <div className="invalid-feedback d-block">{formErrors.whatsapp}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>Calling No. <span style={{ color: 'red' }}>*</span></label>
                 <input type="text" name="phone" value={formData.phone} onChange={handleChange} disabled = {isViewMode}/>
                 {formErrors.phone && <div className="invalid-feedback d-block">{formErrors.phone}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>Email <span style={{ color: 'red' }}>*</span></label>
                 <input type="text" name="email" value={formData.email} onChange={handleChange} disabled = {isViewMode}/>
                 {formErrors.email && <div className="invalid-feedback d-block">{formErrors.email}</div>}
             </div>
 
             {!isViewMode &&(
-                 <div className="col-md-6 d-flex flex-column">
+                 <div className="col-6 d-flex gx-4 flex-column">
                  <label>Password <span style={{ color: 'red' }}>*</span></label>
                  <input type="text" name="password" value={formData.password} onChange={handleChange} disabled = {isViewMode}/>
                  {formErrors.password && <div className="invalid-feedback d-block">{formErrors.password}</div>}
              </div>
             )}
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>Company <span style={{ color: 'red' }}>*</span></label>
                 <input type="text" name="company" value={formData.company} onChange={handleChange} />
                 {formErrors.company && <div className="invalid-feedback d-block">{formErrors.company}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
-                <label>Adhaar No. <span style={{ color: 'red' }}>*</span></label>
-                <input
-                className="ps-2"
-                type="text"
-                name="adharNumber"
-                value={formData.adharNumber}
-                placeholder="Add Adhaar No. to authenticate"
-                onChange={handleChange}
-                disabled = {isViewMode}
-                />
-                {formErrors.adharNumber && <div className="invalid-feedback d-block">{formErrors.adharNumber}</div>}
-            </div>
+        <div className="col-12 my-4">
+  <div className="media-upload-card p-4 h-100">
+    <label className="upload-label mb-3" style={{fontSize:'1rem'}}>Aadhaar Card Photo <span style={{color:'red'}}>*</span></label>
+    <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+      <input
+        type="file"
+        id="aadhaar-upload"
+        accept="image/*"
+        onChange={handleChequePhotoChange}
+        className="d-none"
+      />
+      <label 
+        htmlFor="aadhaar-upload" 
+        className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+      >
+        <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+      </label>
+      <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+      
+       {formData.chequePhoto && (
+        <div className="preview-container mt-4 text-center">
+          <img 
+            src={`${backendUrl}${formData.chequePhoto}`} 
+            alt="Cheque Preview" 
+            className="img-thumbnail rounded" 
+            style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+          />
+          {/* <button 
+            className="btn btn-sm btn-outline-danger mt-2"
+            onClick={() => setFormData(prev => ({...prev, aadhaarPhoto: ''}))}
+          >
+            Remove
+          </button> */}
+        </div>
+      )}
+    </div>
+    {formErrors.chequePhoto && (
+      <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
+    )}
+  </div>
+</div>
 
-            <div className="media-input-ctn mt-5 p-2 col-md-12">
+            {/* <div className="media-input-ctn mt-5 p-2 col-md-12">
                 <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
                 <input type="file" accept="image/*"  name="chequePhoto" onChange={handleChequePhotoChange} />
                 <h4>Add photo of a Aadhaar card</h4>
@@ -379,7 +407,7 @@ const AddUser = () => {
                     </div>
                 )}
 
-            </div>
+            </div> */}
 
             <div className="col-md-12 d-flex flex-column">
                 <label>Address</label>
@@ -393,26 +421,26 @@ const AddUser = () => {
                 {formErrors.apartment && <div className="invalid-feedback d-block">{formErrors.apartment}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>Country/Region</label>
                 <input type="text" name="country" value={formData.country} onChange={handleChange} />
                 {formErrors.country && <div className="invalid-feedback d-block">{formErrors.country}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>State</label>
                 {/* <input type="text" name="state" value={formData.state} onChange={handleChange} /> */}
                 <SelectState value={formData.state} onChange={handleChange}></SelectState>
                 {formErrors.state && <div className="invalid-feedback d-block">{formErrors.state}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>City</label>
                 <input type="text" name="city" value={formData.city} onChange={handleChange} />
                 {formErrors.city && <div className="invalid-feedback d-block">{formErrors.city}</div>}
             </div>
 
-            <div className="col-md-6 d-flex flex-column">
+            <div className="col-6 d-flex gx-4 flex-column">
                 <label>PIN code</label>
                 <input type="text" name="pinCode" value={formData.pinCode} onChange={handleChange} />
                 {formErrors.pinCode && <div className="invalid-feedback d-block">{formErrors.pinCode}</div>}

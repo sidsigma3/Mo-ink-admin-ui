@@ -508,12 +508,12 @@ const handleTag = (value) =>{
 
     return (
     <div className='add-spinners'>
-        <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
+        <div className="top d-flex gap-3 align-items-center" style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/spinners-and-dyers")}>
           <IoArrowBackOutline size={25} />
         </span>
         {state?.index !== undefined? (
-          <h5>{customer?.firstName+" "+customer?.lastName}</h5>
+          <h5 className="m-0" >{customer?.firstName+" "+customer?.lastName}</h5>
         ):(
           <h5>New Spinners & Dyers</h5>
         )}
@@ -524,44 +524,44 @@ const handleTag = (value) =>{
 
     <div className='left'>
 
-    <div className='customer-overview row bg-white p-3 gy-2 rounded'>
-    <div className="col-md-6 d-flex flex-column">
+    <div className='customer-overview row bg-white p-2 gy-2 rounded'>
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>First Name</label>
         <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
         {formErrors.firstName && <p className="text-danger">{formErrors.firstName}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>Last Name</label>
         <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
         {formErrors.lastName && <p className="text-danger">{formErrors.lastName}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>Whatsapp No.</label>
         <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
         {formErrors.whatsapp && <p className="text-danger">{formErrors.whatsapp}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>Calling No.</label>
         <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
         {formErrors.phone && <p className="text-danger">{formErrors.phone}</p>}
     </div>
 
-    <div className="col-md-12 d-flex flex-column">
+    <div className="col-md-12 d-flex gx-4 flex-column">
         <label>Email</label>
         <input type="text" name="email" value={formData.email} onChange={handleChange} />
         {formErrors.email  && <p className="text-danger">{formErrors.email }</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>Company</label>
         <input type="text" name="company" value={formData.company} onChange={handleChange} />
         {formErrors.company && <p className="text-danger">{formErrors.company}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>GSTIN No.</label>
         <input
         className="ps-2"
@@ -574,51 +574,80 @@ const handleTag = (value) =>{
          {formErrors.gstin && <p className="text-danger">{formErrors.gstin}</p>}
     </div>
 
-    <div className="media-input-ctn mt-5 p-2 col-md-12">
-        <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-        <input type="file" accept="image/*" name="chequePhoto" onChange={handleChequePhotoChange} />
-        <h4>Add photo of a business PAN</h4>
+ <div className="col-12 my-4">
+  <div className="media-upload-card p-4 h-100">
+    <label className="upload-label mb-3" style={{fontSize:'1rem'}}>Business PAN Photo</label>
+    <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+      <input
+        type="file"
+        id="cheque-upload"
+        accept="image/*"
+        onChange={handleChequePhotoChange}
+        className="d-none"
+      />
+      <label 
+        htmlFor="cheque-upload" 
+        className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+      >
+        <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+      </label>
+      <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+      
+      {formData.chequePhoto && (
+        <div className="preview-container mt-4 text-center">
+          <img 
+            src={`${backendUrl}${formData.chequePhoto}`} 
+            alt="Cheque Preview" 
+            className="img-thumbnail rounded" 
+            style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+          />
+          {/* Uncomment if you want a remove button
+          <button 
+            className="btn btn-sm btn-outline-danger mt-2"
+            onClick={() => setFormData(prev => ({...prev, chequePhoto: ''}))}
+          >
+            Remove
+          </button> */}
         </div>
-        {formErrors.chequePhoto && <p className="text-danger">{formErrors.chequePhoto}</p>}
-
-        {formData.chequePhoto && (
-          <div className="mt-3">
-            <img src={`${backendUrl}${formData.chequePhoto}`} alt="Cheque" width="120" />
-          </div>
-        )}
+      )}
     </div>
+    {formErrors.chequePhoto && (
+      <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
+    )}
+  </div>
+</div>
 
-    <div className="col-md-12 d-flex flex-column">
+    <div className="col-md-12 d-flex gx-4 flex-column">
         <label>Address</label>
         <input type="text" name="address" value={formData.address} onChange={handleChange} />
         {formErrors.address && <p className="text-danger">{formErrors.address}</p>}
     </div>
 
-    <div className="col-md-12 d-flex flex-column">
+    <div className="col-md-12 d-flex gx-4 flex-column">
         <label>Apartment, Suite, etc.</label>
         <input type="text" name="apartment" value={formData.apartment} onChange={handleChange} />
         {formErrors.apartment && <p className="text-danger">{formErrors.apartment}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>Country/Region</label>
         <input type="text" name="country" value={formData.country} onChange={handleChange} />
         {formErrors.country && <p className="text-danger">{formErrors.country}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>State</label>
           <SelectState value={formData.state} onChange={handleChange} />
           {formErrors.state && <p className="text-danger">{formErrors.state}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>City</label>
         <input type="text" name="city" value={formData.city} onChange={handleChange} />
         {formErrors.city && <p className="text-danger">{formErrors.city}</p>}
     </div>
 
-    <div className="col-md-6 d-flex flex-column">
+    <div className="col-6 d-flex gx-4 flex-column">
         <label>PIN code</label>
         <input type="text" name="pinCode" value={formData.pinCode} onChange={handleChange} />
         {formErrors.pinCode && <p className="text-danger">{formErrors.pinCode}</p>}
