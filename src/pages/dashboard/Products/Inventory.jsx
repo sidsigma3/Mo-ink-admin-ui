@@ -5,7 +5,10 @@ import ExportBtn from '../../../components/Buttons/Export/ExportBtn'
 import DashboardBox from "../../../components/DashboardBox/DashboardBox";
 import ProductFilter from '../../../components/Filter/DayFilter/ProductFilter/ProductFilter';
 import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/StatusFilter';
+import { LuDot } from "react-icons/lu";
 import './Inventory.css';
+import { FiShoppingCart } from "react-icons/fi";
+import { LuWeight } from "react-icons/lu";
 import { getAllProduct } from '../../../services/ProductService'
 import {getAllInventory} from '../../../services/InventoryService'
 import * as XLSX from 'xlsx';
@@ -345,30 +348,43 @@ const toggleType = (product, size, type) => {
  
 
   {/* Card View (Visible on smaller screens) */}
-  <div className="card-view">
-    {allInventory.map((item, index) => (
-      <div key={index} className="inventory-card">
-        <h5 className=""style={{ fontSize: '1.2rem', color: 'black', fontWeight: 500 }}>{item.product}</h5>
-        <div className="inventory-card-row">
-          <span className="label">Counter:</span> <span>{item.counter}</span>
-        </div>
-        <div className="inventory-card-row ">
-           <span className="label">Color:</span>
-         <div className="color-dot">{renderColorDot(item.color)}</div>
-         </div>
-        {/* <div className="inventory-card-row">
-          <span className="label">From Vendor:</span> <span>150 Kgs</span>
-        </div> */}
-        <div className="inventory-card-row">
-          <span className="label">Customer Order:</span> <span>{item.customerOrder} Kgs</span>
-        </div>
-        <div className="inventory-card-row">
-          <span className="label">Remaining Weight:</span> <span>{item.remainingWeight} Kgs</span>
-        </div>
+<div className="card-view">
+  {allInventory.map((item, index) => (
+    <div key={index} className="inventory-card">
+      <div className="product-header">  {/* New wrapper div */}
+        <h5 className="product-name">{item.product}</h5>
+        <span className="product-counter">{item.counter}</span>
       </div>
-    ))}
-  </div>
-</div>
+      
+      <div className="d-flex align-items-center justify-content-between gap-2 mb-3">
+      
+        <span className="">{item.type}</span>
+        <span><LuDot size={25} /></span>
+        <span>{item.color.colorName}</span>
+        <span><LuDot size={25} /></span>
+
+         <span className="color-tag" style={{ backgroundColor: item.color.colorCode }}>
+          {item.color.colorCode}
+        </span>
+
+      </div>
+
+      <div className="tag-container">
+        
+        <span className="order-tag">
+          <FiShoppingCart className="order-icon" />
+          <span>Orders: {item.customerOrder} Kgs</span>
+        </span>
+        
+        <span className="weight-tag">
+          <LuWeight className="weight-icon" />
+          <span>In Stock: {item.remainingWeight} Kgs</span>
+        </span>
+      </div>
+          </div>
+        ))}
+      </div>
+    </div>
 
 
       {/* Pagination */}
