@@ -1443,9 +1443,9 @@ if (minReq.includes("Minimum purchase amount")) {
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '100px', width: '10%' }} className='fw-medium'>Weight (Kgs)</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>Cost</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '90px', width: '9%' }} className='fw-medium'>Discount</th>
-      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>Total</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>CGST</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>SGST</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>Total</th>
       {isViewMode && (
         <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '120px', width: '12%' }} className='fw-medium'>Status</th>
       )}
@@ -1591,9 +1591,9 @@ if (minReq.includes("Minimum purchase amount")) {
 
                                                       <span> ₹{Math.round(baseTotal)}</span>
                                                       <span> ₹{Math.round(discountAmount)} ({combinedDiscountPercent.toFixed(2)}%)</span>
-                                                      <span> ₹{Math.round(finalTotal)}</span>
                                                       <span> {cgst}%</span>
                                                       <span> {sgst}%</span>
+                                                      <span> ₹{Math.round(finalTotal)}</span>
 
                                                     
                                                     </>
