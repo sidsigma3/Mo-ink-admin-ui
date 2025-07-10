@@ -8,7 +8,7 @@ import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/Stat
 import { LuDot } from "react-icons/lu";
 import './Inventory.css';
 import { FiShoppingCart } from "react-icons/fi";
-import { LuWeight } from "react-icons/lu";
+import { FaWeightHanging } from "react-icons/fa";
 import { getAllProduct } from '../../../services/ProductService'
 import {getAllInventory} from '../../../services/InventoryService'
 import * as XLSX from 'xlsx';
@@ -377,7 +377,7 @@ const toggleType = (product, size, type) => {
         </span>
         
         <span className="weight-tag">
-          <LuWeight className="weight-icon" />
+          <FaWeightHanging className="weight-icon" />
           <span>In Stock: {item.remainingWeight} Kgs</span>
         </span>
       </div>

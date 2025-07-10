@@ -103,7 +103,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
           {/* <label className="fs-6 fw-normal text-white form-label">Email id or Phone no</label> */}
           <input
             type="text"
-            placeholder="Email id or Phone no w-80%"
+            placeholder="Email id or Phone no."
             className="fs-6 fw-light form-control mb-3 rounded-pill px-4 py-1"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
