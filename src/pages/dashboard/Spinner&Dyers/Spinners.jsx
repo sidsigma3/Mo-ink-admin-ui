@@ -392,30 +392,47 @@ for (let page = 1; page <= totalPages; page++) {
         {filteredData.map((customer,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
-            <div className='d-flex justify-content-between'>
-                 <h3>{customer.firstName} {customer.lastName}</h3>
+            <div className='d-flex justify-content-between align-items-center'>
+                 <h3 className='fs-6 fw-medium	'>{customer.firstName} {customer.lastName}</h3>
                  <p> 
-                    <div
-                     style={{
-                        width:'5rem',
-                        padding:'0.2rem 0.4rem',
-                        border:'1px solid',borderRadius:'0.2rem',textAlign:'center',
-                        backgroundColor:customer.tag === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
-                        borderColor:customer.tag === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
-                        color : customer.tag === 'Spinner' ? '#1E40AF' : '#92400E' ,
-                    }}
-                    >
-                    {customer.vendorType}
-                    </div>
+            <div
+              style={{
+                padding: '0.2rem 0.2rem',
+                fontSize: '0.8rem',
+                width: '7rem',
+                height: '2rem',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: '0',
+                backgroundColor:
+                  customer.vendorType === 'SPINNER' ? '#dbeafe' : '#fef3c7',
+                border: '1px solid',
+                borderColor:
+                  customer.vendorType === 'SPINNER' ? '#93c5fd' : '#fcd34d',
+                borderRadius: '0.2rem',
+                textAlign: 'center',
+                color:
+                  customer.vendorType === 'SPINNER' ? '#1e40af' : '#92400e',
+                fontWeight: '500',
+              }}
+            >
+              {customer.vendorType.toUpperCase()}
+            </div>
+
+
+
                 </p>
             </div>
 
-            <p><strong></strong> {customer.phoneNumber}</p>
-    
+             <div className="d-flex ">
+             <p className='fw-normal	'> {customer.phoneNumber}</p>
+             <span><LuDot size={25} /></span>
+             <p className="fw-normal">{customer.city}</p>
+            
+          </div>
 
-            <p className='fw-medium'><strong></strong> {customer.city}</p>
-
-            <p className='text-body-tertiary'>Last Order on {customer.lastOrder}</p>
+            <p style={{ fontSize: '0.8rem', color: '#93A3AB', fontWeight: 500 }}>Last Order on {customer.lastOrder}</p>
 
           </div>
         ))}

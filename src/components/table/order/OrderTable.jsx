@@ -513,33 +513,43 @@ const handleRowClick = (order) => {
       <div className="order-cards">
         {orders.map((order) => (
           <div
-            className="order-card shadow-sm"
+            className="order-card"
             key={order.orderId}
             onClick={() => handleRowClick(order)}
           >
-            <div className="d-flex justify-content-between">
-            <h4>{new Date(order.createdAt).toLocaleString()}</h4>
-              <div
-                style={{
-                  padding: "0.2rem 0.4rem",
-                  backgroundColor: "#D1FAE5",
-                  border: "1px solid",
-                  borderColor: "#6EE7B7",
-                  borderRadius: "0.3rem",
-                  textAlign: "center",
-                  color: "#00A65E",
-                  display: "flex",
-                  alignItems:"center"
-                }}
-              >
-                <span className="mb-1">
-                  <BiWallet size={18}/>
-                </span>
-                <h3 className="m-0">{order.payment.amount}</h3>
-              </div>
-            </div>
+           <div className="d-flex justify-content-between align-items-center">
+          <div
+            style={{
+            position: "relative",
+            padding: "0.2rem 0.4rem",
+            minWidth: "3rem",        
+            maxWidth: "8rem",        
+            width: "fit-content",    
+            backgroundColor: "#ededed", 
+            borderRadius: "0.4rem",
+            textAlign: "center",
+            color: "#202021", 
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "1rem",
+            whiteSpace: "nowrap",   
+            overflow: "hidden",
+            textOverflow: "ellipsis" 
+        }}
 
-            <h3>#{order.orderId}</h3>
+          >
+            <h3 style={{ margin: 0 }}>#{order.orderId}</h3>
+          </div>
+
+          <h4 style={{ marginBottom: "1rem" }}>
+            {new Date(order.createdAt).toLocaleString()}
+          </h4>
+        </div>
+
+
+
+            
 
             <div className="d-flex justify-content-between">
               <p>
@@ -608,7 +618,7 @@ const handleRowClick = (order) => {
               </div>
 
 
-              <div className="manufacturer">
+              {/* <div className="manufacturer">
                 {order.manufacturer ? (
                   <div className="manufacturer-name rounded-pill px-2">
                     Assigned
@@ -621,7 +631,7 @@ const handleRowClick = (order) => {
                     Not Assigned
                   </div>
                 )}
-              </div>
+              </div> */}
 
             </div>
           </div>

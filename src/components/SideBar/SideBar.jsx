@@ -11,7 +11,7 @@ import { TbRosetteDiscount } from "react-icons/tb";
 import { GoPeople } from "react-icons/go";
 import { LuFactory } from "react-icons/lu";
 import { MdOutlineDiscount } from "react-icons/md";
-import { LuHome } from "react-icons/lu";
+import { GoHome  } from "react-icons/go";
 import { LuBox } from "react-icons/lu";
 import { LuSettings } from "react-icons/lu";
 import { LuPackage } from "react-icons/lu";
@@ -137,7 +137,7 @@ const SideBar = () => {
           {/* Always visible on mobile */}
           <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
             <Link to={'/dashboard'}>
-              <button onClick={()=>setSelected('dashboard')}><span className='icon'><LuHome size={22} /></span>Dashboard</button>
+              <button onClick={()=>setSelected('dashboard')}><span className='icon'><GoHome  size={22} /></span>Dashboard</button>
             </Link>
           </li>
 
@@ -185,7 +185,7 @@ const SideBar = () => {
               style={{
                 bottom: '70px',       
                 right: '16px',       
-                zIndex: 9999,
+                zIndex: 2147483647 ,
                 width: '220px',
                 animation: 'slideUp 0.3s ease-out'
               }}
@@ -304,7 +304,7 @@ const SideBar = () => {
         <ul className='hide-on-mobile '>
           <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
             <Link to={'/dashboard'}>
-              <button onClick={()=>setSelected('dashboard')}><span className='icon'><LuHome size={22} /></span>Dashboard</button>
+              <button onClick={()=>setSelected('dashboard')}><span className='icon'><GoHome  size={22} /></span>Dashboard</button>
             </Link>
           </li>
 

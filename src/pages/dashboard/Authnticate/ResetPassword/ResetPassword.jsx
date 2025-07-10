@@ -103,12 +103,12 @@ const ResetPassword = () => {
       </p>
 
       <form onSubmit={handleSubmit}>
-        <label className="fs-6 fw-normal text-white form-label">New password</label>
+        {/* <label className="fs-6 fw-normal text-white form-label">New password</label> */}
         <div className="position-relative mb-2">
         <input
           type={showNewPassword ? "text" : "password"}
           placeholder="Create a strong password"
-          className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
+          className="fs-6 fw-light form-control mb-3 rounded-pill px-4 py-1"
           value={newPassword}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -123,12 +123,12 @@ const ResetPassword = () => {
 
 
 
-      <label className="fs-6 fw-normal text-white form-label">Confirm password</label>
+      {/* <label className="fs-6 fw-normal text-white form-label">Confirm password</label> */}
         <div className="position-relative mb-2">
         <input
           type={showConfirmPassword ? "text" : "password"}
           placeholder="Re-enter the password"
-          className="fs-6 fw-light form-control mb-4 rounded-pill px-4"
+          className="fs-6 fw-light form-control mb-4 rounded-pill px-4 py-1"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />

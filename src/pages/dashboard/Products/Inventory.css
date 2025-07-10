@@ -93,6 +93,9 @@
   
     .card-view {
       display: block;
+      display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     }
   
     .inventory-card {
@@ -101,7 +104,7 @@
       margin-bottom: 1rem;
       border-radius: 0.5rem;
       border: 1px solid #ddd;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
     }
   
     .inventory-card h5 {
@@ -119,8 +122,101 @@
       font-weight: 600;
       color: #555;
     }
-  }
-  
+    
+    /* Product header row */
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.product-counter {
+    font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.color-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #3f3c3c ;
+  background-color: #F3F4F6 ; /* fallback */
+  text-transform: uppercase;
+  /* box-shadow: 0 1px 2px rgba(0,0,0,0.1); */
+  border: 1px solid #D1D5DB
+  /* text-shadow: 0 1px 1px rgba(0,0,0,0.2); */
+}
+
+.tag-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px !important;
+  width: 100%;
+  overflow-x: auto; /* Allows horizontal scrolling */
+  white-space: nowrap; /* Prevents wrapping */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  padding-bottom: 4px; /* Space for scrollbar */
+}
+
+.tag-container::-webkit-scrollbar {
+  display: none;
+}
+
+
+.weight-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3f3c3c;
+  background-color: #FEF3C7; /* rose-400 */
+  border: 1px solid #FCD34D; /* rose-500 */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.weight-icon {
+  font-size: 14px;
+  stroke-width: 3px;
+}
+
+.order-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3f3c3c;
+  background-color: #D1FAE5; /* green-400 */
+  border: 1px solid #41b788; /* green-600 */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.order-icon {
+  font-size: 14px;
+  stroke-width: 2.5px;
+}
+
+
+}
+
   
   .pagination-info {
     font-size: 0.875rem;

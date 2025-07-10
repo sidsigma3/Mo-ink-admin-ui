@@ -73,12 +73,12 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
       </div>
 
       {/* Auth Box */}
-      <div className="login-card bg-opacity-40 border border-3 p-4 p-sm-4 rounded-5 text-white position-relative z-2">
+      <div className="login-card bg-opacity-40 border border-3 p-4 p-sm-4 rounded-4  text-white position-relative z-2">
        
        
         <h3 className="text-center fw-bold mb-4">Welcome Team!</h3>
 
-        <div className="toggle d-flex justify-content-center mb-4 bg-white rounded-pill overflow-hidden mx-auto toggle-btns">
+        <div className="toggle d-flex justify-content-center mb-5 bg-white rounded-pill overflow-hidden mx-auto toggle-btns">
           <button className="btn btn-purple text-white fw-medium w-50 rounded-pill">
             Login
           </button>
@@ -90,9 +90,9 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
           </button>
         </div>
 
-        <p className="text-center fs-6 fw-light text-white small mb-4 px-2">
+        {/* <p className="text-center fs-6 fw-light text-white small mb-4 px-2">
         Reconnect with the pulse of Mo Ink and Dyes. Your dashboard is ready log in and lead every step from cone to customer.
-        </p>
+        </p> */}
 
         <form 
          onSubmit={(e) => {
@@ -100,21 +100,21 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
           handleLogin();    
         }}
         >
-          <label className="fs-6 fw-normal text-white form-label">Email id or Phone no</label>
+          {/* <label className="fs-6 fw-normal text-white form-label">Email id or Phone no</label> */}
           <input
             type="text"
-            placeholder="Enter your username"
-            className="fs-6 fw-light form-control mb-3 rounded-pill px-4"
+            placeholder="Email id or Phone no w-80%"
+            className="fs-6 fw-light form-control mb-3 rounded-pill px-4 py-1"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
 
-          <label className="fs-6 fw-normal text-white form-label">Password</label>
+          {/* <label className="fs-6 fw-normal text-white form-label">Password</label> */}
           <div className="position-relative mb-2">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
-              className="fs-6 fw-light form-control rounded-pill px-4 pe-5"
+              className="fs-6 fw-light form-control rounded-pill mb-3 px-4 pe-5 py-1"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -129,12 +129,12 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
 
           {error && <p className="text-danger small">{error}</p>}
 
-          <div className="d-flex justify-content-between align-items-center text-muted small mb-4">
-            <label className=" fs-6 fw-normal text-white form-check-label">
+          <div className="d-flex justify-content-between align-items-center text-muted small mb-5">
+            <label className=" fs-7 fw-normal text-white form-check-label">
               <input type="checkbox" className="form-check-input me-2" />
               Remember me
             </label>
-            <a href="/forgotPassword" className="fs-6 fw-normal text-white text-decoration-none">
+            <a href="/forgotPassword" className="fs-7 fw-normal text-white text-decoration-none">
               Forgot Password?
             </a>
           </div>
@@ -145,7 +145,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
             Login
           </button>
 
-          <div className="text-center small fs-6 fw-normal text-white-50 my-3">Or login with</div>
+          <div className="text-center small fs-7 fw-normal text-white-50 my-3">Or login with</div>
 
           <div className="d-flex justify-content-center gap-2 gap-lg-3">
           <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />

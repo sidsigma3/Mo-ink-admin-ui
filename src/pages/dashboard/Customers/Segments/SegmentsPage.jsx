@@ -10,6 +10,7 @@ import { useSegments } from '../../../../components/Context/SegmentsContext'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Pagination } from 'react-bootstrap'
 import { Dropdown } from 'react-bootstrap'
+import { LuDot } from "react-icons/lu";
 import "./SegmentsPage.css"
 import { getAllSegment } from '../../../../services/SegmentService'
 
@@ -303,30 +304,45 @@ const SegmentsPage = () => {
         {filteredData.map((seg,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
-            <div className='d-flex justify-content-between'>
-                 <h3>{seg.segmentTitle}</h3>
-                 {/* <p> 
-                    <div
-                     style={{
-                        width:'100%',
-                        padding:'0.2rem 0.4rem',
-                        border:'1px solid',borderRadius:'0.2rem',textAlign:'center',
-                        backgroundColor:seg.tag === 'Spinner' ? '#DBEAFE' : '#FEF3C7',
-                        borderColor:seg.tag === 'Spinner' ? '#93C5FD' : '#FCD34D' ,
-                        color : seg.tag === 'Spinner' ? '#1E40AF' : '#92400E' ,
-                    }}
-                    >
-                    {seg.tag}
-                    </div>
-                </p> */}
+            <div className='d-flex justify-content-between align-items-center'>
+                 <h3 className='fs-6 fw-medium	'>{seg.segmentTitle}</h3>
+                <p> 
+                 <div
+                  style={{
+                    padding: '0.2rem 0.2rem',
+                    fontSize: '0.8rem',
+                    width: '7rem',
+                    height: '2rem',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: '0',
+                    backgroundColor:
+                      seg.segmentStatus.toLowerCase() === 'active' ? '#d1fae5' : '#F3F4F6',
+                    border: '1px solid',
+                    borderColor:
+                      seg.segmentStatus.toLowerCase() === 'active' ? '#6ee7b7' : '#D1D5DB',
+                    borderRadius: '0.2rem',
+                    textAlign: 'center',
+                    color:
+                      seg.segmentStatus.toLowerCase() === 'active' ? '#065f46' : '#DC2626',
+                    fontWeight: '500',
+                  }}
+                >
+                  {seg.segmentStatus.toUpperCase()}
+                </div>
+
+                </p>
             </div>
 
-            <p><strong></strong>Customers : {seg.customerCount}</p>
-    
+            <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ gap: '0.5rem' }}>
+            <p className="m-0"><strong></strong>Customers: {seg.customerCount}</p>
+            <span><LuDot size={25} /></span>
+            <p className="m"><strong></strong>{seg.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</p>
+            <span><LuDot size={25} /></span>
+            <p className="m-0">{formatSegmentCondition(seg.segmentCondition)}</p>
+          </div>
 
-            <p className='fw-medium'><strong></strong> {seg.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</p>
-
-            <p >{formatSegmentCondition(seg.segmentCondition)}</p>
 
           </div>
         ))}
