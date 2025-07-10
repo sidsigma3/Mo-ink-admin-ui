@@ -1604,19 +1604,21 @@ const handleReject = (variant) => {
                                                           {discountPercent.toFixed(2)}%
                                                         </span>
                                                       </td>
+                                                     
                                                       <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
+                                                          {(gstRate / 2).toFixed(2)}%
+                                                        </span>
+                                                      </td>
+                                                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
+                                                          {(gstRate / 2).toFixed(2)}%
+                                                        </span>
+                                                      </td>
+
+                                                       <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                                                         <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
                                                           ₹{Math.round(finalTotal)}
-                                                        </span>
-                                                      </td>
-                                                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          {(gstRate / 2).toFixed(2)}%
-                                                        </span>
-                                                      </td>
-                                                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                                                        <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          {(gstRate / 2).toFixed(2)}%
                                                         </span>
                                                       </td>
                                                   
