@@ -304,7 +304,7 @@ useEffect(() => {
                       <span className="d-none d-sm-inline">
                         {startDate && endDate
                           ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                          : "Select Date Range"}
+                          : "Select Date"}
                       </span>
                        </button>
 

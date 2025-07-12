@@ -70,3 +70,15 @@ export const getUnusedActiveColors = async (productId, size, variantType) => {
   );
   return response.data?.data?.colors || [];
 };
+
+export const deleteColorById = async (colorId) => {
+  try {
+    const response = await axios.delete(`${BASE_URL}/${colorId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting color with ID ${colorId}:`, error);
+    throw error;
+  }
+};
+
+

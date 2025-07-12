@@ -25,6 +25,7 @@ import SelectState from '../../../components/SelectState/SelectState';
 import { IoIosArrowForward, IoIosArrowDown  } from "react-icons/io";
 import Toast from '../../../components/Toast/Toast';
 import { uploadProductImage } from '../../../services/ProductService';
+import { MdModeEdit } from "react-icons/md";
 
 const AddSpinners = () => {
   const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -54,6 +55,7 @@ const AddSpinners = () => {
 
   const [manageWallet,setManageWallet] = useState(false)
   
+  const [editingRow, setEditingRow] = useState(null); // to store editable variantId
 
   const [status,setStatus] = useState(customer?.status.toLowerCase() || 'Active')
 
@@ -328,44 +330,74 @@ const handleTag = (value) =>{
     };
     
   
-    const handleSubmitForm = async () => {
-      const showToast = (message, type = "error") => {
-            setToasts([{ message, type }]);
-            setTimeout(() => setToasts([]), 3000);
-          };
-      try {
-        const productIds = Object.keys(rateChartData);
-    
-        for (const productId of productIds) {
-          const chartData = rateChartData[productId];
-          if (!Array.isArray(chartData) || chartData.length === 0) continue;
-    
-          const gstOnProduct = chartData[0]?.gstOnVariant || 0;
-    
-          const payload = {
-            productId: Number(productId),
-            gstOnProduct: Number(gstOnProduct),
-            variant: chartData.map((entry) => ({
-              variantId: entry.variantId,
-              size: entry.size,
-              color: {
-                colorName: entry.color.colorName,
-                hexCode: entry.color.hexCode,
-              },
-              variantType: entry.variantType,
-              ratePerKg: Number(entry.ratePerKg),
-            })),
-          };
-    
-          await createVendorRateChart(customer?.vendorId,productId, payload);
-        }
-    
-        showToast("Rate chart uploaded successfully for all products!", "success");
-      } catch (err) {
-        console.error("Error uploading rate chart:", err.response?.data || err.message);
-        showToast("Error uploading rate chart.", "error");
+   const handleSubmitForm = async () => {
+  const showToast = (message, type = "error") => {
+    setToasts([{ message, type }]);
+    setTimeout(() => setToasts([]), 3000);
+  };
+
+  try {
+    // Case 1: Uploaded format (object)
+    if (!Array.isArray(rateChartData)) {
+      const productIds = Object.keys(rateChartData);
+
+      for (const productId of productIds) {
+        const chartData = rateChartData[productId];
+        if (!Array.isArray(chartData) || chartData.length === 0) continue;
+
+        const gstOnProduct = chartData[0]?.gstOnVariant || 0;
+
+        const payload = {
+          productId: Number(productId),
+          gstOnProduct: Number(gstOnProduct),
+          variant: chartData.map((entry) => ({
+            variantId: entry.variantId,
+            size: entry.size,
+            color: {
+              colorName: entry.color.colorName,
+              hexCode: entry.color.hexCode,
+            },
+            variantType: entry.variantType,
+            ratePerKg: Number(entry.ratePerKg),
+          })),
+        };
+
+        await createVendorRateChart(customer?.vendorId, productId, payload);
       }
-    };
+    }
+
+    // Case 2: API format (array)
+    else {
+      for (const product of rateChartData) {
+        const productId = product.productId;
+        const gstOnProduct = product.gstOnProduct || 0;
+
+        const payload = {
+          productId,
+          gstOnProduct,
+          variant: product.variant.map((entry) => ({
+            variantId: entry.variantId,
+            size: entry.size,
+            color: {
+              colorName: entry.color.colorName,
+              hexCode: entry.color.hexCode,
+            },
+            variantType: entry.variantType,
+            ratePerKg: Number(entry.ratePerKg),
+          })),
+        };
+
+        await createVendorRateChart(customer?.vendorId, productId, payload);
+      }
+    }
+
+    showToast("Rate chart uploaded successfully for all products!", "success");
+  } catch (err) {
+    console.error("Error uploading rate chart:", err.response?.data || err.message);
+    showToast("Error uploading rate chart.", "error");
+  }
+};
+
     
     const groupRateChartData = () => {
       const grouped = {};
@@ -505,6 +537,62 @@ const handleTag = (value) =>{
             // showToast('Cheque photo upload failed. Please try again.', 'error');
           }
         };
+
+
+  const handleRateChartChange = (productId, variantId, field, value) => {
+  setRateChartData((prev) => {
+    const updated = Array.isArray(prev) ? [...prev] : { ...prev };
+
+    // Case 1: File upload format
+    if (!Array.isArray(prev)) {
+      if (!Array.isArray(updated[productId])) return prev;
+
+      updated[productId] = updated[productId].map((variant) => {
+        if (variant.variantId === variantId) {
+          return {
+            ...variant,
+            [field]: field === "ratePerKg" || field === "gstOnVariant" ? parseFloat(value) : value,
+          };
+        }
+        return variant;
+      });
+
+      return updated;
+    }
+
+    // Case 2: API format
+    return updated.map((product) => {
+      if (product.productId !== Number(productId)) return product;
+
+      const updatedVariants = product.variant.map((variant) => {
+        if (variant.variantId === variantId) {
+          const updatedVariant = {
+            ...variant,
+            [field]: field === "ratePerKg" || field === "gstOnVariant" ? parseFloat(value) : value,
+          };
+
+          // If GST is being updated, update top-level too
+          if (field === "gstOnVariant") {
+            return updatedVariant;
+          }
+
+          return updatedVariant;
+        }
+        return variant;
+      });
+
+      return {
+        ...product,
+        gstOnProduct:
+          field === "gstOnVariant" ? parseFloat(value) : product.gstOnProduct,
+        variant: updatedVariants,
+      };
+    });
+  });
+};
+
+
+
 
     return (
     <div className='add-spinners'>
@@ -700,6 +788,7 @@ const handleTag = (value) =>{
                             <th className="py-3 px-4 tablehead text-center">Color Code</th>
                             <th className="py-3 px-4 tablehead text-center">Rate/Kg</th>
                             <th className="py-3 px-4 tablehead text-center">GST (%)</th>
+                            <th></th>
                           </tr>
                         </thead>
                         <tbody className="level-expanded">
@@ -707,7 +796,7 @@ const handleTag = (value) =>{
                             <React.Fragment key={productId}>
                               {/* Product Row */}
                               <tr className="table-secondary">
-                                <td colSpan={5} onClick={() => toggleExpand(productId, setExpandedProducts)} style={{ cursor: "pointer" }}>
+                                <td colSpan={6} onClick={() => toggleExpand(productId, setExpandedProducts)} style={{ cursor: "pointer" }}>
                                   {expandedProducts[productId] ? (
                                             <IoIosArrowDown className="inline-block w-4 h-4 mr-1" />
                                           ) : (
@@ -758,8 +847,61 @@ const handleTag = (value) =>{
                                                     <code>{row.color.hexCode || row.color.colorCode}</code>
                                                   </div>
                                                 </td>
-                                                <td  className="text-center ">{row.ratePerKg}</td>
-                                                <td  className="text-center ">{row.gstOnVariant}</td>
+                                              <td className="text-center">
+                                                    {editingRow === row.variantId ? (
+                                                      <>
+                                                        <input
+                                                          type="number"
+                                                          value={row.ratePerKg}
+                                                          onChange={(e) =>
+                                                             handleRateChartChange(productId, row.variantId, 'ratePerKg', parseFloat(e.target.value))
+                                                          }
+                                                          className="form-control form-control-sm text-center"
+                                                          style={{ width: "80px" }}
+                                                        />
+                                                      </>
+                                                    ) : (
+                                                      row.ratePerKg
+                                                    )}
+                                                  </td>
+
+                                                  <td className="text-center">
+                                                    {editingRow === row.variantId ? (
+                                                      <>
+                                                        <input
+                                                          type="number"
+                                                          value={row.gstOnVariant}
+                                                          onChange={(e) =>
+                                                            handleRateChartChange(productId, row.variantId, 'gstOnVariant', parseFloat(e.target.value))
+                                                          }
+                                                          className="form-control form-control-sm text-center"
+                                                          style={{ width: "80px" }}
+                                                        />
+                                                      </>
+                                                    ) : (
+                                                      row.gstOnVariant
+                                                    )}
+                                                  </td>
+
+                                                  <td className="text-center">
+                                                    {editingRow === row.variantId ? (
+                                                      <button
+                                                        className="btn btn-sm"
+                                                        onClick={() => setEditingRow(null)}
+                                                      >
+                                                        ✅
+                                                      </button>
+                                                    ) : (
+                                                      <button
+                                                        className="btn btn-sm text-primary"
+                                                        onClick={() => setEditingRow(row.variantId)}
+                                                        title="Edit"
+                                                      >
+                                                       <MdModeEdit />
+                                                      </button>
+                                                    )}
+                                                  </td>
+
                                               </tr>
                                             ))}
                                         </React.Fragment>
