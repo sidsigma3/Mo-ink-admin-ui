@@ -388,7 +388,7 @@ useEffect(() => {
                    
                 </li>
 
-                <li className='col-lg col-md-6 col-sm-12 col-12'>
+                <li className='col-lg col-md-6 col-sm-6 col-6'>
                 <DashboardBox heading={'Order to Deliver'} number={ordersToDeliver}></DashboardBox>
                    
                 </li>

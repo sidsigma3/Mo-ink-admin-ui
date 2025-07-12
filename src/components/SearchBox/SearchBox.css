@@ -2,6 +2,7 @@
     background: transparent;
     border: none;
     width: 95%;
+    margin-top: 0rem !important;
 }
 
 .searchBox input:focus{
@@ -16,7 +17,7 @@
 
 @media (max-width: 768px) {
     .searchBox{
-        border-radius: 1rem;
+        border-radius: 0.6rem;
         /* margin-top: 1rem; */
     }
 }

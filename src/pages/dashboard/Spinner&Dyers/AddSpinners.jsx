@@ -574,48 +574,48 @@ const handleTag = (value) =>{
          {formErrors.gstin && <p className="text-danger">{formErrors.gstin}</p>}
     </div>
 
- <div className="col-12 my-4">
-  <div className="media-upload-card p-4 h-100">
-    <label className="upload-label mb-3" style={{fontSize:'1rem'}}>Business PAN Photo</label>
-    <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
-      <input
-        type="file"
-        id="cheque-upload"
-        accept="image/*"
-        onChange={handleChequePhotoChange}
-        className="d-none"
-      />
-      <label 
-        htmlFor="cheque-upload" 
-        className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
-      >
-        <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
-      </label>
-      <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
-      
-      {formData.chequePhoto && (
-        <div className="preview-container mt-4 text-center">
-          <img 
-            src={`${backendUrl}${formData.chequePhoto}`} 
-            alt="Cheque Preview" 
-            className="img-thumbnail rounded" 
-            style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
-          />
-          {/* Uncomment if you want a remove button
-          <button 
-            className="btn btn-sm btn-outline-danger mt-2"
-            onClick={() => setFormData(prev => ({...prev, chequePhoto: ''}))}
-          >
-            Remove
-          </button> */}
+          <div className="col-12 my-4">
+            <div className="media-upload-card p-4 h-100">
+              <label className="upload-label mb-3" style={{fontSize:'1rem'}}>Business PAN Photo</label>
+              <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+                <input
+                  type="file"
+                  id="cheque-upload"
+                  accept="image/*"
+                  onChange={handleChequePhotoChange}
+                  className="d-none"
+                />
+                <label 
+                  htmlFor="cheque-upload" 
+                  className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+                >
+                  <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+                </label>
+                <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+                
+                {formData.chequePhoto && (
+                  <div className="preview-container mt-4 text-center">
+                    <img 
+                      src={`${backendUrl}${formData.chequePhoto}`} 
+                      alt="Cheque Preview" 
+                      className="img-thumbnail rounded" 
+                      style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+                    />
+                    {/* Uncomment if you want a remove button
+                    <button 
+                      className="btn btn-sm btn-outline-danger mt-2"
+                      onClick={() => setFormData(prev => ({...prev, chequePhoto: ''}))}
+                    >
+                      Remove
+                    </button> */}
+                  </div>
+                )}
+              </div>
+              {formErrors.chequePhoto && (
+                <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
+              )}
+            </div>
         </div>
-      )}
-    </div>
-    {formErrors.chequePhoto && (
-      <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
-    )}
-  </div>
-</div>
 
     <div className="col-md-12 d-flex gx-4 flex-column">
         <label>Address</label>
@@ -807,7 +807,7 @@ const handleTag = (value) =>{
             <StatusInput status={status} onStatusChange={handleStatusChange}></StatusInput>
         </div>
 
-        <div className='bg-white p-3 rounded mt-2'>
+        <div className='bg-white p-3 rounded mt-3'>
             <h5>Tag</h5>
             <Dropdown   onSelect={handleTag} className='mt-3'>
             <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2 w-100 mt-1">
