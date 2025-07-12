@@ -20,6 +20,9 @@ import ImportBtn from '../../../components/Buttons/Import/ImportBtn'
 import { IoArrowBackOutline } from 'react-icons/io5'
 import { getColorsByProductId , updateColorsByProductId , uploadColorLibraryImage} from '../../../services/ColorService'
 import Form from 'react-bootstrap/Form';
+import { MdDelete } from 'react-icons/md';
+import { deleteColorById } from '../../../services/ColorService'
+import ModalDelete from '../../../components/Modal/ModalDelete'
 
 const backendUrl = process.env.REACT_APP_IMAGE_URL
 
@@ -34,6 +37,8 @@ const ColorLibrary =  ({setDemoData }) => {
   const [colorStatus, setColorStatus] = useState({});
   const [newColors, setNewColors] = useState([]);
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedColorToDelete, setSelectedColorToDelete] = useState(null);
 
  const handleImageUpload = async (e, index, imageIndex) => {
   const file = e.target.files[0];
@@ -443,6 +448,12 @@ if (totalPages >=1) {
 }
 
 
+ const showToast = (message, type = "error") => {
+            setToasts([{ message, type }]);
+            setTimeout(() => setToasts([]), 3000);
+          };
+
+
   return (
     <div className='colorlibrary'>
       <div className='top d-flex  justify-content-between mb-2 mt-2' style={{cursor:'pointer'}}>
@@ -615,6 +626,21 @@ if (totalPages >=1) {
                 </label>
               </td>
 
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <button
+                  className="btn btn-sm text-danger"
+                  title="Delete Color"
+                  onClick={() => {
+                    setSelectedColorToDelete(item);
+                    setShowDeleteModal(true);
+                  }}
+                >
+                  <MdDelete size={18} />
+                </button>
+              </td>
+
+
+
             </tr>
           ))}
 
@@ -730,6 +756,25 @@ if (totalPages >=1) {
         </tbody>
       </Table>
 
+          <ModalDelete
+              isOpen={showDeleteModal}
+              onCancel={() => {
+                setShowDeleteModal(false);
+                setSelectedColorToDelete(null);
+              }}
+              onConfirm={async () => {
+                try {
+                  await deleteColorById(selectedColorToDelete.id);
+                  showToast(`Deleted ${selectedColorToDelete.colorName}`, 'success');
+                  setColors(prev => prev.filter(color => color.id !== selectedColorToDelete.id));
+                } catch (err) {
+                  showToast(`Failed to delete ${selectedColorToDelete.colorName}`, 'error');
+                } finally {
+                  setShowDeleteModal(false);
+                  setSelectedColorToDelete(null);
+                }
+              }}
+            />
 
       
 
