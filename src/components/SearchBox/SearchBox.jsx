@@ -6,7 +6,7 @@ import "./SearchBox.css"
 const SearchBox = () => {
   return (
     <div className='searchBox d-flex align-items-center gap-3 w-100'>
-        <IoSearchOutline />
+<IoSearchOutline size={16} />
         <input type='text' placeholder='Search'></input>
     </div>
   )

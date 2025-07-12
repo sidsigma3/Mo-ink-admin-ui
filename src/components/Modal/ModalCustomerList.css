@@ -1,24 +1,87 @@
-.modal-customer-list ul{
-    list-style: none;
-    padding: 0;
-
-    li{
-        display: flex;
-        align-items:center;
-        gap:1rem;
-        border-bottom: 1px solid #B9C0CD;
-        padding-bottom: 1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    h5,h6{
-        margin: 0;
-    }
-
-    h5{
-        font-weight: 600 !important;
-    }
-    h6{
-        font-weight: 400;
-    }
+ .customer-item:hover {
+    background-color: #f8f9fa !important;
+  }
+  
+  .customer-item:last-child {
+    border-bottom: none !important;
+  }
+  
+  .min-width-0 {
+    min-width: 0;
+  }
+  
+  .customer-list-container {
+    scrollbar-width: thin;
+    scrollbar-color: #dee2e6 #f8f9fa;
+  }
+  
+  .customer-list-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .customer-list-container::-webkit-scrollbar-track {
+    background: #f8f9fa;
+  }
+  
+  .customer-list-container::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 3px;
+  }
+  
+  .customer-list-container::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+  }
+  
+  .no-padding-modal .modal-content {
+  padding: 0.6rem !important;
 }
+
+  @media (max-width: 576px) {
+    .modal-lg {
+      max-width: 95vw !important;
+      margin: 0.5rem !important;
+    }
+    
+    .customer-item {
+      padding: 1rem 0.75rem !important;
+    }
+    
+    .customer-details h6 {
+      font-size: 0.95rem;
+    }
+    
+    .customer-details p {
+      font-size: 0.8rem;
+    }
+    
+    .modal-footer {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .modal-footer > div {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .modal-footer .d-flex:last-child {
+      flex-direction: row;
+      width: 100%;
+    }
+    
+    .modal-footer .btn {
+      flex: 1;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .customer-list-container {
+      max-height: 50vh !important;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .customer-list-container {
+      max-height: 70vh !important;
+    }
+  }

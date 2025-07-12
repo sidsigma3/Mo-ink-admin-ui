@@ -450,13 +450,18 @@ const AddUser = () => {
 
             </div>
 
-          <div className='d-flex justify-content-between my-4'>
-            {canDelete && (
+          <div className="d-flex justify-content-between my-4">
+            <div>
+                {canDelete && (
                 <DeleteBtn clickFunction={() => handleDelete(customer.userId)} />
-            )}
+                )}
+            </div>
 
-            <SubmitBtn text={'Save'} clickFunction={handleSubmit} />
-        </div>
+            <div>
+                <SubmitBtn text="Save" clickFunction={handleSubmit} />
+            </div>
+            </div>
+
 
         <ModalDeleteUser
         isOpen={showDeleteModal}

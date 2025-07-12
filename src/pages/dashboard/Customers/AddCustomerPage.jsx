@@ -13,7 +13,7 @@ import { FaMinus } from "react-icons/fa";
 import { VscCreditCard } from "react-icons/vsc";
 import { useSegments } from '../../../components/Context/SegmentsContext';
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
-import { MdAdd } from "react-icons/md";
+import { IoAddOutline } from "react-icons/io5";
 import { addCustomer,updateCustomer , deleteCustomer , addMoneyToWallet ,subtractMoneyFromWallet , getWalletTransactions } from '../../../services/CustomerService';
 import { getAllSegment } from '../../../services/SegmentService';
 import StatusInput from '../../../components/StatusInput/StatusInput';
@@ -446,15 +446,15 @@ const handleAddressTypeChange = (e) => {
                     <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
                     <IoArrowBackOutline size={25} />
                 </span>
-          <h4>{customer.customerName}</h4>
+          <h5 className="m-0" style={{ fontSize: '19px' }}>{customer.customerName}</h5>
         </div>
           ):
           (
-        <div className="top d-flex gap-3 mt-2" >
+        <div className="top  d-flex gap-3 align-items-center" >
           <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
             <IoArrowBackOutline size={25} />
           </span>
-          <h4>New Customer</h4>
+          <h5 className="m-0" style={{ fontSize: '19px' }}>New Customer</h5>
         </div>
         )}
 
@@ -462,50 +462,50 @@ const handleAddressTypeChange = (e) => {
 
             <div className='left'>
 
-                <div className='customer-overview row bg-white p-3 gy-2 rounded'>
-                <div className="col-md-6 d-flex flex-column">
+                <div className='customer-overview row bg-white p-2 gy-2 rounded'>
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>First Name</label>
                     <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
                     {errors.firstName && <p className="text-danger">{errors.firstName}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>Last Name</label>
                     <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
                     {errors.lastName && <p className="text-danger">{errors.lastName}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>WhatsApp No.</label>
                     <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
                     {errors.whatsapp && <p className="text-danger">{errors.whatsapp}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>Calling No.</label>
                     <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
                     {errors.phone && <p className="text-danger">{errors.phone}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>Email</label>
                     <input type="text" name="email" value={formData.email} onChange={handleChange} />
                     {errors.email && <p className="text-danger">{errors.email}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>Password</label>
                     <input type="text" name="password" value={formData.password} onChange={handleChange} />
                     {errors.password && <p className="text-danger">{errors.password}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>Company</label>
                     <input type="text" name="company" value={formData.company} onChange={handleChange} />
                     {errors.company && <p className="text-danger">{errors.company}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>GSTIN No.</label>
                     <input
                     className="fs-6 ps-2"
@@ -519,19 +519,50 @@ const handleAddressTypeChange = (e) => {
                 </div>
 
 
-                <div className="media-input-ctn mt-5 p-2 col-md-12">
-                  <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">
-                    <input type="file" accept="image/*" onChange={handleChequePhotoChange} />
-                    <h4>Add photo of cancelled cheque</h4>
-                  </div>
-                  {errors.chequePhoto && <p className="text-danger">{errors.chequePhoto}</p>}
 
-                  {formData.chequePhoto && (
-                    <div className="mt-3">
-                      <img src={`${backendUrl}${formData.chequePhoto}`} alt="Cheque" width="120" />
-                    </div>
-                  )}
-                </div>
+
+                         <div className="col-12 my-4">
+            <div className="media-upload-card p-4 h-100">
+              <label className="upload-label mb-3" style={{fontSize:'1rem'}}>Aadhaar Card Photo</label>
+              <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+                <input
+                  type="file"
+                  id="cheque-upload"
+                  accept="image/*"
+                  onChange={handleChequePhotoChange}
+                  className="d-none"
+                />
+                <label 
+                  htmlFor="cheque-upload" 
+                  className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+                >
+                  <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+                </label>
+                <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+                
+                {formData.chequePhoto && (
+                  <div className="preview-container mt-4 text-center">
+                    <img 
+                      src={`${backendUrl}${formData.chequePhoto}`} 
+                      alt="Cheque Preview" 
+                      className="img-thumbnail rounded" 
+                      style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+                    />
+                    {/* Uncomment if you want a remove button
+                    <button 
+                      className="btn btn-sm btn-outline-danger mt-2"
+                      onClick={() => setFormData(prev => ({...prev, chequePhoto: ''}))}
+                    >
+                      Remove
+                    </button> */}
+                  </div>
+                )}
+              </div>
+              {/* {formErrors.chequePhoto && (
+                <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
+              )} */}
+            </div>
+        </div>
 
 
                 
@@ -558,25 +589,25 @@ const handleAddressTypeChange = (e) => {
                     {errors.street && <p className="text-danger">{errors.street}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>Country/Region</label>
                     <input type="text" name="country" value={formData.country} onChange={handleChange} />
                     {errors.country && <p className="text-danger">{errors.country}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>State</label>
                     <SelectState value={formData.state} onChange={handleChange} />
                     {errors.state && <p className="text-danger">{errors.state}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>City</label>
                     <input type="text" name="city" value={formData.city} onChange={handleChange} />
                     {errors.city && <p className="text-danger">{errors.city}</p>}
                 </div>
 
-                <div className="col-md-6 d-flex flex-column">
+                <div className="col-6 d-flex gx-4 flex-column">
                     <label>PIN code</label>
                     <input type="text" name="pinCode" value={formData.pinCode} onChange={handleChange} />
                     {errors.pinCode && <p className="text-danger">{errors.pinCode}</p>}
@@ -600,7 +631,7 @@ const handleAddressTypeChange = (e) => {
                 </div>
 
 
-                <div>
+                <div className="d-none d-md-block">
                     <label>Add balance</label>
                     <div className='d-flex gap-2 mt-2'>
                     <input value={amount} onChange={(e) => setAmount(e.target.value)} className='rounded border border-secondary-subtle p-1 w-50' placeholder='₹ INR'></input>
@@ -612,14 +643,38 @@ const handleAddressTypeChange = (e) => {
                         placeholder="Comment / Source (e.g., Manual adjustment)"
                       />
 
+                  <div className='d-flex gap-2'>
+                   <button
+                              className="btn d-flex p-0 align-items-center justify-content-center"
+                              style={{
+                                width: '2.2rem',
+                                height: '2.2rem',
+                                backgroundColor: 'rgba(13,110,253,0.1)',
+                                border: '1px solid #0d6efd',
+                                color: '#0d6efd',
+                                borderRadius: '0.4rem',
+                              }}
+                              onClick={handleAddMoney}
+                            >
+                              <IoAddOutline size={24} />
+                            </button>
 
-                    <button className='btn btn-primary d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.28rem 1.2rem'}} onClick={handleAddMoney}>
-                    <MdAdd size={19}/>
-                    </button>
-                    
-                    <button className='btn btn-danger d-flex align-items-cneter' style={{height:'1.8rem',padding:'0.55rem 1.2rem'}} onClick={handleSubtractMoney}>
-                    <FaMinus size={12}/>
-                    </button>
+                            {/* - Subtract Button */}
+                            <button
+                              className="btn d-flex p-0 align-items-center justify-content-center"
+                              style={{
+                                width: '2.2rem',
+                                height: '2.2rem',
+                                backgroundColor: 'rgba(220,53,69,0.1)',
+                                border: '1px solid #dc3545',
+                                color: '#dc3545',
+                                borderRadius: '0.4rem',
+                              }}
+                              onClick={handleSubtractMoney}
+                            >
+                              <FaMinus size={12} />
+                            </button>
+                            </div>
                     </div>
                 </div>
 
@@ -632,61 +687,212 @@ const handleAddressTypeChange = (e) => {
                     <span>Loading...</span>
                   </div>
                 ) : transactions.length > 0 ? (
-                  <Table>
-                    <thead>
-                      <tr>
-                        <th>Source</th>
-                        {/* <th className=" text-center">Invoice No.</th> */}
-                        <th className=" text-center">Type</th>
-                        <th className=" text-center">Amount</th>
-                        <th className=" text-center">Date</th>
-                        <th className=" text-center">Credit Note</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions.slice().reverse().map((item, ix) => (
-                        <tr key={ix}>
-                          <td>{item.source}</td>
-                          {/* <td className=" text-center">INV-87565</td> */}
-                          <td className=" text-center"
-                            style={{
-                              color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000",
-                            }}
-                          >
-                            {item.type}
-                          </td>
+                  <>
+                    {/* Desktop Table View */}
+                    <div className="d-none d-md-block">
+                      <Table>
+                        <thead>
+                          <tr>
+                            <th>Source</th>
+                            {/* <th className=" text-center">Invoice No.</th> */}
+                            <th className=" text-center">Type</th>
+                            <th className=" text-center">Amount</th>
+                            <th className=" text-center">Date</th>
+                            <th className=" text-center">Credit Note</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {transactions.slice().reverse().map((item, ix) => (
+                            <tr key={ix}>
+                              <td>{item.source}</td>
+                              {/* <td className=" text-center">INV-87565</td> */}
+                              <td className=" text-center"
+                                style={{
+                                  color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000",
+                                }}
+                              >
+                                {item.type}
+                              </td>
 
-                          <td className="text-center"
-                            style={{
-                              color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000", 
-                            }}
-                          >
-                            {item.type === "DEBIT" ? "−" : ""}
-                            ₹{item.amount.toFixed(0)} 
-                          </td>
-                         
-                          <td className="text-center">
-                            {new Date(item.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
-                          </td>
+                              <td className="text-center"
+                                style={{
+                                  color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000", 
+                                }}
+                              >
+                                {item.type === "DEBIT" ? "−" : ""}
+                                ₹{item.amount.toFixed(0)} 
+                              </td>
+                             
+                              <td className="text-center">
+                                {new Date(item.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
+                              </td>
 
 
-                          {(item.source?.includes("Refund for cancellation") || item.source?.includes("Refund for return")) && (
-                          <td className=" text-center pr-4">
+                              {(item.source?.includes("Refund for cancellation") || item.source?.includes("Refund for return")) && (
+                              <td className=" text-center pr-4">
+                                <button
+                                className="btn p-0"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadCreditReceipt(item.source);
+                                }}
+                                >
+                                <FiDownload size={20}/>
+                                </button>
+                              </td>
+                               )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="d-block d-md-none">
+                    <label>Add balance</label>
+                   <div className="d-flex flex-wrap gap-2 my-3 align-items-start">
+                          {/* Amount Field */}
+                          <input
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            className="rounded border border-secondary-subtle p-1 w-100 w-md-25"
+                            placeholder="₹ INR"
+                          />
+
+                          {/* Source & Buttons Group */}
+                          <div className="d-flex gap-2 w-100 w-md-75 flex-wrap flex-md-nowrap">
+                            {/* Comment Field */}
+                            <input
+                              value={source}
+                              onChange={(e) => setSource(e.target.value)}
+                              className="rounded border border-secondary-subtle p-1 flex-grow-1"
+                              placeholder="Comment / Source (e.g., Manual adjustment)"
+                            />
+
+                            {/* + Add Button */}
                             <button
-                            className="btn p-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownloadCreditReceipt(item.source);
-                            }}
+                              className="btn d-flex p-0 align-items-center justify-content-center"
+                              style={{
+                                width: '2.2rem',
+                                height: '2.2rem',
+                                backgroundColor: 'rgba(13,110,253,0.1)',
+                                border: '1px solid #0d6efd',
+                                color: '#0d6efd',
+                                borderRadius: '0.4rem',
+                                // lineHeight: 1,
+                              }}
+                              onClick={handleAddMoney}
                             >
-                            <FiDownload size={20}/>
+                              <IoAddOutline size={19} />
                             </button>
-                          </td>
-                           )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+
+                            {/* - Subtract Button */}
+                            <button
+                              className="btn d-flex p-0 align-items-center justify-content-center"
+                              style={{
+                                width: '2.2rem',
+                                height: '2.2rem',
+                                backgroundColor: 'rgba(220,53,69,0.1)',
+                                border: '1px solid #dc3545',
+                                color: '#dc3545',
+                                borderRadius: '0.4rem',
+                              }}
+                              onClick={handleSubtractMoney}
+                            >
+                              <FaMinus size={12} />
+                            </button>
+                          </div>
+                        </div>
+
+
+                      <div className="transaction-history-mobile">
+                        {transactions.slice().reverse().map((item, ix) => (
+                          <div key={ix} className="transaction-card mb-3 p-3 border rounded-3 bg-light">
+                            <div className="d-flex justify-content-between align-items-start mb-2">
+                              <div className="transaction-info flex-grow-1">
+                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                  <span
+                                    className="transaction-source fw-medium text-dark"
+                                    style={{
+                                      fontSize: '0.9rem',
+                                      width: '60%',
+                                      // whiteSpace: 'nowrap',
+                                      // overflow: 'hidden',
+                                      // textOverflow: 'ellipsis'
+                                    }}
+                                  >
+                                    {item.source}
+                                  </span>
+
+                                  <span 
+                                    className="transaction-amount fw-bold text-end"
+                                    style={{
+                                      color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000",
+                                      fontSize: '1.1rem',
+                                      width: '40%',
+                                      alignSelf: 'flex-center',
+                                    }}
+                                  >
+                                    {item.type === "DEBIT" ? "−" : "+"}₹{item.amount.toFixed(0)}
+                                  </span>
+                                </div>
+
+                                
+                                <div className="d-flex justify-content-between align-items-center">
+                                  {/* <span 
+                                    className="transaction-amount fw-bold"
+                                    style={{
+                                      color: item.type === "CREDIT" ? "#3CAA82" : "#FF0000",
+                                      fontSize: '1.1rem'
+                                    }}
+                                  >
+                                    {item.type === "DEBIT" ? "−" : "+"}₹{item.amount.toFixed(0)}
+                                  </span> */}
+                                   <div className="transaction-time">
+                                    <small className="text-muted" style={{fontSize: '0.75rem'}}>
+                                      {new Date(item.createdAt).toLocaleTimeString("en-IN", { 
+                                        timeZone: "Asia/Kolkata",
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })}
+                                    </small>
+                                  </div>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <small className="text-muted" style={{fontSize: '0.8rem'}}>
+                                      {new Date(item.createdAt).toLocaleDateString("en-IN", { 
+                                        timeZone: "Asia/Kolkata",
+                                        day: '2-digit',
+                                        month: 'short',
+                                        year: 'numeric'
+                                      })}
+                                    </small>
+                                    
+                                    {(item.source?.includes("Refund for cancellation") || item.source?.includes("Refund for return")) && (
+                                    <button
+                                        className="btn btn-sm rounded-circle bg-white text-dark d-flex align-items-center justify-content-center"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDownloadCreditReceipt(item.source);
+                                        }}
+                                        style={{
+                                          width: '32px',
+                                          height: '32px',
+                                          border: '1px solid #dee2e6', // dark border
+                                        }}
+                                      >
+                                        <FiDownload size={18} />
+                                      </button>
+
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="py-5 text-body-tertiary d-flex flex-column justify-content-center align-items-center">
                     <RiFilePaper2Line size={50} />
@@ -710,7 +916,7 @@ const handleAddressTypeChange = (e) => {
 
             <div className='right'>
             <div className='bg-white p-3 rounded'>
-                <h5>Status</h5>
+                <h5 className="fs-6">Status</h5>
                 <StatusInput status={status} onStatusChange={handleStatusChange}></StatusInput>
             </div>
 
@@ -739,67 +945,131 @@ const handleAddressTypeChange = (e) => {
                       </div>
                   </div>
 
-                  <div>
-                      <h5 style={{fontSize:'1.1rem'}}>Wallet Balance</h5>
-                      <h5 className={`fs-4 mt-3 ${walletBalance > 0 ? 'text-primary' : 'text-secondary'}`}>
-                          ₹{walletBalance?.toFixed(0) || 0}
-                      </h5>
-                  </div>
+                  <div
+                  className="d-flex flex-column justify-content-center align-items-start"
+                >
+                  <h5 style={{ fontSize: '1rem' }}>Wallet Balance</h5>
+                  <h5 className={`fs-4 mt-2 ${walletBalance > 0 ? 'text-primary' : 'text-secondary'}`}>
+                    ₹{walletBalance?.toFixed(0) || 0}
+                  </h5>
+                </div>
+
               </div>
           </div>
 
 
             {state?.index !== undefined && (
-                <div className="bg-white p-3 rounded mt-2 segment-sec">
-                <h5>Segments</h5>
-                
-             
-                <select
-                className="border border-secondary-subtle rounded p-1 w-100 mb-2"
-                value={selectedValue}
-                onChange={addSegmentAsChip}
-            >
-                <option value="">Select a Segment</option>
-                {segments.map((segment, index) => (
-                    <option key={index} value={segment.segmentTitle}>
-                        {segment.segmentTitle}
-                    </option>
-                ))}
-            </select>
- 
+               <div className="bg-white p-3 rounded-3 mt-3 segment-sec border border-light">
+                  <div className="d-flex align-items-center justify-content-between mb-3">
+                      <h5 className="fs-6 mb-0 fw-semibold text-dark">Segments</h5>
+                      {selectedSegments.length > 0 && (
+                          <small className="text-muted">{selectedSegments.length} selected</small>
+                      )}
+                  </div>
+                  
+                  <div className="position-relative mb-3">
+                      <select
+                          className="form-select border-secondary-subtle rounded-2 py-2 px-3 w-100"
+                          value={selectedValue}
+                          onChange={addSegmentAsChip}
+                          style={{
+                              fontSize: '14px',
+                              transition: 'all 0.2s ease-in-out',
+                              backgroundColor: '#fafafa'
+                          }}
+                          onFocus={(e) => {
+                              e.currentTarget.style.borderColor = '#0d6efd';
+                              e.currentTarget.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.25)';
+                          }}
+                          onBlur={(e) => {
+                              e.currentTarget.style.borderColor = '#dee2e6';
+                              e.currentTarget.style.boxShadow = 'none';
+                          }}
+                      >
+                          <option value="">Choose a segment...</option>
+                          {segments.map((segment, index) => (
+                              <option 
+                                  key={index} 
+                                  value={segment.segmentTitle}
+                                  title={segment.segmentTitle}
+                                  style={{
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      maxWidth: '100%'
+                                  }}
+                              >
+                                  {segment.segmentTitle.length > 40 
+                                      ? `${segment.segmentTitle.substring(0, 40)}...` 
+                                      : segment.segmentTitle
+                                  }
+                              </option>
+                          ))}
+                      </select>
+                  </div>
 
-                {/* Display selected segments as chips */}
-                <div className="chips-container mt-2">
-                    {selectedSegments.map((segment, index) => (
-                    <span
-                        key={index}
-                        className="chip"
-                        style={{
-                        display: 'inline-block',
-                        backgroundColor: '#e0e0e0',
-                        padding: '5px 10px',
-                        margin: '5px',
-                        borderRadius: '20px',
-                        fontSize:"0.9rem"
-                        }}
-                    >
-                        {segment.segmentTitle}
-                        <button
-                        onClick={() => removeSegmentChip(index)}  // Remove chip when clicked
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'red',
-                            marginLeft: '5px',
-                            cursor: 'pointer',
-                        }}
-                        >
-                        x
-                        </button>
-                    </span>
-                    ))}
-                </div>
-                </div>
+                  {/* Display selected segments as chips */}
+                  <div className="chips-container">
+                      {selectedSegments.length === 0 ? (
+                          <div className="text-center py-3 text-muted">
+                              <small>No segments selected</small>
+                          </div>
+                      ) : (
+                          <div className="d-flex flex-wrap gap-2">
+                              {selectedSegments.map((segment, index) => (
+                                  <span
+                                      key={index}
+                                      className="chip d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill border"
+                                      style={{
+                                          backgroundColor: '#f0f8ff',
+                                          borderColor: '#bfdbfe',
+                                          fontSize: '0.8rem',
+                                          fontWeight: '500',
+                                          color: '#0d6efd',
+                                          transition: 'all 0.2s ease-in-out',
+                                          cursor: 'default'
+                                      }}
+                                      onMouseEnter={(e) => {
+                                          e.currentTarget.style.backgroundColor = '#e9ecef';
+                                          e.currentTarget.style.borderColor = '#adb5bd';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                          e.currentTarget.style.borderColor = '#dee2e6';
+                                      }}
+                                  >
+                                      <span className="text-truncate" style={{ maxWidth: '200px' }}>
+                                          {segment.segmentTitle}
+                                      </span>
+                                      <button
+                                          onClick={() => removeSegmentChip(index)}
+                                          className="btn btn-sm p-0 border-0 bg-transparent d-flex align-items-center justify-content-center ms-1"
+                                          style={{
+                                              width: '18px',
+                                              height: '18px',
+                                              borderRadius: '50%',
+                                              color: '#6c757d',
+                                              fontSize: '14px',
+                                              transition: 'all 0.2s ease-in-out'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                              e.currentTarget.style.backgroundColor = '#dc3545';
+                                              e.currentTarget.style.color = 'white';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'transparent';
+                                              e.currentTarget.style.color = '#6c757d';
+                                          }}
+                                          aria-label={`Remove ${segment.segmentTitle}`}
+                                      >
+                                          ×
+                                      </button>
+                                  </span>
+                              ))}
+                          </div>
+                      )}
+                  </div>
+              </div>
             )}
 
             

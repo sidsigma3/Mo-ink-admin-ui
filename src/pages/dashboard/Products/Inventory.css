@@ -192,6 +192,8 @@
 .weight-icon {
   font-size: 14px;
   stroke-width: 3px;
+  fill: none;
+  stroke: #3f3c3c;
 }
 
 .order-tag {
@@ -212,6 +214,9 @@
 .order-icon {
   font-size: 14px;
   stroke-width: 2.5px;
+  fill: none;
+  stroke: #3f3c3c;
+
 }
 
 

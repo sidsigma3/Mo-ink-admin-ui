@@ -1478,10 +1478,11 @@ const handleReject = (variant) => {
                                           <td className="fw-medium" style={{
                                                 fontSize: '0.8rem',
                                                 textAlign: 'start',
+                                                verticalAlign: 'middle' ,
                                                 color: 'black'}}>{order.productName} </td>
 
                                           {/* Size */}
-                                          <td style={{ textAlign: 'center'}}>
+                                          <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
                                               <div className="fw-medium" style={{
                                                 fontSize: '0.8rem',
                                                 textAlign: 'center',
@@ -1526,6 +1527,7 @@ const handleReject = (variant) => {
                                                 fontSize: '0.8rem',
                                                 textAlign: 'center',
                                                 justifyItems: 'center',
+                                                verticalAlign: 'middle' ,
                                                 color: 'black'}}>
                                             <div className="d-flex flex-column gap-3">
                                           
@@ -1537,6 +1539,7 @@ const handleReject = (variant) => {
                                                 fontSize: '0.8rem',
                                                 textAlign: 'center',
                                                 justifyItems: 'center',
+                                                verticalAlign: 'middle' ,
                                                 color: 'black'}}>
                                             <div className="d-flex flex-column gap-3">
                                               <span className="w-75">
@@ -1549,13 +1552,13 @@ const handleReject = (variant) => {
 
                                           {/* Weight Inputs Column */}
                                        
-                                          <td style={{ width: '8rem' }}>
+                                          <td style={{ width: '8rem',  justifyItems: 'center', alignContent:'center' }}>
                                           <div className="d-flex flex-column align-items-center">
                                           <input
                                             type="number"
                                             style={{ border: '1px solid' }}
                                             placeholder="Weight"
-                                            className="rounded border-secondary-subtle weight-input ps-1 py-1 mb-3 w-75"
+                                            className="rounded border-secondary-subtle weight-input ps-1 py-1 w-75"
                                             value={order.color.weight || ''}
                                             onChange={(e) => handleWeightChange(index, e.target.value)}
                                             disabled={["SHIPPED", "CANCELLED", "DELIVERED", "RETURN_REQUESTED", "RETURNED", "RETURN_REJECTED","NEW"].includes(order.status)}
@@ -1631,7 +1634,7 @@ const handleReject = (variant) => {
 
 
                                           {isViewMode && (
-                                            <td>
+                                            <td  style={{ justifyItems: 'center', alignContent:'center'}}  >
                                               <div className="d-flex align-items-center justify-content-center">
                                                 {["RETURNED", "RETURN_REJECTED"].includes(order.status) ? (
                                                   <div className={`${statusClassMap[order.status] || ''} defaultcolor text-capitalize`}>

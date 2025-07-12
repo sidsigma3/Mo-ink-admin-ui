@@ -219,23 +219,23 @@ const AddSegmentsPage = () => {
 
   return (
     <div className='add-segments-page'>
-        <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
+        <div className="top d-flex gap-3 align-items-center" style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/segments")}>
           <IoArrowBackOutline size={25} />
         </span>
-        <h5>New Segments</h5>
+        <h5 className="m-0">New Segments</h5>
       </div>
 
-        <div className='main d-flex gap-3'>
+        <div className='main d-flex gap-3 mt-2'>
             <div className='left'>
                     <div className='title-sec bg-white p-3 d-flex flex-column rounded'>
-                        <h5>Title</h5>
+                        <h5 className='fs-6'>Title</h5>
                         <input type="text" value={segmentData.title} onChange={handleTitleChange} />
                         {errors.title && <p className="text-danger">{errors.title}</p>}
                     </div>
 
                     <div className='seg-type p-3 bg-white mt-2 rounded'>
-                        <h5>Segment type</h5>
+                        <h5 className='fs-6'>Segment type</h5>
                         <div className='bg-white p-2 mt-2'>
                             <div className='d-flex gap-2'>
                                 <input
@@ -247,7 +247,7 @@ const AddSegmentsPage = () => {
                                 />
                                 <label htmlFor='label' className='fw-medium'>Label</label>
                             </div>
-                            <p className='ms-4 mt-1 text-body-tertiary'>
+                            <p className='fs-6 ms-4 mt-1 text-body-tertiary'>
                                 Add customer to the segment one by one
                             </p>
                         </div>
@@ -264,7 +264,7 @@ const AddSegmentsPage = () => {
                                 />
                                 <label htmlFor='Automated' className='fw-medium'>Conditional</label>
                             </div>
-                            <p className='ms-4 mt-1 text-body-tertiary'>
+                            <p className='fs-6 ms-4 mt-1 text-body-tertiary'>
                                 Existing and future customers that match the condition you set will automatically be added to this segment
                             </p>
                         </div>
@@ -287,7 +287,7 @@ const AddSegmentsPage = () => {
 
                 {segmentData.segmentType.toLowerCase() === "label" && (
                     <div className='bg-white p-3 mt-2 rounded label-sec'>
-                    <h5>Applies to</h5>
+                    <h5 className='fs-6'>Applies to</h5>
                     <div className="d-flex gap-2 mb-3 mt-3 align-items-center">
                     <SearchBox></SearchBox>
                     <div>
@@ -301,26 +301,90 @@ const AddSegmentsPage = () => {
                    
                 </div>
                 {errors.selectedCustomer && <p className="text-danger">{errors.selectedCustomer}</p>}
-
-                <div className="customer-list-ctn"> 
-                <ul>
-                {selectedCustomer.map((item,index)=>(
-
-                   
-                        <li id={index} className="d-flex align-items-center justify-content-between mt-3">
-                            <div className='d-flex gap-2 align-items-center'>
-                            <h5 className='m-0'>{item.customerName}</h5>
-                            <GoDotFill />
-                             <p className='fw-normal m-0'>{item.email}</p>
-                             </div>
-                             <button className='border border-0 bg-white' onClick={()=>handleDeleteCustomer(index)}>
-                            <RxCross2 />
-                            </button> 
+                <div className="customer-list-ctn ">
+                <ul className="list-unstyled mb-0">
+                    {selectedCustomer.length === 0 ? (
+                    <li className="text-center py-4 text-muted">
+                        <small>No customers selected</small>
+                    </li>
+                    ) : (
+                    selectedCustomer.map((item, index) => (
+                        <li 
+                        key={index} 
+                        className="bg-white rounded-3 p-3 mb-2 border border-light position-relative overflow-hidden"
+                        style={{
+                            transition: 'all 0.2s ease-in-out',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.04)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                        >
+                        <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center gap-3 flex-grow-1 min-width-0">
+                            <div 
+                                className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'linear-gradient(135deg,rgb(194, 205, 255) 0%, #0D6EFD 100%)',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                color: 'white'
+                                }}
+                            >
+                                {item.customerName.charAt(0).toUpperCase()}
+                            </div>
+                            
+                            <div className="flex-grow-1 min-width-0">
+                                <div className="flex-row align-items-center gap-2">
+                                <h5 className="mb-0 fw-semibold text-dark text-truncate" style={{ fontSize: '16px' }}>
+                                    {item.customerName}
+                                </h5>
+                                {/* <div 
+                                    className="bg-secondary rounded-circle flex-shrink-0"
+                                    style={{ width: '4px', height: '4px', opacity: '0.6' }}
+                                ></div> */}
+                                <p className="mb-0 text-muted text-truncate" style={{ fontSize: '16px' }}>
+                                    {item.email}
+                                </p>
+                                </div>
+                            </div>
+                            </div>
+                            
+                            <button
+                            className="btn btn-sm border-0 bg-transparent p-0 ms-2 flex-shrink-0 d-flex align-items-center justify-content-center"
+                            onClick={() => handleDeleteCustomer(index)}
+                            style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                transition: 'all 0.2s ease-in-out',
+                                color: '#6c757d'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                e.currentTarget.style.color = '#dc3545';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                                e.currentTarget.style.color = '#6c757d';
+                            }}
+                            aria-label={`Remove ${item.customerName}`}
+                            >
+                            <RxCross2 size={16} />
+                            </button>
+                        </div>
                         </li>
-                   
-                ))}
-                 </ul>
-              </div>
+                    ))
+                    )}
+                </ul>
+                </div>
                 </div>
                 )}
                     
@@ -355,8 +419,8 @@ const AddSegmentsPage = () => {
 
 
             <div className='right'>
-                <div className='bg-white p-2 rounded'>
-                    <h5>Status</h5>
+                <div className='bg-white p-3 rounded'>
+                    <h5 class="mb-3">Status</h5>
                     <StatusInput status={segmentData.status} onStatusChange={handleStatusChange}></StatusInput>
                 </div>
             </div>

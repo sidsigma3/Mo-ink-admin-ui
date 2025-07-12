@@ -5,6 +5,7 @@ import { MdEmail } from "react-icons/md";
 import "./ProfilePage.css"
 import { BsCheckCircleFill } from "react-icons/bs";
 import { MdEdit } from "react-icons/md";
+import { IoMdLogOut } from "react-icons/io";
 import SubmitBtn from '../../../components/Buttons/Submit/SubmitBtn';
 import { useNavigate } from 'react-router-dom';
 import { addUser, getUserById, updateUser } from '../../../services/UserService';
@@ -171,8 +172,22 @@ const ProfilePage = ({setIsAuthenticated}) => {
                 <h6 className='text-primary'>{today}</h6>
             </div>
            
-            <button className='btn btn-sm btn-outline-danger h-50' onClick={handleLogout}>Log out</button>
-
+            <button
+            className="btn btn-sm d-flex align-items-center justify-content-center"
+            onClick={handleLogout}
+            style={{
+                backgroundColor: '#dc3545', 
+                color: 'white',
+                border: 'none',
+                width: '32px',
+                height: '32px',
+                borderRadius: '4rem',
+                padding: 0
+            }}
+            title="Log out"
+            >
+            <IoMdLogOut size={18} />
+            </button>
         </div>
 
 
@@ -241,43 +256,43 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
             <div className='row p-3'>
 
-                <div className='col-lg-6 d-flex flex-column mt-2'>
+                <div className='col-6 d-flex gx-4 flex-column mt-2'>
                     <label>First Name</label>
                     <input type='text' name='firstName' className='rounded mt-2' value={formData.firstName} onChange={handleInputChange}></input>
                 </div>
 
-                <div className='col-lg-6 d-flex flex-column mt-2'>
+                <div className='col-6 d-flex gx-4 flex-column mt-2'>
                     <label>Last Name</label>
                     <input type='text' name='lastName' className='rounded mt-2' value={formData.lastName} onChange={handleInputChange}></input>
                 </div>
 
-                {/* <div className='col-lg-6 d-flex flex-column mt-2'>
+                {/* <div className='col-6 d-flex gx-4 flex-column mt-2'>
                     <label>Password</label>
                     <input type='password' className='rounded mt-2' ></input>
                 </div> */}
 
-                <div className='col-lg-6 d-flex flex-column mt-2'>
+                <div className='col-6 d-flex gx-4 flex-column mt-2'>
                     <label>Company</label>
                     <input type='text' name='company' className='rounded mt-2' value={formData.company} onChange={handleInputChange}></input>
                 </div>
 
-                <div className='col-lg-6 d-flex flex-column mt-2'>
+                <div className='col-6 d-flex gx-4 flex-column mt-2'>
                     <label>Country</label>
                     <input type='text' name='country' className='rounded mt-2' value={formData.country} onChange={handleInputChange}></input>
                 </div>
 
-                <div className='col-lg-6 d-flex flex-column mt-2'>
+                <div className='col-6 d-flex gx-4 flex-column mt-2'>
                     <label>Calling Number</label>
                     <input type='text' name='phoneNumber' className='rounded mt-2' value={formData.phoneNumber} onChange={handleInputChange}></input>
                 </div>
 
-                <div className='col-lg-6 d-flex flex-column mt-2'>
+                <div className='col-6 d-flex gx-4 flex-column mt-2'>
                     <label>Whatsapp Number</label>
                     <input type='text' name='whatsappNumber' className='rounded mt-2' value={formData.whatsappNumber} onChange={handleInputChange}></input>
 
                 </div>
 
-                <div className='col-lg-6 d-flex flex-column mt-2'>
+                <div className='col-12 d-flex gx-4 flex-column mt-2'>
                     <label>Email</label>
                     <input type='text' name='email' className='rounded mt-2' value={formData.email} onChange={handleInputChange}></input>
 
