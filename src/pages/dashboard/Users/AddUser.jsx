@@ -250,38 +250,32 @@ const AddUser = () => {
                  </span>
              <h4 className="m-0" style={{fontSize:'1.2rem'}}>{formData.firstName + " "+formData.lastName}</h4>
              <div
-                     style={{
-                         width: '5rem',
-                         border: '1px solid',
-                         borderRadius: '0.2rem',
-                         padding: '0.2rem 0.5rem',
-                         textAlign: 'center',
-                         fontSize:'0.9rem',
-                         backgroundColor:
-                             formData.role.toLowerCase() === 'owner'
-                             ? '#FEDBDC'
-                             :  formData.role.toLowerCase() === 'admin'
-                             ? '#DBEAFE'
-                             :  formData.role.toLowerCase() === 'sales'
-                             ? '#FFECFA'
-                             : '#FFFFFF', // Default background color if none match
-                         borderColor:
-                             formData.role.toLowerCase() === 'owner'
-                             ? '#FD9395'
-                             :  formData.role.toLowerCase() === 'admin'
-                             ? '#93C5FD'
-                             :  formData.role.toLowerCase() === 'sales'
-                             ? '#F75FFF'
-                             : '#CCCCCC', // Default border color if none match
-                         color:
-                             formData.role.toLowerCase() === 'owner'
-                             ? '#B91C1C' // Red text for Owner
-                             :  formData.role.toLowerCase() === 'admin'
-                             ? '#1E40AF' // Blue text for Admin
-                             :  formData.role.toLowerCase() === 'sales'
-                             ? '#7A1E7A' // Purple text for Sales
-                             : '#000000', // Default text color if none match
-                         }}
+                style={{
+                width: '5rem',
+                border: '1px solid',
+                borderRadius: '0.2rem',
+                padding: '0.2rem 0.5rem',
+                textAlign: 'center',
+                fontSize: '0.9rem',
+                ...(formData.role.toLowerCase() === 'master' ? {
+                    backgroundImage: 'linear-gradient(175deg, #F3E47E 30%, #E1A93C 100%)',
+                    backgroundColor: '#F3E47E',
+                    borderColor: '#ffffff',
+                    color: '#7c5d24',
+                } : formData.role.toLowerCase() === 'admin' ? {
+                    backgroundColor: '#DBEAFE',
+                    borderColor: '#93C5FD',
+                    color: '#1E40AF',
+                } : formData.role.toLowerCase() === 'sales' ? {
+                    backgroundColor: '#FFECFA',
+                    borderColor: '#F75FFF',
+                    color: '#7A1E7A',
+                } : {
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#CCCCCC',
+                    color: '#000000',
+                })
+                }}
                  >
                      {
                          formData.role}

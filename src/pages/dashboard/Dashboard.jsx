@@ -350,7 +350,7 @@ const {
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
                           <DashboardBox heading={'Total Revenue (Lacs)'} number={`₹ ${formatNumber(totalRevenueInLacs)}`} />
                         </div>
-                        <div className="dashboardBox-ctn col-12 col-md-4 col-lg-4 col-xl">
+                        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
                           <DashboardBox heading={'Total Weight Sold'} number={`${formatNumber(totalWeightSold)} Kgs`} />
                         </div>
                     </div>
@@ -365,37 +365,38 @@ const {
 
       <div className="current-status-ctn row">
         <h3>Current Status</h3>
-        <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
           <DashboardBox heading={'New Orders To Fulfill'} number={newOrdersToFulfill} />
         </div>
-        <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
           <DashboardBox heading={'Orders at Manufacturer'} number={ordersAtManufacturer} />
         </div>
-        <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
-          <DashboardBox heading={'Orders Received from Manufacturer'} number={ordersDispatched} />
+        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
+          <DashboardBox heading={'Orders Shipped'} number={ordersDispatched} />
         </div>
-      </div>
+     
 
-      <div className="current-status-ctn row">
+      {/* <div className="current-status-ctn row"> */}
        
-       <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+       <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
     <DashboardBox
       heading={'Payment Receivable'}
       number={`₹ ${formatNumber(paymentReceivableInLacs)} Lacs`}
     />
   </div>
-  <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+  <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
     <DashboardBox
       heading={'New Order Received'}
       number={`${formatNumber(newOrderReceivedWeight)} Kgs`}
     />
   </div>
-  <div className="dashboardBox-ctn col-6 col-md-4 col-lg">
+  <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
     <DashboardBox
       heading={'Total Inventory Left'}
       number={`${formatNumber(totalInventoryLeft)} Kgs`}
     />
   </div>
+   {/* </div> */}
        
       </div>
     </div>

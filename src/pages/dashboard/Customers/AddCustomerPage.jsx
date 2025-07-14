@@ -650,8 +650,8 @@ const handleAddressTypeChange = (e) => {
                                 width: '2.2rem',
                                 height: '2.2rem',
                                 backgroundColor: 'rgba(13,110,253,0.1)',
-                                border: '1px solid #0d6efd',
-                                color: '#0d6efd',
+                                border: '1px solid #0D6EFD',
+                                color: '#0D6EFD',
                                 borderRadius: '0.4rem',
                               }}
                               onClick={handleAddMoney}
@@ -776,8 +776,8 @@ const handleAddressTypeChange = (e) => {
                                 width: '2.2rem',
                                 height: '2.2rem',
                                 backgroundColor: 'rgba(13,110,253,0.1)',
-                                border: '1px solid #0d6efd',
-                                color: '#0d6efd',
+                                border: '1px solid #0D6EFD',
+                                color: '#0D6EFD',
                                 borderRadius: '0.4rem',
                                 // lineHeight: 1,
                               }}
@@ -978,7 +978,7 @@ const handleAddressTypeChange = (e) => {
                               backgroundColor: '#fafafa'
                           }}
                           onFocus={(e) => {
-                              e.currentTarget.style.borderColor = '#0d6efd';
+                              e.currentTarget.style.borderColor = '#0D6EFD';
                               e.currentTarget.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.25)';
                           }}
                           onBlur={(e) => {
@@ -1025,7 +1025,7 @@ const handleAddressTypeChange = (e) => {
                                           borderColor: '#bfdbfe',
                                           fontSize: '0.8rem',
                                           fontWeight: '500',
-                                          color: '#0d6efd',
+                                          color: '#0D6EFD',
                                           transition: 'all 0.2s ease-in-out',
                                           cursor: 'default'
                                       }}

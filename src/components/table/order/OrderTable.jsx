@@ -325,7 +325,7 @@ const handleRowClick = (order) => {
 
   return (
     <div>
-    <div className="order-table table-ctn-order">
+    <div className="order-table table-ctn-order rounded-3">
       <Table hover>
         <thead>
           <tr className="order-tablemain">
@@ -510,10 +510,10 @@ const handleRowClick = (order) => {
           </div>
         )}
 
-      <div className="order-cards">
+      <div className="order-cards rounded-4">
         {orders.map((order) => (
           <div
-            className="order-card"
+            className="order-card rounded-4 "
             key={order.orderId}
             onClick={() => handleRowClick(order)}
           >
@@ -543,13 +543,17 @@ const handleRowClick = (order) => {
           </div>
 
           <h4 style={{ marginBottom: "1rem" }}>
-            {new Date(order.createdAt).toLocaleString()}
+            {new Date(order.createdAt).toLocaleString('en-IN', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            })}
+
           </h4>
         </div>
-
-
-
-            
 
             <div className="d-flex justify-content-between">
               <p>
@@ -559,23 +563,31 @@ const handleRowClick = (order) => {
                 </span>
               </p>
               <p>
-                {order.orderVariantResponse.length} Quantity{" "}
+                 {order.orderVariantResponse
+                .filter(variant => variant.status !== 'CANCELLED')
+                .reduce((sum, variant) => sum + (Number(variant.orderWeight) || 0), 0)
+                .toFixed(0)} kg{" "}
                 <span>
                   <LuDot size={25} /> 
                 </span>
               </p>
-              <p>{order.totalAmount.toFixed(2)}</p>
+             <p>₹ {order.totalAmount.toLocaleString('en-IN')}</p>
             </div>
 
             <div className="d-flex justify-content-between align-items-center">
             <div className="dropdown-wrapper" onClick={(e) => e.stopPropagation()}>
                 <h5 
-                  className={statusClassMap[order.status]}
+                  className={statusClassMap[order.status]} 
                   onClick={(e) => e.stopPropagation()}
-                >
-                  {order.status}
+                    style={{ 
+                      textTransform: 'capitalize',
+                      textAlign: 'center',
+                      margin: 0 // Remove default h5 margins if needed
+                    }}
+                  >
+                    {order.status.toLowerCase()}
                 </h5>
-                <select
+                {/* <select
                   className="dropdown-select" // ⛔ removed color class here
                   value={order.status}
                   onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
@@ -585,37 +597,64 @@ const handleRowClick = (order) => {
                       {status}
                     </option>
                   ))}
-                </select>
+                </select> */}
               </div>
 
               <div className="dropdown-wrapper" onClick={(e) => e.stopPropagation()}>
-                {/* Payment Status Display */}
-                <h5
-                  className={
-                    order.payment.paymentStatus === "PAID"
-                      ? "green"
-                      : order.payment.paymentStatus === "UNPAID"
-                      ? "grey"
-                      : "yellow"
-                  }
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {order.payment.paymentStatus}
-                </h5>
+              <select
+                className={
+                  order.payment.paymentStatus === "FULLY_PAID"
+                    ? "green"
+                    : order.payment.paymentStatus === "PARTIALLY_PAID"
+                    ? "purple"
+                    : "yellow"
+                }
+                style={{ 
+                        textTransform: 'capitalize',
+                        textAlign: 'center',
+                        fontWeight: '500',
+                      }}
+                value={order.payment.paymentStatus}
+                onChange={(e) => {
+                  const newStatus = e.target.value;
 
-                {/* Payment Status Dropdown */}
-                <select
-                  className="dropdown-select"
-                  value={order.payment.paymentStatus}
-                  onChange={(e) => handlePaymentStatusChange(order.orderDetailId, e.target.value)}
-                >
-                  {paymentStatusOption.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
+                  const showToast = (message, type = "error") => {
+                    setToasts([{ message, type }]);
+                    setTimeout(() => setToasts([]), 3000);
+                  };
+                  
+                  if (order.status !== "SHIPPED") {
+                    showToast("Payment status can only be changed after order has been shipped", "error");
+                    return;
+                  }
+
+                  setModalData({
+                    isOpen: true,
+                    type: 'payment',
+                    status: newStatus,
+                    orderId: order.orderId,
+                  });
+                }}
+              >
+                {[
+                  { label: "Unpaid", value: "UNPAID" },
+                  { label: "Partially Paid", value: "PARTIALLY_PAID" },
+                  { label: "Paid", value: "FULLY_PAID" },
+                ].map(({ label, value }) => {
+                  const current = order.payment.paymentStatus;
+
+                  const isDisabled =
+                    (current === "PARTIALLY_PAID" && value === "UNPAID") ||
+                    (current === "FULLY_PAID" && (value === "UNPAID" || value === "PARTIALLY_PAID"));
+
+                  return (
+                    <option key={value} value={value} disabled={isDisabled}>
+                      {label}
                     </option>
-                  ))}
-                </select>
-              </div>
+                  );
+                })}
+              </select>
+            </div>
 
 
               {/* <div className="manufacturer">
