@@ -33,7 +33,7 @@ const Dashboard = () => {
   
 
   // const [totalCustomers, setTotalCustomers] = useState(0);
-  const [ totalOrders, setTotalOrders] = useState(0);
+ 
   const [totalRevenue, setTotalRevenue] = useState(0);
   // const [totalWeightSold, setTotalWeightSold] = useState(0);
   const [toDispatch,setToDispatch] = useState(0)
@@ -248,7 +248,7 @@ const fetchDashboardData = async () => {
 
 const {
   totalCustomers,
-  totalPurchaseOrders,
+  totalOrders,
   totalRevenueInLacs,
   totalWeightSold,
   productSoldByCategory,
@@ -345,7 +345,7 @@ const {
                           <DashboardBox heading={'Total Customers'} number={totalCustomers} />
                         </div>
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
-                          <DashboardBox heading={'Total Purchase Order'} number={totalPurchaseOrders} />
+                          <DashboardBox heading={'Total Order'} number={totalOrders} />
                         </div>
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
                           <DashboardBox heading={'Total Revenue (Lacs)'} number={`₹ ${formatNumber(totalRevenueInLacs)}`} />

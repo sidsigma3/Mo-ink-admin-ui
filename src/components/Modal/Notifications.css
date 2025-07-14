@@ -163,6 +163,29 @@
   border: 1px solid #3b82f6; /* blue border */
 }
 
+/* Type-specific background colors */
+
+.notification-inventory {
+  background-color: #fff7e6; /* light orange */
+  /* border-left: 4px solid #f59e0b; */
+}
+
+.notification-user {
+  background-color: #e0f2fe; /* light blue */
+  /* border-left: 4px solid #2563eb; */
+}
+
+.notification-return {
+  background-color: #ffe4e6; /* light red */
+  /* border-left: 4px solid #ef4444; */
+}
+
+.notification-default {
+  background-color: #f5f5f5; /* default gray */
+  /* border-left: 4px solid #9ca3af; */
+}
+
+
 
 .notification-dropdown::-webkit-scrollbar {
   display: none; /* Chrome, Safari */

@@ -4,7 +4,7 @@ const BASE_URL = process.env.REACT_APP_BASE_URL + "/notifications";
 
 export const getUserNotifications = async (userId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/USER/${userId}`);
+    const response = await axios.get(`${BASE_URL}/USER/${userId}/unread`);
     return response.data;
   } catch (error) {
     console.error('Error fetching notifications:', error);

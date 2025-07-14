@@ -7,7 +7,7 @@ import {
   getPaginatedUserNotifications,
 } from '../../../services/NoatificationService';
 
-const TABS = ['Inventory', 'User', 'Return'];
+const TABS = ['Inventory', 'User', 'Order'];
 const userData = JSON.parse(localStorage.getItem('userData'))
 const USER_ID = userData?.userId;
 
@@ -85,7 +85,7 @@ const handleMarkSingleRead = async (id) => {
       title === 'new admin account pending approval' ||
       title === 'new sales account pending approval'
     );
-  if (activeTab === 'Return') return title === 'order return requested';
+  if (activeTab === 'Order') return title === 'order return requested';
 
   return false;
 });
@@ -136,21 +136,35 @@ const handleMarkSingleRead = async (id) => {
         <div className="text-center p-4">No notifications available.</div>
       ) : (
         <div className="notifications-list">
-          {filtered.map(({ id, icon = '🔔', title, message, createdAt, read }) => (
-            <div
-              className={`notification-card ${read ? '' : 'unread'}`}
-              key={id}
-              onClick={() => handleMarkSingleRead(id)}
-            >
+          {filtered.map(({ id, icon = '🔔', title, message, createdAt, read }) => {
+              const normalizedTitle = title?.toLowerCase();
+              const typeClass =
+                normalizedTitle === 'inventory alert'
+                  ? 'inventory'
+                  : normalizedTitle === 'order return requested'
+                  ? 'order'
+                  : normalizedTitle === 'new admin account pending approval' ||
+                    normalizedTitle === 'new sales account pending approval'
+                  ? 'user'
+                  : 'default';
 
-              <div className="icon">{icon}</div>
-              <div className="details">
-                <div className="title">{title}</div>
-                <div className="desc">{message}</div>
-                <div className="time">{formatDateToIST(createdAt)}</div>
-              </div>
-            </div>
-          ))}
+              return (
+                <div
+                  className={`notification-card ${typeClass} ${read ? '' : 'unread'}`}
+                  key={id}
+                  onClick={() => handleMarkSingleRead(id)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="icon">{icon}</div>
+                  <div className="details">
+                    <div className="title">{title}</div>
+                    <div className="desc">{message}</div>
+                    <div className="time">{formatDateToIST(createdAt)}</div>
+                  </div>
+                </div>
+              );
+            })}
+
         </div>
       )}
 
