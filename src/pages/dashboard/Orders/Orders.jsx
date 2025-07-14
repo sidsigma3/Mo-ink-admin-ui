@@ -103,6 +103,7 @@ const Orders = () => {
           size: 10,
           status: selectedStatus,
           orderId: selectedFilter === "Order Id" ? searchValue : undefined,
+          customerId: selectedFilter === "Customer Id" ? searchValue : undefined,
           startDate: adjustedStartDate,
           endDate: adjustedEndDate,
         };
@@ -125,9 +126,11 @@ const Orders = () => {
     const payload = {
       status: selectedStatus,
       orderId: selectedFilter === "Order Id" ? searchValue : undefined,
+      customerId: selectedFilter === "Customer Id" ? searchValue : undefined,
       startDate: adjustDate(startDate),
       endDate: adjustDate(endDate),
     };
+
 
     const res = await fetchOrderAnalytics(payload);
 
@@ -398,7 +401,7 @@ useEffect(() => {
         <div className='order-filter-ctn d-flex gap-2 mb-2 w-30 mt-3'>
           
             <ProductFilter 
-                filterOptions={["Order Id", "Customer"]} 
+                filterOptions={["Order Id", "Customer Id"]} 
                 onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
             />
           

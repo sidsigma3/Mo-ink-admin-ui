@@ -58,6 +58,19 @@ export default function Notifications() {
     }
   };
 
+
+const getNotificationClass = (title = '') => {
+  const normalized = title.toLowerCase();
+
+  if (normalized === 'inventory alert') return 'notification-inventory';
+  if (normalized.includes('admin account') || normalized.includes('sales account')) return 'notification-user';
+  if (normalized.includes('return')) return 'notification-return';
+
+  return 'notification-default';
+};
+
+
+
   const formatDateToIST = (dateStr) => {
  
   // const trimmedDateStr = dateStr.split('.')[0] + 'Z'; 
@@ -109,7 +122,7 @@ export default function Notifications() {
               {notifications.map((notification) => (
                 <div
                     key={notification.id}
-                    className={`notification-item ${notification.read ? '' : 'unread-notification'}`}
+                 className={`notification-item ${notification.read ? '' : 'unread-notification'} ${getNotificationClass(notification.title)}`}
                      onClick={async () => {
                       try {
                         if (!notification.read) {

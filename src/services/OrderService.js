@@ -127,17 +127,16 @@ export const fetchPaginatedOrders = async ({
   size,
   status,
   orderId,
+  customerId,
   startDate,
   endDate,
 }) => {
   try {
-    const params = {
-      page,
-      size,
-    };
+    const params = { page, size };
 
-    if (status && status.length > 0) params.status = status.join(',');
+    if (status?.length > 0) params.status = status.join(',');
     if (orderId) params.orderId = orderId;
+    if (customerId) params.customerId = customerId;
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
 
@@ -151,25 +150,16 @@ export const fetchPaginatedOrders = async ({
 
 
 
-export const fetchOrderAnalytics = async ({ status, orderId, startDate, endDate }) => {
+
+export const fetchOrderAnalytics = async ({ status, orderId, customerId, startDate, endDate }) => {
   try {
     const params = {};
 
-    if (status && status.length > 0) {
-      params.status = status.join(",");
-    }
-
-    if (orderId) {
-      params.orderId = orderId;
-    }
-
-    if (startDate) {
-      params.startDate = startDate.toISOString().split("T")[0];
-    }
-
-    if (endDate) {
-      params.endDate = endDate.toISOString().split("T")[0];
-    }
+    if (status?.length > 0) params.status = status.join(',');
+    if (orderId) params.orderId = orderId;
+    if (customerId) params.customerId = customerId;
+    if (startDate) params.startDate = startDate.toISOString().split("T")[0];
+    if (endDate) params.endDate = endDate.toISOString().split("T")[0];
 
     const response = await axios.get(`${BASE_URL}/analytics`, { params });
     return response.data;
@@ -178,6 +168,7 @@ export const fetchOrderAnalytics = async ({ status, orderId, startDate, endDate 
     return null;
   }
 };
+
 
 
 // services/vendorOrderService.js

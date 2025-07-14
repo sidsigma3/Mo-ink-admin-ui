@@ -105,20 +105,19 @@ const AddUser = () => {
         // if (!formData.password.trim()) validationErrors.password = "Password is required";
         if (!formData.company.trim()) validationErrors.company = "Comapany is required";
         // if (!formData.address.trim()) validationErrors.address = "Address is required";
-        if (!formData.adharNumber.trim()) validationErrors.adharNumber = "Addhar is required";
+        // if (!formData.adharNumber.trim()) validationErrors.adharNumber = "Addhar is required";
         // if (!formData.country.trim()) validationErrors.country = "Country is required";
         // if (!formData.state.trim()) validationErrors.state = "State is required";
         // if (!formData.city.trim()) validationErrors.city = "City is required";
         // if (!formData.apartment.trim()) validationErrors.apartment = "Street/Apartment is required";
 
-    
         // If errors exist, stop submission
         if (Object.keys(validationErrors).length > 0) {
             setFormErrors(validationErrors);
             return;
         }
 
-    
+        
     
         const newUser = {
             firstName: formData.firstName,
