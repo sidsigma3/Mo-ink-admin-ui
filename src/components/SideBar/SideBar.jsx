@@ -1,57 +1,43 @@
-import React, { useState ,useRef ,useEffect } from 'react'
-import "./SideBar.css"
-import { CiHome } from "react-icons/ci";
-import { TbBuildingFactory } from "react-icons/tb";
-import { TbClipboardList } from "react-icons/tb";
-
-import { LuShoppingCart } from "react-icons/lu";
-import { BsBox2 } from "react-icons/bs";
-import { GoGraph } from "react-icons/go";
-import { TbRosetteDiscount } from "react-icons/tb";
-import { GoPeople } from "react-icons/go";
-import { LuFactory } from "react-icons/lu";
-import { MdOutlineDiscount } from "react-icons/md";
-import { GoHome  } from "react-icons/go";
-import { LuBox } from "react-icons/lu";
-import { LuSettings } from "react-icons/lu";
-import { LuPackage } from "react-icons/lu";
-import { GrBug } from "react-icons/gr";
-import { MdOutlinePersonOutline } from "react-icons/md";
-import { TfiMenuAlt } from "react-icons/tfi";
-import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { BsArrowReturnRight } from "react-icons/bs";
-import { RiUserSettingsLine } from "react-icons/ri";
-import { IconContext } from "react-icons";
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { AiOutlineLogout } from "react-icons/ai";
-import { IoPricetagOutline } from "react-icons/io5";
-import { IoColorPaletteOutline } from "react-icons/io5";
 import ModalLogout from '../Modal/ModalLogout';
-
+import "./SideBar.css";
+import { 
+  Home, 
+  ShoppingCart, 
+  Package, 
+  Factory, 
+  ClipboardList, 
+  Palette, 
+  BarChart3, 
+  Tag, 
+  Users, 
+  UserCheck, 
+  Settings, 
+  Bug, 
+  LogOut,
+  Menu,
+  Percent,
+  ChevronRight,
+  ChevronDown
+} from 'lucide-react';
 
 const SideBar = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const navigate = useNavigate()
-    const location =useLocation()
-
-    const [selected,setSelected] = useState('dashboard')
-
-    const [hoverSelected , setHoverSelected] = useState('')
-
+    const [selected, setSelected] = useState('dashboard');
+    const [hoverSelected, setHoverSelected] = useState('');
     const [isMoreMenuOpen, setMoreMenuOpen] = useState(false);
-
     const [isModalOpen, setIsModalOpen] = useState(false);  
-
-    const [isLoggedOut, setIsLoggedOut] = useState(false);  
-  
-
+    const [isLoggedOut, setIsLoggedOut] = useState(false);
+    const [isCustomerSubmenuOpen, setIsCustomerSubmenuOpen] = useState(false);
 
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
 
-
-
-      useEffect(() => {
+    useEffect(() => {
       const handleClickOutside = (event) => {
         if (menuRef.current && !menuRef.current.contains(event.target) && 
             buttonRef.current && !buttonRef.current.contains(event.target)) {
@@ -63,387 +49,351 @@ const SideBar = () => {
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    useEffect(() => {
+      if (location.pathname.includes("/vendor-order")) {
+        setSelected("vendors");
+      } else if (location.pathname.includes("/orders") || location.pathname.includes("/create-order")) {
+        setSelected("orders");
+      } else if (location.pathname.includes("/dashboard")) {
+        setSelected("dashboard");
+      } else if (location.pathname.includes("/products") || location.pathname.includes("/add-product")) {
+        setSelected("products");
+      } else if (location.pathname.includes("/colorlibrary")) {
+        setSelected("colorlibrary");
+      } else if (location.pathname.includes("/analytics")) {
+        setSelected("analytics");
+      } else if (location.pathname.includes("/discounts") || location.pathname.includes("/add-discount")) {
+        setSelected("discount");
+      } else if (location.pathname.includes("/customers") || location.pathname.includes("/add-customer")) {
+        setSelected("customers");
+        setIsCustomerSubmenuOpen(true);
+      } else if (location.pathname.includes("/segments") || location.pathname.includes("/add-segments")) {
+        setSelected("segments");
+        setIsCustomerSubmenuOpen(true);
+      } else if (location.pathname.includes("/inventory") || location.pathname.includes("/inventorydetails")) {
+        setSelected("inventory");
+      } else if (location.pathname.includes("/vendor-order") || location.pathname.includes("/vendor-order-details") || location.pathname.includes("/BulkAssignPage")) {
+        setSelected("vendors");
+      } else if (location.pathname.includes("/spinners-and-dyers") || location.pathname.includes("/add-spinner-and-dyers")) {
+        setSelected("manufactures");
+      } else if (location.pathname.includes("/users") || location.pathname.includes("/add-user")) {
+        setSelected("users");
+      } else {
+        setSelected(""); 
+      }
+    }, [location.pathname]);
 
-  useEffect(() => {
-    if (location.pathname.includes("/vendor-order")) {
-      setSelected("vendors");
-    } else if  (location.pathname.includes("/orders") || location.pathname.includes("/create-order")) {
-      setSelected("orders");
-    } else if (location.pathname.includes("/dashboard")) {
-      setSelected("dashboard");
-    } else if (location.pathname.includes("/products") || location.pathname.includes("/add-product")) {
-      setSelected("products");
-    } else if (location.pathname.includes("/colorlibrary") || location.pathname.includes("/colorlibrary")) {
-      setSelected("colorlibrary");
-    }else if (location.pathname.includes("/analytics")) {
-      setSelected("analytics");
-    }else if (location.pathname.includes("/products") || location.pathname.includes("/add-product")) {
-      setSelected("products");
-    }else if (location.pathname.includes("/discounts") || location.pathname.includes("/add-discount")) {
-      setSelected("discount");
-    }else if (location.pathname.includes("/customers") || location.pathname.includes("/add-customer")) {
-      setSelected("customers");
-    }else if (location.pathname.includes("/segments") || location.pathname.includes("/add-segments")) {
-      setSelected("segments");
-    }else if (location.pathname.includes("/inventory") || location.pathname.includes("/inventorydetails")) {
-      setSelected("inventory");
-    }else if (location.pathname.includes("/vendor-order") || location.pathname.includes("/vendor-order-details") ||  location.pathname.includes("/BulkAssignPage")) {
-      setSelected("vendors");
-    }else if (location.pathname.includes("/spinners-and-dyers") || location.pathname.includes("/add-spinner-and-dyers")) {
-      setSelected("manufactures");
-    }else if (location.pathname.includes("/users") || location.pathname.includes("/add-user")) {
-      setSelected("users");
-    }
-    
-    else {
-      
-      setSelected(""); 
-    }
-  }, [location.pathname]);
+    const handleLogout = () => {
+      setIsModalOpen(true); 
+    };
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("isAuthenticated");
-  //   setIsAuthenticated(false);
-  // };
+    const confirmLogout = () => {
+      localStorage.removeItem("isAuthenticated"); 
+      localStorage.removeItem("userData"); 
+      console.log("User logged out");
+      setIsModalOpen(false);  
+      setIsLoggedOut(true);  
+      navigate("/");         
+    };
 
-          const handleLogout = () => {
-            setIsModalOpen(true); 
-          };
+    const closeModal = () => {
+      setIsModalOpen(false);
+    };
 
-          const confirmLogout = () => {
-            localStorage.removeItem("isAuthenticated"); 
-            localStorage.removeItem("userData"); 
-            // sessionStorage.removeItem("authToken");
-            
-            console.log("User logged out");
-            setIsModalOpen(false);  
-            setIsLoggedOut(true);  
-            navigate("/");         
-          };
+    const toggleCustomerSubmenu = () => {
+      setIsCustomerSubmenuOpen(!isCustomerSubmenuOpen);
+    };
 
-          const closeModal = () => {
-            setIsModalOpen(false);
-          };
+    return (
+      <div className='sidebar-container'>
+        <div className='sidebar-header'>
+          <div className='logo-section'>
+            <div className='logo-placeholder'></div>
+            <span className='brand-name'>Dashboard</span>
+          </div>
+        </div>
 
-
-
-  return (
-    <div className='sideBar shadow'>
-
-       <div className='menu'>
-
-       {/* Mobile menu */}
-        <ul className="on-mobile d-md-none bg-gray-600 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] rounded-t-2xl">
-          {/* Always visible on mobile */}
-          <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
-            <Link to={'/dashboard'}>
-              <button onClick={()=>setSelected('dashboard')}><span className='icon'><GoHome  size={22} /></span>Dashboard</button>
-            </Link>
-          </li>
-
-          <li className={selected === 'orders' ? 'selected' : 'not-selected'}>
-            <Link to={'/orders'}>
-              <button onClick={() => setSelected('orders')}>
-                <span className='icon'><LuShoppingCart size={22} /></span>Orders
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'products' ? 'selected' : 'not-selected'}>
-            <Link to={'/products'}>
-              <button onClick={() => setSelected('products')}>
-                <span className='icon'><LuPackage size={22} /></span>Product
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'discount' ? 'selected' : 'not-selected'}> 
-            <Link to={'/discounts'}>
-              <button onClick={()=>setSelected('discount')}><span className='icon'><TbRosetteDiscount size={27}/></span>Discount</button>
-            </Link>
-          </li>
-
-          {/* More menu button - always visible on mobile */}
-         <li className={selected === 'more' ? 'selected' : 'not-selected'}>
-          <button 
-            ref={buttonRef}
-            onClick={(e) => {
-              e.stopPropagation();
-              setMoreMenuOpen(!isMoreMenuOpen);
-              setSelected('more');
-            }}
-          >
-            <span className='icon'><TfiMenuAlt size={28}/></span>More
-          </button>
-        </li>
-
-
-            {isMoreMenuOpen && (
-            <div
-              ref={menuRef}
-              className="more-menu position-fixed bg-white shadow rounded-3 p-2 border"
-              style={{
-                bottom: '70px',       
-                right: '16px',       
-                zIndex: 2147483647 ,
-                width: '220px',
-                animation: 'slideUp 0.3s ease-out'
-              }}
-            >
-              <ul className="list-unstyled mb-0">
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/vendor-order"
-                    onClick={() => setSelected('vendors')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'vendors' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <TbBuildingFactory size={20} />
-                    Vendor Orders
-                  </Link>
-                </li>
-
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/inventory"
-                    onClick={() => setSelected('inventory')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'inventory' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <TbClipboardList size={20} />
-                    Inventory
-                  </Link>
-                </li>
-
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/colorlibrary-products"
-                    onClick={() => setSelected('colorlibrary')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'colorlibrary' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <IoColorPaletteOutline size={20} />
-                    Color Library
-                  </Link>
-                </li>
-
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/analytics"
-                    onClick={() => setSelected('analytics')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'analytics' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <GoGraph size={20} style={{ strokeWidth: '0.4' }} />
-                    Analytics
-                  </Link>
-                </li>
-
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/customers"
-                    onClick={() => setSelected('customers')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'customers' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <GoPeople size={20} style={{ strokeWidth: '0.4' }} />
-                    Customers
-                  </Link>
-                </li>
-
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/segments"
-                    onClick={() => setSelected('segments')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'segments' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <IoPricetagOutline size={20} />
-                    Segments
-                  </Link>
-                </li>
-
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/spinners-and-dyers"
-                    onClick={() => setSelected('manufactures')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'manufactures' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <LuFactory size={20} />
-                    Spinners & Dyers
-                  </Link>
-                </li>
-
-                <li className="d-flex align-items-center gap-2 p-2 rounded hover-bg">
-                  <Link
-                    to="/users"
-                    onClick={() => setSelected('users')}
-                    className={`text-decoration-none d-flex align-items-center gap-2 w-100 ${
-                      selected === 'users' ? 'fw-semibold text-brand' : 'text-dark'
-                    }`}
-                  >
-                    <RiUserSettingsLine size={20} />
-                    Users
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          )}
-
-        </ul>
-
-        {/* Desktop menu */}
-        <ul className='hide-on-mobile '>
-          <li className={selected === 'dashboard' ? 'selected' : 'not-selected'}>
-            <Link to={'/dashboard'}>
-              <button onClick={()=>setSelected('dashboard')}><span className='icon'><GoHome  size={22} /></span>Dashboard</button>
-            </Link>
-          </li>
-
-          <li className={selected === 'orders' ? 'selected' : 'not-selected'}>
-            <Link to={'/orders'}>
-              <button onClick={() => setSelected('orders')}>
-                <span className='icon'><LuShoppingCart size={22} /></span>Orders
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'vendors' ? 'selected' : 'not-selected'}>
-            <Link to={'/vendor-order'}>
-              <button onClick={() => setSelected('vendors')}>
-                <span className='icon'><TbBuildingFactory size={24} /></span>Vendor Orders
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'products' ? 'selected' : 'not-selected'}>
-            <Link to={'/products'}>
-              <button onClick={() => setSelected('products')}>
-                <span className='icon'><LuPackage size={22} /></span>Product
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'inventory' ? 'selected' : 'not-selected'}>
-            <Link to={'/inventory'}>
-              <button onClick={() => setSelected('inventory')}>
-                <span className='icon'><TbClipboardList size={24} /></span>Inventory
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'colorlibrary' ? 'selected' : 'not-selected'}>
-            <Link to={'/colorlibrary-products'}>
-              <button onClick={() => setSelected('colorlibrary')}>
-                <span className='icon'><IoColorPaletteOutline size={24} /></span>Color Library
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'analytics' ? 'selected' : 'not-selected'}>
-            <Link to={'/analytics'}>
-              <button onClick={()=>setSelected('analytics')}>
-                <span className='icon'><GoGraph size={22} style={{ strokeWidth: '0.4'}}/></span>Analytics
-              </button>
-            </Link>
-          </li>
-
-          <li className={selected === 'discount' ? 'selected' : 'not-selected'}> 
-            <Link to={'/discounts'}>
-              <button onClick={()=>setSelected('discount')}><span className='icon'><TbRosetteDiscount size={27}/></span>Discount</button>
-            </Link>
-          </li>
-
-          <div  
-            onMouseEnter={() => setHoverSelected('customers')}  
-            onMouseLeave={() => {
-              if (selected !== 'segments') setHoverSelected(null);
-            }}
-          >
-            <li className={selected === 'customers' ? 'selected' : 'not-selected'} >
-              <Link to={'/customers'}>
-                <button onClick={()=>setSelected('customers')}><span className='icon'><GoPeople size={22} style={{ strokeWidth: '0.4'}}/></span>Customers</button>
-              </Link>
-            </li>
-          
-            <li className={selected === 'segments' ? 'selected mt-3 ' : 'not-selected mt-3 '}>
-              <Link to={'/segments'}>
-                <button 
-                  onClick={() => {
-                    setSelected('segments');
-                  }} 
-                  className='d-flex ' 
-                  style={{ border: 'none', background: 'none', textDecoration: 'none', fontSize: "0.85rem" }}
-                >
-                  <span><IoPricetagOutline size={22}/></span>Segments
+        <div className='sidebar-menu'>
+          {/* Mobile menu */}
+          <ul className="mobile-menu">
+            <li className={`menu-item ${selected === 'dashboard' ? 'selected' : ''}`}>
+              <Link to={'/dashboard'} className='menu-link'>
+                <button onClick={() => setSelected('dashboard')} className='menu-button'>
+                  <span className='menu-icon'><Home size={22} /></span>
+                  <span className='menu-text'>Dashboard</span>
                 </button>
               </Link>
             </li>
-          </div>
 
-          <li className={selected === 'manufactures' ? 'selected' : 'not-selected'}>
-            <Link to={'/spinners-and-dyers'}>
-              <button onClick={()=>setSelected('manufactures')}><span className='icon'><LuFactory size={22}/></span>Spinners & Dyers</button>
-            </Link>
-          </li>
-
-          <li className={selected === 'users' ? 'selected' : 'not-selected'}>
-            <Link to={'/users'}>
-              <button onClick={()=>setSelected('users')}><span className='icon'><RiUserSettingsLine size={22}/></span>Users</button>
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-        
-        <ul className='hide-on-mobile'>
-            {/* <li className={selected === 'settings' ? 'selected' : 'not-selected'}>
-                <Link to={'/settings'}>
-                <button  onClick={()=>setSelected('settings')}><span className='icon'><LuSettings size={22} /></span>Store settings</button>
-                </Link>
-            </li> */}
-
-            <li>
-            <Link to={'/reportbug'}>
-                <button  onClick={()=>setSelected('report')}><span className='icon'><GrBug size={22}/></span>Report a bug</button>
-                </Link>
+            <li className={`menu-item ${selected === 'orders' ? 'selected' : ''}`}>
+              <Link to={'/orders'} className='menu-link'>
+                <button onClick={() => setSelected('orders')} className='menu-button'>
+                  <span className='menu-icon'><ShoppingCart size={22} /></span>
+                  <span className='menu-text'>Orders</span>
+                </button>
+              </Link>
             </li>
 
-            <div>
-            <li>
-              <button onClick={handleLogout}>
-                <span className='icon'>
-                  <AiOutlineLogout size={22} />
-                </span>
-                Log out
+            <li className={`menu-item ${selected === 'products' ? 'selected' : ''}`}>
+              <Link to={'/products'} className='menu-link'>
+                <button onClick={() => setSelected('products')} className='menu-button'>
+                  <span className='menu-icon'><Package size={22} /></span>
+                  <span className='menu-text'>Products</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'discount' ? 'selected' : ''}`}>
+              <Link to={'/discounts'} className='menu-link'>
+                <button onClick={() => setSelected('discount')} className='menu-button'>
+                  <span className='menu-icon'><Percent size={22}/></span>
+                  <span className='menu-text'>Discount</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'more' ? 'selected' : ''}`}>
+              <button 
+                ref={buttonRef}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMoreMenuOpen(!isMoreMenuOpen);
+                  setSelected('more');
+                }}
+                className='menu-button'
+              >
+                <span className='menu-icon'><Menu size={22}/></span>
+                <span className='menu-text'>More</span>
               </button>
             </li>
 
+            {isMoreMenuOpen && (
+              <div ref={menuRef} className="more-menu-dropdown">
+                <div className="dropdown-content">
+                  <Link to="/vendor-order" onClick={() => setSelected('vendors')} 
+                        className={`dropdown-item ${selected === 'vendors' ? 'active' : ''}`}>
+                    <Factory size={20} />
+                    <span>Vendor Orders</span>
+                  </Link>
 
-              <ModalLogout
-              isOpen={isModalOpen}
-              onConfirm={confirmLogout}
-              onCancel={closeModal}
-            />
+                  <Link to="/inventory" onClick={() => setSelected('inventory')} 
+                        className={`dropdown-item ${selected === 'inventory' ? 'active' : ''}`}>
+                    <ClipboardList size={20} />
+                    <span>Inventory</span>
+                  </Link>
 
+                  <Link to="/colorlibrary-products" onClick={() => setSelected('colorlibrary')} 
+                        className={`dropdown-item ${selected === 'colorlibrary' ? 'active' : ''}`}>
+                    <Palette size={20} />
+                    <span>Color Library</span>
+                  </Link>
 
-              {isLoggedOut && <p>You have been logged out successfully.</p>}
-            </div>
-                    </ul>
+                  <Link to="/analytics" onClick={() => setSelected('analytics')} 
+                        className={`dropdown-item ${selected === 'analytics' ? 'active' : ''}`}>
+                    <BarChart3 size={20} />
+                    <span>Analytics</span>
+                  </Link>
 
+                  <Link to="/customers" onClick={() => setSelected('customers')} 
+                        className={`dropdown-item ${selected === 'customers' ? 'active' : ''}`}>
+                    <Users size={20} />
+                    <span>Customers</span>
+                  </Link>
 
+                  <Link to="/segments" onClick={() => setSelected('segments')} 
+                        className={`dropdown-item ${selected === 'segments' ? 'active' : ''}`}>
+                    <Tag size={20} />
+                    <span>Segments</span>
+                  </Link>
 
+                  <Link to="/spinners-and-dyers" onClick={() => setSelected('manufactures')} 
+                        className={`dropdown-item ${selected === 'manufactures' ? 'active' : ''}`}>
+                    <Factory size={20} />
+                    <span>Spinners & Dyers</span>
+                  </Link>
 
-    </div>
-  )
-}
+                  <Link to="/users" onClick={() => setSelected('users')} 
+                        className={`dropdown-item ${selected === 'users' ? 'active' : ''}`}>
+                    <UserCheck size={20} />
+                    <span>Users</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </ul>
 
-export default SideBar
+          {/* Desktop menu */}
+          <ul className='desktop-menu'>
+            <li className={`menu-item ${selected === 'dashboard' ? 'selected' : ''}`}>
+              <Link to={'/dashboard'} className='menu-link'>
+                <button onClick={() => setSelected('dashboard')} className='menu-button'>
+                  <span className='menu-icon'><Home size={22} /></span>
+                  <span className='menu-text'>Dashboard</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'orders' ? 'selected' : ''}`}>
+              <Link to={'/orders'} className='menu-link'>
+                <button onClick={() => setSelected('orders')} className='menu-button'>
+                  <span className='menu-icon'><ShoppingCart size={22} /></span>
+                  <span className='menu-text'>Orders</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'vendors' ? 'selected' : ''}`}>
+              <Link to={'/vendor-order'} className='menu-link'>
+                <button onClick={() => setSelected('vendors')} className='menu-button'>
+                  <span className='menu-icon'><Factory size={22} /></span>
+                  <span className='menu-text'>Vendor Orders</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'products' ? 'selected' : ''}`}>
+              <Link to={'/products'} className='menu-link'>
+                <button onClick={() => setSelected('products')} className='menu-button'>
+                  <span className='menu-icon'><Package size={22} /></span>
+                  <span className='menu-text'>Products</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'inventory' ? 'selected' : ''}`}>
+              <Link to={'/inventory'} className='menu-link'>
+                <button onClick={() => setSelected('inventory')} className='menu-button'>
+                  <span className='menu-icon'><ClipboardList size={22} /></span>
+                  <span className='menu-text'>Inventory</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'colorlibrary' ? 'selected' : ''}`}>
+              <Link to={'/colorlibrary-products'} className='menu-link'>
+                <button onClick={() => setSelected('colorlibrary')} className='menu-button'>
+                  <span className='menu-icon'><Palette size={22} /></span>
+                  <span className='menu-text'>Color Library</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'analytics' ? 'selected' : ''}`}>
+              <Link to={'/analytics'} className='menu-link'>
+                <button onClick={() => setSelected('analytics')} className='menu-button'>
+                  <span className='menu-icon'><BarChart3 size={22} /></span>
+                  <span className='menu-text'>Analytics</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'discount' ? 'selected' : ''}`}>
+              <Link to={'/discounts'} className='menu-link'>
+                <button onClick={() => setSelected('discount')} className='menu-button'>
+                  <span className='menu-icon'><Percent size={22}/></span>
+                  <span className='menu-text'>Discount</span>
+                </button>
+              </Link>
+            </li>
+
+            
+            <li className={`menu-item ${selected === 'customers' ? 'selected' : ''}`}>
+              <Link to={'/customers'} className='menu-link'>
+                <button onClick={() => setSelected('customers')} className='menu-button'>
+                  <span className='menu-icon'><Users size={22}/></span>
+                  <span className='menu-text'>Customers</span>
+                </button>
+              </Link>
+            </li>
+
+            {/* Customer section with submenu */}
+            {/* <li className={`menu-item submenu-parent ${selected === 'customers' || selected === 'segments' ? 'selected' : ''}`}> */}
+              {/* <div className='submenu-container'> */}
+                {/* <Link to={'/customers'} className='menu-link'>
+                  <button onClick={() => setSelected('customers')} className='menu-button'>
+                    <span className='menu-icon'><Users size={22} /></span>
+                    <span className='menu-text'>Customers</span>
+                    <span className='submenu-arrow' onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleCustomerSubmenu();
+                    }}>
+                      {isCustomerSubmenuOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    </span>
+                  </button>
+                </Link> */}
+                
+                {/* {isCustomerSubmenuOpen && (
+                  <div className='submenu'>
+                    <Link to={'/segments'} className='submenu-link'>
+                      <button 
+                        onClick={() => setSelected('segments')} 
+                        className={`submenu-button ${selected === 'segments' ? 'selected' : ''}`}
+                      >
+                        <span className='submenu-icon'><Tag size={18}/></span>
+                        <span className='submenu-text'>Segments</span>
+                      </button>
+                    </Link>
+                  </div>
+                )} */}
+              {/* </div> */}
+            {/* </li> */}
+
+            <li className={`menu-item ${selected === 'segments' ? 'selected' : ''}`}>
+              <Link to={'/segments'} className='menu-link'>
+                <button onClick={() => setSelected('segments')} className='menu-button'>
+                  <span className='menu-icon'><Tag size={22}/></span>
+                  <span className='menu-text'>Segments</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'manufactures' ? 'selected' : ''}`}>
+              <Link to={'/spinners-and-dyers'} className='menu-link'>
+                <button onClick={() => setSelected('manufactures')} className='menu-button'>
+                  <span className='menu-icon'><Factory size={22}/></span>
+                  <span className='menu-text'>Spinners & Dyers</span>
+                </button>
+              </Link>
+            </li>
+
+            <li className={`menu-item ${selected === 'users' ? 'selected' : ''}`}>
+              <Link to={'/users'} className='menu-link'>
+                <button onClick={() => setSelected('users')} className='menu-button'>
+                  <span className='menu-icon'><UserCheck size={22}/></span>
+                  <span className='menu-text'>Users</span>
+                </button>
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Bottom section */}
+        <div className='sidebar-footer'>
+          <div className='footer-menu'>
+            <Link to={'/reportbug'} className='menu-link'>
+              <button onClick={() => setSelected('report')} className='menu-button footer-button'>
+                <span className='menu-icon'><Bug size={22}/></span>
+                <span className='menu-text'>Report a bug</span>
+              </button>
+            </Link>
+
+            <button onClick={handleLogout} className='menu-button logout-button'>
+              <span className='menu-icon'><LogOut size={22} /></span>
+              <span className='menu-text'>Log out</span>
+            </button>
+          </div>
+
+          <ModalLogout
+            isOpen={isModalOpen}
+            onConfirm={confirmLogout}
+            onCancel={closeModal}
+          />
+
+          {isLoggedOut && <p className='logout-message'>You have been logged out successfully.</p>}
+        </div>
+      </div>
+    );
+};
+
+export default SideBar;

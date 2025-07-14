@@ -146,30 +146,25 @@ for (let number = 1; number <= totalPages; number++) {
                               border: '1px solid',
                               borderRadius: '0.2rem',
                               textAlign: 'center',
-                              backgroundColor:
-                                user.role.toLowerCase() === 'owner'
-                                  ? '#FEDBDC'
-                                  : user.role.toLowerCase() === 'admin'
-                                  ? '#DBEAFE'
-                                  : user.role.toLowerCase() === 'sales'
-                                  ? '#FFECFA'
-                                  : '#FFFFFF',
-                              borderColor:
-                                user.role.toLowerCase() === 'owner'
-                                  ? '#FD9395'
-                                  : user.role.toLowerCase() === 'admin'
-                                  ? '#93C5FD'
-                                  : user.role.toLowerCase() === 'sales'
-                                  ? '#F75FFF'
-                                  : '#CCCCCC',
-                              color:
-                                user.role.toLowerCase() === 'owner'
-                                  ? '#B91C1C'
-                                  : user.role.toLowerCase() === 'admin'
-                                  ? '#1E40AF'
-                                  : user.role.toLowerCase() === 'sales'
-                                  ? '#7A1E7A'
-                                  : '#000000',
+                              ...(user.role.toLowerCase().includes('master') ? {
+                          backgroundImage: 'linear-gradient(175deg, #F3E47E 30%, #E1A93C 100%)',
+                          backgroundColor: '#F3E47E',
+                          borderColor: '#ffffff',
+                          color: '#7c5d24',
+                        } : user.role.toLowerCase().includes('admin') ? {
+                          backgroundColor: '#DBEAFE',
+                          borderColor: '#93C5FD',
+                          color: '#1E40AF',
+                        } : user.role.toLowerCase().includes('sales') ? {
+                          backgroundColor: '#FFECFA',
+                          borderColor: '#F75FFF',
+                          color: '#7A1E7A',
+                        } : {
+                          backgroundColor: '#FFFFFF',
+                          borderColor: '#CCCCCC',
+                          color: '#000000',
+                        })
+                    
                             }}
                           >
                             {user.role}
@@ -241,33 +236,27 @@ for (let number = 1; number <= totalPages; number++) {
                         alignItems: 'center',
                         marginBottom: '0',
                         fontWeight: '500',
-
-                        backgroundColor:
-                           user.role.toLowerCase() === 'owner'
-                            ? '#F3F4F6'
-                            :  user.role.toLowerCase() === 'admin'
-                            ? '#DBEAFE'
-                            :  user.role.toLowerCase() === 'sales'
-                            ? '#FFECFA'
-                            : '#FFFFFF', // Default background color if none match
-                            border: '1px solid',
-                            borderRadius: '0.2rem',
-                        borderColor:
-                           user.role.toLowerCase() === 'owner'
-                            ? '#D1D5DB'
-                            :  user.role.toLowerCase() === 'admin'
-                            ? '#93C5FD'
-                            :  user.role.toLowerCase() === 'sales'
-                            ? '#F75FFF'
-                            : '#CCCCCC', // Default border color if none match
-                        color:
-                           user.role.toLowerCase() === 'owner'
-                            ? '#3f3c3c' // Red text for Owner
-                            :  user.role.toLowerCase() === 'admin'
-                            ? '#1E40AF' // Blue text for Admin
-                            :  user.role.toLowerCase() === 'sales'
-                            ? '#7A1E7A' // Purple text for Sales
-                            : '#000000', // Default text color if none match
+                        border: '1px solid',
+                        borderRadius: '0.2rem',
+                        
+                        ...(user.role.toLowerCase().includes('master') ? {
+                          backgroundImage: 'linear-gradient(175deg, #F3E47E 30%, #E1A93C 100%)',
+                          backgroundColor: '#F3E47E',
+                          borderColor: '#ffffff',
+                          color: '#7c5d24',
+                        } : user.role.toLowerCase().includes('admin') ? {
+                          backgroundColor: '#DBEAFE',
+                          borderColor: '#93C5FD',
+                          color: '#1E40AF',
+                        } : user.role.toLowerCase().includes('sales') ? {
+                          backgroundColor: '#FFECFA',
+                          borderColor: '#F75FFF',
+                          color: '#7A1E7A',
+                        } : {
+                          backgroundColor: '#FFFFFF',
+                          borderColor: '#CCCCCC',
+                          color: '#000000',
+                        })
                       }}
                     >
                     {user.role}
