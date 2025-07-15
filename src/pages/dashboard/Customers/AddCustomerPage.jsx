@@ -437,6 +437,26 @@ const handleAddressTypeChange = (e) => {
         };
 
 
+        const handleDownloadChequePhoto = async () => {
+          console.log('hello')
+          try {
+            const response = await fetch(`${backendUrl}${formData.chequePhoto}`);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'aadhaar-photo.jpg'; // you can customize the name
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+          } catch (error) {
+            console.error("Error downloading image:", error);
+          }
+        };
+
+
  
   return (
     <div className='add-customer'>
@@ -518,51 +538,49 @@ const handleAddressTypeChange = (e) => {
                     {errors.gstin && <p className="text-danger">{errors.gstin}</p>}
                 </div>
 
+                <div className="media-upload-card p-4 h-100">
+                  <label className="upload-label mb-3" style={{ fontSize: '1rem' }}>
+                    Aadhaar Card Photo
+                  </label>
 
-
-
-                         <div className="col-12 my-4">
-            <div className="media-upload-card p-4 h-100">
-              <label className="upload-label mb-3" style={{fontSize:'1rem'}}>Aadhaar Card Photo</label>
-              <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
-                <input
-                  type="file"
-                  id="cheque-upload"
-                  accept="image/*"
-                  onChange={handleChequePhotoChange}
-                  className="d-none"
-                />
-                <label 
-                  htmlFor="cheque-upload" 
-                  className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
-                >
-                  <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
-                </label>
-                <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
-                
-                {formData.chequePhoto && (
-                  <div className="preview-container mt-4 text-center">
-                    <img 
-                      src={`${backendUrl}${formData.chequePhoto}`} 
-                      alt="Cheque Preview" 
-                      className="img-thumbnail rounded" 
-                      style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+                  <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+                    <input
+                      type="file"
+                      id="cheque-upload"
+                      accept="image/*"
+                      onChange={handleChequePhotoChange}
+                      className="d-none"
                     />
-                    {/* Uncomment if you want a remove button
-                    <button 
-                      className="btn btn-sm btn-outline-danger mt-2"
-                      onClick={() => setFormData(prev => ({...prev, chequePhoto: ''}))}
+                    <label
+                      htmlFor="cheque-upload"
+                      className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
                     >
-                      Remove
-                    </button> */}
+                      <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+                    </label>
+                    <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+
+                    {formData.chequePhoto && (
+                      <div className="preview-container mt-4 text-center">
+                        <img
+                          src={`${backendUrl}${formData.chequePhoto}`}
+                          alt="Cheque Preview"
+                          className="img-thumbnail rounded"
+                          style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+                        />
+                       <button
+                          className="btn btn-sm btn-outline-secondary mt-2"
+                          onClick={handleDownloadChequePhoto}
+                        >
+                          <i className="bi bi-download me-1"></i>Download
+                        </button>
+
+                      </div>
+                    )}
+                    {/* {formErrors.chequePhoto && (
+                                <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
+                              )} */}
                   </div>
-                )}
-              </div>
-              {/* {formErrors.chequePhoto && (
-                <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
-              )} */}
-            </div>
-        </div>
+                </div>
 
 
                 

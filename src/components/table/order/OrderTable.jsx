@@ -23,7 +23,7 @@ import Tooltip from "../../Tooltip/Tooltip";
 import Toast from "../../Toast/Toast";
 
 
-const OrderTable = forwardRef(({data}, ref) => {
+const OrderTable = forwardRef(({data,allData}, ref) => {
  
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -178,12 +178,12 @@ const handleRowClick = (order) => {
             setTimeout(() => setToasts([]), 3000);
           };
 
-    if (!orders || orders.length === 0) {
+    if (!allData || allData.length === 0) {
       showToast("No orders available to export.", "error");
       return;
     }
 
-    const formattedData = orders.map((order) => {
+    const formattedData = allData.map((order) => {
      const rawInput = order.createdAt; // get timestamp string
 
         const rawDate = new Date(rawInput); // parse to Date object
@@ -209,7 +209,7 @@ const handleRowClick = (order) => {
         "Customer": order.customer.customerName,
         "Quantity": order.orderVariantResponse.length,
         "Weight": order.totalAmount,
-        "Amount": order.payment.amount,
+        "Amount": order.payment.totalAmount,
         "Payment Status": order.payment.paymentStatus,
         "Order Status": order.status,
       };

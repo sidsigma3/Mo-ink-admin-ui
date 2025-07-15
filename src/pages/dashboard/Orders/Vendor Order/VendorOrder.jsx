@@ -28,7 +28,7 @@ const VendorOrder = () => {
 
     const { order } = useVendorOrderContext();
     const [orders, setOrders] = useState([]);
-    
+    const [ordersAll,setOrdersAll] = useState([])
     const [searchFilter, setSearchFilter] = useState({ filter: "", value: "" });
     const [statusFilter, setStatusFilter] = useState([]);
     const [startDate, setStartDate] = useState(null);
@@ -42,6 +42,21 @@ const VendorOrder = () => {
     const [totalAmount, setTotalAmount] = useState(0)
     const [totalReceived , setTotalReceived] = useState(0)
     const [totalPending, setTotalPending] = useState(0)
+
+
+      useEffect(() => {
+            fetchAllOrders()
+        }, []);
+    
+         const fetchAllOrders = async () => {
+          try {
+            const data = await getVendorOrder();
+            setOrdersAll(data);
+          } catch (error) {
+            console.error("Error fetching all orders:", error);
+          }
+        };
+    
 
 
     const handleRowClick = (correlationId) => {
@@ -214,9 +229,9 @@ const fetchVendorAnalytics = async () => {
       
       
  const handleExport = () => {
-    if (!orders || orders.length === 0) return;
+    if (!ordersAll || ordersAll.length === 0) return;
 
-    const data = orders.map((order) => {
+    const data = ordersAll.map((order) => {
       const totalWeight = order.vendorOrderVariantResponse.reduce(
         (sum, variant) => sum + variant.vendorOrderWeight,
         0
@@ -326,7 +341,7 @@ if (totalPages > 1) {
                                        <span className="d-none d-sm-inline">
                                          {startDate && endDate
                                            ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                                           : "Select Date Range"}
+                                           : "Select Date"}
                                        </span>
                                        <FiCalendar className="d-sm-none " size={20} />
                                      </button>

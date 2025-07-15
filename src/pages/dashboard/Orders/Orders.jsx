@@ -70,21 +70,19 @@ const Orders = () => {
       deliveryStatuses.includes(order.status)
     ).length;
 
-    // useEffect(() => {
-    //     fetchAllOrders()
-    //     // fetchDashboardData();
-    // }, []);
+    useEffect(() => {
+        fetchAllOrders()
+        // fetchDashboardData();
+    }, []);
 
-    //  const fetchAllOrders = async () => {
-    //   try {
-    //     const data = await getAllOrders();
-    //     setOrdersAll(data);
-    //     const total = Math.ceil(data.length / 10);
-    //     setTotalPages(total);
-    //   } catch (error) {
-    //     console.error("Error fetching all orders:", error);
-    //   }
-    // };
+     const fetchAllOrders = async () => {
+      try {
+        const data = await getAllOrders();
+        setOrdersAll(data);
+      } catch (error) {
+        console.error("Error fetching all orders:", error);
+      }
+    };
 
 
 
@@ -412,7 +410,7 @@ useEffect(() => {
 
         
             <div className="order-table-ctn mt-4">
-            <OrderTable ref={orderTableRef} data={ordersData}/>
+            <OrderTable ref={orderTableRef} data={ordersData} allData={ordersAll}/>
 
             <Pagination className="mt-4 d-flex justify-content-end pagination">
               <Pagination.Prev

@@ -200,21 +200,6 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 // };
 
 
-const [orders, setOrders] = useState([]);
-
-const fetchOrders = async () => {
-  try {
-      const data = await getAllOrders();
-      setOrders(data);
-  } catch (error) {
-      console.error("Failed to fetch orders", error);
-  }
-};
-
-useEffect(() => {
-  fetchOrders();
-}, []);
-
 
     const [cart, setCart] = useState([]);
     
