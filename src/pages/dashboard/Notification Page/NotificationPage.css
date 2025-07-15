@@ -184,3 +184,18 @@
   background-color: #cccccc;
   cursor: not-allowed;
 }
+
+@media (max-width: 480px) {
+  .mark-all-container {
+    display: none;
+  }
+
+.tabs {
+  display: flex;
+  justify-content: center; 
+  gap: 0.6rem;
+  width: 100%;
+}
+
+
+}

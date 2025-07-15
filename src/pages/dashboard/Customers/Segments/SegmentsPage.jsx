@@ -212,7 +212,7 @@ const SegmentsPage = () => {
             </div>
         </div>
 
-        <div className='table-ctn'>
+        <div className='table-ctn rounded-3'>
            <Table>
             <thead>
               <tr>
@@ -300,7 +300,7 @@ const SegmentsPage = () => {
 
 
 
-            <div className="data-cards">
+            <div className="data-cards rounded-4">
         {filteredData.map((seg,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 

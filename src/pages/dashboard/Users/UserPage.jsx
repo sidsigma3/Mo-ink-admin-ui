@@ -114,7 +114,7 @@ for (let number = 1; number <= totalPages; number++) {
             </div>
         </div>
 
-        <div className='table-ctn'>
+        <div className='table-ctn rounded-3'>
             <Table hover>
                 <thead>
                     <tr>
@@ -149,7 +149,7 @@ for (let number = 1; number <= totalPages; number++) {
                               ...(user.role.toLowerCase().includes('master') ? {
                           backgroundImage: 'linear-gradient(175deg, #F3E47E 30%, #E1A93C 100%)',
                           backgroundColor: '#F3E47E',
-                          borderColor: '#ffffff',
+                          borderColor: '#E1A93C',
                           color: '#7c5d24',
                         } : user.role.toLowerCase().includes('admin') ? {
                           backgroundColor: '#DBEAFE',
@@ -218,7 +218,7 @@ for (let number = 1; number <= totalPages; number++) {
 
             </Table>
 
-            <div className="data-cards">
+            <div className="data-cards rounded-4">
             {filteredData.map((user,index) => (
           <div className="data-card" key={index}>
 
@@ -242,7 +242,7 @@ for (let number = 1; number <= totalPages; number++) {
                         ...(user.role.toLowerCase().includes('master') ? {
                           backgroundImage: 'linear-gradient(175deg, #F3E47E 30%, #E1A93C 100%)',
                           backgroundColor: '#F3E47E',
-                          borderColor: '#ffffff',
+                          borderColor: '#E1A93C',
                           color: '#7c5d24',
                         } : user.role.toLowerCase().includes('admin') ? {
                           backgroundColor: '#DBEAFE',

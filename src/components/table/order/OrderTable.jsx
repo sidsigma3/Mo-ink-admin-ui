@@ -513,7 +513,7 @@ const handleRowClick = (order) => {
       <div className="order-cards rounded-4">
         {orders.map((order) => (
           <div
-            className="order-card rounded-4 "
+            className="order-card rounded-3 "
             key={order.orderId}
             onClick={() => handleRowClick(order)}
           >
@@ -542,17 +542,21 @@ const handleRowClick = (order) => {
             <h3 style={{ margin: 0 }}>#{order.orderId}</h3>
           </div>
 
-          <h4 style={{ marginBottom: "1rem" }}>
-            {new Date(order.createdAt).toLocaleString('en-IN', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true
-            })}
-
-          </h4>
+         <h4 style={{ marginBottom: "1rem" }}>
+              {(() => {
+                const timeStr = new Date(order.createdAt).toLocaleString('en-IN', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true,
+                });
+                return timeStr.replace(/(am|pm)/i, match => `${match.toUpperCase()},`);
+                 })()}{' '}
+              {new Date(order.createdAt).toLocaleString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </h4>
         </div>
 
             <div className="d-flex justify-content-between">

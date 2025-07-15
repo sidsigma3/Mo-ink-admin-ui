@@ -65,3 +65,18 @@ header .myAcc-ctn .avatar-mob{
     header .bell-icon{}
 
 }
+
+@media (max-width: 480px) {
+    header{
+    background-color: #A383C2;
+}
+
+.notification-button{
+    color: #FFF;
+}
+
+header .bell-icon{
+
+
+}
+}

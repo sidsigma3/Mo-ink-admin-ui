@@ -11,6 +11,8 @@
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  z-index: -10;
+
 }
 
 .total-orders-card:hover {
@@ -35,6 +37,7 @@
   height: 40vh;
   min-height: 250px;
   max-height: 300px;
+  z-index: 0;
 }
 
 @media (max-width: 768px) {

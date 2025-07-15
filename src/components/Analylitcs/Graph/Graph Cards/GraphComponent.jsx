@@ -67,7 +67,8 @@ const GraphComponent = ({ type, data, options, plugins = [], text, number }) => 
         height: '240px',
         boxSizing: 'border-box',
         display: 'block',
-        width: '326px'
+        width: '326px',
+        // zIndex: '-1'
       }}>
 
       </canvas>

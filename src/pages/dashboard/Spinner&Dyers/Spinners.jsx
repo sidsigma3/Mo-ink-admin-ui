@@ -293,7 +293,7 @@ for (let page = 1; page <= totalPages; page++) {
             </div>
         </div>
 
-        <div className='table-ctn'>
+        <div className='table-ctn rounded-3'>
             <Table hover>
                 <thead>
                     <tr>
@@ -388,7 +388,7 @@ for (let page = 1; page <= totalPages; page++) {
 
 
 
-                <div className="data-cards">
+                <div className="data-cards rounded-4">
         {filteredData.map((customer,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
@@ -427,7 +427,7 @@ for (let page = 1; page <= totalPages; page++) {
 
              <div className="d-flex ">
              <p className='fw-normal	'> {customer.phoneNumber}</p>
-             <span><LuDot size={25} /></span>
+              
              <p className="fw-normal">{customer.city}</p>
             
           </div>

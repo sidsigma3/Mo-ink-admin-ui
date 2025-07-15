@@ -46,7 +46,7 @@ const [username, setUsername] = useState("");
     </div>
 
     {/* Auth Box */}
-    <div className="verify-card bg-opacity-40 border border-3 border-white p-4 p-sm-4 rounded-4 text-white position-relative z-2">
+    <div className="verify-card bg-opacity-20 border border-3 border-white p-4 p-sm-4 rounded-4 text-white position-relative z-2">
     <button
         className="btn btn-link text-white fw-normal text-decoration-none p-0 mb-3"
         onClick={() => navigate("/")}

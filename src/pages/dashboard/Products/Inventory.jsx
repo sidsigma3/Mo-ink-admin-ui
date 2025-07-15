@@ -13,6 +13,7 @@ import { getAllProduct } from '../../../services/ProductService'
 import {getAllInventory} from '../../../services/InventoryService'
 import * as XLSX from 'xlsx';
 import TooltipVendor from '../../../components/Tooltip/TooltipVendor';
+import { FaUser } from 'react-icons/fa';
 
 const Inventory = () => {
 
@@ -358,7 +359,10 @@ const toggleType = (product, size, type) => {
       
       <div className="d-flex align-items-center justify-content-between gap-2 mb-3">
       
-        <span className="">{item.type}</span>
+        <span className="" style={{ 
+        textTransform: 'capitalize'}}>
+        {/* <FaUser className="icon-style" /> */}
+        {item.type}</span>
         <span><LuDot size={25} /></span>
         <span>{item.color.colorName}</span>
         <span><LuDot size={25} /></span>
@@ -373,12 +377,12 @@ const toggleType = (product, size, type) => {
         
         <span className="order-tag">
           <FiShoppingCart className="order-icon" />
-          <span>Orders: {item.customerOrder} Kgs</span>
+          <span>Orders: {item.customerOrder} Kg</span>
         </span>
         
         <span className="weight-tag">
           <LuWeight  className="weight-icon" />
-          <span>In Stock: {item.remainingWeight} Kgs</span>
+          <span>In Stock: {item.remainingWeight} Kg</span>
         </span>
       </div>
           </div>

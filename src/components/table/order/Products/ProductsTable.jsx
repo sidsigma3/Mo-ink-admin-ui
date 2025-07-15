@@ -192,7 +192,7 @@ for (let i = 1; i <= totalPages; i++) {
 
   return (
     <div>
-    <div className="product-table">
+    <div className="product-table rounded-3">
     <Table hover>
       <thead className='z-1'>
         <tr>
@@ -298,7 +298,7 @@ for (let i = 1; i <= totalPages; i++) {
     
 
 
-      <div className="product-cards">
+      <div className="product-cards rounded-4">
 
       {finalData.map((product, index) => (
           product.groupedVariants.map((item, ix) => (
