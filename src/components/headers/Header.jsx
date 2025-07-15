@@ -44,7 +44,7 @@ const Header = () => {
         </Link>
       </div>
       
-      <div className="myAcc-ctn d-flex align-items-center justify-content-center gap-4 position-relative">
+      <div className="myAcc-ctn  d-flex align-items-center justify-content-center gap-4 position-relative">
          {userDetails.role === "MASTER" && (
         <Notifications />
           )}

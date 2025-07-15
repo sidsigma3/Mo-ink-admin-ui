@@ -73,22 +73,22 @@ const SignupPage = ({ togglePage, isLogin }) => {
   };
 
   return (
-    <div className="Signup-wrapper d-flex align-items-center justify-content-center px-3">
-    <div className="background-blur"
+     <div className="login-wrapper d-flex align-items-center justify-content-center px-3">
+      <div className="background-blur"
        style={{
        backgroundImage: "url('/bg-texture.png')",
       }}
       >
       </div>
 
+      {/* Logo */}
+      <div className="position-absolute top-0 start-0 p-4 p-lg-5"
+      >
+        <img src="logo.png" alt="Logo" className="logo-img mx-auto" />
+      </div>
 
-    {/* Logo */}
-    <div className="position-absolute top-0 start-0 p-4 p-lg-5">
-      <img src="logo.png" alt="Logo" className="logo-img mx-auto" />
-    </div>
-
-    {/* Auth Box */}
-    <div className="signup-card bg-opacity-40 border border-3 p-4 p-sm-4 rounded-4  text-white position-relative z-2">
+      {/* Auth Box */}
+      <div className="login-card bg-opacity-20 border border-3 p-4 p-sm-4 rounded-4  text-white position-relative z-2">
       {/* <button
         className="btn btn-link text-white fw-normal text-decoration-none mb-3"
         onClick={() => navigate("/")}
@@ -219,7 +219,7 @@ const SignupPage = ({ togglePage, isLogin }) => {
           </div>
         </div>
 
-        <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium mt-5"
+        <button type="submit" className="btn btn-purple w-100 rounded-pill fw-medium mt-4"
         onClick={() => handleSignup}
         >
           Register

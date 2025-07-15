@@ -51,7 +51,9 @@ html, body, #root {
   flex-direction: column;
 }
 
-body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important; height: 100%;}
+body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important; 
+  
+  height: 100%;}
 
 .container-fluid {
   overflow: visible;
@@ -110,7 +112,7 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
     flex-wrap: wrap-reverse;
     height: auto;
     /* padding-top: 11vh; */
-    padding-bottom: 8vh;
+    padding-bottom: 6.1vh;
   }
   
   .main .sidebarWrapper{
@@ -134,3 +136,21 @@ body{font-family:"Open Sans , sans-serif" ; background-color: #F7F8FA !important
   
   }
   
+
+   /* Testing bg gradiant-Mobile */
+@media (max-width: 480px) {
+
+  body{font-family:"Open Sans , sans-serif" ; background: linear-gradient(0deg, #F7F8FA 20%, #5d20938c 100%);
+  }
+
+  
+
+  .more-menu-dropdown {
+    right: 1rem;
+    /* left: 210px; */
+    width: 200px;
+    bottom: 85px;
+    z-index: 9999 !important;
+
+  }
+}

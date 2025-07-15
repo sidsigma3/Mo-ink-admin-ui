@@ -1,7 +1,7 @@
 .product-table {
     border: 1px solid #ddd;
     border-radius: 1rem;
-    height: 70vh;
+    height: 60vh;
     overflow: auto;
     margin-top: 1rem;
   }
@@ -98,6 +98,13 @@
 
     .product-table .pagination{
       display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-table{
+     
+      height: 80vh;
     }
   }
   

@@ -259,7 +259,7 @@ const AddUser = () => {
                 ...(formData.role.toLowerCase() === 'master' ? {
                     backgroundImage: 'linear-gradient(175deg, #F3E47E 30%, #E1A93C 100%)',
                     backgroundColor: '#F3E47E',
-                    borderColor: '#ffffff',
+                    borderColor: '#E1A93C',
                     color: '#7c5d24',
                 } : formData.role.toLowerCase() === 'admin' ? {
                     backgroundColor: '#DBEAFE',

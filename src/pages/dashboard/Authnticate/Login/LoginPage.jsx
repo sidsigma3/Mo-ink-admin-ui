@@ -73,7 +73,7 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
       </div>
 
       {/* Auth Box */}
-      <div className="login-card bg-opacity-40 border border-3 p-4 p-sm-4 rounded-4  text-white position-relative z-2">
+      <div className="login-card bg-opacity-20 border border-3 p-4 p-sm-4 rounded-4  text-white position-relative z-2">
        
        
         <h3 className="text-center fw-bold mb-4">Welcome Team!</h3>

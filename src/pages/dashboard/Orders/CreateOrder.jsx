@@ -2164,7 +2164,7 @@ const handleReject = (variant) => {
                     <tr>
                       <td className=" fw-medium pt-4">Final Cost</td>
                         <td></td>
-                        <td className="text-end">₹{Math.round(grandTotals.baseTotal - grandTotals.totalDiscount)}</td>
+                        <td className="text-end pt-4">₹{Math.round(grandTotals.baseTotal - grandTotals.totalDiscount)}</td>
                     </tr>
 
 
@@ -2208,13 +2208,13 @@ const handleReject = (variant) => {
                       <td></td>
                       {/* <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td> */}
                       {/* <td className="text-end">₹{calculateGrandTotal(orderDetails).toFixed(2)-((calculateGrandTotal(orderDetails) * (discountPercentage + (Number(selectedDiscountValue) || 0))) / 100)+49}</td> */}
-                      <td className='text-end'>₹49</td>
+                      <td className='text-end pt-2 pb-4'>₹49</td>
                     </tr>
                   
                     <tr>
                       <td className='fw-medium pt-4 pt-2'>Net Pay</td>
                       <td ></td>
-                      <td className='text-end'>₹{(netPayablePrice).toFixed(0)}</td>
+                      <td className='text-end pt-4 '>₹{(netPayablePrice).toFixed(0)}</td>
                       {/* <td className="text-end pt-3">₹{calculateTotalAmount()}</td> */}
                     </tr>
 
@@ -2254,36 +2254,36 @@ const handleReject = (variant) => {
                     <tr className="border-bottom">
                       <td className=" fw-medium py-4">To Pay</td>
                       <td></td>
-                      <td className='text-end'>₹{(toPay).toFixed(0)}</td>
+                      <td className='text-end py-4'>₹{(toPay).toFixed(0)}</td>
                       {/* <td className="text-end pb-3 pt-2">₹{netPayable}</td> */}
                     </tr>
 
                     <tr>
                       <td className="fw-medium pt-4">Advance Paid</td>
-                      <td>{onlinePercentage}%</td>
+                      <td className="pt-4">{onlinePercentage}%</td>
                       {isViewMode === true ? (
                         order?.createdByUser ? (
                           // If order created by admin, show actual onlineAmount paid
-                          <td className="text-end">₹{order?.payment.onlineAmount.toFixed(0)}</td>
+                          <td className="text-end pt-4">₹{order?.payment.onlineAmount.toFixed(0)}</td>
                         ) : (
                           // Otherwise show total amount paid
-                          <td className="text-end">₹{order?.payment.totalAmountPaid.toFixed(0)}</td>
+                          <td className="text-end pt-4">₹{order?.payment.totalAmountPaid.toFixed(0)}</td>
                         )
                       ) : (
                         // In edit mode, calculate based on percentage
-                        <td className="text-end">₹{((toPay * onlinePercentage) / 100).toFixed(0)}</td>
+                        <td className="text-end pt-4">₹{((toPay * onlinePercentage) / 100).toFixed(0)}</td>
                       )}
                     </tr>
 
 
                     <tr>
                       <td className="fw-medium pb-3 pt-2">Balance Due</td>
-                      <td className="pt-2">{codPercentage}%</td>
+                      <td className="pb-3 pt-2">{codPercentage}%</td>
 
                       {isViewMode === true ? (
-                          <td className="text-end">₹{order?.payment.pendingAmount.toFixed(0)-order?.payment.totalAdjustedAmount.toFixed(0)}</td>
+                          <td className="text-end pb-3 pt-2">₹{order?.payment.pendingAmount.toFixed(0)-order?.payment.totalAdjustedAmount.toFixed(0)}</td>
                         ):(
-                          <td className="text-end pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td>
+                          <td className="text-end pb-3 pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td>
                         )
                       }
                      

@@ -6,6 +6,10 @@
     margin-top: 1rem;
   }
 
+  .zindex{
+    z-index: 1;
+  }
+
 .zoom-img {
   transition: transform 0.3s ease;
   cursor: pointer;
@@ -16,7 +20,7 @@
 }
 
 .card{
-  z-index: 1050;
+  z-index: -2;
 }
 
   
@@ -129,6 +133,7 @@
   .colorlibrary-table-ctn {
     border: none;
   }
+
 }
   
 

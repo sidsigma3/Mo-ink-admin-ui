@@ -269,7 +269,7 @@ if (totalPages >= 1) {
         </div>
 
 
-        <div className='table-ctn'>
+        <div className='table-ctn rounded-3'>
             <Table hover>
                 <thead>
                     <tr>
@@ -326,7 +326,7 @@ if (totalPages >= 1) {
             
             </Table>
 
-            <div className="data-cards">
+            <div className="data-cards rounded-4">
          {filteredData.map((customer,index) => {
             const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
           return(

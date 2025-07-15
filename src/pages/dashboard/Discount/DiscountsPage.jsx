@@ -225,7 +225,7 @@ if (totalPages >=1) {
         </div>
 
 
-        <div className='discount-table-ctn'>
+        <div className='discount-table-ctn rounded-3'>
           <Table hover>
             <thead>
               <tr>
@@ -299,7 +299,7 @@ if (totalPages >=1) {
 
       
 
-          <div className="data-cards">
+          <div className="data-cards rounded-4">
         {filteredData.map((discount,index) => (
           <div className="data-card " key={index} onClick={() => handleRowClick(index)}>
 
