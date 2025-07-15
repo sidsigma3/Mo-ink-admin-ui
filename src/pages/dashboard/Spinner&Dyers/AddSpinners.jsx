@@ -592,6 +592,25 @@ const handleTag = (value) =>{
 };
 
 
+ const handleDownloadChequePhoto = async () => {
+          console.log('hello')
+          try {
+            const response = await fetch(`${backendUrl}${formData.chequePhoto}`);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'aadhaar-photo.jpg'; // you can customize the name
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+          } catch (error) {
+            console.error("Error downloading image:", error);
+          }
+        };
+
 
 
     return (
@@ -689,13 +708,14 @@ const handleTag = (value) =>{
                       className="img-thumbnail rounded" 
                       style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
                     />
-                    {/* Uncomment if you want a remove button
-                    <button 
-                      className="btn btn-sm btn-outline-danger mt-2"
-                      onClick={() => setFormData(prev => ({...prev, chequePhoto: ''}))}
-                    >
-                      Remove
-                    </button> */}
+
+                     <button
+                          className="btn btn-sm btn-outline-secondary mt-2"
+                          onClick={handleDownloadChequePhoto}
+                        >
+                          <i className="bi bi-download me-1"></i>Download
+                      </button>
+                   
                   </div>
                 )}
               </div>

@@ -102,7 +102,7 @@ const toggleType = (product, size, type) => {
       });
 
       setAllInventory(flatData);
-      setInventory(groupInventory(flatData)); // ✅ grouped data
+      setInventory(groupInventory(flatData)); 
 
       // Dashboard stats
       const totalSKU = flatData.length;
@@ -203,7 +203,7 @@ const toggleType = (product, size, type) => {
       <div className='d-flex justify-content-between align-items-center mb-4'>
         <h4 className='page-title mb-0'>Inventory</h4>
         <div className='d-flex gap-2'>
-        <ExportBtn onClick={() => exportToExcel(inventory)}></ExportBtn>
+        <ExportBtn onClick={() => exportToExcel(allInventory)} />
 
           {/* <button className='btn btn-primary d-flex align-items-center gap-2 px-3 add-product-btn'>
             + Add Product
