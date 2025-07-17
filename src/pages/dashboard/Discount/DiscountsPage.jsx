@@ -225,14 +225,14 @@ if (totalPages >=1) {
         </div>
 
 
-        <div className='discount-table-ctn rounded-3'>
+        <div className='discount-table-ctn'>
           <Table hover>
             <thead>
               <tr>
                 <th>Title</th>
 
-                {/* <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Start Date</th>
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>End Date</th> */}
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Start Date</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>End Date</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Customer</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Used</th>
@@ -259,7 +259,7 @@ if (totalPages >=1) {
                 </div>
                 
                 </td>
-                {/* <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
                  {new Intl.DateTimeFormat('en-GB').format(new Date(discount.startDateTime))}
                 </td>
 
@@ -268,7 +268,7 @@ if (totalPages >=1) {
                   {discount.endDateTime
                     ? new Intl.DateTimeFormat('en-GB').format(new Date(discount.endDateTime))
                     : ''}
-                </td> */}
+                </td>
 
               <td style={{ justifyItems: 'center', alignContent:'center'}}   >
                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
@@ -299,38 +299,16 @@ if (totalPages >=1) {
 
       
 
-          <div className="data-cards rounded-4">
+          <div className="data-cards">
         {filteredData.map((discount,index) => (
-          <div className="data-card " key={index} onClick={() => handleRowClick(index)}>
+          <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3 className='fs-6 fw-medium	'>{discount.discountCode}</h3>
+                 <h3>{discount.discountCode}</h3>
                  <p> 
-                 <div
-                  style={{
-                    padding: '0.2rem 0.2rem',
-                    fontSize: '0.8rem',
-                    width: '7rem',
-                    height: '2rem',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: '0',
-                    backgroundColor:
-                      discount.discountStatus.toLowerCase() === 'active' ? '#d1fae5' : '#F3F4F6',
-                    border: '1px solid',
-                    borderColor:
-                      discount.discountStatus.toLowerCase() === 'active' ? '#6ee7b7' : '#D1D5DB',
-                    borderRadius: '0.2rem',
-                    textAlign: 'center',
-                    color:
-                      discount.discountStatus.toLowerCase() === 'active' ? '#065f46' : '#DC2626',
-                    fontWeight: '500',
-                  }}
-                >
-                  {discount.discountStatus.toUpperCase()}
+                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
+                  {discount.discountStatus}
                 </div>
-
                 </p>
             </div>
 
@@ -344,7 +322,7 @@ if (totalPages >=1) {
 
             <span><LuDot  size={25}/></span>
 
-            <p className="text-muted"> {discount.minPurchaseRequirement}</p>
+            <p><strong></strong> {discount.minPurchaseRequirement}</p>
 
             {/* <div style={{ display: 'flex', alignItems: 'center' }}>
            
@@ -399,7 +377,7 @@ if (totalPages >=1) {
                 ))}
             </div>
 
-                  <div className='d-flex justify-content-end mt-2 pagination'>
+          <div className='d-flex justify-content-end mt-2 pagination'>
           <Pagination>{paginationItems}</Pagination>
         </div>
 
