@@ -193,7 +193,7 @@ const handleMediaChange = async (e, type) => {
     let validationErrors = {};
 
     if (!formData.productName.trim()) validationErrors.productName = "Product name is required.";
-    if (!formData.description.trim()) validationErrors.description = "Description is required.";
+    // if (!formData.description.trim()) validationErrors.description = "Description is required.";
     // if (!formData.pricePerKg || formData.pricePerKg <= 0) validationErrors.pricePerKg = "Valid price per Kg is required.";
     // if (!formData.costPerItem || formData.costPerItem <= 0) validationErrors.costPerItem = "Valid cost per item is required.";
     // if (!formData.compareAtPrice || formData.compareAtPrice <= 0) validationErrors.compareAtPrice = "Valid Compare at price is required.";
@@ -820,7 +820,7 @@ console.log(sizeColorMap)
           </div>
 
 
-           <div className="mb-3">
+           {/* <div className="mb-3">
           <div className="desc-input-ctn d-flex flex-column mb-5">
             <label style={{fontSize:'1rem'}}>Description</label>
             <ReactQuill
@@ -844,7 +844,7 @@ console.log(sizeColorMap)
             {errors.description && <p className="text-danger">{errors.description}</p>}
 
           </div>
-          </div>
+          </div> */}
          
       <div className="">
   <div className=" row g-4">
