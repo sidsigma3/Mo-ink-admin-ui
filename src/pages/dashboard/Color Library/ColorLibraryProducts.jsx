@@ -78,19 +78,24 @@ const ColorLibraryProducts = () => {
       <div className="py-5 zindex">
         <div className="row g-4 justify-content-center">
           {products.map((item, index) => (
-            <div className="col-6 col-lg-2" key={index}>
+            <div className="col-6 col-lg-2" key={index}
+            style={{cursor:'pointer'}}
+             onClick={() =>{
+                      navigate("/colorlibrary", {
+                        state: { productId: item.productId },
+                      })
+                    }}
+            >
               <div className="card h-100 shadow-sm border-0 rounded-4 ">
-                <div className="overflow-hidden rounded-top-4">
+                <div className="overflow-hidden rounded-top-4" 
+                  
+                >
                   {/* ✅ 3. Use imageMap with fallback */}
                   <img
                     src={imageMap[item.name.toLowerCase()] || 'https://via.placeholder.com/150'}
                     alt={item.name}
                     className="w-100 rounded-4 p-1 zoom-img"
-                    onClick={() =>
-                      navigate("/colorlibrary", {
-                        state: { productId: item.productId },
-                      })
-                    }
+                   
                   />
                 </div>
                 <div className="card-body p-1 text-center">

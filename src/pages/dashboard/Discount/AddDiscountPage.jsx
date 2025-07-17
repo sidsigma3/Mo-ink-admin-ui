@@ -420,8 +420,8 @@ const handleMaxUsageChange = (field1,field2) => {
     if (selectedOptionCustomer === "All" && customers.length === 0)
         validationErrors.allCustomers = "No customers available.";
     if (productSelect.length === 0) validationErrors.products = "Select at least one product.";
-    if (!formData.activeDates.startDate) validationErrors.startDate = "Start date is required.";
-    if (!formData.activeDates.startTime) validationErrors.startTime = "Start time is required.";
+    // if (!formData.activeDates.startDate) validationErrors.startDate = "Start date is required.";
+    // if (!formData.activeDates.startTime) validationErrors.startTime = "Start time is required.";
     // if (formData.activeDates.hasEndDate && !formData.activeDates.endDate)
     //     validationErrors.endDate = "End date is required when 'Has End Date' is selected.";
 
@@ -482,10 +482,10 @@ const handleMaxUsageChange = (field1,field2) => {
       applicableProductIds: productSelect.map(p => p.productId ? Number(p.productId) : Number(p.id)), 
       applicableSegmentIds:selectedSegment.map(s =>Number(s.segmentId)),
       eligibleCustomerIds,
-      startDateTime: formatDateTime(formData.activeDates.startDate, formData.activeDates.startTime),
-      endDateTime: formData.activeDates.hasEndDate
-        ? formatDateTime(formData.activeDates.endDate, formData.activeDates.endTime)
-        : null
+      // startDateTime: formatDateTime(formData.activeDates.startDate, formData.activeDates.startTime),
+      // endDateTime: formData.activeDates.hasEndDate
+      //   ? formatDateTime(formData.activeDates.endDate, formData.activeDates.endTime)
+      //   : null
       
     };
 
@@ -879,7 +879,7 @@ const handleMaxUsageChange = (field1,field2) => {
             </ul>
           </div>
 
-          <div className="bg-white rounded p-3 mt-2">
+          {/* <div className="bg-white rounded p-3 mt-2">
             <h5 style={{fontSize:'1rem'}}>Active dates</h5>
 
             <div className="d-flex gap-2">
@@ -915,7 +915,7 @@ const handleMaxUsageChange = (field1,field2) => {
            
 
 
-          </div>
+          </div> */}
 
           <div className="d-flex justify-content-between my-4">
             <DeleteBtn clickFunction={handleDelete}></DeleteBtn>

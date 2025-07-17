@@ -231,8 +231,8 @@ if (totalPages >=1) {
               <tr>
                 <th>Title</th>
 
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Start Date</th>
-                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>End Date</th>
+                {/* <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Start Date</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>End Date</th> */}
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Customer</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Used</th>
@@ -259,7 +259,7 @@ if (totalPages >=1) {
                 </div>
                 
                 </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+                {/* <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
                  {new Intl.DateTimeFormat('en-GB').format(new Date(discount.startDateTime))}
                 </td>
 
@@ -268,7 +268,7 @@ if (totalPages >=1) {
                   {discount.endDateTime
                     ? new Intl.DateTimeFormat('en-GB').format(new Date(discount.endDateTime))
                     : ''}
-                </td>
+                </td> */}
 
               <td style={{ justifyItems: 'center', alignContent:'center'}}   >
                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
