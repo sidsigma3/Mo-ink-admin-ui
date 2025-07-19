@@ -239,8 +239,8 @@ if (totalPages >= 1) {
 
   return (
     <div className='customer-page'>
-          <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.2rem'}}>Customers</h4>
+            <div className='top d-flex justify-content-between align-items-center mt-2 mb-4 '>
+            <h3 className='m-0' style={{fontSize:'1.2rem'}}>Customers</h3>
 
             <div className='d-flex gap-2'>
                 <ExportBtn onClick={exportToExcel}></ExportBtn>
@@ -255,21 +255,21 @@ if (totalPages >= 1) {
         </div>
 
 
-        <div className='d-flex gap-2 filter-sec'>
-            <div className='w-75'>
-                <ProductFilter 
+        <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
+                    <div className='col-sm-6 col-md-9'>
+                        <ProductFilter 
                     filterOptions={["City", "Customer"]} 
                     onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
                 />
             </div>
          
-            <div className='w-25'>
+            <div className='col-sm-6 col-md-3'>
                 <StatusFilter status={'Active'}></StatusFilter> 
             </div>
         </div>
 
 
-        <div className='table-ctn rounded-3'>
+        <div className='table-ctn rounded-2'>
             <Table hover>
                 <thead>
                     <tr>

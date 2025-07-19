@@ -86,8 +86,8 @@ for (let number = 1; number <= totalPages; number++) {
 
   return (
     <div className='user-page'>
-         <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.2rem'}}>Users</h4>
+         <div className='top d-flex justify-content-between align-items-center mt-2 mb-4 '>
+            <h3 className='m-0' style={{fontSize:'1.2rem'}}>Users</h3>
 
             {(userData.role === "MASTER") && (
                 <div className='d-flex gap-2'>
@@ -101,20 +101,20 @@ for (let number = 1; number <= totalPages; number++) {
         </div>
 
 
-        <div className='d-flex gap-2 filter-sec'>
-            <div className='w-75'>
-            <ProductFilter 
+         <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
+                                            <div className='col-sm-6 col-md-9'>
+                                                <ProductFilter  
                   filterOptions={["Name","Role"]} 
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
          
-            <div className='w-25'>
+            <div className='col-sm-6 col-md-3'>
                 <StatusFilter status={'Active'}></StatusFilter> 
             </div>
         </div>
 
-        <div className='table-ctn rounded-3'>
+        <div className='table-ctn rounded-2'>
             <Table hover>
                 <thead>
                     <tr>

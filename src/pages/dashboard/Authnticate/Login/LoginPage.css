@@ -41,7 +41,7 @@
 
 
 .toggle {
-  width: 85%;
+  width: 100%;
 }
 
 .btn:hover {
@@ -54,12 +54,12 @@
 }
 
 .text-purple {
-  color: #0D6EFD !important;
+  color: #6B21A8!important;
 }
 
 
 .btn-purple {
-  background-color: #0D6EFD  !important;
+  background-color: #6B21A8 !important;
   color: hsl(0, 0%, 100%) !important;
 }
 
@@ -71,7 +71,7 @@
 .toggle-btns button {
   border-radius: 9999px !important;
   font-size: 1rem;
-  padding: 0.5rem 0;
+  padding: 0.35rem 0;
 }
 
 .icon-sm {
@@ -87,6 +87,17 @@
 .w-60 {
   width: 60%;
 }
+
+
+@media (max-width: 1540px) {
+.login-card {
+    height: 68vh;    }
+  }
+
+  @media (max-width: 1280px) {
+.login-card {
+    height: 88vh;    }
+  }
 
 @media (max-width: 768px) {
 .login-card {

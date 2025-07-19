@@ -34,6 +34,7 @@ import ModalShipOrder from '../../../components/Modal/ModalShipOrder';
 import ModalDeliverOrder from '../../../components/Modal/ModalDeliverOrder';
 import ModalReturnOrder from '../../../components/Modal/ModalReturnOrder';
 import Tooltip from '../../../components/Tooltip/Tooltip';
+import { RiFilePaper2Line } from 'react-icons/ri';
 import ModalSendInvoice from '../../../components/Modal/ModalSendInvoice';
 import Toast from "../../../components/Toast/Toast";
 
@@ -170,6 +171,9 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       // "RETURNED",
       "CANCELLED",
     ];
+    
+
+
     
   
     
@@ -1365,16 +1369,102 @@ const handleReject = (variant) => {
 
 
 
+
+// Testing COD Details
+// Testing COD Details
+// Testing COD Details
+// Testing COD Details
+const [transactions, setTransactions] = useState([]);
+const [showAddForm, setShowAddForm] = useState(false);
+const [newTransaction, setNewTransaction] = useState({
+  transactionId: '',
+  date: new Date().toISOString().split('T')[0],
+  payType: '',
+  amountCollected: 0,
+  remaining: 0
+});
+
+const remainingBalance = useMemo(() => {
+  const openingBalance = isViewMode === true ? 
+    (order?.payment.pendingAmount - order?.payment.totalAdjustedAmount) :
+    ((toPay * codPercentage) / 100);
+  
+  const totalCollected = transactions.reduce((sum, transaction) => sum + transaction.amountCollected, 0);
+  return Math.max(0, openingBalance - totalCollected);
+}, [transactions, isViewMode, order, toPay, codPercentage]);
+
+const handleAddPayment = () => {
+  setShowAddForm(true);
+  setNewTransaction({
+    ...newTransaction,
+    transactionId: `TXN${Date.now()}`,
+    remaining: remainingBalance
+  });
+};
+
+const handleSaveTransaction = () => {
+  if (!newTransaction.transactionId || !newTransaction.payType || newTransaction.amountCollected <= 0) {
+    alert('Please fill all required fields');
+    return;
+  }
+
+  const calculatedRemaining = Math.max(0, remainingBalance - newTransaction.amountCollected);
+  
+  const transactionToAdd = {
+    id: Date.now(),
+    ...newTransaction,
+    remaining: calculatedRemaining,
+    date: newTransaction.date || new Date().toISOString().split('T')[0]
+  };
+
+  setTransactions([...transactions, transactionToAdd]);
+  setShowAddForm(false);
+  
+  setNewTransaction({
+    transactionId: '',
+    date: new Date().toISOString().split('T')[0],
+    payType: '',
+    amountCollected: 0,
+    remaining: 0
+  });
+};
+
+const handleCancelTransaction = () => {
+  setShowAddForm(false);
+  setNewTransaction({
+    transactionId: '',
+    date: new Date().toISOString().split('T')[0],
+    payType: '',
+    amountCollected: 0,
+    remaining: 0
+  });
+};
+
+const handleSendPaymentLink = () => {
+  if (remainingBalance <= 0) return;
+  
+  const paymentLink = `https://your-payment-gateway.com/pay?amount=${remainingBalance}&orderId=${order?.orderId}`;
+  const whatsappMessage = `Hi ${selectedCustomer?.name || 'Customer'}, please complete your payment of ₹${remainingBalance} using this link: ${paymentLink}`;
+  
+  console.log('Sending payment link:', paymentLink);
+  console.log('WhatsApp message:', whatsappMessage);
+  
+  // toast.success
+};
+// Testing COD Details
+// Testing COD Details
+// Testing COD Details
+
   return (
     <div className='create-order'>
-        <div className='top d-flex gap-3 mb-2 mt-2' style={{cursor:'pointer'}}>
+        <div className='top d-flex gap-3 mb-4 mt-2' style={{cursor:'pointer'}}>
             <span onClick={() => navigate('/orders')}><IoArrowBackOutline size={25}/></span>
            { Object.keys(order).length === 0 ? (
-            <h5 style={{fontSize:'1.2rem'}}>Create Order</h5>
+            <h3 className='m-0' style={{fontSize:'1.2rem'}}>Create Order</h3>
 
            ): (
                 <div className='d-flex gap-2'>
-                <h5>{order.orderId}</h5>
+                <h3 className='m-0' style={{fontSize:'1.2rem'}}>{order.orderId}</h3>
              
                     {/* <p className={order.payment==='Paid' ? 'green' : 'grey'}>{order.payment}</p>
                     <p className={statusClassMap[order.orderStatus]}>{order.orderStatus}</p> 
@@ -1417,7 +1507,7 @@ const handleReject = (variant) => {
                       <div>
                       </div>
                     ):(
-                    <button className='btn btn-sm btn-primary' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
+                    <button className='btn-secondary-custom' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
                     )}
                     </div>
                     {renderModal()}
@@ -2085,7 +2175,7 @@ const handleReject = (variant) => {
             
             
 
-                <div className='payment bg-white p-4 rounded' id="invoice-to-download" ref={invoiceRef}>
+                <div className='payment mb-3 bg-white p-4 rounded' id="invoice-to-download" ref={invoiceRef}>
                     <h4>Payment</h4>
 
                     <div  className='container border p-3 rounded mb-3' >
@@ -2308,8 +2398,8 @@ const handleReject = (variant) => {
                             {orderDetails.length > 0 && (
                               <div className="d-flex justify-content-end w-100">
                                 {isViewMode && !weightChanged ? (
-                                  <Button
-                                    className="btn btn-primary"
+                                  <button
+                                    className="btn-secondary-custom"
                                     onClick={() => {
                                       setSelectedOrderId(order.orderId);
                                       setIsModalOpen(true);
@@ -2317,12 +2407,12 @@ const handleReject = (variant) => {
                                     }}
                                   >
                                     Send Invoice
-                                  </Button>
+                                  </button>
                                 ) : (
                                   !isViewMode && (
-                                    <Button className="btn-sm" onClick={handleCreateOrder}>
+                                    <button className="btn-secondary-custom" onClick={handleCreateOrder}>
                                       Create Order
-                                    </Button>
+                                    </button>
                                   )
                                 )}
                               </div>
@@ -2340,10 +2430,201 @@ const handleReject = (variant) => {
                               />
                             )}
 
-
-                   
-
                 </div>
+
+
+
+                    <div className='payment bg-white rounded-3 shadow-sm border-0' style={{padding: '24px'}}>
+                {/* Header with Opening Balance */}
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h4>COD Collection Details</h4>
+                  </div>
+                  {/* <div className="bg-light rounded-pill px-3 py-2 d-flex align-items-center gap-2">
+                    <div className=" rounded-circle d-flex align-items-center justify-content-center" style={{width: '6px', height: '6px',  backgroundColor: '#6B21A8'}}></div>
+                    <span className="text-muted small fw-medium">Opening Balance:</span>
+                    <span className="fw-bold text-dark" style={{fontSize: '15px'}}>
+                      ₹{isViewMode === true ? 
+                        (order?.payment.pendingAmount.toFixed(0) - order?.payment.totalAdjustedAmount.toFixed(0)) :
+                        ((toPay * codPercentage) / 100).toFixed(0)
+                      }
+                    </span>
+                  </div> */}
+                </div>
+
+                {/* Table Container with Modern Styling */}
+                <div className="container p-0 bg-white border rounded-3 mb-4 overflow-hidden" style={{boxShadow: '0 2px 8px rgba(0,0,0,0.04)'}}>
+                  <table className="w-100">
+                    <thead className="bg-light">
+                      <tr>
+                        <th className="fw-semibold text-dark border-0 py-3 px-4" style={{fontSize: '13px', letterSpacing: '0.02em'}}>
+                          Transaction ID
+                        </th>
+                        <th className="fw-semibold text-dark border-0 py-3 px-4" style={{fontSize: '13px', letterSpacing: '0.02em'}}>
+                          Date
+                        </th>
+                        <th className="fw-semibold text-dark border-0 py-3 px-4" style={{fontSize: '13px', letterSpacing: '0.02em'}}>
+                          Payment Type
+                        </th>
+                        <th className="fw-semibold text-dark border-0 py-3 px-4 text-end" style={{fontSize: '13px', letterSpacing: '0.02em'}}>
+                          Amount Collected
+                        </th>
+                        <th className="fw-semibold text-dark border-0 py-3 px-4 text-end" style={{fontSize: '13px', letterSpacing: '0.02em'}}>
+                          Remaining
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Transaction Rows */}
+                      {transactions && transactions.length > 0 && transactions.map((transaction, index) => (
+                        <tr key={transaction.id || index} className="border-bottom" style={{borderColor: '#f1f3f4 !important'}}>
+                          <td className="py-3 px-4 text-dark" style={{fontSize: '14px'}}>
+                            <div className="d-flex align-items-center gap-2">
+                              <div className="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style={{width: '8px', height: '8px'}}>
+                                <div className="bg-primary rounded-circle" style={{width: '4px', height: '4px'}}></div>
+                              </div>
+                              <span className="fw-medium">{transaction.transactionId}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-muted" style={{fontSize: '14px'}}>
+                            {new Date(transaction.date).toLocaleDateString('en-IN', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </td>
+                          <td className="py-3 px-4" style={{fontSize: '14px'}}>
+                            <span className="badge bg-light text-dark border px-2 py-1 rounded-pill" style={{fontSize: '12px', fontWeight: '500'}}>
+                              {transaction.payType}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-end fw-semibold text-success" style={{fontSize: '14px'}}>
+                            ₹{transaction.amountCollected.toFixed(0)}
+                          </td>
+                          <td className="py-3 px-4 text-end fw-semibold text-primary" style={{fontSize: '14px'}}>
+                            ₹{transaction.remaining.toFixed(0)}
+                          </td>
+                        </tr>
+                      ))}
+
+                      {/* Input Row for Adding New Transaction */}
+                      {showAddForm && (
+                        <tr className="bg-light bg-opacity-30 border-top border-2 border-primary border-opacity-20">
+                          <td className="py-3 px-4">
+                            <input 
+                              type="text" 
+                              className="form-control border-0 bg-white rounded-2 shadow-sm"
+                              style={{fontSize: '14px', padding: '10px 14px', height: '40px'}}
+                              placeholder="Enter transaction ID"
+                              value={newTransaction.transactionId}
+                              onChange={(e) => setNewTransaction({...newTransaction, transactionId: e.target.value})}
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <input 
+                              type="date" 
+                              className="form-control border-0 bg-white rounded-2 shadow-sm"
+                              style={{fontSize: '14px', padding: '10px 14px', height: '40px'}}
+                              value={newTransaction.date}
+                              onChange={(e) => setNewTransaction({...newTransaction, date: e.target.value})}
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <select 
+                              className="form-select border-0 bg-white rounded-2 shadow-sm"
+                              style={{fontSize: '14px', padding: '10px 14px', height: '40px', borderRadius: '20px'}}
+                              value={newTransaction.payType}
+                              onChange={(e) => setNewTransaction({...newTransaction, payType: e.target.value})}
+                            >
+                              <option value="" disabled>Select payment type</option>
+                              <option value="Cash in Hand">💵 Cash in Hand</option>
+                              <option value="Check">🏦 Check</option>
+                              <option value="Online Transfer">💳 Online Transfer</option>
+                              <option value="UPI">📱 UPI</option>
+                              <option value="Card">💳 Card</option>
+                            </select>
+                          </td>
+                          <td className="py-3 px-4">
+                            <input 
+                              type="number" 
+                              className="form-control border-0 bg-white rounded-2 shadow-sm text-end"
+                              style={{fontSize: '14px', padding: '10px 14px', height: '40px'}}
+                              placeholder="0"
+                              value={newTransaction.amountCollected}
+                              onChange={(e) => setNewTransaction({...newTransaction, amountCollected: parseFloat(e.target.value) || 0})}
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="d-flex gap-2 justify-content-end">
+                              <button 
+                                className="btn btn-success rounded-2 border-0 d-flex align-items-center justify-content-center"
+                                style={{width: '36px', height: '36px', fontSize: '14px'}}
+                                onClick={handleSaveTransaction}
+                              >
+                                ✓
+                              </button>
+                              <button 
+                                className="btn btn-light border rounded-2 d-flex align-items-center justify-content-center"
+                                style={{width: '36px', height: '36px', fontSize: '14px'}}
+                                onClick={handleCancelTransaction}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+
+                  {/* Empty State */}
+                  {(!transactions || transactions.length === 0) && !showAddForm && (
+                    <div className="py-5 d-flex flex-column justify-content-center align-items-center text-center" style={{minHeight: '200px'}}>
+                      <div className="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style={{width: '80px', height: '80px'}}>
+                        <RiFilePaper2Line size={32} className="text-muted" />
+                      </div>
+                      <h6 className="text-dark fw-semibold mb-2" style={{fontSize: '16px'}}>No transactions yet</h6>
+                      <p className="text-muted mb-0 small">Start by adding your first COD collection entry</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="d-flex justify-content-center align-items-center">
+                  <button 
+                    className="btn-secondary-custom px-2"
+                    onClick={handleSendPaymentLink}
+                    disabled={remainingBalance <= 0}
+                  >
+                    <span className="fw-bold"></span>
+                    Send Payment Link
+                  </button>
+                  
+                  {/* <div className="d-flex gap-3">
+                    {!showAddForm ? (
+                      <button 
+                        className="btn-primary-custom px-2"
+                        onClick={handleAddPayment}
+                        disabled={remainingBalance <= 0}
+                      >
+                        <span className="fw-bold"></span>
+                        Add Payment
+                      </button>
+                    ) : (
+                      <button 
+                        className="btn btn-light border rounded-3 d-flex align-items-center gap-2 px-4 py-2"
+                        style={{fontSize: '14px', fontWeight: '500', height: '44px'}}
+                        onClick={handleCancelTransaction}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div> */}
+                </div>
+              </div>
+
+
+
             </div>
          
 

@@ -180,49 +180,49 @@ const SideBar = () => {
                 <div ref={menuRef} className="more-menu-dropdown">
                   <div className="dropdown-content">
                     <Link to="/vendor-order" onClick={() => handleMoreMenuItemClick('vendors')} 
-                          className={`dropdown-item ${isDropdownItemActive('vendors') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('vendors') ? 'active' : ''}`}>
                       <Factory size={20} />
                       <span>Vendor Orders</span>
                     </Link>
 
                     <Link to="/inventory" onClick={() => handleMoreMenuItemClick('inventory')} 
-                          className={`dropdown-item ${isDropdownItemActive('inventory') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('inventory') ? 'active' : ''}`}>
                       <ClipboardList size={20} />
                       <span>Inventory</span>
                     </Link>
 
                     <Link to="/colorlibrary-products" onClick={() => handleMoreMenuItemClick('colorlibrary')} 
-                          className={`dropdown-item ${isDropdownItemActive('colorlibrary') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('colorlibrary') ? 'active' : ''}`}>
                       <Palette size={20} />
                       <span>Color Library</span>
                     </Link>
 
                     <Link to="/analytics" onClick={() => handleMoreMenuItemClick('analytics')} 
-                          className={`dropdown-item ${isDropdownItemActive('analytics') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('analytics') ? 'active' : ''}`}>
                       <BarChart3 size={20} />
                       <span>Analytics</span>
                     </Link>
 
                     <Link to="/customers" onClick={() => handleMoreMenuItemClick('customers')} 
-                          className={`dropdown-item ${isDropdownItemActive('customers') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('customers') ? 'active' : ''}`}>
                       <Users size={20} />
                       <span>Customers</span>
                     </Link>
 
                     <Link to="/segments" onClick={() => handleMoreMenuItemClick('segments')} 
-                          className={`dropdown-item ${isDropdownItemActive('segments') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('segments') ? 'active' : ''}`}>
                       <Tag size={20} />
                       <span>Segments</span>
                     </Link>
 
                     <Link to="/spinners-and-dyers" onClick={() => handleMoreMenuItemClick('manufactures')} 
-                          className={`dropdown-item ${isDropdownItemActive('manufactures') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('manufactures') ? 'active' : ''}`}>
                       <Factory size={20} />
                       <span>Spinners & Dyers</span>
                     </Link>
 
                     <Link to="/users" onClick={() => handleMoreMenuItemClick('users')} 
-                          className={`dropdown-item ${isDropdownItemActive('users') ? 'active' : ''}`}>
+                          className={`dropdown-items ${isDropdownItemActive('users') ? 'active' : ''}`}>
                       <UserCheck size={20} />
                       <span>Users</span>
                     </Link>

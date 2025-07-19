@@ -69,7 +69,9 @@
 
 }
 
-
+.text-custom {
+color: #6B21A8;
+}
 /* .table-ctn {
     border: 1px solid #ddd;
     border-radius: 1rem;

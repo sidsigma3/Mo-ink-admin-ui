@@ -26,7 +26,7 @@
 
 .notification-card.unread {
   background-color: #e0f2ff;
-  border: 1px solid #3b82f6;
+  border: 1px solid #6B21A8;
 }
 
 
@@ -54,7 +54,7 @@
 }
 
 .tab.active {
-  background-color: #0D6EFD;
+  background-color: #6B21A8;
   color: #ffffff;
 }
 
@@ -104,14 +104,14 @@
 }
 
 .notification-card.unread {
-  box-shadow: 0 0 0 2px #3b82f6;
+  box-shadow: 0 0 0 2px #6B21A8;
 }
 
 
 /* Icon Section */
 .icon {
   font-size: 1.5rem;             /* 24px */
-  color: #0D6EFD;
+  color: ##6B21A8;
   margin-top: 0.25rem;
 }
 
@@ -149,7 +149,7 @@
 
 .mark-all-btn {
   padding: 8px 16px;
-  background-color: #0D6EFD;
+  background-color: #6B21A8;
   color: white;
   border: none;
   border-radius: 8px;
@@ -159,7 +159,7 @@
 }
 
 .mark-all-btn:hover {
-  background-color: #0a5bd4;
+  background-color: #6B21A8;
 }
 
 
@@ -173,12 +173,22 @@
 
 .pagination button {
   padding: 6px 12px;
-  background-color: #007bff;
+  background-color: #6B21A8;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
 }
+
+.pagination button:active {
+  padding: 6px 12px;
+  background-color: #6B21A8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 
 .pagination button:disabled {
   background-color: #cccccc;

@@ -1,6 +1,56 @@
 .delete-btn{
-    height: 40px;
-    padding: 0.2rem 1.7rem;
+    color: red;
+     padding: 10px 8px;
     font-size: 0.8rem;
-    font-weight: 400
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    box-shadow: none;
+    border-radius: 6px;
+    border: 1.5px solid red;
+    background-color: transparent;
+    white-space: nowrap;
+    white-space: nowrap;
+    white-space: nowrap;
+    display: inline-flex; 
+    align-items: center;
+    justify-content: center;
+    min-width: 8rem; 
+    width: auto; 
+    cursor: pointer;
+  
+  /* Transition Properties */
+  transition: all 0.3s ease-in-out;
+  /* Animate these properties: */
+  transition-property: color, background-color, border-color;
+  /* For better performance: */
+  will-change: color, background-color, border-color;
+}
+
+
+.delete-btn:hover{
+    color: #fff;
+     padding: 10px 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    box-shadow: none;
+    border-radius: 6px;
+    /* border: 1.5px solid red; */
+    background-color: red;
+    white-space: nowrap;
+    white-space: nowrap;
+    white-space: nowrap;
+    display: inline-flex; 
+    align-items: center;
+    justify-content: center;
+    min-width: 8rem; 
+    width: auto; 
+    cursor: pointer;
+  
+  /* Transition Properties */
+  transition: all 0.3s ease-in-out;
+  /* Animate these properties: */
+  transition-property: color, background-color, border-color;
+  /* For better performance: */
+  will-change: color, background-color, border-color;
 }

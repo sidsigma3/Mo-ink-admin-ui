@@ -5,13 +5,14 @@
 }
 
 /* Dashboard Box Container */
-.info-ctn {
+.info-cttn {
   margin-bottom: 1rem;
+  width: 50%;
 }
 
 /* Inventory Wrapper */
 .inventory-wrapper {
-  background-color: #f9f9f9;
+  /* background-color: #f9f9f9; */
   padding: 1.5rem;
   border-radius: 1rem;
 }
@@ -69,6 +70,47 @@
 
   .card-view {
     display: block;
+  }
+
+  .card {
+    transition: all 0.3s ease;
+    border-radius: 0.5rem !important;
+    border: 1px solid #ddd;
+    margin-bottom: 1rem;
+  }
+
+  .card-title{
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .card-body{
+    padding: 1rem;
+  }
+
+  .card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px);
+  }
+  
+  .card-title:hover {
+    color: var(--bs-primary) !important;
+  }
+  
+  .bg-gradient {
+    background: linear-gradient(90deg, #6B21A80%, #6f42c1 100%) !important;
+  }
+  
+  .rounded-3 {
+    border-radius: 0.75rem !important;
+  }
+  
+  .gap-2 {
+    gap: 0.5rem !important;
+  }
+  
+  .gap-3 {
+    gap: 1rem !important;
   }
 
   .stock-card {
@@ -142,3 +184,9 @@
   display: inline-block;
 }
 
+
+@media (max-width: 480px) {
+ .info-cttn {
+  width: -webkit-fill-available;
+}
+}

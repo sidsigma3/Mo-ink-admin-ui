@@ -21,7 +21,10 @@ import { FiDownload } from "react-icons/fi";
 import { downloadCreditReceipt } from '../../../services/InvoiceServices';
 import SelectState from '../../../components/SelectState/SelectState';
 import Toast from '../../../components/Toast/Toast';
+import { Download, Link, X } from 'lucide-react';
+
 import { uploadProductImage } from '../../../services/ProductService';
+
 
 const AddCustomerPage = () => {
 const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -30,8 +33,12 @@ const backendUrl = process.env.REACT_APP_IMAGE_URL
   const { rows, setRows } = useSegments();
   const [errors, setErrors] = useState({});
   const [toasts, setToasts] = useState([]);
+  const [showPreview, setShowPreview] = useState(false);
+
 
   const [selectedAddressType, setSelectedAddressType] = useState("HOME");
+
+
 
   const navigate =useNavigate()
   // const { customers ,setCustomers } = useCustomerContext();
@@ -450,24 +457,45 @@ const handleAddressTypeChange = (e) => {
 
 
 
+         const handleCopyImageLink = async () => {
+    try {
+      const imageUrl = `${backendUrl}${formData.chequePhoto}`;
+      await navigator.clipboard.writeText(imageUrl);
+      alert('Image link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      alert('Failed to copy link');
+    }
+  };
+
+  const handleImageClick = () => {
+    setShowPreview(true);
+  };
+
+  const handleClosePreview = () => {
+    setShowPreview(false);
+  };
+
+
+
  
   return (
     <div className='add-customer'>
 
       {state?.index !== undefined ? (
-          <div className='d-flex gap-3 mb-3'> 
+          <div className='top d-flex  gap-3 align-items-center mt-2 mb-4 '>
                     <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
                     <IoArrowBackOutline size={25} />
                 </span>
-          <h5 className="m-0" style={{ fontSize: '19px' }}>{customer.customerName}</h5>
+          <h3 className='m-0' style={{fontSize:'1.2rem'}}>{customer.customerName}</h3>
         </div>
           ):
           (
-        <div className="top  d-flex gap-3 align-items-center" >
+        <div className='top d-flex gap-3 align-items-center mt-2 mb-4 '>
           <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
             <IoArrowBackOutline size={25} />
           </span>
-          <h5 className="m-0" style={{ fontSize: '19px' }}>New Customer</h5>
+            <h3 className='m-0' style={{fontSize:'1.2rem'}}>New Customer</h3>
         </div>
         )}
 
@@ -530,8 +558,10 @@ const handleAddressTypeChange = (e) => {
                     />
                     {errors.gstin && <p className="text-danger">{errors.gstin}</p>}
                 </div>
+                  
 
-                <div className="media-upload-card p-4 h-100">
+                  <div className='col-12 my-4'>
+               <div className="media-upload-card p-4 h-100">
                   <label className="upload-label mb-3" style={{ fontSize: '1rem' }}>
                     Aadhaar Card Photo
                   </label>
@@ -546,7 +576,7 @@ const handleAddressTypeChange = (e) => {
                     />
                     <label
                       htmlFor="cheque-upload"
-                      className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+                      className="upload-button btn btn-outline-custom  rounded-pill px-4 py-2 mb-2"
                     >
                       <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
                     </label>
@@ -558,22 +588,124 @@ const handleAddressTypeChange = (e) => {
                           src={`${backendUrl}${formData.chequePhoto}`}
                           alt="Cheque Preview"
                           className="img-thumbnail rounded"
-                          style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
+                          style={{ 
+                            maxWidth: '100px', 
+                            maxHeight: '100px', 
+                            objectFit: 'contain',
+                            cursor: 'pointer'
+                          }}
+                          onClick={handleImageClick}
                         />
-                       <button
+                        {/* <button
                           className="btn btn-sm btn-outline-secondary mt-2"
                           onClick={handleDownloadChequePhoto}
                         >
                           <i className="bi bi-download me-1"></i>Download
-                        </button>
-
+                        </button> */}
                       </div>
                     )}
-                    {/* {formErrors.chequePhoto && (
-                                <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
-                              )} */}
                   </div>
-                </div>
+                          </div>
+                          </div>
+
+                          {/* Preview Modal */}
+                            {showPreview && (
+                              <div 
+                                className="modal fade show d-block" 
+                                style={{ 
+                                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                  maxWidth: '100%',
+                                  zIndex: 2000
+                                }}
+                                onClick={handleClosePreview}
+                              >
+                                <div 
+                                  className="modal-dialog modal-xl d-flex align-items-center justify-content-center"
+                                  style={{ maxWidth: '100vw', height: '100vh' }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="modal-content bg-transparent border-0" style={{ position: 'relative' }}>
+                                    {/* Image */}
+                                    <img
+                                      src={`${backendUrl}${formData.chequePhoto}`}
+                                      alt="Aadhaar Card Preview"
+                                      className="img-fluid rounded"
+                                      style={{ 
+                                        maxWidth: '100%',
+                                        maxHeight: '70vh',
+                                        objectFit: 'contain'
+                                      }}
+                                    />
+
+                                    {/* Action buttons */}
+                                    <div 
+                                      className="d-flex flex-column gap-2 d-lg-flex d-md-flex d-sm-none d-none" 
+                                      style={{ 
+                                        position: 'absolute', 
+                                        top: '10px', 
+                                        right: '10px', 
+                                        zIndex: 1060 
+                                      }}
+                                    >
+                                      <button
+                                        className="btn btn-primary rounded-circle p-2"
+                                        onClick={handleDownloadChequePhoto}
+                                        title="Download"
+                                        style={{ width: '40px', height: '40px' }}
+                                      >
+                                        <Download size={16} />
+                                      </button>
+                                      <button
+                                        className="btn btn-info rounded-circle p-2"
+                                        onClick={handleCopyImageLink}
+                                        title="Copy Image Link"
+                                        style={{ width: '40px', height: '40px' }}
+                                      >
+                                        <Link size={16} />
+                                      </button>
+                                      <button
+                                        className="btn btn-secondary rounded-circle p-2"
+                                        onClick={handleClosePreview}
+                                        title="Close"
+                                        style={{ width: '40px', height: '40px' }}
+                                      >
+                                        <X size={16} />
+                                      </button>
+                                    </div>
+
+                                    {/* Mobile buttons - below image on small screens */}
+                                    <div 
+                                      className="d-flex gap-2 justify-content-end mt-3 d-lg-none d-md-none d-sm-flex d-flex"
+                                    >
+                                      <button
+                                        className="btn btn-primary rounded-circle p-2"
+                                        onClick={handleDownloadChequePhoto}
+                                        title="Download"
+                                        style={{ width: '40px', height: '40px' }}
+                                      >
+                                        <Download size={16} />
+                                      </button>
+                                      <button
+                                        className="btn btn-info rounded-circle p-2"
+                                        onClick={handleCopyImageLink}
+                                        title="Copy Image Link"
+                                        style={{ width: '40px', height: '40px' }}
+                                      >
+                                        <Link size={16} />
+                                      </button>
+                                      <button
+                                        className="btn btn-secondary rounded-circle p-2"
+                                        onClick={handleClosePreview}
+                                        title="Close"
+                                        style={{ width: '40px', height: '40px' }}
+                                      >
+                                        <X size={16} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
 
                 
@@ -660,9 +792,9 @@ const handleAddressTypeChange = (e) => {
                               style={{
                                 width: '2.2rem',
                                 height: '2.2rem',
-                                backgroundColor: 'rgba(13,110,253,0.1)',
-                                border: '1px solid #0D6EFD',
-                                color: '#0D6EFD',
+                                backgroundColor: '#f7ecffff',
+                                border: '1px solid #6B21A8',
+                                color: '#6B21A8',
                                 borderRadius: '0.4rem',
                               }}
                               onClick={handleAddMoney}
@@ -786,9 +918,9 @@ const handleAddressTypeChange = (e) => {
                               style={{
                                 width: '2.2rem',
                                 height: '2.2rem',
-                                backgroundColor: 'rgba(13,110,253,0.1)',
-                                border: '1px solid #0D6EFD',
-                                color: '#0D6EFD',
+                                backgroundColor: '#f7ecffff',
+                                border: '1px solid #6B21A8',
+                                color: '##6B21A8',
                                 borderRadius: '0.4rem',
                                 // lineHeight: 1,
                               }}
@@ -939,7 +1071,7 @@ const handleAddressTypeChange = (e) => {
                               cx="50"
                               cy="50"
                               r="35"
-                              stroke={walletBalance > 0 ? "#007bff" : "#B9C0CD"} // Blue if wallet has balance
+                              stroke={walletBalance > 0 ? "#6B21A8" : "#B9C0CD"} // Blue if wallet has balance
                               strokeWidth="5"
                               fill="none"
                               strokeDasharray="240"
@@ -950,7 +1082,7 @@ const handleAddressTypeChange = (e) => {
                       {/* Icon in the center */}
                       <div
                           className="position-absolute d-flex justify-content-center align-items-center"
-                          style={{ top: 0, left: 0, width: '100%', height: '100%', color: walletBalance > 0 ? "#007bff" : "#6c757d" }}
+                          style={{ top: 0, left: 0, width: '100%', height: '100%', color: walletBalance > 0 ? "#6B21A8" : "#6c757d" }}
                       >
                           <VscCreditCard size={30} />
                       </div>
@@ -960,7 +1092,7 @@ const handleAddressTypeChange = (e) => {
                   className="d-flex flex-column justify-content-center align-items-start"
                 >
                   <h5 style={{ fontSize: '1rem' }}>Wallet Balance</h5>
-                  <h5 className={`fs-4 mt-2 ${walletBalance > 0 ? 'text-primary' : 'text-secondary'}`}>
+                  <h5 className={`fs-4 mt-2 ${walletBalance > 0 ? 'text-custom' : 'text-secondary'}`}>
                     ₹{walletBalance?.toFixed(0) || 0}
                   </h5>
                 </div>
@@ -989,7 +1121,7 @@ const handleAddressTypeChange = (e) => {
                               backgroundColor: '#fafafa'
                           }}
                           onFocus={(e) => {
-                              e.currentTarget.style.borderColor = '#0D6EFD';
+                              e.currentTarget.style.borderColor = '##6B21A8';
                               e.currentTarget.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.25)';
                           }}
                           onBlur={(e) => {
@@ -1030,24 +1162,24 @@ const handleAddressTypeChange = (e) => {
                               {selectedSegments.map((segment, index) => (
                                   <span
                                       key={index}
-                                      className="chip d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill border"
+                                      className="chip d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill "
                                       style={{
-                                          backgroundColor: '#f0f8ff',
-                                          borderColor: '#bfdbfe',
+                                          backgroundColor: '#6b21a80e',
+                                          border: '1px solid #6B21A8',
                                           fontSize: '0.8rem',
                                           fontWeight: '500',
-                                          color: '#0D6EFD',
+                                          color: '#6B21A8',
                                           transition: 'all 0.2s ease-in-out',
                                           cursor: 'default'
                                       }}
-                                      onMouseEnter={(e) => {
-                                          e.currentTarget.style.backgroundColor = '#e9ecef';
-                                          e.currentTarget.style.borderColor = '#adb5bd';
-                                      }}
-                                      onMouseLeave={(e) => {
-                                          e.currentTarget.style.backgroundColor = '#f8f9fa';
-                                          e.currentTarget.style.borderColor = '#dee2e6';
-                                      }}
+                                      // onMouseEnter={(e) => {
+                                      //     e.currentTarget.style.backgroundColor = '#6b21a80e';
+                                      //     e.currentTarget.style.borderColor = '#6B21A8';
+                                      // }}
+                                      // onMouseLeave={(e) => {
+                                      //     e.currentTarget.style.backgroundColor = '#6b21a80e';
+                                      //     e.currentTarget.style.borderColor = '#6B21A8';
+                                      // }}
                                   >
                                       <span className="text-truncate" style={{ maxWidth: '200px' }}>
                                           {segment.segmentTitle}
@@ -1059,18 +1191,18 @@ const handleAddressTypeChange = (e) => {
                                               width: '18px',
                                               height: '18px',
                                               borderRadius: '50%',
-                                              color: '#6c757d',
+                                              color: '#1d1e1fff',
                                               fontSize: '14px',
                                               transition: 'all 0.2s ease-in-out'
                                           }}
-                                          onMouseEnter={(e) => {
-                                              e.currentTarget.style.backgroundColor = '#dc3545';
-                                              e.currentTarget.style.color = 'white';
-                                          }}
-                                          onMouseLeave={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'transparent';
-                                              e.currentTarget.style.color = '#6c757d';
-                                          }}
+                                          // onMouseEnter={(e) => {
+                                          //     e.currentTarget.style.backgroundColor = '#dc3545';
+                                          //     e.currentTarget.style.color = 'white';
+                                          // }}
+                                          // onMouseLeave={(e) => {
+                                          //     e.currentTarget.style.backgroundColor = 'transparent';
+                                          //     e.currentTarget.style.color = '#6c757d';
+                                          // }}
                                           aria-label={`Remove ${segment.segmentTitle}`}
                                       >
                                           ×

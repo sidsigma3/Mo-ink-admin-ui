@@ -47,12 +47,12 @@ const VendorOrderFilter = ({ status = [], onStatusChange }) => {
       <Dropdown.Toggle
         variant="light"
         id="dropdown-basic"
-        className="d-flex align-items-center justify-content-between gap-2"
+        className="d-flex align-items-center  border justify-content-between gap-2 w-100"
       >
         <p className="m-0">{displayText()}</p>
       </Dropdown.Toggle>
 
-      <Dropdown.Menu className="px-2" style={{ minWidth: "200px" }}>
+      <Dropdown.Menu className="px-2" style={{ minWidth: "120px" }}>
         {vendorStatuses.map((statusKey) => (
           <Form.Check
             key={statusKey}

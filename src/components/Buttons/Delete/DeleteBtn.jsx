@@ -4,7 +4,7 @@ import "./DeleteBtn.css"
 const DeleteBtn = ({clickFunction}) => {
   return (
     <>
-    <button className='delete-btn btn btn btn-outline-danger' onClick={clickFunction}>
+    <button className='delete-btn ' onClick={clickFunction}>
         Delete
     </button>
     </>

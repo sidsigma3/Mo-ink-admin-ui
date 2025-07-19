@@ -5,7 +5,7 @@ import "./../Add/AddBtn.css"
 const SubmitBtn = ({text,clickFunction,disabled}) => {
   return (
     <>
-    <button  onClick={clickFunction} className='btn btn-primary add-btn d-flex align-items-center gap-1' disabled={disabled}>
+    <button  onClick={clickFunction} className='btn-primary-custom' disabled={disabled}>
         <span>{text}</span>
         {/* <MdAdd size={18}/> */}
     </button>

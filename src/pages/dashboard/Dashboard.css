@@ -31,7 +31,14 @@
     /* width: 100%; */
 }
 
+.dashboardBox-ctn {
+  padding: 0 7.5px ; /* Half of desired gap */
+  margin-bottom: 15px; /* Vertical spacing */
+}
 
+.info-ctn {
+  margin: 0 -7.5px ; /* Negative margin to offset padding */
+}
 /* .right-content .top-sec{
     height: 20%; 
     padding-bottom: 1%;   
