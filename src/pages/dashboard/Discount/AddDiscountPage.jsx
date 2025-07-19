@@ -92,26 +92,18 @@ const parseMaxPurchaseRequirement = (requirementString) => {
 const [formData, setFormData] = useState(() => {
   const parsedActiveDates = discount?.activeDates || {
     startDate: "",
-    startTime: "",
     hasEndDate: false,
-    endDate: "",
-    endTime: ""
+    endDate: ""
   };
 
   if (discount?.startDateTime) {
     const startDateObj = new Date(discount.startDateTime);
     parsedActiveDates.startDate = startDateObj.toISOString().split("T")[0];
-  
-    // Extract only HH:MM format for time
-    parsedActiveDates.startTime = startDateObj.toTimeString().slice(0, 5);
   }
-  
+
   if (discount?.endDateTime) {
     const endDateObj = new Date(discount.endDateTime);
     parsedActiveDates.endDate = endDateObj.toISOString().split("T")[0];
-  
-    // Extract only HH:MM format for time
-    parsedActiveDates.endTime = endDateObj.toTimeString().slice(0, 5);
     parsedActiveDates.hasEndDate = true;
   }
 
@@ -119,12 +111,12 @@ const [formData, setFormData] = useState(() => {
 
   return {
     used: discount?.used || 0,
-    discountCode: discount?.discountCode || "",   
-    discountType: discount?.discountType || "Percentage", // Default selected type
+    discountCode: discount?.discountCode || "",
+    discountType: discount?.discountType || "Percentage",
     discountValue: discount?.discountValue || "",
-    appliesTo: discount?.applicableProducts || [], // Products or categories applied to
+    appliesTo: discount?.applicableProducts || [],
     minPurchaseRequirement: parseMinPurchaseRequirement(discount?.minPurchaseRequirement) || {
-      type: "No", 
+      type: "No",
       value: ""
     },
     customerEligibility: discount?.customerEligibilityType
@@ -133,10 +125,12 @@ const [formData, setFormData] = useState(() => {
 
     maxUsage: parsedMax.maxUsage,
     usageLimit: parsedMax.usageLimit,
-    
-    activeDates: parsedActiveDates ,
-    status: discount?.discountStatus || "Active" 
-  }});
+
+    activeDates: parsedActiveDates,
+    status: discount?.discountStatus || "Active"
+  };
+});
+
 
    const [segments,setSegments] = useState([])
       
@@ -421,9 +415,9 @@ const handleMaxUsageChange = (field1,field2) => {
         validationErrors.allCustomers = "No customers available.";
     if (productSelect.length === 0) validationErrors.products = "Select at least one product.";
     if (!formData.activeDates.startDate) validationErrors.startDate = "Start date is required.";
-    if (!formData.activeDates.startTime) validationErrors.startTime = "Start time is required.";
-    // if (formData.activeDates.hasEndDate && !formData.activeDates.endDate)
-    //     validationErrors.endDate = "End date is required when 'Has End Date' is selected.";
+    // if (!formData.activeDates.startTime) validationErrors.startTime = "Start time is required.";
+    if (formData.activeDates.hasEndDate && !formData.activeDates.endDate)
+        validationErrors.endDate = "End date is required";
 
     // Stop submission if errors exist
     if (Object.keys(validationErrors).length > 0) {
@@ -475,7 +469,7 @@ const handleMaxUsageChange = (field1,field2) => {
       appliesToAllProducts: productSelect.length === finalData.length,
       productEligibilityType: productSelect.length === finalData.length ? "All" : "Specific Product",
       customerEligibilityType: selectedOptionCustomer,
-      discountStatus: formData.status,
+      discountStatus: formData.status.toUpperCase(),
       minPurchaseRequirement: minPurchaseRequirementString,
       maxPurchaseRequirements: maxPurchaseRequirementString,
       discountMethod: selectedMethod,
@@ -888,11 +882,11 @@ const handleMaxUsageChange = (field1,field2) => {
                 <input type="date" value={formData.activeDates.startDate} onChange={(e)=>handleActiveDatesChange('startDate',e)}></input>
                 {errors.startDate && <p className="text-danger">{errors.startDate}</p>}
               </div>
-              <div className="d-flex gap-2 flex-column flex-grow-1">
+              {/* <div className="d-flex gap-2 flex-column flex-grow-1">
                 <label style={{fontSize:'1rem'}}>Start time (IST)</label>
                 <input type="time" value={formData.activeDates.startTime}  onChange={(e)=>handleActiveDatesChange('startTime',e)}></input>
                 {errors.startTime && <p className="text-danger">{errors.startTime}</p>}
-              </div>
+              </div> */}
             </div>
 
             <div className="d-flex align-items-center gap-2 mt-2">
@@ -905,11 +899,12 @@ const handleMaxUsageChange = (field1,field2) => {
                  <div className="d-flex gap-2 flex-column flex-grow-1">
                    <label>Start date</label>
                    <input type="date" value={formData.activeDates.endDate} onChange={(e)=>handleActiveDatesChange('endDate',e)}></input>
+                   {errors.endDate && <p className="text-danger">{errors.endDate}</p>}
                  </div>
-                 <div className="d-flex gap-2 flex-column flex-grow-1">
+                 {/* <div className="d-flex gap-2 flex-column flex-grow-1">
                    <label>Start time (IST)</label>
                    <input type="time" value={formData.activeDates.endTime}  onChange={(e)=>handleActiveDatesChange('endTime',e)}></input>
-                 </div>
+                 </div> */}
                </div>
             )}
            

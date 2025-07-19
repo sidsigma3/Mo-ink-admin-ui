@@ -97,38 +97,24 @@ const ColorLibraryProducts = () => {
       <div className="py-5 zindex">
         <div className="row g-4 justify-content-center">
           {products.map((item, index) => (
-            <div className="col-6 col-lg-2" key={item.productId || index}>
-              <div 
-                className="card h-100 shadow-sm border-0 rounded-4"
-                onClick={(e) => handleCardClick(item.productId, e)}
-                style={{ cursor: 'pointer' }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleCardClick(item.productId, e);
-                  }
-                }}
-              >
-                {/* Desktop image */}
-                <div className="overflow-hidden rounded-top-4 d-none d-sm-block">
+
+            <div className="col-6 col-lg-2" key={index}
+            style={{cursor:'pointer'}}
+             onClick={() =>{
+                      navigate("/colorlibrary", {
+                        state: { productId: item.productId },
+                      })
+                    }}
+            >
+              <div className="card h-100 shadow-sm border-0 rounded-4 ">
+                <div className="overflow-hidden rounded-top-4" 
+                  
+                >
+                  {/* ✅ 3. Use imageMap with fallback */}
                   <img
                     src={imageMap[item.name.toLowerCase()] || 'https://via.placeholder.com/150'}
                     alt={item.name}
                     className="w-100 rounded-4 p-1 zoom-img"
-                    onClick={(e) => handleImageClick(item.productId, e)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                </div>
-                
-                {/* Mobile image */}
-                <div className="ratio ratio-16x9 d-sm-none">
-                  <img
-                    src={imageMap[item.name.toLowerCase()] || 'https://via.placeholder.com/150'}
-                    alt={item.name}
-                    className="w-100 h-100 object-fit-cover p-1 zoom-img"
-                    onClick={(e) => handleImageClick(item.productId, e)}
-                    style={{ cursor: 'pointer' }}
                   />
                 </div>
                 

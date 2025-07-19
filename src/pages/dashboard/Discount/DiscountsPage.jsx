@@ -299,9 +299,9 @@ if (totalPages >=1) {
 
       
 
-          <div className="data-cards rounded-4">
+          <div className="data-cards">
         {filteredData.map((discount,index) => (
-          <div className="data-card " key={index} onClick={() => handleRowClick(index)}>
+          <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
                  <h3 className='fs-6 fw-medium m-0	'>{discount.discountCode}</h3>
@@ -330,7 +330,6 @@ if (totalPages >=1) {
                 >
                   {discount.discountStatus.toUpperCase()}
                 </div>
-
                 </p>
             </div>
 
@@ -343,6 +342,7 @@ if (totalPages >=1) {
               </p>
 
             <span><LuDot  size={25}/></span>
+
 
             <p className="text-muted m-0"> {discount.minPurchaseRequirement}</p>
 
@@ -399,7 +399,7 @@ if (totalPages >=1) {
                 ))}
             </div>
 
-                  <div className='d-flex justify-content-end mt-2 pagination'>
+          <div className='d-flex justify-content-end mt-2 pagination'>
           <Pagination>{paginationItems}</Pagination>
         </div>
 
