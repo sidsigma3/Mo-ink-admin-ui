@@ -62,7 +62,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #0D6EFD;
+  color: ##6B21A8;
 }
 
 .btn-tertiary{
@@ -71,8 +71,8 @@
     font-size: 0.8rem;
     font-weight: 400;
     background-color: #ffffff !important;
-    border: 2px solid #0D6EFD;
-    color: #0D6EFD !important;
+    border: 2px solid ##6B21A8;
+    color: #6B21A8!important;
 }
 
 
@@ -136,6 +136,13 @@
         }
     }
 
+}
+
+
+.btn-tertiary{
+  background-color: #ffffff;
+  color: #6B21A8;
+  border: 1px solid #6B21A8;
 }
 
 /* .input-row {

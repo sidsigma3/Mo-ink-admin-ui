@@ -476,10 +476,10 @@ const BulkAssignPage = () => {
 
     return (
         <div className='create-order'>
-         <div className='top d-flex gap-3 mb-2 mt-2' style={{cursor:'pointer'}}>
+         <div className='top d-flex gap-3  mb-4 mt-2' style={{cursor:'pointer'}}>
                     <span onClick={() => navigate('/vendor-order')}><IoArrowBackOutline size={25}/></span>
                    { Object.keys(order).length === 0 ? (
-                    <h5 style={{fontSize:'1.2rem'}}>Create Vendor Order</h5>
+                    <h3 className='m-0' style={{fontSize:'1.2rem'}}>Create Vendor Order</h3>
         
                    ): (
                         <div className='d-flex gap-2'>
@@ -500,7 +500,7 @@ const BulkAssignPage = () => {
                 <div className="d-flex flex-column flex-md-row gap-4 align-items-md-center col-12 col-md-12 col-lg-6">
 
                     {/* Label Div */}
-                    <div className="col-2">
+                    <div className="col-3">
                     <label className="form-label fs-6 fw-medium mb-0">Order for:</label>
                     </div>
 
@@ -589,12 +589,12 @@ const BulkAssignPage = () => {
                 </div>
 
 
-                    <div className='products bg-white p-4 mb-3 rounded'>
+                    <div className='products bg-white p-4 rounded'>
                         <h6>Order Details</h6>
                 
                 <div className='d-flex justify-content-center gap-2 mb-1 mt-3 border-bottom pb-5'>
                     <div>
-                        <button className='btn btn-sm btn-primary' onClick={() => setShowModalOrder(true)}>
+                        <button className='btn-secondary-custom' onClick={() => setShowModalOrder(true)}>
                             Browse Color Catalogue
                         </button>
                     </div>
@@ -969,8 +969,8 @@ const BulkAssignPage = () => {
               </div>
               </div>
 
-              <div>
-                <button className='btn btn-primary' onClick={handleCreateVendorOrders}>Create Order</button>
+              <div className="d-flex justify-content-end"> 
+                <button className='mt-4 btn-primary-custom' onClick={handleCreateVendorOrders}>Create Order</button>
               </div>
 
 

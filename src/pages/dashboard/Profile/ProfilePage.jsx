@@ -300,7 +300,7 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
                 {/* Save Button */}
       <div className='d-flex justify-content-end mt-3'>
-        <button className="btn btn-primary" onClick={handleSubmit}>Save Changes</button>
+        <button className="btn-outline-secondary" onClick={handleSubmit}>Save Changes</button>
       </div>
 
       {/* Toast */}

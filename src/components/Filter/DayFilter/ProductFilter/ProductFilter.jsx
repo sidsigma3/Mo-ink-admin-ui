@@ -22,11 +22,11 @@ const ProductFilter = ({ filterOptions, onFilterChange }) => {
     };
   
     return (
-      <div className="d-flex bg-white p-2 gap-3 border order-id w-100 ps-0">
+      <div className="d-flex bg-white p-2 gap-3 border order-id w-100 ps-0" style={{ height: '2.3 rem' }}>
         {/* Dropdown Selection */}
         <div className="d-flex align-items-center justify-content-between border border-right" style={{ width: "39%" }}>
           <Dropdown onSelect={handleSelect} size="sm" className="d-flex align-items-center w-100">
-            <Dropdown.Toggle variant="light" id="dropdown-basic" className="p-0 px-2 d-flex align-items-center justify-content-between gap-2 w-100 border border-0">
+            <Dropdown.Toggle variant="light" id="dropdown-basic" className="p-0 px-2 d-flex align-items-center justify-content-between gap-2 w-100 border border-0" style={{ width: "120px", minWidth: "120px" }}>
               <p className="m-0 d-flex align-items-center gap-2">{selectedFilter}</p>
             </Dropdown.Toggle>
   

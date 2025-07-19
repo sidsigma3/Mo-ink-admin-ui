@@ -192,7 +192,7 @@ for (let i = 1; i <= totalPages; i++) {
 
   return (
     <div>
-    <div className="product-table rounded-3">
+    <div className="product-table rounded-2">
     <Table hover>
       <thead className='z-1'>
         <tr>

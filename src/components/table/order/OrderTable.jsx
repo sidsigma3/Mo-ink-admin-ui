@@ -325,7 +325,7 @@ const handleRowClick = (order) => {
 
   return (
     <div>
-    <div className="order-table table-ctn-order rounded-3">
+    <div className="order-table table-ctn-order rounded-2">
       <Table hover>
         <thead>
           <tr className="order-tablemain">
@@ -408,7 +408,7 @@ const handleRowClick = (order) => {
                 ₹{(order.payment.totalAmount + order.payment.walletAmount - order.payment.totalAdjustedAmount - order.payment.returnRefundAmount - order.payment.cancelRefundAmount).toFixed(0)}
               </td>
 
-              <td style={{ textAlign: 'center', verticalAlign: 'middle' }} onClick={(e) => e.stopPropagation()}>
+              <td style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
                 <select
                   className={
                     order.payment.paymentStatus === "FULLY_PAID"
@@ -518,27 +518,7 @@ const handleRowClick = (order) => {
             onClick={() => handleRowClick(order)}
           >
            <div className="d-flex justify-content-between align-items-center">
-          <div
-            style={{
-            position: "relative",
-            padding: "0.2rem 0.4rem",
-            minWidth: "3rem",        
-            maxWidth: "8rem",        
-            width: "fit-content",    
-            backgroundColor: "#ededed", 
-            borderRadius: "0.4rem",
-            textAlign: "center",
-            color: "#202021", 
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "1rem",
-            whiteSpace: "nowrap",   
-            overflow: "hidden",
-            textOverflow: "ellipsis" 
-        }}
-
-          >
+          <div className="order-tag-id"  >
             <h3 style={{ margin: 0 }}>#{order.orderId}</h3>
           </div>
 
@@ -579,7 +559,7 @@ const handleRowClick = (order) => {
             </div>
 
             <div className="d-flex justify-content-between align-items-center">
-            <div className="dropdown-wrapper" onClick={(e) => e.stopPropagation()}>
+            <div className="dropdown-wrappers" onClick={(e) => e.stopPropagation()}>
                 <h5 
                   className={statusClassMap[order.status]} 
                   onClick={(e) => e.stopPropagation()}
@@ -604,7 +584,7 @@ const handleRowClick = (order) => {
                 </select> */}
               </div>
 
-              <div className="dropdown-wrapper" onClick={(e) => e.stopPropagation()}>
+              <div className="dropdown-wrappers" onClick={(e) => e.stopPropagation()}>
               <select
                 className={
                   order.payment.paymentStatus === "FULLY_PAID"

@@ -1,5 +1,5 @@
 .status{
-    /* width: 25%; */
+    width: 100%;
     border-radius: 0.3rem;
     
 }
@@ -10,10 +10,25 @@
     margin: 0;
 }
 
+.status p{
+    font-size: 1rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+.status .dropdown-toggle{
+     height: 2.3rem;
+    font-size: 0.8rem;
+}
+
+.status .dropdown-menu{
+    width: 4rem ;
+    font-size: 0.8rem;
+}
+
 
 .dropdown button{
     background-color: white;
-    border: 1px solid #D1D5DB;
     border-radius: 0.3rem;
     color: black;
 }

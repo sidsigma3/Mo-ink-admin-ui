@@ -31,10 +31,11 @@
   padding: 10px 14px;
   border: 1px solid #d1d5db;
   transition: border 0.2s;
+  border-radius: 4px;
 }
 
 .form-control:focus {
-  border-color: #0D6EFD;
+  border-color: #6B21A8;
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
 }
 
@@ -63,8 +64,8 @@
 
 .tag.active {
   background-color: #e7f0ff;
-  color: #0D6EFD;
-  border-color: #0D6EFD;
+  color: #6B21A8;
+  border-color: #6B21A8;
   font-weight: 500;
 }
 
@@ -104,9 +105,9 @@
 }
 
 .priority-btn.active {
-  background-color: #0D6EFD !important;
+  background-color: #6B21A8!important;
   color: #ffffff !important;
-  border-color: #0D6EFD !important;
+  border-color: #6B21A8!important;
   box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.2);
 }
 
@@ -122,7 +123,7 @@
   border: 2px dashed #d1d5db;
   padding: 40px;
   text-align: center;
-  color: #0D6EFD;
+  color: #6B21A8;
   background-color: #f9fafb;
   border-radius: 10px;
   cursor: pointer;
@@ -207,7 +208,7 @@
 }
 
 .submit-btn {
-  background-color: #0D6EFD;
+  background-color: #6B21A8;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -218,5 +219,5 @@
 }
 
 .submit-btn:hover {
-  background-color: #0b5ed7;
+  background-color: #6b21a898;
 }

@@ -13,7 +13,7 @@
   width: 85%;
   background-color: rgba(14, 6, 54, 0.041);
   backdrop-filter: blur(6px);
-  border: 4px solid #0D6EFD  !important;
+  border: 4px solid #6B21A8 !important;
   color: #0b1127 !important;
       align-items: start;
 
@@ -42,11 +42,11 @@
   }
   
   .text-purple {
-    color: #6b21a8;
+    color: #6B21A8;
   }
   
   .btn-purple {
-    background-color: #6b21a8;
+    background-color: #6B21A8;
     color: white;
   }
   

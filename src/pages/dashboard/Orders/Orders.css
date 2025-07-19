@@ -1,7 +1,6 @@
 .order .top{
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
     align-items: center;
 }
 
@@ -40,7 +39,7 @@
 
 
 .order .info-ctn ul li{
-    padding: 0.2rem 0.5rem 0.2rem 0;
+        padding: 0.5rem 0.5rem 0.2rem 0;
      /* border-right: 1px solid #93A3AB; */
     position: relative;
     /* background-color: white; */
@@ -62,6 +61,18 @@
     width: 1px;
     background-color: #93A3AB;
 } */
+
+
+
+.order-filter-cttn {
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .order-filter-cttn {
+        width: 55%;
+    }
+}
 
 
 .order .info-ctn ul li h4{
@@ -151,6 +162,10 @@
     .lg-btn{
         display: none;
     }
+
+    .order .order-filter-ctn{
+    width: 100%;
+}
 }
 
 @media (max-width: 1024px) {

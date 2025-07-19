@@ -56,6 +56,13 @@
     width: 50% !important;
 }
 
+
+.btn-outline-custom {
+  background-color: #ffffff;
+  color: #6B21A8;
+  border: 1px solid #6B21A8;
+}
+
   @media (max-width: 1024px) {
     .table-ctn{
      

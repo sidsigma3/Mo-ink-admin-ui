@@ -64,8 +64,7 @@ const Products = () => {
 
   return (
     <div className='products'>
-        <div className='top d-flex justify-content-between'>
-            <div>
+    <div className='top d-flex align-items-center justify-content-between mt-2 mb-4 gap-3'>            <div>
                 <h3 className='mb-0 ' style={{fontSize:'1.2rem'}}>Products</h3>
             </div>
 
@@ -85,16 +84,15 @@ const Products = () => {
 
         </div>
 
-        <div className='filter-sec d-flex gap-2 align-items-center mt-2'>
-
-            <div className='w-75'>
-                <ProductFilter 
+        <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
+                                            <div className='col-sm-6 col-md-9'>
+                                                <ProductFilter  
                     filterOptions={["Product Name"]} 
                     onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
                 />
             </div>
             
-            <div className='w-25'>
+            <div className='col-sm-6 col-md-3'>
             <StatusFilter status="All" onStatusChange={handleStatusChange} />
             </div>
         </div>

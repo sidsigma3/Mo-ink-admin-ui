@@ -25,7 +25,7 @@ const AnalyticsPage = () => {
 
       const createGradient = (ctx, chartArea) => {
         const gradient = ctx.createLinearGradient(0, 0, 0, chartArea.bottom);
-        gradient.addColorStop(0, "rgba(5, 97, 252, 0.8)"); // Start with solid blue
+        gradient.addColorStop(0, "#6B21A8"); // Start with solid blue
         gradient.addColorStop(1, "rgba(5, 97, 252, 0)"); // Fade to transparent
         return gradient;
       };
@@ -37,7 +37,7 @@ const AnalyticsPage = () => {
           {
             label: "Sales",
             data: [30, 50, 40, 70, 60], // Your dataset values
-            borderColor: "#0561FC", // Line color
+            borderColor: "#6B21A8", // Line color
             backgroundColor: (ctx) => {
               const { chart } = ctx;
               const { ctx: canvasCtx, chartArea } = chart;
@@ -49,9 +49,9 @@ const AnalyticsPage = () => {
             fill: true, // Enables area fill
             tension: 0.4, // Curve the line
             pointBackgroundColor: "#fff", // Point background color
-            pointBorderColor: "#0561FC", // Point border color
+            pointBorderColor: "#6B21A8", // Point border color
             pointHoverBackgroundColor: "#fff", // Point hover fill color
-            pointHoverBorderColor: "#0561FC", // Point hover border color
+            pointHoverBorderColor: "#6B21A8", // Point hover border color
           },
         ],
       };
@@ -66,9 +66,9 @@ const AnalyticsPage = () => {
             borderRadius:7,
             data: [3000, 4000, 5000],
             backgroundColor: [ // Dynamically set color based on max value
-              Math.max(...[3000, 4000, 5000]) === 3000 ? "#0561FC" : "#CDCDCD", // Blue if max
-              Math.max(...[3000, 4000, 5000]) === 4000 ? "#0561FC" : "#CDCDCD", // Blue if max
-              Math.max(...[3000, 4000, 5000]) === 5000 ? "#0561FC" : "#CDCDCD", // Blue if max
+              Math.max(...[3000, 4000, 5000]) === 3000 ? "#6B21A8" : "#CDCDCD", // Blue if max
+              Math.max(...[3000, 4000, 5000]) === 4000 ? "#6B21A8" : "#CDCDCD", // Blue if max
+              Math.max(...[3000, 4000, 5000]) === 5000 ? "#6B21A8" : "#CDCDCD", // Blue if max
             ],
           },
         ],
@@ -82,9 +82,9 @@ const AnalyticsPage = () => {
           {
             data: [300, 50, 100],
             backgroundColor: [
-              "#0561FC", // Main color
-              "#0350D2", // A darker shade of #0561FC
-              "#3A73FF", // A lighter shade of #0561FC
+              "#6B21A8", // Main color
+              "#6b21a8b4", // A darker shade of #6B21A8
+              "#6b21a869", // A lighter shade of #6B21A8
             ],
           },
         ],
@@ -118,7 +118,7 @@ const AnalyticsPage = () => {
             barThickness: 25,
             borderRadius:7,
             backgroundColor: [
-              "#0561FC",
+              "#6B21A8",
             ],
             barThickness: 30,  // Set fixed bar width
           },
@@ -162,7 +162,7 @@ const AnalyticsPage = () => {
               const opacity = 0.2 + (0.8 * (index + 1)) / sortedCustomers.length;
               return `rgba(5, 97, 252, ${opacity})`; // Faded blue color for lower ranked customers
             }),
-            borderColor: "rgba(5, 97, 252, 1)", // Solid blue for borders
+            borderColor: "#6B21A8", // Solid blue for borders
             borderWidth: 1,
             barThickness: 25,
             borderRadius:7,
@@ -258,7 +258,7 @@ const AnalyticsPage = () => {
 
   return (
     <div className='analytics-page'>
-        <div className='top d-flex justify-content-between'>
+        <div className='top d-flex justify-content-between mt-2'>
             <h4 style={{fontSize:'1.2rem'}}>Analytics</h4>
             <Filter></Filter>
         </div>

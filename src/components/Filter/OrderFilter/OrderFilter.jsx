@@ -29,7 +29,7 @@ const OrderFilter = ({ status = [], onStatusChange }) => {
 
   return (
     <Dropdown className='order-filter'>
-  <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center justify-content-between gap-2">
+  <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center  border justify-content-between gap-2 w-100">
     <p className="m-0">
       {selectedStatuses.length === 0
         ? "All"

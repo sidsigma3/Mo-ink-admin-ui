@@ -615,14 +615,14 @@ const handleTag = (value) =>{
 
     return (
     <div className='add-spinners'>
-        <div className="top d-flex gap-3 align-items-center" style={{ cursor: "pointer" }}>
+               <div className='top d-flex gap-3 align-items-center mt-2 mb-4 ' style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/spinners-and-dyers")}>
           <IoArrowBackOutline size={25} />
         </span>
         {state?.index !== undefined? (
-          <h5 className="m-0" >{customer?.firstName+" "+customer?.lastName}</h5>
+          <h3 className='m-0' style={{fontSize:'1.2rem'}}>{customer?.firstName+" "+customer?.lastName}</h3>
         ):(
-          <h5>New Spinners & Dyers</h5>
+          <h3 className='m-0' style={{fontSize:'1.2rem'}}>New Spinners & Dyers</h3>
         )}
       
       </div>
@@ -694,7 +694,7 @@ const handleTag = (value) =>{
                 />
                 <label 
                   htmlFor="cheque-upload" 
-                  className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+                  className="upload-button btn btn-outline-custom rounded-pill px-4 py-2 mb-2"
                 >
                   <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
                 </label>
@@ -936,7 +936,7 @@ const handleTag = (value) =>{
 
                        <div className="d-flex justify-content-center mt-4">    
                       <button className="btn btn-tertiary" onClick={handleSubmitForm}>
-                        Submit Rate Chart
+                        Submit
                       </button>
                       </div>
 

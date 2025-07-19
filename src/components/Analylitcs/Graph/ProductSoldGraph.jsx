@@ -15,7 +15,7 @@ const ProductSoldGraph = ({ productData }) => {
       {
         label: 'Weight (kg)',
         data: weights,
-        backgroundColor: '#0561FC',
+        backgroundColor: '#6B21A8',
         borderRadius: 5,
       },
     ],
