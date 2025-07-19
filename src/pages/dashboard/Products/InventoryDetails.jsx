@@ -2,13 +2,14 @@ import React, { useRef, useState , useEffect} from 'react';
 import { Table } from 'react-bootstrap';
 import ExportBtn from '../../../components/Buttons/Export/ExportBtn';
 import DashboardBox from "../../../components/DashboardBox/DashboardBox";
-import { BsDot } from 'react-icons/bs';
+import {  BsDot, BsBoxSeam, BsRulers } from 'react-icons/bs';
 import "./InventoryDetails.css"
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate , useLocation } from 'react-router-dom';
 import { getInventoryLogs , adjustInventory } from '../../../services/InventoryService';
 import { FaMinus } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
+import { IoAddOutline } from "react-icons/io5";
 import * as XLSX from 'xlsx';
 import Toast from '../../../components/Toast/Toast';
 import ModalInventoryChange from '../../../components/Modal/ModalInventoryChange';
@@ -181,14 +182,14 @@ const InventoryDetails = () => {
   
 
   return (
-    <div className='inventory-wrapper bg p-1'>
+    <div className='inventory-wrapper bg p-0'>
       {/* Page Title */}
-      <div className='d-flex justify-content-between align-items-center mb-4'>
+      <div className='d-flex justify-content-between align-items-center mt-2 mb-4'>
       <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
       <span onClick={() => navigate("/inventory")}>
           <IoArrowBackOutline size={25} />
         </span>
-        <h4 className='page-title mb-0'>Inventory Details</h4>
+        <h3 className='page-title m-0' style={{fontSize:'1.2rem'}}>Inventory Details</h3>
         </div>
         <div className='d-flex gap-2'>
         <ExportBtn onClick={() => exportLogsToExcel(logsByVariant)}></ExportBtn>
@@ -198,7 +199,7 @@ const InventoryDetails = () => {
 
 
 {/* Summary Boxes */}
-<div className="info-ctn row w-50">
+<div className="info-cttn row">
     <div className="dashboardBox-ctn col-6 col-md-6 col-lg-4 col-xl">
       <DashboardBox heading="Total Customer Order" number={`${totalOrders} Kgs`} />
     </div>
@@ -215,19 +216,35 @@ const InventoryDetails = () => {
 
 
        {/* Header Info */}
-    <div className="d-flex justify-content-start align-items-center gap-2 my-4">
-      <h5 className="mb-0 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.product}</h5>
-      <BsDot size="1.8rem" color="#6c757d" /> 
-      <span className="badge bg-light px-1 py-1"style={{ fontSize: '1.2rem', color: 'black', fontWeight: 500 }}>{item.raw.size}</span>
-      <BsDot size="1.8rem" color="#6c757d" />
-      <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.type}</h5>
-      <BsDot size="1.8rem" color="#6c757d" />
-      <span className="rounded-circle d-inline-block"style={{ width: 25, height: 25, backgroundColor: item.color.colorCode }}></span>
-      <h5 className="mb-0 pl-2 fw-semibold" style={{ fontSize: '1.2rem' }}>{item.raw.color.colorName}</h5>
-
-
-    </div>
-
+   <div className="header d-flex flex-wrap align-items-center gap-2 my-4">
+          <div className="d-flex align-items-center flex-wrap gap-2">
+            {/* Product Name */}
+            <h5 className="mb-0 fw-semibold text-truncate" style={{ fontSize: 'clamp(1rem, 1rem, 1.5rem)' }}>
+              {item.product}
+            </h5>
+            
+            <BsDot size="1.8rem" color="#6c757d" />
+            
+            {/* Size */}
+            <h5 className="mb-0 fw-semibold text-truncate" style={{ fontSize: 'clamp(1rem, 1rem, 1.5rem)' }}>
+            {item.raw.size}
+            </h5>
+            
+            <BsDot size="1.8rem" color="#6c757d" />
+            
+            {/* Product Type */}
+            <h5 className="mb-0 fw-semibold text-truncate" style={{ fontSize: 'clamp(1rem, 1rem, 1.5rem)' }}>
+              {item.type}
+            </h5>
+            
+            <BsDot size="1.8rem" color="#6c757d" />
+            
+            {/* Color Name */}
+            <h5 className="mb-0 fw-semibold" style={{ fontSize: 'clamp(1rem, 1rem, 1.5rem)' }}>
+              {item.raw.color.colorName}
+            </h5>
+          </div>
+        </div>
     <div>
       
       <label>Add Inventory</label>
@@ -236,17 +253,17 @@ const InventoryDetails = () => {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className='rounded border border-secondary-subtle p-1 w-50'
-          placeholder='weight (Kg)'
+          placeholder='Weight (Kg)'
         />
 
         <input
           value={source}
           onChange={(e) => setSource(e.target.value)}
           className="rounded border border-secondary-subtle p-1 w-100"
-          placeholder="Comment / Source (e.g., Manual adjustment)"
+          placeholder="Add remarks"
         />
 
-        <button
+        {/* <button
           className='btn btn-primary d-flex align-items-center'
           style={{ height: '1.8rem', padding: '0.28rem 1.2rem' }}
           onClick={() => openConfirmationModal("INCREASE")}
@@ -260,17 +277,51 @@ const InventoryDetails = () => {
           onClick={() => openConfirmationModal("DECREASE")} // ✅
         >
           <FaMinus size={12} />
-        </button>
+        </button> */}
 
-         {/* ✅ Modal component */}
-      <ModalInventoryChange
-        isOpen={isModalOpen}
-        onConfirm={handleModalConfirm}
-        onCancel={handleModalCancel}
-      />
-      </div>
-         
-    </div>
+         <div className='d-flex gap-2'>
+          <button
+                    className="btn d-flex p-0 align-items-center justify-content-center"
+                    style={{
+                      width: '2.2rem',
+                      height: '2.2rem',
+                      backgroundColor: '#6b21a818',
+                      border: '1px solid #6B21A8',
+                      color: '#6B21A8',
+                      borderRadius: '0.4rem',
+                    }}
+                    onClick={openConfirmationModal}
+                  >
+                    <IoAddOutline size={24} />
+                  </button>
+
+                  {/* - Subtract Button */}
+                  <button
+                    className="btn d-flex p-0 align-items-center justify-content-center"
+                    style={{
+                      width: '2.2rem',
+                      height: '2.2rem',
+                      backgroundColor: '#FBEAEC',
+                      border: '1px solid #dc3545',
+                      color: '#dc3545',
+                      borderRadius: '0.4rem',
+                    }}
+                    onClick={openConfirmationModal}
+                  >
+                    <FaMinus size={12} />
+                  </button>
+                  </div>
+
+
+              {/* ✅ Modal component */}
+            <ModalInventoryChange
+              isOpen={isModalOpen}
+              onConfirm={handleModalConfirm}
+              onCancel={handleModalCancel}
+            />
+            </div>
+              
+          </div>
 
 
 
@@ -307,24 +358,82 @@ const InventoryDetails = () => {
 
 
 
-  {/* Card View (Visible on smaller screens) */}
-  <div className="card-view">
-    {logsByVariant.slice().reverse().map((item, idx) => (
-      <div key={idx} className="stock-card">
-        <div className="stock-card-row"><span className="label">Date:</span> <span>{formatDateToIST(item.createdAt)}</span></div>
-        <div className="stock-card-row"><span className="label">Source:</span> <span>{item.source}</span></div>
-        <div className="stock-card-row"><span className="label">Name:</span> <span>{item.name}</span></div>
-        <div className="stock-card-row">
-          <span className="label">Type:</span>
-          <span className={`fw-semibold ${actionDisplayMap[item.action]?.color || 'text-muted'}`}>
-            {actionDisplayMap[item.action]?.label || item.action}
-          </span>
+ 
+{/* Card View (Visible on smaller screens) */}
+<div className="card-view">
+  {logsByVariant.slice().reverse().map((item, idx) => {
+    const actionConfig = actionDisplayMap[item.action] || { 
+      label: item.action, 
+      color: 'text-muted', 
+      bg: 'bg-grey', 
+    };
+    
+    return (
+      <div key={idx} className="card border-1 overflow-hidden">
+        <div className="card-body ">
+          {/* Header section */}
+          <div className="d-flex justify-content-between align-items-start mb-3">
+            <div className="flex-grow-1">
+              <h5 className="card-title mb-1">
+                {item.name}
+              </h5>
+              <div className="d-flex align-items-center gap-2">
+                <small className="text-muted d-flex align-items-center gap-1">
+                  <span className="badge bg-gray rounded-pill" style={{width: '6px', height: '6px'}}></span>
+                  {item.source}
+                </small>
+                <small className="text-muted">•</small>
+                <small className="text-muted">{formatDateToIST(item.createdAt)}</small>
+              </div>
+            </div>
+            
+            {/* Action badge */}
+            <span className={`badge ${actionConfig.bg} ${actionConfig.color} rounded-pill bg-gray px-3 py-2 d-flex align-items-center gap-2`}>
+              <span>{actionConfig.icon}</span>
+              {actionConfig.label}
+            </span>
+          </div>
+          
+          {/* Metrics section */}
+          <div className="row g-3">
+            <div className="col-6">
+              <div className="bg-light rounded-3 p-2 border">
+                <div className="text-uppercase text-muted fw-medium mb-1" style={{fontSize: '0.7rem', letterSpacing: '0.5px'}}>
+                  Customer Order
+                </div>
+                <div className="fw-medium text-dark h5 mb-0 d-flex align-items-center gap-2">
+                  {item.changedReservedWeight}
+                  <span className={`badge rounded-pill ${
+                    item.changedReservedWeight && item.changedReservedWeight.toString().includes('+') ? 'bg-success' :
+                    item.changedReservedWeight && item.changedReservedWeight.toString().includes('-') ? 'bg-danger' : 'bg-secondary'
+                  }`} style={{width: '8px', height: '8px'}}></span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="col-6">
+              <div className="bg-light rounded-3 p-2 border">
+                <div className="text-uppercase text-muted fw-medium mb-1" style={{fontSize: '0.7rem', letterSpacing: '0.5px'}}>
+                Inventory change
+                </div>
+                <div className="fw-medium text-dark h5 mb-0 d-flex align-items-center gap-2">
+                  {item.changedAvailableWeight}
+                  <span className={`badge rounded-pill ${
+                    item.changedAvailableWeight && item.changedAvailableWeight.toString().includes('+') ? 'bg-success' :
+                    item.changedAvailableWeight && item.changedAvailableWeight.toString().includes('-') ? 'bg-danger' : 'bg-secondary'
+                  }`} style={{width: '8px', height: '8px'}}></span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="stock-card-row"><span className="label">Customer Order:</span> <span>{item.changedReservedWeight}</span></div>
-        <div className="stock-card-row"><span className="label">Change in inventory:</span> <span>{item.changedAvailableWeight}</span></div>
+        
+        {/* Subtle bottom border for depth */}
+        <div className="border-top border-light opacity-50 mx-3"></div>
       </div>
-    ))}
-  </div>
+    );
+  })}
+</div>
 </div>
 
       {/* Pagination */}

@@ -6,7 +6,7 @@ import './ColorLibraryProducts.css';
 
 const backendUrl = process.env.REACT_APP_IMAGE_URL;
 
-// ✅ 1. Yarn image mapping data (placed BEFORE usage)
+// Yarn image mapping data
 const yarnData = [
   {
     name: "Cotton",
@@ -34,7 +34,7 @@ const yarnData = [
   },
 ];
 
-// ✅ 2. Create image map for easy lookup
+// Create image map for easy lookup
 const imageMap = yarnData.reduce((acc, item) => {
   acc[item.name.toLowerCase()] = item.image;
   return acc;
@@ -49,6 +49,23 @@ const ColorLibraryProducts = () => {
     fetchProductData();
   }, []);
 
+  const handleCardClick = (productId, event) => {
+    // Prevent event bubbling if needed
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('Navigating to productId:', productId); // Debug log
+    navigate("/colorlibrary", { state: { productId } });
+  };
+
+  const handleImageClick = (productId, event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('Image clicked for productId:', productId); // Debug log
+    navigate("/colorlibrary", { state: { productId } });
+  };
+
   const fetchProductData = async () => {
     try {
       const data = await getColorCountPerProduct();
@@ -60,8 +77,10 @@ const ColorLibraryProducts = () => {
         image: '', // we'll map the image below
       }));
 
+      console.log('Fetched products:', transformed); // Debug log
       setProducts(transformed);
     } catch (error) {
+      console.error('Error fetching products:', error); // Debug log
       setToasts(prev => [
         ...prev,
         { id: Date.now(), message: 'Failed to load products.', type: 'error' },
@@ -78,21 +97,41 @@ const ColorLibraryProducts = () => {
       <div className="py-5 zindex">
         <div className="row g-4 justify-content-center">
           {products.map((item, index) => (
-            <div className="col-6 col-lg-2" key={index}>
-              <div className="card h-100 shadow-sm border-0 rounded-4 ">
-                <div className="overflow-hidden rounded-top-4">
-                  {/* ✅ 3. Use imageMap with fallback */}
+            <div className="col-6 col-lg-2" key={item.productId || index}>
+              <div 
+                className="card h-100 shadow-sm border-0 rounded-4"
+                onClick={(e) => handleCardClick(item.productId, e)}
+                style={{ cursor: 'pointer' }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleCardClick(item.productId, e);
+                  }
+                }}
+              >
+                {/* Desktop image */}
+                <div className="overflow-hidden rounded-top-4 d-none d-sm-block">
                   <img
                     src={imageMap[item.name.toLowerCase()] || 'https://via.placeholder.com/150'}
                     alt={item.name}
                     className="w-100 rounded-4 p-1 zoom-img"
-                    onClick={() =>
-                      navigate("/colorlibrary", {
-                        state: { productId: item.productId },
-                      })
-                    }
+                    onClick={(e) => handleImageClick(item.productId, e)}
+                    style={{ cursor: 'pointer' }}
                   />
                 </div>
+                
+                {/* Mobile image */}
+                <div className="ratio ratio-16x9 d-sm-none">
+                  <img
+                    src={imageMap[item.name.toLowerCase()] || 'https://via.placeholder.com/150'}
+                    alt={item.name}
+                    className="w-100 h-100 object-fit-cover p-1 zoom-img"
+                    onClick={(e) => handleImageClick(item.productId, e)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </div>
+                
                 <div className="card-body p-1 text-center">
                   <h6 className="fw-bold text-dark mb-2">{item.name}</h6>
                   <p className="mb-0 text-muted">

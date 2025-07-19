@@ -293,7 +293,7 @@ useEffect(() => {
 
   return (
     <div className='order'>
-        <div className='top'>
+        <div className='top mt-2 mb-4'>
             <h3>Orders</h3>
 
             <div className='btn-ctn'>
@@ -361,55 +361,52 @@ useEffect(() => {
         </div>
 
 
-        <div className='info-ctn'>
-            <ul className='row'>
+        <div className='info-ctn row'>
                 
-                <li className='col-lg col-md-4 col-sm-6 col-6'>
+                <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
                     <DashboardBox heading={'Total Orders'} number={totalOrders}></DashboardBox>
                     
-                </li>
+                </div>
 
-                <li className='col-lg col-md-4 col-sm-6 col-6'>
+                <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
                 <DashboardBox heading={'Ordered Quantity'} number={totalQuantity}></DashboardBox>
                    
-                </li>
+                </div>
 
-                <li className='col-lg col-md-4 col-sm-6 col-6'>
+                <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
                 <DashboardBox heading={'Ordered Amount'} number={'₹ '+formatNumber(totalRevenue)} />
                   
-                </li>
+                </div>
 
-                <li className='col-lg col-md-4 col-sm-6 col-6'>
+                <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
                 <DashboardBox heading={'Received Amount'} number={'₹ ' + formatNumber(totalReceivedAmount)} />
                   
-                </li>
+                </div>
 
-                <li className='col-lg col-md-6 col-sm-6 col-6'>
+                <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
                 <DashboardBox heading={'Total Order Weight'} number={totalOrderWeight + " Kg"}></DashboardBox>
                    
-                </li>
+                </div>
 
-                <li className='col-lg col-md-6 col-sm-6 col-6'>
+                <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
                 <DashboardBox heading={'Order to Deliver'} number={ordersToDeliver}></DashboardBox>
                    
-                </li>
-            </ul>
+                </div>
         </div>
 
-        <div className='order-filter-ctn d-flex gap-2 mb-2 w-30 mt-3'>
-          
-            <ProductFilter 
-                filterOptions={["Order Id", "Customer Id"]} 
-                onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
-            />
-          
-                {/* <StatusFilter status={"Active"}></StatusFilter> */}
-              <OrderFilter status={selectedStatus} onStatusChange={handleStatusChange} />
-
+        <div className='order-filter-cttn d-flex gap-2 my-3'>
+            <div className='col-sm-6 col-md-9'>
+                <ProductFilter 
+                    filterOptions={["Order Id", "Customer Id"]} 
+                    onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+                />
+            </div>
+            <div className='col-sm-6 col-md-3'>
+                <OrderFilter status={selectedStatus} onStatusChange={handleStatusChange} />
+            </div>
         </div>
-
         
-            <div className="order-table-ctn mt-4">
+            <div className="order-table-ctn ">
             <OrderTable ref={orderTableRef} data={ordersData} allData={ordersAll}/>
 
             <Pagination className="mt-4 d-flex justify-content-end pagination">

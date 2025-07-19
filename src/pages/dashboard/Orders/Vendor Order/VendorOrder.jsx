@@ -329,53 +329,61 @@ if (totalPages > 1) {
 
   return (
     <div className='vendor-order'>
-         <div className='top d-flex justify-content-between align-items-center'>
-            <h3>Vendor Orders</h3>
+         <div className='top d-flex justify-content-between align-items-center  mt-2 mb-4'>
+            <h3 className='m-0' style={{fontSize:'1.2rem'}}>Vendor Orders</h3>
 
             <div className='btn-ctn d-flex justify-content-center align-items-center gap-2'>
-                 <div className="date-filter position-relative">
-                                      <button
-                                       className="border rounded bg-white px-2 py-1 d-flex align-items-center"
-                                       onClick={() => setShowPicker(!showPicker)}
-                                     >
-                                       <span className="d-none d-sm-inline">
-                                         {startDate && endDate
-                                           ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                                           : "Select Date"}
-                                       </span>
-                                       <FiCalendar className="d-sm-none " size={20} />
-                                     </button>
+                   <div className='btn-ctn'>
+                                          <div className="date-filter position-relative">
+                                               <button
+                                               className=" date-btn btn lg-btn fw-medium "
+                                               onClick={() => setShowPicker(!showPicker)}
+                                             >
+                                               <span className="d-none d-sm-inline">
+                                                 {startDate && endDate
+                                                   ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
+                                                   : "Select Date"}
+                                               </span>
+                                                 </button>
+                         
+                                                 <button className="date-btn btn sm-bttn"
+                                                 onClick={() => setShowPicker(!showPicker)}>
+                                               <FiCalendar className=" " size={20} />
+                                             </button>
+                                           {startDate && endDate && (
+                                             <button
+                                               className="ms-2 btn btn-sm btn-outline-secondary"
+                                               onClick={() => {
+                                                 setStartDate(null);
+                                                 setEndDate(null);
+                                                 // No need to call fetch here — useEffect will handle it!
+                                               }}
+                                             >
+                                               Clear
+                                             </button>
+                                           )}
                  
-                                      {startDate && endDate && (
-                                           <button
-                                             className="ms-2 p-2 btn btn-sm btn-outline-secondary"
-                                             onClick={handleClearDateFilter}
-                                           >
-                                             Clear
-                                           </button>
+                 
+                 
+                                         {showPicker && (
+                                           <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute", right: "0" }}>
+                                             <DatePicker
+                                               selected={startDate}
+                                               onChange={(dates) => {
+                                                 const [start, end] = dates;
+                                                 setStartDate(start);
+                                                 setEndDate(end);
+                                               }}
+                                               startDate={startDate}
+                                               endDate={endDate}
+                                               selectsRange
+                                               inline
+                                               dateFormat="dd MMM yyyy"
+                                             />
+                                           </div>
                                          )}
-                 
-                                     {showPicker && (
-                                       <div ref={datePickerRef} style={{
-                                           zIndex: 1000,
-                                           position: "absolute",
-                                           right: 0,
-                                           width: "max-content",
-                                           maxWidth: "90vw", 
-                                           backgroundColor: "white",
-                                           boxShadow: "0 4px 16px rgba(0,0,0,0.1)", }}>
-                                         <DatePicker
-                                           selected={startDate}
-                                           onChange={handleDateChange}
-                                           startDate={startDate}
-                                           endDate={endDate}
-                                           selectsRange
-                                           inline
-                                           dateFormat="dd MMM yyyy"
-                                         />
                                        </div>
-                                     )}
-                                   </div>
+                                       </div>
 
                 <ExportBtn onClick={handleExport}></ExportBtn>
 
@@ -390,40 +398,40 @@ if (totalPages > 1) {
                
             </div>
         </div>
-        <div className='info-ctn mt-3'>
-          <ul className='row'>
-            <li className='col-lg col-md-4 col-sm-6 col-6'>
+        <div className='info-ctn row mt-3'>
+            <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
               <DashboardBox heading={'Total Orders'} number={totalOrders} />
-            </li>
+            </div>
 
-            <li className='col-lg col-md-4 col-sm-6 col-6'>
+            <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
               <DashboardBox heading={'Ordered Quantity'} number={`${totalQuantity} kg`} />
-            </li>
+            </div>
 
-            <li className='col-lg col-md-4 col-sm-6 col-6'>
+            <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
               <DashboardBox heading={'Total Amount'} number={`₹${totalAmount.toFixed(0)}`} />
-            </li>
+            </div>
 
-            <li className='col-lg col-md-4 col-sm-6 col-6'>
+            <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
               <DashboardBox heading={'Total Received'} number={totalReceived} />
-            </li>
+            </div>
 
-            <li className='col-lg col-md-4 col-sm-6 col-6'>
+            <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
               <DashboardBox heading={'Total Pending'} number={totalPending} />
-            </li>
-          </ul>
+            </div>
         </div>
 
 
 
-        <div className='order-filter-ctn d-flex gap-2 mb-2 w-30 mt-3'>
-          
-          <ProductFilter 
+        <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
+                                    <div className='col-sm-6 col-md-9'>
+                                        <ProductFilter  
                 filterOptions={["Order Id", "Vendor"]} 
                 onFilterChange={handleFilterChange} 
           />
-    
+    </div>
+            <div className='col-sm-6 col-md-3'>
         <VendorOrderFilter status={statusFilter} onStatusChange={handleStatusChange} />
+        </div>
 
 
         </div>

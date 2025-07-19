@@ -76,22 +76,25 @@ const Dashboard = () => {
 
 
 
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+      // Check if the clicked element is not one of our toggle buttons
+      const isToggleButton = event.target.closest('.date-btn');
+      if (!isToggleButton) {
+        setShowPicker(false);
+      }
+    }
+  };
 
-   useEffect(() => {
-            const handleClickOutside = (event) => {
-                if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
-                    setShowPicker(false);
-                }
-            };
-    
-            if (showPicker) {
-                document.addEventListener("mousedown", handleClickOutside);
-            }
-    
-            return () => {
-                document.removeEventListener("mousedown", handleClickOutside);
-            };
-        }, [showPicker]);
+  if (showPicker) {
+    document.addEventListener('mousedown', handleClickOutside);
+  }
+
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [showPicker]);
 
 useEffect(() => {
   fetchDashboardData();
@@ -272,7 +275,7 @@ const {
 
   return (
     <div className="right-content w-100">
-                    <div className="top d-flex align-items-center justify-content-between w-100 mb-2">
+                    <div className="top d-flex align-items-center justify-content-between w-100 mt-2 mb-4">
                         <h3 className="mb-0">Dashboard</h3>
 
                         {/* <div className="filter-ctn d-flex">

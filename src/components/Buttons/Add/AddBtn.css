@@ -3,9 +3,10 @@
     padding: 0.2rem 2rem;
     font-size: 0.8rem;
     font-weight: 400;
-    background-color: #0D6EFD !important;
-    /* border: 2px solid #0D6EFD; */
+    background-color: #6B21A8!important;
+    /* border: 2px solid ##6B21A8; */
     color: #ffffff !important;
+    text-decoration: none;
   }
 
 .lg-add-btn{

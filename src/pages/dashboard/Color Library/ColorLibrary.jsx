@@ -457,9 +457,9 @@ if (totalPages >=1) {
   return (
     <div className='colorlibrary'>
       <div className='top d-flex  justify-content-between mb-2 mt-2' style={{cursor:'pointer'}}>
-                <div className='d-flex gap-3'>
+                <div className='top d-flex gap-3 align-items-center'>
                 <span onClick={() => navigate('/colorlibrary-products')}><IoArrowBackOutline size={25}/></span>
-                <h5 style={{fontSize:'1.2rem'}}>Color Details</h5>
+                <h5 className='m-0' style={{fontSize:'1.2rem'}}>Color Details</h5>
                </div>
              <div className='d-flex gap-2'>
                 <ExportBtn onClick={() => exportToExcel(colors, colorStatus)} />
@@ -476,15 +476,15 @@ if (totalPages >=1) {
             </div>
 
 
-        <div className='d-flex gap-2 filter-sec'>
-            <div className='w-75'>
-              <ProductFilter 
+        <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
+                    <div className='col-sm-6 col-md-9'>
+                        <ProductFilter 
                   filterOptions={["Color Name", "Color Code"]}
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
          
-            <div className='w-25'>
+            <div className='col-sm-6 col-md-3'>
                 <StatusFilter status={'All'} onStatusChange={handleStatusChange}></StatusFilter> 
             </div>
         </div>

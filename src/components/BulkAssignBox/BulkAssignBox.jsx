@@ -124,7 +124,7 @@ const BulkAssignBox = ({size,sizeData,handleBack,productName,setOrderList,setOrd
                 <input onChange={(e)=>setQuantity(e.target.value)} className='rounded border border-secondary-subtle px-1 w-50' type='number'></input>
                 </div>
                 
-                <button onClick={handleAddtoCart} className='btn btn-primary btn-sm w-100 mt-2 d-flex gap-2 justify-content-center'> <span><FiShoppingCart /></span>Add to cart</button>
+                <button onClick={handleAddtoCart} className='btn btn-primary-custom btn-sm w-100 mt-2 d-flex gap-2 justify-content-center'> <span><FiShoppingCart /></span>Add to cart</button>
                 </div>
             </div>
     ) :(

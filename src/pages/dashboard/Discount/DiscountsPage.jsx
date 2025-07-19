@@ -199,8 +199,8 @@ if (totalPages >=1) {
 
   return (
     <div className='discounts'>
-        <div className='top d-flex justify-content-between mb-2'>
-            <h4 style={{fontSize:'1.2rem'}}>Discounts</h4>
+        <div className='top d-flex justify-content-between align-items-center mt-2 mb-4 '>
+            <h4 className='m-0' style={{fontSize:'1.2rem'}}>Discounts</h4>
 
             <div className='d-flex gap-2'>
                 <ExportBtn onClick={() => exportToExcel(filteredData)}></ExportBtn>
@@ -211,21 +211,21 @@ if (totalPages >=1) {
             </div>
         </div>
 
-        <div className='d-flex gap-2 filter-sec'>
-            <div className='w-75'>
-              <ProductFilter 
+         <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
+                            <div className='col-sm-6 col-md-9'>
+                                <ProductFilter 
                   filterOptions={["Discount Code", "Start Date", "End Date"]}
                   onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
               />
             </div>
          
-            <div className='w-25'>
+            <div className='col-sm-6 col-md-3'>
                 <StatusFilter status={'All'} onStatusChange={handleStatusChange}></StatusFilter> 
             </div>
         </div>
 
 
-        <div className='discount-table-ctn rounded-3'>
+        <div className='discount-table-ctn rounded-2'>
           <Table hover>
             <thead>
               <tr>
@@ -304,8 +304,8 @@ if (totalPages >=1) {
           <div className="data-card " key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
-                 <h3 className='fs-6 fw-medium	'>{discount.discountCode}</h3>
-                 <p> 
+                 <h3 className='fs-6 fw-medium m-0	'>{discount.discountCode}</h3>
+                 <p className='m-0'> 
                  <div
                   style={{
                     padding: '0.2rem 0.2rem',
@@ -317,14 +317,14 @@ if (totalPages >=1) {
                     alignItems: 'center',
                     marginBottom: '0',
                     backgroundColor:
-                      discount.discountStatus.toLowerCase() === 'active' ? '#d1fae5' : '#F3F4F6',
+                      discount.discountStatus.toLowerCase() === 'active' ? '#d1fae5' : '#FEE2E2',
                     border: '1px solid',
                     borderColor:
-                      discount.discountStatus.toLowerCase() === 'active' ? '#6ee7b7' : '#D1D5DB',
+                      discount.discountStatus.toLowerCase() === 'active' ? '#6ee7b7' : '#FCA5A5',
                     borderRadius: '0.2rem',
                     textAlign: 'center',
                     color:
-                      discount.discountStatus.toLowerCase() === 'active' ? '#065f46' : '#DC2626',
+                      discount.discountStatus.toLowerCase() === 'active' ? '#065f46' : '#be5757',
                     fontWeight: '500',
                   }}
                 >
@@ -344,7 +344,7 @@ if (totalPages >=1) {
 
             <span><LuDot  size={25}/></span>
 
-            <p className="text-muted"> {discount.minPurchaseRequirement}</p>
+            <p className="text-muted m-0"> {discount.minPurchaseRequirement}</p>
 
             {/* <div style={{ display: 'flex', alignItems: 'center' }}>
            

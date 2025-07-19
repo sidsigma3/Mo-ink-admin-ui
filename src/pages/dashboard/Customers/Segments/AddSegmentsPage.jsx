@@ -219,11 +219,11 @@ const AddSegmentsPage = () => {
 
   return (
     <div className='add-segments-page'>
-        <div className="top d-flex gap-3 align-items-center" style={{ cursor: "pointer" }}>
+         <div className='top d-flex gap-3 align-items-center mt-2 mb-4 ' style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/segments")}>
           <IoArrowBackOutline size={25} />
         </span>
-        <h5 className="m-0">New Segments</h5>
+        <h3 className='m-0' style={{fontSize:'1.2rem'}}>New Segments</h3>
       </div>
 
         <div className='main d-flex gap-3 mt-2'>
@@ -292,7 +292,7 @@ const AddSegmentsPage = () => {
                     <SearchBox></SearchBox>
                     <div>
                     <button
-                        className="btn btn-primary"
+                        className="btn-primary-custom"
                         onClick={() => setShowModalCustomer(true)}
                     >
                         Browse
@@ -311,7 +311,7 @@ const AddSegmentsPage = () => {
                     selectedCustomer.map((item, index) => (
                         <li 
                         key={index} 
-                        className="bg-white rounded-3 p-3 mb-2 border border-light position-relative overflow-hidden"
+                        className="bg-white rounded-3 p-3 mb-2 border border-light overflow-hidden"
                         style={{
                             transition: 'all 0.2s ease-in-out',
                             boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
@@ -332,7 +332,7 @@ const AddSegmentsPage = () => {
                                 style={{
                                 width: '40px',
                                 height: '40px',
-                                background: 'linear-gradient(135deg,rgb(194, 205, 255) 0%, #0D6EFD 100%)',
+                                background: 'linear-gradient(135deg,rgb(194, 205, 255) 0%, #6B21A8 100%)',
                                 fontSize: '14px',
                                 fontWeight: '600',
                                 color: 'white'

@@ -800,9 +800,9 @@ console.log(sizeColorMap)
   return (
     
     <div className="add-product-ctn">
-        <div className='top d-flex gap-3' style={{cursor:"pointer"}}>
+        <div className='top d-flex gap-3 align-items-center mt-2 mb-4 ' style={{cursor:"pointer"}}>
             <span onClick={() => navigate('/products')}><IoArrowBackOutline size={25}/></span>
-            <h5>Add Products</h5>
+            <h3 className='m-0' style={{fontSize:'1.2rem'}}>Add Products</h3>
         </div>
 
     <div className="add-product d-flex gap-2">
@@ -862,7 +862,7 @@ console.log(sizeColorMap)
           />
           <label 
             htmlFor="hank-upload" 
-            className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+            className="upload-button btn-secondary-custom rounded-pill px-4 py-2 mb-2"
           >
             <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
           </label>
@@ -902,7 +902,7 @@ console.log(sizeColorMap)
           />
           <label 
             htmlFor="cone-upload" 
-            className="upload-button btn btn-outline-primary rounded-pill px-4 py-2 mb-2"
+            className="upload-button btn-secondary-custom rounded-pill px-4 py-2 mb-2"
           >
             <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
           </label>
@@ -1374,7 +1374,7 @@ console.log(sizeColorMap)
                          e.stopPropagation();
                          handleAddColor(sizeIndex);
                        }}
-                       style={{ padding: "5px", background: "none", border: "none", color: "#0561FC" }}
+                       style={{ padding: "5px", background: "none", border: "none", color: "#6B21A8" }}
                      >
                        <IoMdAddCircleOutline size={20} />
                      </button>
@@ -1512,7 +1512,7 @@ console.log(sizeColorMap)
        
     </div>
 
-        <div className="w-100 d-flex justify-content-between my-4">
+        <div className="w-100 d-flex justify-content-between align-items-center mt-2 mb-4 ">
           {state?.index !== undefined && (
             <DeleteBtn clickFunction={() => setShowDeleteModal(true)} />
           )}

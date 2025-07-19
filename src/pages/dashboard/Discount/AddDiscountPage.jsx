@@ -526,11 +526,11 @@ const handleMaxUsageChange = (field1,field2) => {
 
   return (
     <div className="add-discount">
-      <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
+      <div className="top d-flex gap-3  mt-2 mb-4" style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/discounts")}>
           <IoArrowBackOutline size={25} />
         </span>
-        <h4>Add discount</h4>
+        <h3 className='m-0' style={{fontSize:'1.2rem'}}>Add discount</h3>
       </div>
 
       <div className="main d-flex gap-2 mt-2">
@@ -567,7 +567,7 @@ const handleMaxUsageChange = (field1,field2) => {
               <h5 style={{fontSize:'1rem'}}>Discount code</h5>
 
               {isViewMode === true ? (
-                  <h4 style={{fontSize:'1rem', color: '#0D6EFD'}}>{formData.discountCode}</h4>
+                  <h4 style={{fontSize:'1rem', color: '##6B21A8'}}>{formData.discountCode}</h4>
               ):(
                 <input 
                 type="text"   
@@ -631,7 +631,7 @@ const handleMaxUsageChange = (field1,field2) => {
                 <SearchBox></SearchBox>
                 <div>
                   <button
-                    className="btn btn-primary"
+                    className="btn-primary-custom"
                     onClick={() => setShowModalOrder(true)}
                   >
                     Browse
@@ -647,13 +647,13 @@ const handleMaxUsageChange = (field1,field2) => {
                   key={ix}
                   className="d-inline-flex align-items-center"
                   style={{
-                    backgroundColor: '#f0f8ff',
+                    backgroundColor: '#6b21a80e',
                     borderRadius: '16px',
                     padding: '6px 14px',
                     fontSize: '0.8rem',
                     fontWeight: '500',
-                    color: '#0D6EFD',
-                    border: '1px solid #bfdbfe',
+                    color: '#6B21A8',
+                    border: '1px solid #6B21A8',
                     lineHeight: '1.25',
                     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -763,7 +763,7 @@ const handleMaxUsageChange = (field1,field2) => {
                         <SearchBox></SearchBox>
                         <div>
                         <button
-                            className="btn btn-primary"
+                            className="btn-primary-custom"
                             onClick={() => setShowModalSegment(true)}
                         >
                             Browse
@@ -806,7 +806,7 @@ const handleMaxUsageChange = (field1,field2) => {
                         <SearchBox></SearchBox>
                         <div>
                         <button
-                            className="btn btn-primary"
+                            className="btn-primary-custom"
                             onClick={() => setShowModalCustomer(true)}
                         >
                             Browse

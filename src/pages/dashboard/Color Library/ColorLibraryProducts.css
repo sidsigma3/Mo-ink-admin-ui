@@ -94,7 +94,16 @@
   }
   }
 
-
+/* Mobile aspect ratio override */
+@media (max-width: 767.98px) {
+  .sm-aspect-16-9 {
+    padding-top: 56.25% !important; /* 16:9 aspect ratio */
+  }
+  
+  .card .position-relative {
+    padding-top: 56.25% !important;
+  }
+}
   
   @media (max-width: 768px) {
     .colorlibrary-table-ctn table {
