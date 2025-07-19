@@ -238,24 +238,15 @@ const AddUser = () => {
                 setTimeout(() => setToasts([]), 3000);
             };
 
-            const handleDownloadChequePhoto = async () => {
-          console.log('hello')
-          try {
-            const response = await fetch(`${backendUrl}${formData.chequePhoto}`);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
+            const handleDownloadChequePhoto = () => {
+            if (!formData.chequePhoto) {
+                console.error("No cheque photo URL provided");
+                return;
+            }
 
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'aadhaar-photo.jpg'; // you can customize the name
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-          } catch (error) {
-            console.error("Error downloading image:", error);
-          }
-        };
+            const url = `${backendUrl}${formData.chequePhoto}`;
+            window.open(url, '_blank');
+            };
 
 
 

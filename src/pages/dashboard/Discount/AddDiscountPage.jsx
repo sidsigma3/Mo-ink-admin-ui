@@ -843,7 +843,7 @@ const handleMaxUsageChange = (field1,field2) => {
                     checked={formData.maxUsage.limitTotal === true}
                     onChange={() => handleMaxUsageChange("limitTotal", "limitPerCustomer")}
                   />
-                  <label style={{fontSize:'1rem'}}>Limit number of times this discount can be used in total</label>
+                  <label style={{fontSize:'1rem'}}>Limit number of times this discount can be used per customer</label>
                 </div>
 
                 {/* Show input only when limitTotal is selected */}
@@ -862,14 +862,14 @@ const handleMaxUsageChange = (field1,field2) => {
                 )}
               </li>
 
-              <li>
+              {/* <li>
                 <input
                   type="checkbox"
                   checked={formData.maxUsage.limitPerCustomer === true}
                   onChange={() => handleMaxUsageChange("limitPerCustomer", "limitTotal")}
                 />
                 <label style={{fontSize:'1rem'}}>Limit to one use per customer</label>
-              </li>
+              </li> */}
             </ul>
           </div>
 
