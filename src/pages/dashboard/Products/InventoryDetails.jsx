@@ -69,7 +69,7 @@ const InventoryDetails = () => {
 
 
   const handleInventoryAdjust = async (actionType) => {
-     const { variantId } = item.raw.variantId || {};
+     const variantId = item.raw?.variantId;
 
 
      const showToast = (message, type = "error") => {
@@ -94,6 +94,8 @@ const InventoryDetails = () => {
     };
 
     try {
+
+      console.log(payload,item.raw)
       const response = await adjustInventory(payload,variantId);
     
       showToast(`Inventory successfully ${actionType === "INCREASE" ? "added" : "reduced"}.`, "success" );
