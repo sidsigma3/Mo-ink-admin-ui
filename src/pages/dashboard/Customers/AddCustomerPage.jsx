@@ -893,25 +893,26 @@ const handleAddressTypeChange = (e) => {
                     {/* Mobile Card View */}
                     <div className="d-block d-md-none">
                     <label>Add balance</label>
-                   <div className="d-flex flex-wrap gap-2 my-3 align-items-start">
+                   <div className="d-flex gap-2 mt-2">
                           {/* Amount Field */}
                           <input
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            className="rounded border border-secondary-subtle p-1 w-100 w-md-25"
-                            placeholder="₹ INR"
+                            className="rounded border border-secondary-subtle p-1 w-50"
+                            placeholder="₹INR"
                           />
 
                           {/* Source & Buttons Group */}
-                          <div className="d-flex gap-2 w-100 w-md-75 flex-wrap flex-md-nowrap">
+                          
                             {/* Comment Field */}
                             <input
                               value={source}
                               onChange={(e) => setSource(e.target.value)}
-                              className="rounded border border-secondary-subtle p-1 flex-grow-1"
-                              placeholder="Comment / Source (e.g., Manual adjustment)"
+                              className="rounded border border-secondary-subtle p-1 w-100"
+                              placeholder="Add remarks"
                             />
-
+                           
+                           <div className="d-flex gap-2">
                             {/* + Add Button */}
                             <button
                               className="btn d-flex p-0 align-items-center justify-content-center"
@@ -1162,7 +1163,7 @@ const handleAddressTypeChange = (e) => {
                               {selectedSegments.map((segment, index) => (
                                   <span
                                       key={index}
-                                      className="chip d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill "
+                                      className="chip d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill "
                                       style={{
                                           backgroundColor: '#6b21a80e',
                                           border: '1px solid #6B21A8',

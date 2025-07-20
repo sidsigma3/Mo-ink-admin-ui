@@ -28,7 +28,7 @@ const InventoryDetails = () => {
   const openConfirmationModal = (actionType) => {
     setPendingAction(actionType); 
     setIsModalOpen(true);
-  };
+};
 
   const handleModalConfirm = () => {
     if (pendingAction) {
@@ -246,82 +246,64 @@ const InventoryDetails = () => {
           </div>
         </div>
     <div>
-      
-      <label>Add Inventory</label>
-        <div className='d-flex gap-2 mt-2'>
-        <input
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className='rounded border border-secondary-subtle p-1 w-50'
-          placeholder='Weight (Kg)'
-        />
+  <label>Add Inventory</label>
+  <div className='d-flex gap-2 mt-2'>
+    <input
+      value={amount}
+      onChange={(e) => setAmount(e.target.value)}
+      className='rounded border border-secondary-subtle p-1 w-50'
+      placeholder='Weight (Kg)'
+    />
 
-        <input
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
-          className="rounded border border-secondary-subtle p-1 w-100"
-          placeholder="Add remarks"
-        />
+    <input
+      value={source}
+      onChange={(e) => setSource(e.target.value)}
+      className="rounded border border-secondary-subtle p-1 w-100"
+      placeholder="Add remarks"
+    />
 
-        {/* <button
-          className='btn btn-primary d-flex align-items-center'
-          style={{ height: '1.8rem', padding: '0.28rem 1.2rem' }}
-          onClick={() => openConfirmationModal("INCREASE")}
-        >
-          <MdAdd size={19} />
-        </button>
+    <div className='d-flex gap-2'>
+      {/* + Add Button */}
+      <button
+        className="btn d-flex p-0 align-items-center justify-content-center"
+        style={{
+          width: '2.2rem',
+          height: '2.2rem',
+          backgroundColor: '#6b21a818',
+          border: '1px solid #6B21A8',
+          color: '#6B21A8',
+          borderRadius: '0.4rem',
+        }}
+        onClick={() => openConfirmationModal("INCREASE")}
+      >
+        <IoAddOutline size={24} />
+      </button>
 
-        <button
-          className='btn btn-danger d-flex align-items-center'
-          style={{ height: '1.8rem', padding: '0.55rem 1.2rem' }}
-          onClick={() => openConfirmationModal("DECREASE")} // ✅
-        >
-          <FaMinus size={12} />
-        </button> */}
+      {/* - Subtract Button */}
+      <button
+        className="btn d-flex p-0 align-items-center justify-content-center"
+        style={{
+          width: '2.2rem',
+          height: '2.2rem',
+          backgroundColor: '#FBEAEC',
+          border: '1px solid #dc3545',
+          color: '#dc3545',
+          borderRadius: '0.4rem',
+        }}
+        onClick={() => openConfirmationModal("DECREASE")}
+      >
+        <FaMinus size={12} />
+      </button>
+    </div>
 
-         <div className='d-flex gap-2'>
-          <button
-                    className="btn d-flex p-0 align-items-center justify-content-center"
-                    style={{
-                      width: '2.2rem',
-                      height: '2.2rem',
-                      backgroundColor: '#6b21a818',
-                      border: '1px solid #6B21A8',
-                      color: '#6B21A8',
-                      borderRadius: '0.4rem',
-                    }}
-                    onClick={openConfirmationModal}
-                  >
-                    <IoAddOutline size={24} />
-                  </button>
-
-                  {/* - Subtract Button */}
-                  <button
-                    className="btn d-flex p-0 align-items-center justify-content-center"
-                    style={{
-                      width: '2.2rem',
-                      height: '2.2rem',
-                      backgroundColor: '#FBEAEC',
-                      border: '1px solid #dc3545',
-                      color: '#dc3545',
-                      borderRadius: '0.4rem',
-                    }}
-                    onClick={openConfirmationModal}
-                  >
-                    <FaMinus size={12} />
-                  </button>
-                  </div>
-
-
-              {/* ✅ Modal component */}
-            <ModalInventoryChange
-              isOpen={isModalOpen}
-              onConfirm={handleModalConfirm}
-              onCancel={handleModalCancel}
-            />
-            </div>
-              
-          </div>
+    {/* Modal component */}
+    <ModalInventoryChange
+      isOpen={isModalOpen}
+      onConfirm={handleModalConfirm}
+      onCancel={handleModalCancel}
+    />
+  </div>
+</div>
 
 
 
@@ -371,12 +353,17 @@ const InventoryDetails = () => {
     return (
       <div key={idx} className="card border-1 overflow-hidden">
         <div className="card-body ">
-          {/* Header section */}
-          <div className="d-flex justify-content-between align-items-start mb-3">
-            <div className="flex-grow-1">
-              <h5 className="card-title mb-1">
-                {item.name}
-              </h5>
+            <div className="mb-3">
+              <div className="d-flex justify-content-between align-items-center mb-1">
+                <h5 className="card-title mb-0">
+                  {item.name}
+                </h5>
+                <span className={`badge ${actionConfig.bg} ${actionConfig.color} rounded-pill bg-gray px-3 py-2 d-flex align-items-center gap-2`}>
+                  <span>{actionConfig.icon}</span>
+                  {actionConfig.label}
+                </span>
+              </div>
+              
               <div className="d-flex align-items-center gap-2">
                 <small className="text-muted d-flex align-items-center gap-1">
                   <span className="badge bg-gray rounded-pill" style={{width: '6px', height: '6px'}}></span>
@@ -386,15 +373,7 @@ const InventoryDetails = () => {
                 <small className="text-muted">{formatDateToIST(item.createdAt)}</small>
               </div>
             </div>
-            
-            {/* Action badge */}
-            <span className={`badge ${actionConfig.bg} ${actionConfig.color} rounded-pill bg-gray px-3 py-2 d-flex align-items-center gap-2`}>
-              <span>{actionConfig.icon}</span>
-              {actionConfig.label}
-            </span>
-          </div>
           
-          {/* Metrics section */}
           <div className="row g-3">
             <div className="col-6">
               <div className="bg-light rounded-3 p-2 border">

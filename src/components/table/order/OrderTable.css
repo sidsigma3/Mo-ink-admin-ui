@@ -280,6 +280,7 @@
         margin-bottom: 1rem;
         /* border-radius: 0.5rem; */
         border: 1px solid #ddd;
+        
     }
 
     .order-table .order-cards .order-card h4{
@@ -442,7 +443,6 @@
   
 
   .order-tag-id{
-    position: relative; /* Needed for z-index to work */
     padding: 0.2rem 0.4rem;
     min-width: 3rem;        
     max-width: 8rem;        
@@ -458,7 +458,6 @@
     white-space: nowrap;   
     overflow: hidden;
     text-overflow: ellipsis; 
-    z-index: 0 !important;
   }
 
 

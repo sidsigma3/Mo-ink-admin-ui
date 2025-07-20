@@ -1,10 +1,10 @@
 .import-btn{
   height: 40px;
-  padding: 0.2rem 2rem;
-  font-size: 0.8rem;
-  font-weight: 400;
+    padding: 0.2rem 2rem;
+    font-size: 0.8rem;
+    font-weight: 400;
   background-color: #ffffff !important;
-  border: 2px solid ##6B21A8;
+  border: 1.2px solid #6B21A8;
   color: #6B21A8!important;
 }
 
@@ -14,11 +14,13 @@
 
 @media(max-width:768px){
     .sm-btn{
-        display: grid;
-        padding: 0.5rem 0.5rem !important;
-        width: 2.5rem !important;
-        height: 2.5rem !important;
+        display: grid !important;
+        padding: 0.1rem 0.1rem !important;
         border-radius: 50%;
+        width: 2.2rem !important;
+        height: 2.2rem !important;
+        align-items: center;
+        justify-items: center;
     }
 
 

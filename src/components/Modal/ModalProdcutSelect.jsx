@@ -59,12 +59,13 @@ const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        {/* <Button variant="secondary" onClick={handleClose}>
           Close
-        </Button>
-        <Button variant="primary" onClick={handleConfirmSelection}>
+        </Button> */}
+        <button
+                    className="btn-secondary-custom" onClick={handleConfirmSelection}>
           Add Selected
-        </Button>
+        </button>
       </Modal.Footer>
     </Modal>
   );

@@ -173,3 +173,271 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+
+
+.color-card {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  
+  overflow: hidden;
+  z-index: -1;
+  margin-bottom: 1rem;
+}
+
+/* .color-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+} */
+
+/* .color-card.border-primary {
+  border: 2px solid #0d6efd !important;
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.12);
+} */
+
+.card-header {
+  position: relative;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  z-index: 5;
+}
+
+/* .bg-primary.bg-opacity-10 {
+  background: rgba(13, 110, 253, 0.05) !important;
+  border-bottom-color: #0d6efd;
+} */
+
+.header-actions {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Toggle Switch Styles */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  z-index: 15;
+  margin-bottom: 0 !important;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  z-index: 16;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+input:checked + .slider {
+  background-color: #28a745;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+.slider.round {
+  border-radius: 22px;
+}
+
+/* Button Styles */
+.btn-outline-danger {
+  position: relative;
+  z-index: 15;
+  background: white;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  padding: 0.25rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  width: 28px;
+  height: 28px;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  transform: scale(1.05);
+}
+
+.btn-outline-danger:focus {
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+/* Card Body */
+.card-body {
+  padding: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Form Controls */
+.form-control-sm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  transition: all 0.15s ease-in-out;
+}
+
+/* .form-control-sm:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+} */
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+/* Image Upload Section */
+.image-upload-wrapper {
+  flex: 1;
+  position: relative;
+  z-index: 3;
+}
+
+.image-upload-box {
+  display: block;
+  width: 100%;
+  height: 70px;
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+/* .image-upload-box:hover {
+  border-color: #0d6efd;
+  background: #f0f8ff;
+} */
+
+.upload-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+}
+
+.upload-icon {
+  font-size: 1.5rem;
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Status Labels */
+.status-label {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-label.active {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-label.inactive {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* Badge Styles */
+.badge.bg-primary {
+  background-color: #0d6efd !important;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .color-card {
+    margin-bottom: 1rem;
+  }
+  
+  .card-header {
+    padding: 0.75rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .image-upload-box {
+    height: 120px;
+  }
+
+  .text-primary-custom{
+    color: #6B21A8;
+  }
+}
+
+/* Fix for file inputs */
+input[type="file"] {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Ensure proper layering */
+.d-flex.justify-content-between.align-items-center {
+  /* position: relative;
+  z-index: 4; */
+}
+
+.gap-2 {
+  gap: 0.5rem !important;
+}

@@ -471,12 +471,18 @@ if (totalPages >=1) {
                     style={{ display: 'none' }}
                     onChange={handleFileChange}
                   />
+                  <Link to={'/create-order'}>
+                                <AddBtn
+                                    text={"Add color"}
+                                    onClick={handleAddColor}
+                                ></AddBtn>
+                            </Link>
               </div>
             
             </div>
 
 
-        <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
+        <div className='order-filter-cttn d-flex gap-2 mb-3 mt-4 '>
                     <div className='col-sm-6 col-md-9'>
                         <ProductFilter 
                   filterOptions={["Color Name", "Color Code"]}
@@ -487,13 +493,15 @@ if (totalPages >=1) {
             <div className='col-sm-6 col-md-3'>
                 <StatusFilter status={'All'} onStatusChange={handleStatusChange}></StatusFilter> 
             </div>
+
+            
         </div>
 
-        <div className='d-flex justify-content-end mb-2'>
+        {/* <div className='d-flex justify-content-end mb-2'>
           <button className="btn btn-sm btn-primary" onClick={handleAddColor}>
             ➕ Add Color
           </button>
-        </div>
+        </div> */}
 
 
         <div className='colorlibrary-table-ctn d-none d-md-block'>
@@ -842,7 +850,285 @@ if (totalPages >=1) {
 
         </div>
 
-          <button className="btn btn-primary mt-3" onClick={handleSaveColors}>
+        <div className='d-block d-md-none'>
+          {/* Existing Colors Cards */}
+          {colors.map((item, index) => (
+            <div key={item.id} className="color-card mb-3  border rounded-3 overflow-hidden bg-white">
+              {/* Card Header */}
+              <div className="card-header bg-light px-3 py-2 border-bottom">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h6 className="mb-0 fw-semibold text-primary-custom">
+                    {item.colorName || `Color #${index + 1}`}
+                  </h6>
+                  <div className="d-flex align-items-center header-actions">
+                    {/* Status Toggle */}
+                    <label className="switch mb-0">
+                      <input
+                        type="checkbox"
+                        checked={colorStatus[item.id] || false}
+                        onChange={() => {
+                          setColorStatus(prev => ({
+                            ...prev,
+                            [item.id]: !prev[item.id]
+                          }));
+                        }}
+                      />
+                      <span className="slider round"></span>
+                    </label>
+                    
+                    {/* Delete Button */}
+                    <button
+                      className="btn btn-sm btn-outline-danger p-1"
+                      title="Delete Color"
+                      onClick={() => {
+                        setSelectedColorToDelete(item);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <MdDelete size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="card-body p-3">
+                {/* Color Name and Code Row */}
+                <div className="row g-2 mb-3">
+                  <div className="col-6">
+                    <label className="form-label fw-medium text-muted small">Color Name</label>
+                    <Form.Control
+                      type="text"
+                      value={item.colorName}
+                      placeholder="Enter color name"
+                      className="form-control-sm"
+                      onChange={(e) => handleColorChange(index, "colorName", e.target.value)}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label fw-medium text-muted small">Color Code</label>
+                    <Form.Control
+                      type="text"
+                      value={item.colorCode}
+                      placeholder="Enter color code"
+                      className="form-control-sm"
+                      onChange={(e) => handleColorChange(index, "colorCode", e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Images Section */}
+                <div className="mb-3">
+                  {/* <label className="form-label fw-medium text-muted small mb-2">Images</label> */}
+                  <div className="d-flex gap-2">
+                    {/* Cone Image */}
+                    <div className="image-upload-wrapper">
+                      <label className="form-label small text-secondary mb-1">Cone</label>
+                      <label
+                        htmlFor={`upload-cone-${index}`}
+                        className="image-upload-box d-flex align-items-center justify-content-center"
+                      >
+                        {item[`localPreview0`] || item.colorImage?.[0] ? (
+                          <img
+                            src={item[`localPreview0`] || `${backendUrl}${item.colorImage[0]}`}
+                            alt="Cone"
+                            className="uploaded-image"
+                          />
+                        ) : (
+                          <div className="upload-placeholder">
+                            <div className="upload-icon">➕</div>
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        type="file"
+                        id={`upload-cone-${index}`}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => handleImageUpload(e, index, 0)}
+                      />
+                    </div>
+
+                    {/* Hank Image */}
+                    <div className="image-upload-wrapper">
+                      <label className="form-label small text-secondary mb-1">Hank</label>
+                      <label
+                        htmlFor={`upload-hank-${index}`}
+                        className="image-upload-box d-flex align-items-center justify-content-center"
+                      >
+                        {item[`localPreview1`] || item.colorImage?.[1] ? (
+                          <img
+                            src={item[`localPreview1`] || `${backendUrl}${item.colorImage[1]}`}
+                            alt="Hank"
+                            className="uploaded-image"
+                          />
+                        ) : (
+                          <div className="upload-placeholder">
+                            <div className="upload-icon">➕</div>
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        type="file"
+                        id={`upload-hank-${index}`}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => handleImageUpload(e, index, 1)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Display */}
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="small fw-medium text-muted">Status</span>
+                  <div className="status-toggle-wrapper">
+                    <span className={`status-label ${colorStatus[item.id] ? 'active' : 'inactive'}`}>
+                      {colorStatus[item.id] ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* New Colors Cards */}
+          {newColors.map((item, index) => (
+            <div key={item.id} className="color-card mb-3 shadow-sm border rounded-3 overflow-hidden bg-white border-primary border-2">
+              {/* Card Header */}
+              <div className="card-header bg-primary bg-opacity-10 px-3 py-2 border-bottom border-primary">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h6 className="mb-0 fw-semibold text-primary">
+                    <span className="badge bg-primary me-2">NEW</span>
+                    {item.colorName || `Color #${colors.length + index + 1}`}
+                  </h6>
+                  <div className="d-flex align-items-center header-actions">
+                    {/* Status Toggle */}
+                    <label className="switch mb-0">
+                      <input
+                        type="checkbox"
+                        checked={item.status === 'ACTIVE'}
+                        onChange={() =>
+                          handleNewColorChange(index, 'status', item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                        }
+                      />
+                      <span className="slider round"></span>
+                    </label>
+                    
+                    {/* Remove Button */}
+                    <button
+                      className="btn btn-sm btn-outline-danger p-1"
+                      title="Remove Color"
+                      onClick={() => {
+                        setNewColors(prev => prev.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <MdDelete size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="card-body p-3">
+                {/* Color Name and Code Row */}
+                <div className="row g-2 mb-3">
+                  <div className="col-6">
+                    <label className="form-label fw-medium text-muted small">Color Name</label>
+                    <input
+                      className="form-control form-control-sm"
+                      placeholder="Enter color name"
+                      value={item.colorName}
+                      onChange={(e) => handleNewColorChange(index, 'colorName', e.target.value)}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label fw-medium text-muted small">Color Code</label>
+                    <input
+                      className="form-control form-control-sm"
+                      placeholder="Enter color code"
+                      value={item.colorCode}
+                      onChange={(e) => handleNewColorChange(index, 'colorCode', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Images Section */}
+                <div className="mb-3">
+                  <div className="d-flex gap-2">
+                    {/* Cone Image */}
+                    <div className="image-upload-wrapper">
+                      <label className="form-label small text-secondary mb-1">Cone</label>
+                      <label
+                        htmlFor={`new-upload-cone-${index}`}
+                        className="image-upload-box d-flex align-items-center justify-content-center"
+                      >
+                        {item.localPreview0 || item.colorImage?.[0] ? (
+                          <img
+                            src={item.localPreview0 || `${backendUrl}${item.colorImage[0]}`}
+                            alt="Cone"
+                            className="uploaded-image"
+                          />
+                        ) : (
+                          <div className="upload-placeholder">
+                            <div className="upload-icon">➕</div>
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        type="file"
+                        id={`new-upload-cone-${index}`}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => handleNewImageUpload(e, index, 0)}
+                      />
+                    </div>
+
+                    {/* Hank Image */}
+                    <div className="image-upload-wrapper">
+                      <label className="form-label small text-secondary mb-1">Hank</label>
+                      <label
+                        htmlFor={`new-upload-hank-${index}`}
+                        className="image-upload-box d-flex align-items-center justify-content-center"
+                      >
+                        {item.localPreview1 || item.colorImage?.[1] ? (
+                          <img
+                            src={item.localPreview1 || `${backendUrl}${item.colorImage[1]}`}
+                            alt="Hank"
+                            className="uploaded-image"
+                          />
+                        ) : (
+                          <div className="upload-placeholder">
+                            <div className="upload-icon">➕</div>
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        type="file"
+                        id={`new-upload-hank-${index}`}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => handleNewImageUpload(e, index, 1)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Display */}
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="small fw-medium text-muted">Status</span>
+                  <div className="status-toggle-wrapper">
+                    <span className={`status-label ${item.status === 'ACTIVE' ? 'active' : 'inactive'}`}>
+                      {item.status === 'ACTIVE' ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+          <button className="btn-primary-custom mt-3" onClick={handleSaveColors}>
         Save Changes
       </button>
 
