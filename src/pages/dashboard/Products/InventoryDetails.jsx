@@ -69,6 +69,9 @@ const InventoryDetails = () => {
 
 
   const handleInventoryAdjust = async (actionType) => {
+     const { variantId } = item.raw.variantId || {};
+
+
      const showToast = (message, type = "error") => {
         setToasts([{ message, type }]);
         setTimeout(() => setToasts([]), 3000);
@@ -84,14 +87,14 @@ const InventoryDetails = () => {
     }
 
     const payload = {
-      variantId:item.raw.variantId,
+      variantId:variantId,
       adjustWeight: Number(amount),
       remarks: source.trim(),
       actionType, // "INCREASE" or "DECREASE"
     };
 
     try {
-      const response = await adjustInventory(payload,item.raw.variantId);
+      const response = await adjustInventory(payload,variantId);
     
       showToast(`Inventory successfully ${actionType === "INCREASE" ? "added" : "reduced"}.`, "success" );
       fetchLogs();
