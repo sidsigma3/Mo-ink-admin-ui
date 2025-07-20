@@ -13,6 +13,7 @@ import DatePicker from "react-datepicker";
 import { getAllInventory } from "../../services/InventoryService";
 import { getAllProduct } from "../../services/ProductService";
 import { FiCalendar } from "react-icons/fi";
+import BottomNav from "../../components/SideBar/BottomNav";
 import { fetchDashboardAnalytics } from "../../services/analyticsService";
 
 const Dashboard = () => {
@@ -400,9 +401,10 @@ const {
     />
   </div>
    {/* </div> */}
-       
+      
       </div>
     </div>
+    
   );
 };
 

@@ -39,7 +39,7 @@ const OrderFilter = ({ status = [], onStatusChange }) => {
     </p>
   </Dropdown.Toggle>
 
-  <Dropdown.Menu className="px-2" style={{ minWidth: "200px" }}>
+  <Dropdown.Menu className="px-2">
     {statusOptions.map((status) => (
       <Form.Check
         key={status}

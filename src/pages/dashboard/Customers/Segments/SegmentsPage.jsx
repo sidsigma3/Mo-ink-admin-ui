@@ -335,7 +335,7 @@ const SegmentsPage = () => {
                 </p>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center flex-wrap mt-3" style={{ gap: '0.5rem' }}>
+            <div className="d-flex justify-content-start align-items-center flex-wrap mt-3" style={{ gap: '0.2rem' }}>
             <p className="m-0"><strong></strong>Customers: {seg.customerCount}</p>
             <span><LuDot size={25} /></span>
             <p className="m"><strong></strong>{seg.segmentType === 'AUTOMATED' ? 'Automated' : 'Label'}</p>

@@ -753,7 +753,7 @@ const handleMaxUsageChange = (field1,field2) => {
                 {selectedOptionCustomer === "specific-segment" && (
                   <div className="ps-4 w-100">
                              
-                    <div className="d-flex gap-2 mb-3 mt-3 w-50">
+                    <div className="d-flex gap-2 mb-3 mt-3 align-items-center">
                         <SearchBox></SearchBox>
                         <div>
                         <button
@@ -792,11 +792,11 @@ const handleMaxUsageChange = (field1,field2) => {
                 <label style={{fontSize:'1rem'}}>Specific customers</label>
                 </div>
                 {selectedOptionCustomer === "specific-customer" && (
-                    <div className="w-100 pe-3">
+                    <div className="ps-4 w-100">
 
-                  <div className="d-flex align-items-center gap-2 ps-4 ">
+                  <div className="">
                              
-                    <div className="d-flex gap-2 mb-3 mt-3">
+                    <div className="d-flex gap-2 mb-3 mt-3 align-items-center">
                         <SearchBox></SearchBox>
                         <div>
                         <button
@@ -897,7 +897,7 @@ const handleMaxUsageChange = (field1,field2) => {
             {formData.activeDates.hasEndDate===true && (
                  <div className="d-flex gap-2 mt-2">
                  <div className="d-flex gap-2 flex-column flex-grow-1">
-                   <label>Start date</label>
+                   <label style={{fontSize:'1rem'}}>End date</label>
                    <input type="date" value={formData.activeDates.endDate} onChange={(e)=>handleActiveDatesChange('endDate',e)}></input>
                    {errors.endDate && <p className="text-danger">{errors.endDate}</p>}
                  </div>

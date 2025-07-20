@@ -301,7 +301,7 @@ if (totalPages >=1) {
 
           <div className="data-cards">
         {filteredData.map((discount,index) => (
-          <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
+          <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>
                  <h3 className='fs-6 fw-medium m-0	'>{discount.discountCode}</h3>

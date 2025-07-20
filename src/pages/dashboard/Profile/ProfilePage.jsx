@@ -166,7 +166,7 @@ const ProfilePage = ({setIsAuthenticated}) => {
   
   return (
     <div className='profile-page'>
-        <div className='d-flex justify-content-between'>
+        <div className='d-flex justify-content-between mt-2 mb-4'>
             <div>
                 <h5>Welcome , {userDetails.firstName} {" "} {userDetails.lastName}</h5>
                 <h6 className='text-primary'>{today}</h6>
@@ -213,11 +213,14 @@ const ProfilePage = ({setIsAuthenticated}) => {
                 style={{ display: "none" }}
             />
             </div>
+            </div>
+
+               
 
             {/* <div className='position-absolute avatar' >
                 <img  src='/Avatar.png'></img>
             </div> */}
-
+            <div>
             <div className='d-flex justify-content-between profile-info'>
                 <div>
                 <h5> {userDetails.firstName+" "+userDetails.lastName}</h5>
@@ -300,7 +303,7 @@ const ProfilePage = ({setIsAuthenticated}) => {
 
                 {/* Save Button */}
       <div className='d-flex justify-content-end mt-3'>
-        <button className="btn-outline-secondary" onClick={handleSubmit}>Save Changes</button>
+        <button className="btn-primary-custom" onClick={handleSubmit}>Save Changes</button>
       </div>
 
       {/* Toast */}
