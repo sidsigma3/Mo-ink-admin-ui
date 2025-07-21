@@ -21,7 +21,7 @@ import { getAllCustomer , getWalletTransactions} from '../../../services/Custome
 import { getAllOrders , updateOrderVariantStatuses , updateOrderVariants} from '../../../services/OrderService';
 import { Segment } from 'react';
 import { getAllDiscount } from '../../../services/DiscountService';
-import { createOrder } from '../../../services/OrderService';
+import { createOrder, getCodOrderById , sendCodOrderById} from '../../../services/OrderService';
 import emailjs from 'emailjs-com';
 import ReactWhatsapp from 'react-whatsapp';
 import html2pdf from 'html2pdf.js';
@@ -37,6 +37,7 @@ import Tooltip from '../../../components/Tooltip/Tooltip';
 import { RiFilePaper2Line } from 'react-icons/ri';
 import ModalSendInvoice from '../../../components/Modal/ModalSendInvoice';
 import Toast from "../../../components/Toast/Toast";
+import ModalCollectAmount from '../../../components/Modal/ModalCollectAmount';
 
 
 const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -102,6 +103,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [customers,setCustomer] = useState([])
     const [openDropdown,setOpenDropdown] = useState(null)
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const [selectedVariantForModal, setSelectedVariantForModal] = useState(null);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
@@ -171,39 +173,8 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
       // "RETURNED",
       "CANCELLED",
     ];
-    
 
-
-    
-  
-    
-// const handleStatusChange = async (orderId, newStatus) => {
-//     try {
-//         // Fetch the existing order details before updating
-//         const existingOrder = orders.find(order => order.orderId === orderId);
-
-//         console.log(existingOrder)
-
-//         if (!existingOrder) {
-//             console.error("Order not found.");
-//             return;
-//         }
-
-//         const updatedOrderData = {
-//             ...existingOrder, 
-//             status: newStatus, 
-//         };
-
-//         await updateOrder(orderId, updatedOrderData);
-//         fetchOrders();
-
-//       alert("Order status updated successfully.");
-//     } catch (error) {
-//         console.error("Failed to update order status:", error);
-//     }
-// };
-
-
+    const [transactionsCod, setTransactionsCod] = useState([]);
 
     const [cart, setCart] = useState([]);
     
@@ -264,6 +235,34 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
               
               fetchData(); 
             }, []); 
+
+
+
+            const fetchCodTransactions = async (orderId) => {
+              try {
+                const res = await getCodOrderById(orderId);
+                const codTransactions = res.data?.paymentCodTransactions || [];
+
+                const formattedTransactions = codTransactions.map((tx) => ({
+                  transactionId: tx.razorpayReferenceId,
+                  date: tx.paidAt,
+                  payType: 'Online Payment Link',
+                  amountCollected: tx.amountPaid,
+                  remaining: tx.remainingAmount
+                }));
+
+                setTransactionsCod(formattedTransactions);
+              } catch (error) {
+                console.error("Failed to fetch COD transactions:", error);
+              }
+            };
+
+
+
+            useEffect(() => {
+              fetchCodTransactions(order?.orderId); // Make sure orderId is available
+            }, [order?.orderId]);
+
 
             const aggregateProductData = (productData) => {
               return productData.map((product) => {
@@ -921,6 +920,27 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     }
   };
   
+
+  const handleSendPaymentLink = () => {
+    console.log('hello')
+    setShowModal(true);
+  };
+
+  const handleModalCancel = () => {
+    setShowModal(false);
+  };
+
+  const handleModalConfirm = async (amountToCollect) => {
+    try {
+      const res = await sendCodOrderById(order?.orderId, amountToCollect);
+      alert("Payment link sent successfully!");
+      // Optionally refresh transactions or state here
+    } catch (error) {
+      alert("Failed to send payment link.");
+    } finally {
+      setShowModal(false);
+    }
+  };
     
 
     const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -1440,17 +1460,7 @@ const handleCancelTransaction = () => {
   });
 };
 
-const handleSendPaymentLink = () => {
-  if (remainingBalance <= 0) return;
-  
-  const paymentLink = `https://your-payment-gateway.com/pay?amount=${remainingBalance}&orderId=${order?.orderId}`;
-  const whatsappMessage = `Hi ${selectedCustomer?.name || 'Customer'}, please complete your payment of ₹${remainingBalance} using this link: ${paymentLink}`;
-  
-  console.log('Sending payment link:', paymentLink);
-  console.log('WhatsApp message:', whatsappMessage);
-  
-  // toast.success
-};
+
 // Testing COD Details
 // Testing COD Details
 // Testing COD Details
@@ -2594,11 +2604,19 @@ const handleSendPaymentLink = () => {
                   <button 
                     className="btn-secondary-custom px-2"
                     onClick={handleSendPaymentLink}
-                    disabled={remainingBalance <= 0}
+                    // disabled={remainingBalance <= 0}
                   >
                     <span className="fw-bold"></span>
                     Send Payment Link
                   </button>
+
+
+                  <ModalCollectAmount
+                    isOpen={showModal}
+                    onCancel={handleModalCancel}
+                    onConfirm={handleModalConfirm}
+                    // maxAmount={remainingBalance}
+                  />
                   
                   {/* <div className="d-flex gap-3">
                     {!showAddForm ? (

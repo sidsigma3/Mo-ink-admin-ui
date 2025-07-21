@@ -232,3 +232,31 @@ export const fetchVendorOrderAnalytics = async ({ status, orderId, startDate, en
     return null;
   }
 };
+
+
+export const getCodOrderById = async (orderId) => {
+  try {
+    const response = await axios.get(`${URL}/payment/cod/${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching order with ID ${orderId}:`, error);
+    throw error;
+  }
+};
+
+export const sendCodOrderById = async (orderId, amountToCollect) => {
+  try {
+    const response = await axios.post(
+      `${URL}/payment/cod/generate-link/${orderId}`,
+      {}, 
+      {
+        params: { amountToCollect }, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error generating COD link for order ID ${orderId}:`, error);
+    throw error;
+  }
+};
+
