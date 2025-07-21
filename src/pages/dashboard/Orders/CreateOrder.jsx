@@ -2406,7 +2406,7 @@ const handleCancelTransaction = () => {
                     </ReactWhatsapp> */}
 
                             {orderDetails.length > 0 && (
-                              <div className="d-flex justify-content-end w-100">
+                              <div className="d-flex justify-content-center w-100">
                                 {isViewMode && !weightChanged ? (
                                   <button
                                     className="btn-secondary-custom"
@@ -2486,7 +2486,7 @@ const handleCancelTransaction = () => {
                     </thead>
                     <tbody>
                       {/* Transaction Rows */}
-                      {transactions && transactions.length > 0 && transactions.map((transaction, index) => (
+                      {transactionsCod && transactionsCod.length > 0 && transactionsCod.map((transaction, index) => (
                         <tr key={transaction.id || index} className="border-bottom" style={{borderColor: '#f1f3f4 !important'}}>
                           <td className="py-3 px-4 text-dark" style={{fontSize: '14px'}}>
                             <div className="d-flex align-items-center gap-2">
@@ -2601,14 +2601,16 @@ const handleCancelTransaction = () => {
 
                 {/* Action Buttons */}
                 <div className="d-flex justify-content-center align-items-center">
-                  <button 
+                 <button 
                     className="btn-secondary-custom px-2"
                     onClick={handleSendPaymentLink}
-                    // disabled={remainingBalance <= 0}
+                    disabled={
+                      (order?.payment.pendingAmount ?? 0) - (order?.payment.totalAdjustedAmount ?? 0) <= 0
+                    }
                   >
-                    <span className="fw-bold"></span>
-                    Send Payment Link
+                    <span className="fw-bold">Send Payment Link</span>
                   </button>
+
 
 
                   <ModalCollectAmount
