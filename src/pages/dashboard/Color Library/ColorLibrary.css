@@ -393,7 +393,7 @@ input:checked + .slider:before {
 
 /* Badge Styles */
 .badge.bg-primary {
-  background-color: #0d6efd !important;
+  background-color: #6B21A8 !important;
   color: white;
   padding: 0.25rem 0.5rem;
   font-size: 0.7rem;

@@ -40,6 +40,11 @@ const ColorLibrary =  ({setDemoData }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedColorToDelete, setSelectedColorToDelete] = useState(null);
 
+  // Fixed filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [filteredColors, setFilteredColors] = useState([]);
+
  const handleImageUpload = async (e, index, imageIndex) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -69,8 +74,6 @@ const ColorLibrary =  ({setDemoData }) => {
   }
 };
 
-
-
 const handleAddColor = () => {
     setNewColors(prev => [
       ...prev,
@@ -85,7 +88,6 @@ const handleAddColor = () => {
       }
     ]);
   };
-
 
  
   const handleChange = () => {
@@ -102,6 +104,7 @@ const handleAddColor = () => {
   try {
     const data = await getColorsByProductId(productId);
     setColors(data);
+    setFilteredColors(data); // Initialize filtered colors
 
     // Set initial checked status for each color (fallback to true if null)
     const statusMap = {};
@@ -113,7 +116,6 @@ const handleAddColor = () => {
     console.error("Failed to fetch colors:", error);
   }
 };
-
 
 const handleSaveColors = async () => {
   try {
@@ -147,10 +149,6 @@ const handleSaveColors = async () => {
 
     navigate('/colorlibrary-products')
 
-    // setTimeout(() => {
-    //   navigate('colorlibrary-products');
-    // }, 1500);
-
   } catch (error) {
     console.error("Save failed", error);
     setToasts(prev => [
@@ -165,8 +163,6 @@ const handleColorChange = (index, field, value) => {
   updatedColors[index][field] = value;
   setColors(updatedColors);
 };
-
-
 
 const handleNewColorChange = (index, field, value) => {
   setNewColors(prev => {
@@ -205,148 +201,64 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
   }
 };
 
+  // Fixed filter functions
+  const handleFilterChange = (filter, value) => {
+    console.log("Filter changed:", filter, value);
+    setSearchTerm(value);
+    applyCombinedFilter(value, selectedStatus);
+  };
 
-const demoData = [
-  {
-    colorName: "Red",
-    colorCode: "AL565SD",
-    // imageUrl: "https://saroj.in/cdn/shop/files/WhatsAppImage2023-04-08at5.01.46PM_2_1200x.jpg?v=1728303359",
-    imageUrl: "",
-    status: "Active",
-  },
-  {
-    colorName: "Blue",
-    colorCode: "BL112XY",
-    imageUrl: "https://saroj.in/cdn/shop/files/WhatsAppImage2023-03-11at1.28.09PM_1.jpg?v=1728304968",
-    status: "Inactive",
-  },
-  {
-    colorName: "Green",
-    colorCode: "GR221AB",
-    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHOHFn9N_zncYXBZxMXDJShO9ZbZWTTL_Kzg&s",
-    status: "Active",
-  },
-  {
-    colorName: "Yellow",
-    colorCode: "YL783CJ",
-    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRykV6QQvWAT9--D3ltC6lggzIjHBoWHsXahQ&s",
-    status: "Inactive",
-  },
-  {
-    colorName: "Purple",
-    colorCode: "PR991XY",
-    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvjEbqjhtuOT1OUaDJhJeHK_aNH-i4V8USUg&s",
-    status: "Active",
-  },
-  {
-    colorName: "Orange",
-    colorCode: "OR442HK",
-    imageUrl: "https://saroj.in/cdn/shop/files/WhatsAppImage2023-03-06at6.55.16PM_1024x1024.jpg?v=1728303305",
-    status: "Inactive",
-  },
-  {
-    colorName: "Black",
-    colorCode: "BK110XM",
-    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzV4Vgn1r8wv-_htbDkNJgPhVRqAXF6vdEDw&s",
-    status: "Active",
-  },
-  {
-    colorName: "White",
-    colorCode: "WH776PO",
-    imageUrl: "https://saroj.in/cdn/shop/files/WhatsAppImage2023-03-08at8.03.22PM_1200x.jpg?v=1728304269",
-    status: "Inactive",
-  },
-];
-  
-  
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const handleStatusChange = (status) => {
+    console.log("Status filter changed to:", status);
+    setSelectedStatus(status);
+    applyCombinedFilter(searchTerm, status);
+  };
+
+  const applyCombinedFilter = (searchValue, status) => {
+    const lowercasedSearch = searchValue?.toLowerCase?.() || "";
+    
+    let filtered = [...colors]; // Start with all colors
+
+    // Apply search filter
+    if (lowercasedSearch) {
+      filtered = filtered.filter((item) => {
+        const matchesColorName = item.colorName?.toLowerCase().includes(lowercasedSearch);
+        const matchesColorCode = item.colorCode?.toLowerCase().includes(lowercasedSearch);
+        return matchesColorName || matchesColorCode;
+      });
+    }
+
+    // Apply status filter - Fixed logic
+    if (status !== 'All') {
+      filtered = filtered.filter((item) => {
+        // Check both the original status and the current toggle state
+        const currentToggleState = colorStatus[item.id];
+        const itemStatus = currentToggleState ? 'ACTIVE' : 'INACTIVE';
+        
+        // Also check original status from data if toggle state is undefined
+        const originalStatus = item.status === 'ACTIVE';
+        const finalStatus = currentToggleState !== undefined ? currentToggleState : originalStatus;
+        const statusString = finalStatus ? 'ACTIVE' : 'INACTIVE';
+        
+        console.log(`Item ${item.colorName}: toggle=${currentToggleState}, original=${item.status}, final=${statusString}, looking for=${status}`);
+        return statusString === status;
+      });
+    }
+
+    console.log("Filtered colors:", filtered);
+    setFilteredColors(filtered);
+  };
+
+  // Update filter when colors or colorStatus changes + reset page when filtering
+  useEffect(() => {
+    applyCombinedFilter(searchTerm, selectedStatus);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [colors, colorStatus, searchTerm, selectedStatus]);
+
   const [toasts, setToasts] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
-
-  const [discountData , setDiscountData] = useState([])
-  const [filteredData, setFilteredData] = useState([]);
-  
-      useEffect(() => {
-          const fetchData = async () => {
-            try {
-              const data = await getAllDiscount();
-              console.log(data)
-              setDiscountData(data.data)
-              setFilteredData(data.data)
-            } catch (error) {
-              console.error('Error fetching Customers:', error);
-            }
-          };
-        
-        fetchData(); 
-      }, []); 
-  
-
-  const handleRowClick = (index) => {
-    navigate('/add-discount', { state: { index , discountData} });
-  };
-
-
-  const handleDelete = (index) => {
-    setDiscountData(discountData.filter((_, i) => i !== index));
-  };
-
-  const handleDuplicate = (index) => {
-    setDiscountData([discountData[index],...discountData]);
-  };
-
-
-  const handleFilterChange = (filter, value) => {
-    if (filter === "Color Name") {
-      setSearchTerm(value);
-      applyCombinedFilter(value, selectedStatus, startDate, endDate);
-    } else if (filter === "Color Code") {
-      setStartDate(value);
-      applyCombinedFilter(searchTerm, selectedStatus, value, endDate);
-    }
-  };
-  
-  
-  const handleStatusChange = (status) => {
-    setSelectedStatus(status);
-    applyCombinedFilter(searchTerm, status, startDate, endDate);
-  };
-  
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-    applyCombinedFilter(searchTerm, selectedStatus, date, endDate);
-  };
-  
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-    applyCombinedFilter(searchTerm, selectedStatus, startDate, date);
-  };
-
-  const applyCombinedFilter = (searchValue, status, start, end) => {
-    const lowercasedSearch = searchValue?.toLowerCase?.() || "";
-  
-    const filtered = discountData.filter((item) => {
-      const matchesSearch = item.discountCode.toLowerCase().includes(lowercasedSearch);
-      const matchesStatus = status === 'All' || item.discountStatus === status;
-  
-      const itemStartDate = item.startDateTime ? new Date(item.startDateTime) : null;
-      const itemEndDate = item.endDateTime ? new Date(item.endDateTime) : null;
-  
-      const matchesStartDate = !start || (itemStartDate && itemStartDate >= new Date(start));
-      const matchesEndDate = !end || (itemEndDate && itemEndDate <= new Date(end));
-  
-      return matchesSearch && matchesStatus && matchesStartDate && matchesEndDate;
-    });
-  
-    setFilteredData(filtered);
-  };
-  
 
 const exportToExcel = (colors, colorStatus, fileName = 'colors.xlsx') => {
   const data = colors.map((item) => ({
@@ -401,58 +313,91 @@ const handleFileChange = (e) => {
   });
 };
 
-
-
-  const allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
-  const selectedProducts = discountData?.applicableProducts || [];
-  const isAllProducts = allProducts.length === selectedProducts.length;
-  const selectedProductText = isAllProducts ? "all products" : "selected products";
-
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedDiscounts = filteredData.slice(
+  const totalPages = Math.ceil(filteredColors.length / itemsPerPage);
+  const paginatedColors = filteredColors.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  // Fixed pagination with proper ellipsis logic
   const paginationItems = [];
 
-if (totalPages >=1) {
-  paginationItems.push(
-    <Pagination.Prev
-      key="prev"
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-    />
-  );
+  if (totalPages > 1) {
+    // Previous button
+    paginationItems.push(
+      <Pagination.Prev
+        key="prev"
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+      />
+    );
 
-  for (let number = 1; number <= totalPages; number++) {
+    // Always show page 1
     paginationItems.push(
       <Pagination.Item
-        key={number}
-        active={number === currentPage}
-        onClick={() => setCurrentPage(number)}
+        key={1}
+        active={currentPage === 1}
+        onClick={() => setCurrentPage(1)}
       >
-        {number}
+        1
       </Pagination.Item>
     );
+
+    // Show ellipsis if current page is far from start
+    if (currentPage > 3) {
+      paginationItems.push(<Pagination.Ellipsis key="ellipsis-start" disabled />);
+    }
+
+    // Show pages around current page
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let number = startPage; number <= endPage; number++) {
+      if (number !== 1 && number !== totalPages) {
+        paginationItems.push(
+          <Pagination.Item
+            key={number}
+            active={number === currentPage}
+            onClick={() => setCurrentPage(number)}
+          >
+            {number}
+          </Pagination.Item>
+        );
+      }
+    }
+
+    // Show ellipsis if current page is far from end
+    if (currentPage < totalPages - 2) {
+      paginationItems.push(<Pagination.Ellipsis key="ellipsis-end" disabled />);
+    }
+
+    // Always show last page (if more than 1 page)
+    if (totalPages > 1) {
+      paginationItems.push(
+        <Pagination.Item
+          key={totalPages}
+          active={currentPage === totalPages}
+          onClick={() => setCurrentPage(totalPages)}
+        >
+          {totalPages}
+        </Pagination.Item>
+      );
+    }
+
+    // Next button
+    paginationItems.push(
+      <Pagination.Next
+        key="next"
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        disabled={currentPage === totalPages}
+      />
+    );
   }
-
-  paginationItems.push(
-    <Pagination.Next
-      key="next"
-      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={currentPage === totalPages}
-    />
-  );
-}
-
 
  const showToast = (message, type = "error") => {
             setToasts([{ message, type }]);
             setTimeout(() => setToasts([]), 3000);
           };
-
 
   return (
     <div className='colorlibrary'>
@@ -481,7 +426,6 @@ if (totalPages >=1) {
             
             </div>
 
-
         <div className='order-filter-cttn d-flex gap-2 mb-3 mt-4 '>
                     <div className='col-sm-6 col-md-9'>
                         <ProductFilter 
@@ -491,18 +435,13 @@ if (totalPages >=1) {
             </div>
          
             <div className='col-sm-6 col-md-3'>
-                <StatusFilter status={'All'} onStatusChange={handleStatusChange}></StatusFilter> 
+                <StatusFilter 
+                  status={selectedStatus} 
+                  statusOptions={['All', 'ACTIVE', 'INACTIVE']}
+                  onStatusChange={handleStatusChange}
+                />
             </div>
-
-            
         </div>
-
-        {/* <div className='d-flex justify-content-end mb-2'>
-          <button className="btn btn-sm btn-primary" onClick={handleAddColor}>
-            ➕ Add Color
-          </button>
-        </div> */}
-
 
         <div className='colorlibrary-table-ctn d-none d-md-block'>
           <Table hover>
@@ -525,27 +464,33 @@ if (totalPages >=1) {
           </tr>
         </thead>
         <tbody>
-          {colors.map((item, index) => (
+          {paginatedColors.map((item, index) => (
             <tr key={item.id}>
                <td style={{ verticalAlign: "middle" }}>
                   <Form.Control
                     type="text"
                     value={item.colorName}
-                    onChange={(e) => handleColorChange(index, "colorName", e.target.value)}
+                    onChange={(e) => {
+                      const originalIndex = colors.findIndex(color => color.id === item.id);
+                      handleColorChange(originalIndex, "colorName", e.target.value);
+                    }}
                   />
                 </td>
                 <td style={{ textAlign: "center", verticalAlign: "middle" }}>
                   <Form.Control
                     type="text"
                     value={item.colorCode}
-                    onChange={(e) => handleColorChange(index, "colorCode", e.target.value)}
+                    onChange={(e) => {
+                      const originalIndex = colors.findIndex(color => color.id === item.id);
+                      handleColorChange(originalIndex, "colorCode", e.target.value);
+                    }}
                   />
                 </td>
           {/* Cone Image TD */}
                 <td style={{ textAlign: "center", verticalAlign: "middle" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <label
-                      htmlFor={`upload-cone-${index}`}
+                      htmlFor={`upload-cone-${item.id}`}
                       style={{
                         cursor: "pointer",
                         display: "inline-block",
@@ -570,10 +515,13 @@ if (totalPages >=1) {
                     </label>
                     <input
                       type="file"
-                      id={`upload-cone-${index}`}
+                      id={`upload-cone-${item.id}`}
                       accept="image/*"
                       style={{ display: "none" }}
-                      onChange={(e) => handleImageUpload(e, index, 0)} // imageIndex 0 for cone
+                      onChange={(e) => {
+                        const originalIndex = colors.findIndex(color => color.id === item.id);
+                        handleImageUpload(e, originalIndex, 0);
+                      }}
                     />
                   </div>
                 </td>
@@ -582,7 +530,7 @@ if (totalPages >=1) {
                 <td style={{ textAlign: "center", verticalAlign: "middle" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <label
-                      htmlFor={`upload-hank-${index}`}
+                      htmlFor={`upload-hank-${item.id}`}
                       style={{
                         cursor: "pointer",
                         display: "inline-block",
@@ -607,15 +555,16 @@ if (totalPages >=1) {
                     </label>
                     <input
                       type="file"
-                      id={`upload-hank-${index}`}
+                      id={`upload-hank-${item.id}`}
                       accept="image/*"
                       style={{ display: "none" }}
-                      onChange={(e) => handleImageUpload(e, index, 1)} // imageIndex 1 for hank
+                      onChange={(e) => {
+                        const originalIndex = colors.findIndex(color => color.id === item.id);
+                        handleImageUpload(e, originalIndex, 1);
+                      }}
                     />
                   </div>
                 </td>
-
-
 
               <td style={{ textAlign: "center", verticalAlign: "middle" }}>
                 <label className="switch">
@@ -627,7 +576,6 @@ if (totalPages >=1) {
                         ...prev,
                         [item.id]: !prev[item.id]
                       }));
-                      // Optionally call API here to persist the status toggle
                     }}
                   />
                   <span className="slider round"></span>
@@ -646,9 +594,6 @@ if (totalPages >=1) {
                   <MdDelete size={18} />
                 </button>
               </td>
-
-
-
             </tr>
           ))}
 
@@ -783,76 +728,11 @@ if (totalPages >=1) {
                 }
               }}
             />
-
-      
-
-          <div className="data-cards">
-        {filteredData.map((discount,index) => (
-          <div className="data-card shadow-sm" key={index} onClick={() => handleRowClick(index)}>
-
-            <div className='d-flex justify-content-between'>
-                 <h3>{discount.discountCode}</h3>
-                 <p> 
-                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'4rem'}}>
-                  {discount.discountStatus}
-                </div>
-                </p>
-            </div>
-
-            <div className='d-flex mt-3'>
-            
-            <p className="text-muted m-0">
-                  {discount.discountType === "Percentage"
-                    ? `${discount.discountValue}% off on ${discount?.applicableProducts[0]?.productName}`
-                    : `₹${discount.discountValue} off on cotton yarn`}
-              </p>
-
-            <span><LuDot  size={25}/></span>
-
-            <p><strong></strong> {discount.minPurchaseRequirement}</p>
-
-            {/* <div style={{ display: 'flex', alignItems: 'center' }}>
-           
-            <div style={{ display: 'flex' }}>
-                {product.colorVariants.map((color, index) => (
-                <div
-                    key={index}
-                    style={{
-                    width: '35px',
-                    height: '35px',
-                    backgroundColor: color,
-                    borderRadius: '50%',
-                    marginLeft: index === 0 ? '0' : '-10px',
-                    border: '1px solid #fff',
-                    }}
-                 
-                ></div>
-                ))}
-            </div>
-            </div> */}
-            </div>
-
-            {/* <div className='d-flex justify-content-between mt-2 pe-4'>
-                 <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
-                    {product.status}
-                    </div>
-                </p>
-                 <p>{product.stock} Kgs</p>
-            </div> */}
-          </div>
-        ))}
-      </div>
-
-
-
-
-
         </div>
 
         <div className='d-block d-md-none'>
           {/* Existing Colors Cards */}
-          {colors.map((item, index) => (
+          {filteredColors.map((item, index) => (
             <div key={item.id} className="color-card mb-3  border rounded-3 overflow-hidden bg-white">
               {/* Card Header */}
               <div className="card-header bg-light px-3 py-2 border-bottom">
@@ -902,7 +782,10 @@ if (totalPages >=1) {
                       value={item.colorName}
                       placeholder="Enter color name"
                       className="form-control-sm"
-                      onChange={(e) => handleColorChange(index, "colorName", e.target.value)}
+                      onChange={(e) => {
+                        const originalIndex = colors.findIndex(color => color.id === item.id);
+                        handleColorChange(originalIndex, "colorName", e.target.value);
+                      }}
                     />
                   </div>
                   <div className="col-6">
@@ -912,20 +795,22 @@ if (totalPages >=1) {
                       value={item.colorCode}
                       placeholder="Enter color code"
                       className="form-control-sm"
-                      onChange={(e) => handleColorChange(index, "colorCode", e.target.value)}
+                      onChange={(e) => {
+                        const originalIndex = colors.findIndex(color => color.id === item.id);
+                        handleColorChange(originalIndex, "colorCode", e.target.value);
+                      }}
                     />
                   </div>
                 </div>
 
                 {/* Images Section */}
                 <div className="mb-3">
-                  {/* <label className="form-label fw-medium text-muted small mb-2">Images</label> */}
                   <div className="d-flex gap-2">
                     {/* Cone Image */}
                     <div className="image-upload-wrapper">
                       <label className="form-label small text-secondary mb-1">Cone</label>
                       <label
-                        htmlFor={`upload-cone-${index}`}
+                        htmlFor={`upload-cone-mobile-${item.id}`}
                         className="image-upload-box d-flex align-items-center justify-content-center"
                       >
                         {item[`localPreview0`] || item.colorImage?.[0] ? (
@@ -942,10 +827,13 @@ if (totalPages >=1) {
                       </label>
                       <input
                         type="file"
-                        id={`upload-cone-${index}`}
+                        id={`upload-cone-mobile-${item.id}`}
                         accept="image/*"
                         style={{ display: "none" }}
-                        onChange={(e) => handleImageUpload(e, index, 0)}
+                        onChange={(e) => {
+                          const originalIndex = colors.findIndex(color => color.id === item.id);
+                          handleImageUpload(e, originalIndex, 0);
+                        }}
                       />
                     </div>
 
@@ -953,7 +841,7 @@ if (totalPages >=1) {
                     <div className="image-upload-wrapper">
                       <label className="form-label small text-secondary mb-1">Hank</label>
                       <label
-                        htmlFor={`upload-hank-${index}`}
+                        htmlFor={`upload-hank-mobile-${item.id}`}
                         className="image-upload-box d-flex align-items-center justify-content-center"
                       >
                         {item[`localPreview1`] || item.colorImage?.[1] ? (
@@ -970,10 +858,13 @@ if (totalPages >=1) {
                       </label>
                       <input
                         type="file"
-                        id={`upload-hank-${index}`}
+                        id={`upload-hank-mobile-${item.id}`}
                         accept="image/*"
                         style={{ display: "none" }}
-                        onChange={(e) => handleImageUpload(e, index, 1)}
+                        onChange={(e) => {
+                          const originalIndex = colors.findIndex(color => color.id === item.id);
+                          handleImageUpload(e, originalIndex, 1);
+                        }}
                       />
                     </div>
                   </div>
@@ -1060,7 +951,7 @@ if (totalPages >=1) {
                     <div className="image-upload-wrapper">
                       <label className="form-label small text-secondary mb-1">Cone</label>
                       <label
-                        htmlFor={`new-upload-cone-${index}`}
+                        htmlFor={`new-upload-cone-mobile-${index}`}
                         className="image-upload-box d-flex align-items-center justify-content-center"
                       >
                         {item.localPreview0 || item.colorImage?.[0] ? (
@@ -1077,7 +968,7 @@ if (totalPages >=1) {
                       </label>
                       <input
                         type="file"
-                        id={`new-upload-cone-${index}`}
+                        id={`new-upload-cone-mobile-${index}`}
                         accept="image/*"
                         style={{ display: "none" }}
                         onChange={(e) => handleNewImageUpload(e, index, 0)}
@@ -1088,7 +979,7 @@ if (totalPages >=1) {
                     <div className="image-upload-wrapper">
                       <label className="form-label small text-secondary mb-1">Hank</label>
                       <label
-                        htmlFor={`new-upload-hank-${index}`}
+                        htmlFor={`new-upload-hank-mobile-${index}`}
                         className="image-upload-box d-flex align-items-center justify-content-center"
                       >
                         {item.localPreview1 || item.colorImage?.[1] ? (
@@ -1105,7 +996,7 @@ if (totalPages >=1) {
                       </label>
                       <input
                         type="file"
-                        id={`new-upload-hank-${index}`}
+                        id={`new-upload-hank-mobile-${index}`}
                         accept="image/*"
                         style={{ display: "none" }}
                         onChange={(e) => handleNewImageUpload(e, index, 1)}

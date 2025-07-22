@@ -561,7 +561,7 @@ const handleMaxUsageChange = (field1,field2) => {
               <h5 style={{fontSize:'1rem'}}>Discount code</h5>
 
               {isViewMode === true ? (
-                  <h4 style={{fontSize:'1rem', color: '##6B21A8'}}>{formData.discountCode}</h4>
+                  <h4 style={{fontSize:'1rem', color: '#6B21A8'}}>{formData.discountCode}</h4>
               ):(
                 <input 
                 type="text"   

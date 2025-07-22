@@ -62,7 +62,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: ##6B21A8;
+  color: #6B21A8;
 }
 
 .btn-tertiary{
@@ -71,7 +71,7 @@
     font-size: 0.8rem;
     font-weight: 400;
     background-color: #ffffff !important;
-    border: 2px solid ##6B21A8;
+    border: 2px solid #6B21A8;
     color: #6B21A8!important;
 }
 

@@ -54,17 +54,31 @@ const Products = () => {
 
 
       const handleStatusChange = (status) => {
-        if (status === "All") {
-            setFilteredData(product); // Show all products
-        } else {
-            const filtered = product.filter(item => item.availableStatus === status);
-            setFilteredData(filtered);
-        }
-    };
+    if (status === "All" || !status) {
+        setFilteredData(product);
+        return;
+    }
+    
+    const filtered = product.filter(item => {
+        // Check multiple possible status field names
+        const statusFields = [
+            item.availableStatus,
+            item.status,
+            item.productStatus,
+            item.available_status
+        ];
+        
+        return statusFields.some(field => 
+            field?.toString().toLowerCase() === status.toLowerCase()
+        );
+    });
+    
+    setFilteredData(filtered);
+};
 
   return (
     <div className='products'>
-    <div className='top d-flex align-items-center justify-content-between mt-2 mb-4 gap-3'>            <div>
+    <div className='top d-flex align-items-center justify-content-between mt-2 mb-4 gap-3'> <div>
                 <h3 className='mb-0 ' style={{fontSize:'1.2rem'}}>Products</h3>
             </div>
 
