@@ -6,7 +6,7 @@
     background-color: #6B21A8!important;
     /* border: 2px solid #6B21A8; */
     color: #ffffff !important;
-    text-decoration: none;
+    text-decoration: none !important;  
   }
 
 .lg-add-btn{
