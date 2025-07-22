@@ -2443,7 +2443,7 @@ const handleCancelTransaction = () => {
                 </div>
 
 
-
+              {isViewMode && (
                     <div className='payment bg-white rounded-3 shadow-sm border-0' style={{padding: '24px'}}>
                 {/* Header with Opening Balance */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
@@ -2588,7 +2588,7 @@ const handleCancelTransaction = () => {
                   </table>
 
                   {/* Empty State */}
-                  {(!transactions || transactions.length === 0) && !showAddForm && (
+                  {(!transactionsCod || transactionsCod.length === 0) && !showAddForm && (
                     <div className="py-5 d-flex flex-column justify-content-center align-items-center text-center" style={{minHeight: '200px'}}>
                       <div className="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style={{width: '80px', height: '80px'}}>
                         <RiFilePaper2Line size={32} className="text-muted" />
@@ -2600,11 +2600,13 @@ const handleCancelTransaction = () => {
                 </div>
 
                 {/* Action Buttons */}
+              
                 <div className="d-flex justify-content-center align-items-center">
                  <button 
                     className="btn-secondary-custom px-2"
                     onClick={handleSendPaymentLink}
                     disabled={
+                  
                       (order?.payment.pendingAmount ?? 0) - (order?.payment.totalAdjustedAmount ?? 0) <= 0
                     }
                   >
@@ -2641,8 +2643,9 @@ const handleCancelTransaction = () => {
                     )}
                   </div> */}
                 </div>
+               
               </div>
-
+                )}
 
 
             </div>
