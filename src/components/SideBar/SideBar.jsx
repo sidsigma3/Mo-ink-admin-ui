@@ -78,6 +78,8 @@ const SideBar = () => {
         setSelected("manufactures");
       } else if (location.pathname.includes("/users") || location.pathname.includes("/add-user")) {
         setSelected("users");
+      } else if (location.pathname.includes("/reportbug")) {
+        setSelected("reportbug");
       } else {
         setSelected(""); 
       }
@@ -379,7 +381,7 @@ const SideBar = () => {
 
         {/* Bottom section */}
         <div className='sidebar-footer'>
-          <div className='footer-menu'>
+          <div className={`footer-menu ${selected === 'reportbug' ? 'selected' : ''}`}>
             <Link to={'/reportbug'} className='menu-link'>
               <button onClick={() => setSelected('report')} className='menu-button footer-button'>
                 <span className='menu-icon'><Bug size={22}/></span>

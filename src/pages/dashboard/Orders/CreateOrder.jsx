@@ -331,11 +331,30 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
 
     console.log(finalData)
   
-    const handleReceiveOrder = (order) => {
-      console.log(order)
-
-      setOrderDetails(order);
-    };
+   
+const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
+  console.log('handleReceiveOrder called with:', { newItems, action });
+  
+  if (action === 'ADD_TO_EXISTING') {
+    // Add new items to existing orderDetails (from catalogue view)
+    setOrderDetails(prevOrderDetails => {
+      const updatedOrderDetails = [...prevOrderDetails, ...newItems];
+      console.log('Updated orderDetails (ADD_TO_EXISTING):', updatedOrderDetails);
+      return updatedOrderDetails;
+    });
+  } else if (action === 'CREATE_WITH_EXISTING') {
+    // Create order with existing + new items (from products view)
+    setOrderDetails(prevOrderDetails => {
+      const updatedOrderDetails = [...prevOrderDetails, ...newItems];
+      console.log('Updated orderDetails (CREATE_WITH_EXISTING):', updatedOrderDetails);
+      return updatedOrderDetails;
+    });
+  } else {
+    // Default behavior - replace orderDetails completely (legacy support)
+    setOrderDetails(newItems);
+    console.log('Updated orderDetails (CREATE_NEW):', newItems);
+  }
+};
 
     const [selectedCustomer, setSelectedCustomer] = useState(order.customer || null);
 
@@ -807,119 +826,128 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
   
 
  
-  const handleCreateOrder = async () => {
-    try {
-      if (!selectedCustomer) {
-        alert("No customer selected!");
-        return;
-      }
-  
-      if (orderDetails.length === 0) {
-        alert("No items in the order!");
-        return;
-      }
-  
-      const homeAddress = selectedCustomer?.addresses?.find(addr => addr.addressType === "HOME");
-      const isOdisha = homeAddress?.state?.toLowerCase() === "odisha";
-  
-      // Calculate total weight for proportional handling charges
-      const totalWeight = orderDetails.reduce((sum, order) => {
-        return sum + (Number(order.color.weight) || 0);
-      }, 0);
-  
-      const orderVariants = orderDetails
-        .filter(order => order.variantId && order.color?.weight > 0)
-        .map(order => {
-          const breakdown = calculatePriceBreakdown(
-            { ...order.color,gstOnProduct:order.gstOnProduct,price:order.price, },
-            selectedDiscountValue,
-            discountPercentage,
-            selectedDiscountData
-          );
 
-          console.log(breakdown)
-  
-          const gstRate = breakdown.gstRate || 0;
-          const gstAmount = breakdown.gstAmount || 0;
-          const weight = Number(order.color.weight) || 0;
-  
-          const proportionalHandlingCharge =
-            totalWeight > 0 ? Number(((weight / totalWeight) * handlingCharges).toFixed(2)) : 0;
-  
-          return {
-            variantId: order.variantId,
-            orderWeight: weight,
-            variantType: order.variantType || "Cone",
-            orderVariantCgst: Number(isOdisha ? (gstAmount / 2).toFixed(0) : "0.0"),
-            orderVariantSgst: Number(isOdisha ? (gstAmount / 2).toFixed(0) : "0.0"),
-            orderVariantIgst: Number(isOdisha ? "0.0" : gstAmount.toFixed(0)),
-            orderVariantDiscount: Number(breakdown.discountAmount?.toFixed(0)) || "0.0",
-            orderVariantHandlingCharges: proportionalHandlingCharge,
-            orderVariantTotalAmount: Number((breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(0)),
-            status: "NEW",
-            statusReason: null,
-            statusRemark: null
-          };
-        });
 
-      console.log(orderVariants)
-  
-      const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
-      const totalAmount = Number(calculateTotalAmount());
-  
-      if (orderVariants.length === 0 || totalQuantity === 0) {
-        alert("No valid variants or zero weight!");
-        return;
-      }
-  
-      const walletUsed = walletDeduction || 0;
-  
-      const billingAddress = selectedCustomer.addresses?.find(
-        (addr) => addr.addressType === "HOME"
-      );
-  
-      const formattedCustomer = {
-        customerId: selectedCustomer.customerId,
-        billingAddressId: billingAddress?.id || null,
-        shippingAddressId: selectedAddress?.id || null,
-      };
-  
-      const orderData = {
-        customer: formattedCustomer,
-        status: "NEW",
-        totalAmount: Number(toPay.toFixed(0)),
-        discountId: selectedDiscountId || null,
-        quantity: totalQuantity,
-        paymentTypeDiscount: selectedPayment || "",
-        createdByUserId:user.userId,
-        payment: {
-          paymentId: Date.now(),
-          totalAmount: Number(toPay.toFixed(0)),
-          codAmount: Number(codAmt.toFixed(0)),
-          onlineAmount: Number(onlineAmt.toFixed(0)),
-          transactionId: "TXN" + Date.now(),
-          paidAmount: Number(onlineAmt.toFixed(0)),
-          pendingAmount: Number(codAmt.toFixed(0)),
-          paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTIALLY_PAID",
-          totalDiscount: Number(grandTotals.totalDiscount.toFixed(0)),
-          totalSgst: Number(isOdisha ? grandTotals.sgst.toFixed(0) : "0.00"),
-          totalCgst: Number(isOdisha ? grandTotals.cgst.toFixed(0) : "0.00"),
-          totalIgst: Number(isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(0)),
-          walletAmount: walletUsed,
-          totalHandlingCharges:handlingCharges,
-        },
-        orderVariants
-      };
-  
-      const response = await createOrder(orderData);
-    
-      showToast('Order Created successfully','success')
-      navigate('/orders');
-    } catch (error) {
-      console.error("Error creating order:", error);
-      showToast('Failed to create order','erorr')
+
+// Your existing handleCreateOrder function remains the same
+const handleCreateOrder = async () => {
+  try {
+    if (!selectedCustomer) {
+      alert("No customer selected!");
+      return;
     }
-  };
+
+    if (orderDetails.length === 0) {
+      alert("No items in the order!");
+      return;
+    }
+
+    const homeAddress = selectedCustomer?.addresses?.find(addr => addr.addressType === "HOME");
+    const isOdisha = homeAddress?.state?.toLowerCase() === "odisha";
+
+    // Calculate total weight for proportional handling charges
+    const totalWeight = orderDetails.reduce((sum, order) => {
+      return sum + (Number(order.color.weight) || 0);
+    }, 0);
+
+    const orderVariants = orderDetails
+      .filter(order => order.variantId && order.color?.weight > 0)
+      .map(order => {
+        const breakdown = calculatePriceBreakdown(
+          { ...order.color, gstOnProduct: order.gstOnProduct, price: order.price },
+          selectedDiscountValue,
+          discountPercentage,
+          selectedDiscountData
+        );
+
+        console.log(breakdown);
+
+        const gstRate = breakdown.gstRate || 0;
+        const gstAmount = breakdown.gstAmount || 0;
+        const weight = Number(order.color.weight) || 0;
+
+        const proportionalHandlingCharge =
+          totalWeight > 0 ? Number(((weight / totalWeight) * handlingCharges).toFixed(2)) : 0;
+
+        return {
+          variantId: order.variantId,
+          orderWeight: weight,
+          variantType: order.variantType || "Cone",
+          orderVariantCgst: Number(isOdisha ? (gstAmount / 2).toFixed(0) : "0.0"),
+          orderVariantSgst: Number(isOdisha ? (gstAmount / 2).toFixed(0) : "0.0"),
+          orderVariantIgst: Number(isOdisha ? "0.0" : gstAmount.toFixed(0)),
+          orderVariantDiscount: Number(breakdown.discountAmount?.toFixed(0)) || "0.0",
+          orderVariantHandlingCharges: proportionalHandlingCharge,
+          orderVariantTotalAmount: Number((breakdown.finalTotal + gstAmount + proportionalHandlingCharge).toFixed(0)),
+          status: "NEW",
+          statusReason: null,
+          statusRemark: null
+        };
+      });
+
+    console.log(orderVariants);
+
+    const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
+    const totalAmount = Number(calculateTotalAmount());
+
+    if (orderVariants.length === 0 || totalQuantity === 0) {
+      alert("No valid variants or zero weight!");
+      return;
+    }
+
+    const walletUsed = walletDeduction || 0;
+
+    const billingAddress = selectedCustomer.addresses?.find(
+      (addr) => addr.addressType === "HOME"
+    );
+
+    const formattedCustomer = {
+      customerId: selectedCustomer.customerId,
+      billingAddressId: billingAddress?.id || null,
+      shippingAddressId: selectedAddress?.id || null,
+    };
+
+    const orderData = {
+      customer: formattedCustomer,
+      status: "NEW",
+      totalAmount: Number(toPay.toFixed(0)),
+      discountId: selectedDiscountId || null,
+      quantity: totalQuantity,
+      paymentTypeDiscount: selectedPayment || "",
+      createdByUserId: user.userId,
+      payment: {
+        paymentId: Date.now(),
+        totalAmount: Number(toPay.toFixed(0)),
+        codAmount: Number(codAmt.toFixed(0)),
+        onlineAmount: Number(onlineAmt.toFixed(0)),
+        transactionId: "TXN" + Date.now(),
+        paidAmount: Number(onlineAmt.toFixed(0)),
+        pendingAmount: Number(codAmt.toFixed(0)),
+        paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTIALLY_PAID",
+        totalDiscount: Number(grandTotals.totalDiscount.toFixed(0)),
+        totalSgst: Number(isOdisha ? grandTotals.sgst.toFixed(0) : "0.00"),
+        totalCgst: Number(isOdisha ? grandTotals.cgst.toFixed(0) : "0.00"),
+        totalIgst: Number(isOdisha ? "0.00" : (grandTotals.cgst + grandTotals.sgst).toFixed(0)),
+        walletAmount: walletUsed,
+        totalHandlingCharges: handlingCharges,
+      },
+      orderVariants
+    };
+
+    const response = await createOrder(orderData);
+  
+    showToast('Order Created successfully', 'success');
+    navigate('/orders');
+  } catch (error) {
+    console.error("Error creating order:", error);
+    showToast('Failed to create order', 'error');
+  }
+};
+
+// Update your ModalOrder component usage to use the new handler
+// Replace your existing onOrderCreate prop:
+
+
   
     
 
@@ -1402,6 +1430,9 @@ const handleAddPayment = () => {
   });
 };
 
+
+
+
 const handleSaveTransaction = () => {
   if (!newTransaction.transactionId || !newTransaction.payType || newTransaction.amountCollected <= 0) {
     alert('Please fill all required fields');
@@ -1485,12 +1516,14 @@ const handleSendPaymentLink = () => {
 
 
         <ModalOrder
-             show={showModalOrder}
-             handleClose={() => setShowModalOrder(false)}
-             products={finalData}
-             addToCart={addToCart}
-             onOrderCreate={handleReceiveOrder}
-            onProductUpdate={refreshAllProducts}
+  show={showModalOrder}
+  handleClose={() => setShowModalOrder(false)}
+  products={finalData}
+  addToCart={addToCart}
+  onOrderCreate={handleReceiveOrder}  // Uses the updated handler above
+  onProductUpdate={refreshAllProducts}
+  existingCartItems={orderDetails}  
+            
         >
 
         </ModalOrder>
@@ -1507,7 +1540,7 @@ const handleSendPaymentLink = () => {
                       <div>
                       </div>
                     ):(
-                    <button className='btn-secondary-custom' onClick={() => setShowModalOrder(true)}>Browse Color Catalouge</button>
+                    <button className='btn-secondary-custom' onClick={() => setShowModalOrder(true)}>Browse Catalouge</button>
                     )}
                     </div>
                     {renderModal()}
@@ -1843,7 +1876,7 @@ const handleSendPaymentLink = () => {
 
 
 
-                                    <div className='d-flex flex-column gap-3'>
+                                    <td  style={{ justifyItems: 'center', alignContent:'center'}} >
                                       <div className="d-flex align-items-center justify-content-between">
                                         {!isViewMode && (
                                           <button
@@ -1862,7 +1895,7 @@ const handleSendPaymentLink = () => {
                                           </button>
                                         )}
                                       </div>
-                                    </div>
+                                    </td>
 
 
                                           

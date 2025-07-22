@@ -921,7 +921,7 @@ const handleAddressTypeChange = (e) => {
                                 height: '2.2rem',
                                 backgroundColor: '#f7ecffff',
                                 border: '1px solid #6B21A8',
-                                color: '##6B21A8',
+                                color: '#6B21A8',
                                 borderRadius: '0.4rem',
                                 // lineHeight: 1,
                               }}
@@ -1122,7 +1122,7 @@ const handleAddressTypeChange = (e) => {
                               backgroundColor: '#fafafa'
                           }}
                           onFocus={(e) => {
-                              e.currentTarget.style.borderColor = '##6B21A8';
+                              e.currentTarget.style.borderColor = '#6B21A8';
                               e.currentTarget.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.25)';
                           }}
                           onBlur={(e) => {

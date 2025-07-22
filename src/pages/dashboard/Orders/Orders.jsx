@@ -262,22 +262,30 @@ useEffect(() => {
       const datePickerRef = useRef(null);
 
       // Close date picker when clicking outside
-      useEffect(() => {
+        useEffect(() => {
           const handleClickOutside = (event) => {
-              if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
-                  setShowPicker(false);
+            if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+              // Check if the clicked element is not one of our toggle buttons
+              const isToggleButton = event.target.closest('.date-btn');
+              if (!isToggleButton) {
+                setShowPicker(false);
               }
+            }
           };
-  
+        
           if (showPicker) {
-              document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener('mousedown', handleClickOutside);
           }
-  
-          return () => {
-              document.removeEventListener("mousedown", handleClickOutside);
+        
+          return () => {    
+            document.removeEventListener('mousedown', handleClickOutside);
           };
-      }, [showPicker]);
-
+        }, [showPicker]);
+        
+        useEffect(() => {
+          fetchDashboardData();
+        }, [startDate, endDate]);
+ 
 
     const formatNumber = (num) => {
         if (num >= 10000000) {

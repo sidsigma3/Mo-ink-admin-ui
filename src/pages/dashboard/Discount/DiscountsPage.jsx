@@ -30,7 +30,6 @@ const DiscountsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-
   const [discountData , setDiscountData] = useState([])
   const [filteredData, setFilteredData] = useState([]);
   
@@ -49,71 +48,103 @@ const DiscountsPage = () => {
         fetchData(); 
       }, []); 
   
+  // Re-apply filters whenever any filter state changes
+  useEffect(() => {
+    if (discountData.length > 0) {
+      applyCombinedFilter(searchTerm, selectedStatus, startDate, endDate);
+    }
+  }, [discountData, searchTerm, selectedStatus, startDate, endDate]);
 
   const handleRowClick = (index) => {
-    navigate('/add-discount', { state: { index , discountData} });
+    // Use the original index from discountData instead of filtered index
+    const originalIndex = discountData.findIndex(item => item === filteredData[index]);
+    navigate('/add-discount', { state: { index: originalIndex , discountData} });
   };
 
-
   const handleDelete = (index) => {
-    setDiscountData(discountData.filter((_, i) => i !== index));
+    // Get the actual item from filteredData and find its index in discountData
+    const itemToDelete = filteredData[index];
+    const originalIndex = discountData.findIndex(item => item === itemToDelete);
+    
+    if (originalIndex !== -1) {
+      const updatedData = discountData.filter((_, i) => i !== originalIndex);
+      setDiscountData(updatedData);
+    }
   };
 
   const handleDuplicate = (index) => {
-    setDiscountData([discountData[index],...discountData]);
+    // Get the actual item from filteredData
+    const itemToDuplicate = filteredData[index];
+    setDiscountData([itemToDuplicate, ...discountData]);
   };
 
-
   const handleFilterChange = (filter, value) => {
+    console.log('Filter changed:', filter, value); // Debug log
     if (filter === "Discount Code") {
-      setSearchTerm(value);
-      applyCombinedFilter(value, selectedStatus, startDate, endDate);
+      setSearchTerm(value || '');
     } else if (filter === "Start Date") {
       setStartDate(value);
-      applyCombinedFilter(searchTerm, selectedStatus, value, endDate);
     } else if (filter === "End Date") {
       setEndDate(value);
-      applyCombinedFilter(searchTerm, selectedStatus, startDate, value);
     }
   };
   
-  
   const handleStatusChange = (status) => {
-    setSelectedStatus(status);
-    applyCombinedFilter(searchTerm, status, startDate, endDate);
-  };
-  
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-    applyCombinedFilter(searchTerm, selectedStatus, date, endDate);
-  };
-  
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-    applyCombinedFilter(searchTerm, selectedStatus, startDate, date);
+    console.log('Status changed:', status); // Debug log
+    setSelectedStatus(status || 'All');
   };
 
   const applyCombinedFilter = (searchValue, status, start, end) => {
+    console.log('Applying filter with:', { searchValue, status, start, end }); // Debug log
+    
+    if (!discountData || discountData.length === 0) {
+      setFilteredData([]);
+      return;
+    }
+
     const lowercasedSearch = searchValue?.toLowerCase?.() || "";
   
     const filtered = discountData.filter((item) => {
-      const matchesSearch = item.discountCode.toLowerCase().includes(lowercasedSearch);
-      const matchesStatus = status === 'All' || item.discountStatus === status;
+      // Search term matching (discount code)
+      const matchesSearch = !searchValue || 
+        item.discountCode?.toLowerCase().includes(lowercasedSearch);
+      
+      // Status matching - make it case-insensitive
+      const itemStatus = item.discountStatus?.toLowerCase() || '';
+      const filterStatus = status?.toLowerCase() || 'all';
+      const matchesStatus = filterStatus === 'all' || itemStatus === filterStatus;
   
+      // Date range matching
       const itemStartDate = item.startDateTime ? new Date(item.startDateTime) : null;
       const itemEndDate = item.endDateTime ? new Date(item.endDateTime) : null;
   
       const matchesStartDate = !start || (itemStartDate && itemStartDate >= new Date(start));
       const matchesEndDate = !end || (itemEndDate && itemEndDate <= new Date(end));
-  
-      return matchesSearch && matchesStatus && matchesStartDate && matchesEndDate;
+
+      const result = matchesSearch && matchesStatus && matchesStartDate && matchesEndDate;
+      
+      // Debug logging for first few items
+      if (discountData.indexOf(item) < 3) {
+        console.log(`Item ${item.discountCode}:`, {
+          matchesSearch,
+          matchesStatus,
+          matchesStartDate,
+          matchesEndDate,
+          result,
+          itemStatus,
+          filterStatus
+        });
+      }
+      
+      return result;
     });
   
+    console.log(`Filtered ${filtered.length} items from ${discountData.length} total`); // Debug log
     setFilteredData(filtered);
+    setCurrentPage(1); // Reset to first page when filtering
   };
   
-
-    const exportToExcel = (discounts) => {
+  const exportToExcel = (discounts) => {
        const showToast = (message, type = "error") => {
             setToasts([{ message, type }]);
             setTimeout(() => setToasts([]), 3000);
@@ -157,7 +188,6 @@ const DiscountsPage = () => {
   const isAllProducts = allProducts.length === selectedProducts.length;
   const selectedProductText = isAllProducts ? "all products" : "selected products";
 
-
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedDiscounts = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
@@ -166,36 +196,35 @@ const DiscountsPage = () => {
 
   const paginationItems = [];
 
-if (totalPages >=1) {
-  paginationItems.push(
-    <Pagination.Prev
-      key="prev"
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-    />
-  );
-
-  for (let number = 1; number <= totalPages; number++) {
+  if (totalPages >= 1) {
     paginationItems.push(
-      <Pagination.Item
-        key={number}
-        active={number === currentPage}
-        onClick={() => setCurrentPage(number)}
-      >
-        {number}
-      </Pagination.Item>
+      <Pagination.Prev
+        key="prev"
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+      />
+    );
+
+    for (let number = 1; number <= totalPages; number++) {
+      paginationItems.push(
+        <Pagination.Item
+          key={number}
+          active={number === currentPage}
+          onClick={() => setCurrentPage(number)}
+        >
+          {number}
+        </Pagination.Item>
+      );
+    }
+
+    paginationItems.push(
+      <Pagination.Next
+        key="next"
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        disabled={currentPage === totalPages}
+      />
     );
   }
-
-  paginationItems.push(
-    <Pagination.Next
-      key="next"
-      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={currentPage === totalPages}
-    />
-  );
-}
-
 
   return (
     <div className='discounts'>
@@ -215,28 +244,32 @@ if (totalPages >=1) {
                             <div className='col-sm-6 col-md-9'>
                                 <ProductFilter 
                   filterOptions={["Discount Code", "Start Date", "End Date"]}
-                  onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
+                  onFilterChange={handleFilterChange}
+                  searchTerm={searchTerm}
+                  startDate={startDate}
+                  endDate={endDate}
               />
             </div>
          
             <div className='col-sm-6 col-md-3'>
-                <StatusFilter status={'All'} onStatusChange={handleStatusChange}></StatusFilter> 
+                <StatusFilter 
+                  status={selectedStatus} 
+                  onStatusChange={handleStatusChange}
+                  statusOptions={['All', 'Active', 'Inactive', 'Expired']}
+                ></StatusFilter> 
             </div>
         </div>
-
 
         <div className='discount-table-ctn rounded-2'>
           <Table hover>
             <thead>
               <tr>
                 <th>Title</th>
-
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Start Date</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>End Date</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Status</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Customer</th>
                 <th style={{ textAlign: 'center', verticalAlign: 'middle'}}>Used</th>
-
                 <th style={{width:'1rem'}}></th>
               </tr>
             </thead>
@@ -264,7 +297,6 @@ if (totalPages >=1) {
                 </td>
 
                 <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
-
                   {discount.endDateTime
                     ? new Intl.DateTimeFormat('en-GB').format(new Date(discount.endDateTime))
                     : ''}
@@ -272,7 +304,6 @@ if (totalPages >=1) {
 
               <td style={{ justifyItems: 'center', alignContent:'center'}}   >
                 <div style={{backgroundColor:discount.discountStatus.toLowerCase() === 'active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:discount.discountStatus.toLowerCase()==='active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'6rem' ,padding: '4px'}}>
-
                 {discount.discountStatus}
                 </div>
               </td>
@@ -294,10 +325,7 @@ if (totalPages >=1) {
             </tr>
           ))}
             </tbody>
-
           </Table>
-
-      
 
           <div className="data-cards">
         {filteredData.map((discount,index) => (
@@ -343,46 +371,11 @@ if (totalPages >=1) {
 
             <span><LuDot  size={25}/></span>
 
-
             <p className="text-muted m-0"> {discount.minPurchaseRequirement}</p>
-
-            {/* <div style={{ display: 'flex', alignItems: 'center' }}>
-           
-            <div style={{ display: 'flex' }}>
-                {product.colorVariants.map((color, index) => (
-                <div
-                    key={index}
-                    style={{
-                    width: '35px',
-                    height: '35px',
-                    backgroundColor: color,
-                    borderRadius: '50%',
-                    marginLeft: index === 0 ? '0' : '-10px',
-                    border: '1px solid #fff',
-                    }}
-                 
-                ></div>
-                ))}
             </div>
-            </div> */}
-            </div>
-
-            {/* <div className='d-flex justify-content-between mt-2 pe-4'>
-                 <p> 
-                   <div style={{padding:'0.2rem 0.4rem' ,backgroundColor:product.status === 'Active'? '#D1FAE5' : '#F3F4F6',border:'1px solid' ,borderColor:product.status==='Active' ? '#6EE7B7' : '#D1D5DB',borderRadius:'0.2rem',textAlign:'center',width:'100%'}}>
-                    {product.status}
-                    </div>
-                </p>
-                 <p>{product.stock} Kgs</p>
-            </div> */}
           </div>
         ))}
       </div>
-
-
-
-
-
         </div>
 
        {/* Toast Notification */}

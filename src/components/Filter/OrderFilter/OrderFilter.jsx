@@ -39,13 +39,13 @@ const OrderFilter = ({ status = [], onStatusChange }) => {
     </p>
   </Dropdown.Toggle>
 
-  <Dropdown.Menu className="px-2">
+  <Dropdown.Menu className="px-2 ">
     {statusOptions.map((status) => (
       <Form.Check
         key={status}
         type="checkbox"
         id={`status-${status}`}
-        label={status}
+        label={<span style={{ fontSize: '0.8rem' }}>{status}</span>}
         checked={selectedStatuses.includes(status)}
         onChange={() => handleToggle(status)}
       />
