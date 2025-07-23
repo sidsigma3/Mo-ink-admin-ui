@@ -57,7 +57,7 @@ const GraphComponent = ({ type, data, options, plugins = [], text, number }) => 
   }, [type, data, options, plugins]);
 
   return (
-    <div className="graph-card">
+    <div className="graph-card z-10 ">
       {text && <h4>{text}</h4>}
       {number && <h3>{number}</h3>}
       <div className="chart-container">

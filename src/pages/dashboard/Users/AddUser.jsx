@@ -1,4 +1,4 @@
-import React ,{useState} from 'react'
+import React ,{useState, useRef } from 'react'
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useLocation, useNavigate } from 'react-router-dom';
 import "./AddUser.css"
@@ -14,6 +14,8 @@ import { activeNewUser } from '../../../services/UserService';
 import SelectState from '../../../components/SelectState/SelectState';
 import StatusChangeModal from '../../../components/Modal/StatusChangeModal';
 import ModalDeleteUser from '../../../components/Modal/ModalDeleteUser';
+import { Download, Link, X, Camera } from 'lucide-react';
+
 
 const AddUser = () => {
     const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -26,6 +28,10 @@ const AddUser = () => {
     const [pendingStatus, setPendingStatus] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [showPreview, setShowPreview] = useState(false);
+    const fileInputRef = useRef(null);
+
+
 
     const isViewMode = !!state
 
@@ -184,22 +190,52 @@ const AddUser = () => {
         }
         };
 
-       const handleChequePhotoChange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-      
-                try {
-                  const res = await uploadProductImage(file,"user"); // Implement this backend uploader
-                  const uploadedUrl = res.data;
-      
-                  setFormData((prev) => ({
-                    ...prev,
-                    chequePhoto: uploadedUrl,
-                  }));
-                } catch (error) {
-                  showToast('Cheque photo upload failed. Please try again.', 'error');
-                }
+
+
+const handleChangePhoto = () => {
+  console.log('Change photo button clicked!'); // Debug log
+  
+  // Trigger the hidden file input
+  if (fileInputRef.current) {
+    fileInputRef.current.click();
+  } else {
+    console.error('File input ref not found');
+    // addToast('Unable to open file selector', 'error');
+  }
+};
+
+
+       const handleDownloadChequePhoto = () => {
+          if (!formData.chequePhoto) {
+            console.error("No cheque photo URL provided");
+            return;
+          }
+
+          const url = `${backendUrl}${formData.chequePhoto}`;
+          window.open(url, '_blank');
         };
+
+
+
+
+         const handleCopyImageLink = async () => {
+    try {
+      const imageUrl = `${backendUrl}${formData.chequePhoto}`;
+      await navigator.clipboard.writeText(imageUrl);
+      alert('Image link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      alert('Failed to copy link');
+    }
+  };
+
+  const handleImageClick = () => {
+    setShowPreview(true);
+  };
+
+  const handleClosePreview = () => {
+    setShowPreview(false);
+  };
 
         const handleStatusChange = (newStatus) => {
             setPendingStatus(newStatus);
@@ -238,15 +274,15 @@ const AddUser = () => {
                 setTimeout(() => setToasts([]), 3000);
             };
 
-            const handleDownloadChequePhoto = () => {
-            if (!formData.chequePhoto) {
-                console.error("No cheque photo URL provided");
-                return;
-            }
+            // const handleDownloadChequePhoto = () => {
+            // if (!formData.chequePhoto) {
+            //     console.error("No cheque photo URL provided");
+            //     return;
+            // }
 
-            const url = `${backendUrl}${formData.chequePhoto}`;
-            window.open(url, '_blank');
-            };
+            // const url = `${backendUrl}${formData.chequePhoto}`;
+            // window.open(url, '_blank');
+            // };
 
 
 
@@ -356,53 +392,372 @@ const AddUser = () => {
                 {formErrors.company && <div className="invalid-feedback d-block">{formErrors.company}</div>}
             </div>
 
-        <div className="col-12 my-4">
-  <div className="media-upload-card p-4 h-100">
-    <label className="upload-label mb-3" style={{fontSize:'1rem'}}>Aadhaar Card Photo <span style={{color:'red'}}>*</span></label>
-    <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
-      <input
-        type="file"
-        id="aadhaar-upload"
-        accept="image/*"
-        onChange={handleChequePhotoChange}
-        className="d-none"
-      />
-      <label 
-        htmlFor="aadhaar-upload" 
-        className="upload-button btn btn-outline-custom rounded-pill px-4 py-2 mb-2"
-      >
-        <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
-      </label>
-      <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
-      
-       {formData.chequePhoto && (
-        <div className="preview-container mt-4 text-center">
-          <img 
-            src={`${backendUrl}${formData.chequePhoto}`} 
-            alt="Cheque Preview" 
-            className="img-thumbnail rounded" 
-            style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
-          />
-           <button
-                className="btn btn-sm btn-outline-secondary mt-2"
-                onClick={handleDownloadChequePhoto}
-            >
-                <i className="bi bi-download me-1"></i>Download
-            </button>
-          {/* <button 
-            className="btn btn-sm btn-outline-danger mt-2"
-            onClick={() => setFormData(prev => ({...prev, aadhaarPhoto: ''}))}
-          >
-            Remove
-          </button> */}
-        </div>
-      )}
-    </div>
-    {formErrors.chequePhoto && (
-      <p className="text-danger small mt-2 mb-0">{formErrors.chequePhoto}</p>
-    )}
-  </div>
-</div>
+        <div className='col-12 my-4'>
+               <div className="media-upload-card p-4 h-100">
+                  <label className="upload-label mb-3" style={{ fontSize: '1rem' }}>
+                    Aadhaar Card Photo
+                  </label>
+
+                  <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+                    <input
+                      type="file"
+                      id="cheque-upload"
+                      accept="image/*"
+                      onChange={handleChangePhoto}
+                      className="d-none"
+                    />
+                    <label
+                      htmlFor="cheque-upload"
+                      className="upload-button btn btn-outline-custom  rounded-pill px-4 py-2 mb-2"
+                    >
+                      <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+                    </label>
+                    <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+
+                    {formData.chequePhoto && (
+                      <div className="preview-container mt-4 text-center">
+                        <img
+                          src={`${backendUrl}${formData.chequePhoto}`}
+                          alt="Cheque Preview"
+                          className="img-thumbnail rounded"
+                          style={{ 
+                            maxWidth: '100px', 
+                            maxHeight: '100px', 
+                            objectFit: 'contain',
+                            cursor: 'pointer'
+                          }}
+                          onClick={handleImageClick}
+                        />
+                        {/* <button
+                          className="btn btn-sm btn-outline-secondary mt-2"
+                          onClick={handleDownloadChequePhoto}
+                        >
+                          <i className="bi bi-download me-1"></i>Download
+                        </button> */}
+                      </div>
+                    )}
+                  </div>
+                          </div>
+                          </div>
+
+                          {/* Preview Modal */}
+                          {showPreview && (
+                        <div 
+                            className="modal fade m-0 p-0 show d-block" 
+                            style={{ 
+                            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                            backdropFilter: 'blur(4px)',
+                            zIndex: 2000
+                            }}
+                            onClick={handleClosePreview}
+                        >
+                            <div 
+                            className="modal-dialog modal-xl d-flex align-items-center justify-content-center p-3"
+                            style={{ 
+                                maxWidth: '100vw', 
+                                height: '100vh',
+                                margin: 0
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            >
+                            <div 
+                                className="position-relative w-100 h-100 d-flex align-items-center justify-content-center"
+                                style={{ maxWidth: '95vw', maxHeight: '95vh' }}
+                            >
+                                {/* Main Image Container */}
+                                <div className="position-relative">
+                                <img
+                                    src={`${backendUrl}${formData.chequePhoto}`}
+                                    alt="Aadhaar Card Preview"
+                                    className="img-fluid rounded-3 shadow-lg"
+                                    style={{ 
+                                    maxWidth: '100%',
+                                    maxHeight: '85vh',
+                                    objectFit: 'contain',
+                                    backgroundColor: 'white',
+                                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                                    cursor: 'default'
+                                    }}
+                                    draggable={false}
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    onLoad={() => console.log('Image loaded successfully')}
+                                    // onError={() => addToast('Failed to load image', 'error')}
+                                />
+                                </div>
+
+                                {/* Desktop Action Buttons - Top Right */}
+                                <div 
+                                className="d-none d-lg-flex flex-column gap-3" 
+                                style={{ 
+                                    position: 'absolute', 
+                                    top: '20px', 
+                                    right: '20px', 
+                                    zIndex: 1070,
+                                    pointerEvents: 'auto'
+                                }}
+                                >
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDownloadChequePhoto();
+                                    }}
+                                    title="Save to Local Storage"
+                                    style={{ 
+                                    width: '48px', 
+                                    height: '48px',
+                                    backgroundColor: '#6B21A8',
+                                    color: 'white',
+                                    transition: 'all 0.2s ease-in-out',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                    onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#7C3AED';
+                                    e.currentTarget.style.transform = 'scale(1.05)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#6B21A8';
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    }}
+                                >
+                                    <Download size={20} />
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCopyImageLink();
+                                    }}
+                                    title="Copy Image Link"
+                                    style={{ 
+                                    width: '48px', 
+                                    height: '48px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    color: '#6B21A8',
+                                    transition: 'all 0.2s ease-in-out',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                    onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'white';
+                                    e.currentTarget.style.transform = 'scale(1.05)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    }}
+                                >
+                                    <Link size={20} />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleChangePhoto();
+                                    }}
+                                    title="Change Photo"
+                                    style={{ 
+                                    width: '48px', 
+                                    height: '48px',
+                                    backgroundColor: 'rgba(34, 197, 94, 0.9)',
+                                    color: 'white',
+                                    transition: 'all 0.2s ease-in-out',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                    onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#22c55e';
+                                    e.currentTarget.style.transform = 'scale(1.05)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.9)';
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    }}
+                                >
+                                    <Camera size={20} />
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleClosePreview();
+                                    }}
+                                    title="Close Preview"
+                                    style={{ 
+                                    width: '48px', 
+                                    height: '48px',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                    color: 'white',
+                                    transition: 'all 0.2s ease-in-out',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                    onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                                    e.currentTarget.style.transform = 'scale(1.05)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    }}
+                                >
+                                    <X size={20} />
+                                </button>
+                                </div>
+
+                                {/* Mobile/Tablet Action Buttons - Bottom Center */}
+                                <div 
+                                className="d-flex d-lg-none gap-2 justify-content-center position-absolute"
+                                style={{ 
+                                    bottom: '20px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    zIndex: 1070,
+                                    padding: '12px 16px',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                    borderRadius: '50px',
+                                    backdropFilter: 'blur(10px)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    pointerEvents: 'auto'
+                                }}
+                                >
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDownloadChequePhoto();
+                                    }}
+                                    title="Save to Storage"
+                                    style={{ 
+                                    width: '40px', 
+                                    height: '40px',
+                                    backgroundColor: '#6B21A8',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                >
+                                    <Download size={16} />
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCopyImageLink();
+                                    }}
+                                    title="Copy Link"
+                                    style={{ 
+                                    width: '40px', 
+                                    height: '40px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    color: '#6B21A8',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                >
+                                    <Link size={16} />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleChangePhoto();
+                                    }}
+                                    title="Change Photo"
+                                    style={{ 
+                                    width: '40px', 
+                                    height: '40px',
+                                    backgroundColor: 'rgba(34, 197, 94, 0.9)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                >
+                                    <Camera size={16} />
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleClosePreview();
+                                    }}
+                                    title="Close"
+                                    style={{ 
+                                    width: '40px', 
+                                    height: '40px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    zIndex: 1070
+                                    }}
+                                >
+                                    <X size={16} />
+                                </button>
+                                </div>
+
+                                {/* ESC Key Hint - Top Left */}
+                                <div 
+                                className="d-none d-md-block position-absolute text-white-50 small"
+                                style={{ 
+                                    top: '20px', 
+                                    left: '20px',
+                                    fontFamily: 'monospace',
+                                    userSelect: 'none',
+                                    fontSize: '12px',
+                                    fontWeight: '400'
+                                }}
+                                >
+                                Press ESC to close
+                                </div>
+
+                                {/* Loading indicator for image */}
+                                {!formData.chequePhoto && (
+                                <div 
+                                    className="position-absolute d-flex align-items-center justify-content-center"
+                                    style={{
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    color: 'white',
+                                    fontSize: '16px'
+                                    }}
+                                >
+                                    <div className="spinner-border text-light me-2" role="status" style={{ width: '20px', height: '20px' }}>
+                                    <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                    Loading image...
+                                </div>
+                                )}
+
+                                {/* Hidden file input for photo change */}
+                                <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleChangePhoto}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                />
+                            </div>
+                            </div>
+                        </div>
+                        )}
+
+
 
             {/* <div className="media-input-ctn mt-5 p-2 col-md-12">
                 <div className="media-input d-flex flex-column justify-content-center align-items-center py-5">

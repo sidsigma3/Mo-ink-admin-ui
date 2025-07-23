@@ -130,14 +130,14 @@
 }
 
 .product-dropdown-header {
-  padding: 16px 20px;
+  padding: 10px 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
   transition: all 0.2s ease;
   background: #e9d5ff69;
-  min-height: 60px;
+  min-height: 50px;
 }
 
 .product-dropdown-header:hover {
@@ -205,7 +205,7 @@
   background: #ffffff;
   border: 1px solid #6c757d;
   border-radius: 8px;
-  padding: 16px;
+  padding: 10px;
   font-size: 14px;
   font-weight: 500;
   color: #374151;

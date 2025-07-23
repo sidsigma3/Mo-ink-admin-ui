@@ -2218,7 +2218,7 @@ const handleCancelTransaction = () => {
             
             
 
-                <div className='payment mb-3 bg-white p-4 rounded' id="invoice-to-download" ref={invoiceRef}>
+                <div className='payment mb-3 bg-white p-3 rounded' id="invoice-to-download" ref={invoiceRef}>
                     <h4>Payment</h4>
 
                     <div  className='container border p-3 rounded mb-3' >
@@ -2341,13 +2341,13 @@ const handleCancelTransaction = () => {
                       <td className="fw-medium pt-2 pb-4 ">Wallet</td>
                       <td className="pb-3 pt-2">{walletBalances.toFixed(0)}</td>
                       <td style={{ textAlign: "end" }} className="pb-3 text-success pt-2">
-                      <span className="mr-1 font-semibold">-</span> ₹ {isViewMode ? (
+                      <span className=" font-semibold">-</span> ₹ {isViewMode ? (
                               // Show plain text in view mode
                               <span>{walletDeduction ? `${walletDeduction.toFixed(0)}` : "0"}</span>
                           ) : (
                               // Show input field in edit mode
                               <input
-                                className="border border-secondary-subtle text-success rounded-1 ps-2 text-end p-1"
+                                className="border border-secondary-subtle text-success rounded-1 w-80  text-center ps-2 text-end p-1"
                                 type="number"
                                 placeholder="Enter amount"
                                 value={walletDeduction ? Math.min(walletDeduction.toFixed(0), Math.min(walletBalances.toFixed(0), netPayablePrice.toFixed(0))) : ""}
@@ -2425,9 +2425,9 @@ const handleCancelTransaction = () => {
                       
 
                     </div>
-                    {orderDetails.length === 0 &&(
+                    {/* {orderDetails.length === 0 &&(
                          <h5>Add a Product to calculate total and view payment options</h5>
-                    )}
+                    )} */}
 
                     <ModalInvoice
                         show={showModalInvoice}

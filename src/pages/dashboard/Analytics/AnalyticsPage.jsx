@@ -257,7 +257,7 @@ const AnalyticsPage = () => {
     
 
   return (
-    <div className='analytics-page'>
+    <div className='analytics-page '>
         <div className='top d-flex justify-content-between mt-2'>
             <h4 style={{fontSize:'1.2rem'}}>Analytics</h4>
             <Filter></Filter>
