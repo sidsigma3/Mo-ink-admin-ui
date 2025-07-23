@@ -12,7 +12,7 @@ const StatusFilter = ({ status ,onStatusChange }) => {
   };
    
   return (
-    <Dropdown onSelect={handleSelect}  size="sm" className='status'>
+    <Dropdown onSelect={handleSelect}  size="sm" className='status position-relative z-n1'>
       <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center  border justify-content-between gap-2 w-100">
         <p className="m-0">{selectedStatus}</p>
       </Dropdown.Toggle>

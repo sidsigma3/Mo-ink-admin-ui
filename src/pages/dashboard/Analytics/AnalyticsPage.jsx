@@ -289,11 +289,11 @@ const AnalyticsPage = () => {
           <GraphComponent type="bar" data={chartDataTopColor} options={chartOptionsTopColor} />
         </div> */}
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
           <TotalSales/>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
           <TotalOrders></TotalOrders>
         </div>
 
@@ -301,11 +301,11 @@ const AnalyticsPage = () => {
            <AvgOrder></AvgOrder>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
            <TopProducts></TopProducts>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
            <TopSellingCounter></TopSellingCounter>
         </div>
 
@@ -313,23 +313,23 @@ const AnalyticsPage = () => {
            <TopSellingColor></TopSellingColor>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
            <OnlineStoreConversionRate></OnlineStoreConversionRate>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
           <OnlineStoreSession></OnlineStoreSession>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
            <SessionByDevice></SessionByDevice>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
             <SalesMap></SalesMap>
         </div>
 
-        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
+        <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
           <TopCustomers></TopCustomers>
         </div>
 

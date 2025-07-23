@@ -2244,33 +2244,34 @@ const handleCancelTransaction = () => {
                     <tr className='border-bottom'>
                       <td>
                         <div>
-                          <p className=" fw-medium pt-2">Total Discount</p>
-                          <p className="text-black-50  fw-medium my-2 ps-5" >Pay Type</p>
+                          <p className="fw-medium pt-2">Total Discount</p>
+                          <p className="text-black-50 fw-medium my-2 ps-5">Pay Type</p>
                           <p className="text-black-50 fw-medium pb-2 ps-5">Coupon</p>
                         </div>
                       </td>
 
-                      <td>
+                     <td>
                       <div>
-                      <p>
-                          {(
-                            Number(discountPercentage) +
-                            Number(selectedDiscountValue || 0) -
-                            (Number(discountPercentage) * Number(selectedDiscountValue || 0)) / 100
-                          ).toFixed(2)}%
-                        </p>
+                        <p>{(grandTotals.baseTotal > 0
+                        ? (grandTotals.totalDiscount / grandTotals.baseTotal) * 100
+                        : 0).toFixed(2)}%</p>
                         <p>{discountPercentage}%</p>
-                        <p className="text-gray-400">{selectedDiscountValue || 0}%</p>
+                        <p className="text-gray-400">
+                          {selectedDiscountData?.discountType === 'Percentage'
+                            ? `${selectedDiscountData?.discountValue}%`
+                            : `₹${selectedDiscountData?.discountValue || 0}`}
+                        </p>
                       </div>
-                      </td>
+                    </td>
+
 
                       <td>
                         <div>
                           <p className='text-end text-success'>
-                          <span className="mr-1 font-semibold">-</span> ₹{grandTotals.totalDiscount.toFixed(0)}
+                            <span className="mr-1 font-semibold">-</span> ₹{grandTotals.totalDiscount.toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
-                            ₹{(grandTotals.totalPaymentTypeDiscount).toFixed(0)}
+                            ₹{grandTotals.totalPaymentTypeDiscount.toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
                             ₹{grandTotals.totalCouponTypeDiscount.toFixed(0)}
@@ -2278,6 +2279,7 @@ const handleCancelTransaction = () => {
                         </div>
                       </td>
                     </tr>
+
 
                     <tr>
                       <td className=" fw-medium pt-4">Final Cost</td>
