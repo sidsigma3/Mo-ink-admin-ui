@@ -271,6 +271,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   padding: 12px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
 .dropdown-items {
