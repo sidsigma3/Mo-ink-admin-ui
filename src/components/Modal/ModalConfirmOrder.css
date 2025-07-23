@@ -20,6 +20,7 @@
   box-shadow: 0 20px 80px rgba(0, 0, 0, 0.05);
   position: relative;
   text-align: center;
+  justify-items: center;
 }
 
 .modal-close {
@@ -99,6 +100,82 @@
   background: #a1a1a1;
 }
 
+/* Payment Method Tabs */
+.payment-method-tabs {
+  display: flex;
+  width: 80%;
+  margin-bottom: 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.payment-method-tabs .tab-button {
+  flex: 1;
+  padding: 6px 20px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  outline: none;
+  user-select: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.payment-method-tabs .tab-button:hover {
+  color: #475569;
+  background: rgba(107, 33, 168, 0.05);
+}
+
+.payment-method-tabs .tab-button.active {
+  background: #E6F9ED;
+  color: #2E7D32;
+  border: 2px solid #27692b6e;
+
+}
+
+.payment-method-tabs .tab-button.active:hover {
+  background: #E6F9ED;
+  color: #2E7D32;
+}
+
+
+
+
+/* Animation for smooth transitions */
+.payment-method-tabs .tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.payment-method-tabs .tab-button:active::before {
+  opacity: 0.1;
+  background: #E6F9ED;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .payment-method-tabs .tab-button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
 @media screen and (max-width: 480px) {
   .modal-box {
     width: 100%;
@@ -110,6 +187,7 @@
   .modal-actions {
     flex-direction: column;
     gap: 0.75rem;
+    width: 100%;
   }
 
   .modal-actions button {

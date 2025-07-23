@@ -116,7 +116,7 @@ const SideBar = () => {
     };
 
     return (
-      <div className='sidebar-container'>
+      <div className='sidebar-container' >
         <div className='sidebar-header'>
           <div className='logo-section'>
             <div className='logo-placeholder'></div>
@@ -124,9 +124,9 @@ const SideBar = () => {
           </div>
         </div>
 
-        <div className='sidebar-menu'>
+        <div className='sidebar-menu' >
           {/* Mobile menu */}
-          <ul className="mobile-menu">
+          <ul className="mobile-menu z-40">
             <li className={`menu-item ${selected === 'dashboard' ? 'selected' : ''}`}>
               <Link to={'/dashboard'} className='menu-link'>
                 <button onClick={() => setSelected('dashboard')} className='menu-button'>
@@ -179,7 +179,7 @@ const SideBar = () => {
             </li>
 
             {isMoreMenuOpen && (
-                <div ref={menuRef} className="more-menu-dropdown">
+                <div ref={menuRef} className="more-menu-dropdown" style={{ zIndex: 5 }}>
                   <div className="dropdown-content">
                     <Link to="/vendor-order" onClick={() => handleMoreMenuItemClick('vendors')} 
                           className={`dropdown-items ${isDropdownItemActive('vendors') ? 'active' : ''}`}>

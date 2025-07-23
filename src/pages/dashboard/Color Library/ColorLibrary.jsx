@@ -817,7 +817,7 @@ const handleFileChange = (e) => {
                           <img
                             src={item[`localPreview0`] || `${backendUrl}${item.colorImage[0]}`}
                             alt="Cone"
-                            className="uploaded-image"
+                            className="uploaded-image cone-bg"
                           />
                         ) : (
                           <div className="upload-placeholder">
@@ -848,7 +848,7 @@ const handleFileChange = (e) => {
                           <img
                             src={item[`localPreview1`] || `${backendUrl}${item.colorImage[1]}`}
                             alt="Hank"
-                            className="uploaded-image"
+                            className="uploaded-image hank-bg"
                           />
                         ) : (
                           <div className="upload-placeholder">

@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react'
+import React, { useCallback, useState , useEffect } from 'react'
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate , useLocation} from 'react-router-dom';
 import StatusFilter from '../../../components/Filter/DayFilter/StatusFilter/StatusFilter';
@@ -425,8 +425,7 @@ const handleAddressTypeChange = (e) => {
         }
   }
 
-
-        const handleChequePhotoChange = async (e) => {
+const handleChequePhotoChange = async (e) => {
           const file = e.target.files[0];
           if (!file) return;
 
@@ -475,8 +474,6 @@ const handleAddressTypeChange = (e) => {
   const handleClosePreview = () => {
     setShowPreview(false);
   };
-
-
 
  
   return (
@@ -609,103 +606,263 @@ const handleAddressTypeChange = (e) => {
                           </div>
 
                           {/* Preview Modal */}
-                            {showPreview && (
+                          {showPreview && (
+                            <div 
+                              className="modal fade m-0 p-0 show d-block" 
+                              style={{ 
+                                backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                                backdropFilter: 'blur(4px)',
+                                zIndex: 2000
+                              }}
+                              onClick={handleClosePreview}
+                            >
                               <div 
-                                className="modal fade show d-block" 
+                                className="modal-dialog modal-xl d-flex align-items-center justify-content-center p-3"
                                 style={{ 
-                                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                  maxWidth: '100%',
-                                  zIndex: 2000
+                                  maxWidth: '100vw', 
+                                  height: '100vh',
+                                  margin: 0
                                 }}
-                                onClick={handleClosePreview}
+                                onClick={(e) => e.stopPropagation()}
                               >
                                 <div 
-                                  className="modal-dialog modal-xl d-flex align-items-center justify-content-center"
-                                  style={{ maxWidth: '100vw', height: '100vh' }}
-                                  onClick={(e) => e.stopPropagation()}
+                                  className="position-relative w-100 h-100 d-flex align-items-center justify-content-center"
+                                  style={{ maxWidth: '95vw', maxHeight: '95vh' }}
                                 >
-                                  <div className="modal-content bg-transparent border-0" style={{ position: 'relative' }}>
-                                    {/* Image */}
+                                  {/* Main Image Container */}
+                                  <div className="position-relative">
                                     <img
                                       src={`${backendUrl}${formData.chequePhoto}`}
                                       alt="Aadhaar Card Preview"
-                                      className="img-fluid rounded"
+                                      className="img-fluid rounded-3 shadow-lg"
                                       style={{ 
                                         maxWidth: '100%',
-                                        maxHeight: '70vh',
-                                        objectFit: 'contain'
+                                        maxHeight: '85vh',
+                                        objectFit: 'contain',
+                                        backgroundColor: 'white',
+                                        border: '2px solid rgba(255, 255, 255, 0.1)',
+                                        cursor: 'default'
                                       }}
+                                      draggable={false}
+                                      onContextMenu={(e) => e.preventDefault()}
+                                      onLoad={() => console.log('Image loaded successfully')}
+                                      // onError={() => addToast('Failed to load image', 'error')}
                                     />
+                                  </div>
 
-                                    {/* Action buttons */}
-                                    <div 
-                                      className="d-flex flex-column gap-2 d-lg-flex d-md-flex d-sm-none d-none" 
+                                  {/* Desktop Action Buttons - Top Right */}
+                                  <div 
+                                    className="d-none d-lg-flex flex-column gap-3" 
+                                    style={{ 
+                                      position: 'absolute', 
+                                      top: '20px', 
+                                      right: '20px', 
+                                      zIndex: 1070,
+                                      pointerEvents: 'auto'
+                                    }}
+                                  >
+                                    <button
+                                      type="button"
+                                      className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDownloadChequePhoto();
+                                      }}
+                                      title="Download Image"
                                       style={{ 
-                                        position: 'absolute', 
-                                        top: '10px', 
-                                        right: '10px', 
-                                        zIndex: 1060 
+                                        width: '48px', 
+                                        height: '48px',
+                                        backgroundColor: '#6B21A8',
+                                        color: 'white',
+                                        transition: 'all 0.2s ease-in-out',
+                                        cursor: 'pointer',
+                                        zIndex: 1070
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#7C3AED';
+                                        e.currentTarget.style.transform = 'scale(1.05)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#6B21A8';
+                                        e.currentTarget.style.transform = 'scale(1)';
                                       }}
                                     >
-                                      <button
-                                        className="btn btn-primary rounded-circle p-2"
-                                        onClick={handleDownloadChequePhoto}
-                                        title="Download"
-                                        style={{ width: '40px', height: '40px' }}
-                                      >
-                                        <Download size={16} />
-                                      </button>
-                                      <button
-                                        className="btn btn-info rounded-circle p-2"
-                                        onClick={handleCopyImageLink}
-                                        title="Copy Image Link"
-                                        style={{ width: '40px', height: '40px' }}
-                                      >
-                                        <Link size={16} />
-                                      </button>
-                                      <button
-                                        className="btn btn-secondary rounded-circle p-2"
-                                        onClick={handleClosePreview}
-                                        title="Close"
-                                        style={{ width: '40px', height: '40px' }}
-                                      >
-                                        <X size={16} />
-                                      </button>
-                                    </div>
-
-                                    {/* Mobile buttons - below image on small screens */}
-                                    <div 
-                                      className="d-flex gap-2 justify-content-end mt-3 d-lg-none d-md-none d-sm-flex d-flex"
+                                      <Download size={20} />
+                                    </button>
+                                    
+                                    <button
+                                      type="button"
+                                      className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCopyImageLink();
+                                      }}
+                                      title="Copy Image Link"
+                                      style={{ 
+                                        width: '48px', 
+                                        height: '48px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                        color: '#6B21A8',
+                                        transition: 'all 0.2s ease-in-out',
+                                        cursor: 'pointer',
+                                        zIndex: 1070
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'white';
+                                        e.currentTarget.style.transform = 'scale(1.05)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                                        e.currentTarget.style.transform = 'scale(1)';
+                                      }}
                                     >
-                                      <button
-                                        className="btn btn-primary rounded-circle p-2"
-                                        onClick={handleDownloadChequePhoto}
-                                        title="Download"
-                                        style={{ width: '40px', height: '40px' }}
-                                      >
-                                        <Download size={16} />
-                                      </button>
-                                      <button
-                                        className="btn btn-info rounded-circle p-2"
-                                        onClick={handleCopyImageLink}
-                                        title="Copy Image Link"
-                                        style={{ width: '40px', height: '40px' }}
-                                      >
-                                        <Link size={16} />
-                                      </button>
-                                      <button
-                                        className="btn btn-secondary rounded-circle p-2"
-                                        onClick={handleClosePreview}
-                                        title="Close"
-                                        style={{ width: '40px', height: '40px' }}
-                                      >
-                                        <X size={16} />
-                                      </button>
-                                    </div>
+                                      <Link size={20} />
+                                    </button>
+                                    
+                                    <button
+                                      type="button"
+                                      className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleClosePreview();
+                                      }}
+                                      title="Close Preview"
+                                      style={{ 
+                                        width: '48px', 
+                                        height: '48px',
+                                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                        color: 'white',
+                                        transition: 'all 0.2s ease-in-out',
+                                        cursor: 'pointer',
+                                        zIndex: 1070
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                                        e.currentTarget.style.transform = 'scale(1.05)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+                                        e.currentTarget.style.transform = 'scale(1)';
+                                      }}
+                                    >
+                                      <X size={20} />
+                                    </button>
                                   </div>
+
+                                  {/* Mobile/Tablet Action Buttons - Bottom Center */}
+                                  <div 
+                                    className="d-flex d-lg-none gap-3 justify-content-center position-absolute"
+                                    style={{ 
+                                      bottom: '20px',
+                                      left: '50%',
+                                      transform: 'translateX(-50%)',
+                                      zIndex: 1070,
+                                      padding: '12px 20px',
+                                      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                      borderRadius: '50px',
+                                      backdropFilter: 'blur(10px)',
+                                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                                      pointerEvents: 'auto'
+                                    }}
+                                  >
+                                    <button
+                                      type="button"
+                                      className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDownloadChequePhoto();
+                                      }}
+                                      title="Download"
+                                      style={{ 
+                                        width: '44px', 
+                                        height: '44px',
+                                        backgroundColor: '#6B21A8',
+                                        color: 'white',
+                                        cursor: 'pointer',
+                                        zIndex: 1070
+                                      }}
+                                    >
+                                      <Download size={18} />
+                                    </button>
+                                    
+                                    <button
+                                      type="button"
+                                      className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCopyImageLink();
+                                      }}
+                                      title="Copy Link"
+                                      style={{ 
+                                        width: '44px', 
+                                        height: '44px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                        color: '#6B21A8',
+                                        cursor: 'pointer',
+                                        zIndex: 1070
+                                      }}
+                                    >
+                                      <Link size={18} />
+                                    </button>
+                                    
+                                    <button
+                                      type="button"
+                                      className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleClosePreview();
+                                      }}
+                                      title="Close"
+                                      style={{ 
+                                        width: '44px', 
+                                        height: '44px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                        color: 'white',
+                                        cursor: 'pointer',
+                                        zIndex: 1070
+                                      }}
+                                    >
+                                      <X size={18} />
+                                    </button>
+                                  </div>
+
+                                  {/* ESC Key Hint - Top Left */}
+                                  <div 
+                                    className="d-none d-md-block position-absolute text-white-50 small"
+                                    style={{ 
+                                      top: '20px', 
+                                      left: '20px',
+                                      fontFamily: 'monospace',
+                                      userSelect: 'none',
+                                      fontSize: '12px',
+                                      fontWeight: '400'
+                                    }}
+                                  >
+                                    Press ESC to close
+                                  </div>
+
+                                  {/* Loading indicator for image */}
+                                  {!formData.chequePhoto && (
+                                    <div 
+                                      className="position-absolute d-flex align-items-center justify-content-center"
+                                      style={{
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        color: 'white',
+                                        fontSize: '16px'
+                                      }}
+                                    >
+                                      <div className="spinner-border text-light me-2" role="status" style={{ width: '20px', height: '20px' }}>
+                                        <span className="visually-hidden">Loading...</span>
+                                      </div>
+                                      Loading image...
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            )}
+                            </div>
+                          )}
 
 
                 

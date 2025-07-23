@@ -628,7 +628,8 @@ const BulkAssignPage = () => {
     </div>
 
   {Array.isArray(spinnerRateChart) && spinnerRateChart.length > 0 ? (
-    <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
+    <div className="mt-2 overflow-x-auto">
+    <table className="w-100 table" style={{ fontSize: "0.8rem", fontWeight: 500, overflowX: "auto" }}>
       <thead>
         <tr>
           <th>Product</th>
@@ -723,6 +724,7 @@ const BulkAssignPage = () => {
         })}
       </tbody>
     </table>
+    </div>
     ) : (
         <p className="mt-2 text-muted">Rate chart not available for this spinner.</p>
       )}
@@ -815,7 +817,8 @@ const BulkAssignPage = () => {
     </div>
 
     {Array.isArray(dyerRateChart) && dyerRateChart.length > 0 ? (
-    <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
+      <div className="mt-2 overflow-x-auto">
+      <table className="w-100 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
       <thead>
         <tr>
           <th>Product</th>
@@ -901,6 +904,7 @@ const BulkAssignPage = () => {
         })}
       </tbody>
     </table>
+    </div>
       ) : (
         <p className="mt-2 text-muted">Rate chart not available for this spinner.</p>
       )}

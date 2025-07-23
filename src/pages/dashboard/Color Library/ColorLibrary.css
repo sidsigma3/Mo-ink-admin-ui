@@ -368,7 +368,15 @@ input:checked + .slider:before {
 .uploaded-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.cone-bg {
+  background: linear-gradient(to bottom, #979EA4, #A2A5AC, #C0C4C6);
+}
+
+.hank-bg {
+  background: linear-gradient(to bottom, #D6D2D3, #D6D2D3, #D6D2D3);
 }
 
 /* Status Labels */
@@ -416,7 +424,7 @@ input:checked + .slider:before {
   }
   
   .image-upload-box {
-    height: 120px;
+    height: 80px;
   }
 
   .text-primary-custom{
