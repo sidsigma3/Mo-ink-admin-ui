@@ -523,19 +523,7 @@ const handleRowClick = (order) => {
           </div>
 
          <h4 style={{ marginBottom: "1rem" }}>
-              {(() => {
-                const timeStr = new Date(order.createdAt).toLocaleString('en-IN', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: true,
-                });
-                return timeStr.replace(/(am|pm)/i, match => `${match.toUpperCase()},`);
-                 })()}{' '}
-              {new Date(order.createdAt).toLocaleString('en-IN', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}
+             {formatDateToIST(order.createdAt)}
             </h4>
         </div>
 

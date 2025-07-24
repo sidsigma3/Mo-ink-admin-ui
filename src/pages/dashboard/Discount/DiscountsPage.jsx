@@ -16,6 +16,7 @@ import { getAllDiscount } from '../../../services/DiscountService'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Toast from '../../../components/Toast/Toast'
+import { getAllProduct } from '../../../services/ProductService'
 
 const DiscountsPage = () => {
 
@@ -183,10 +184,44 @@ const DiscountsPage = () => {
       saveAs(dataBlob, "Discounts_List.xlsx");
     };
 
-  const allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
-  const selectedProducts = discountData?.applicableProducts || [];
-  const isAllProducts = allProducts.length === selectedProducts.length;
-  const selectedProductText = isAllProducts ? "all products" : "selected products";
+
+
+const [totalProducts, setTotalProducts] = useState(0);
+
+useEffect(() => {
+  const fetchTotalProducts = async () => {
+    try {
+      const data = await getAllProduct(); // Use your existing service
+      setTotalProducts(data.data.length);
+    } catch (error) {
+      console.error('Error fetching total products:', error);
+    }
+  };
+  
+  fetchTotalProducts();
+}, []);
+
+const getProductText = (discount) => {
+  if (!discount.applicableProducts || discount.applicableProducts.length === 0) {
+    return "no products";
+  }
+  
+  if (discount.applicableProducts.length === totalProducts) {
+    return "All products";
+  }
+  
+  if (discount.applicableProducts.length === 1) {
+    return discount.applicableProducts[0].productName || "product";
+  }
+  
+  return `${discount.applicableProducts.length} products`;
+};
+
+
+  // const allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
+  // const selectedProducts = discountData?.applicableProducts || [];
+  // const isAllProducts = allProducts.length === selectedProducts.length;
+  // const selectedProductText = isAllProducts ? "all products" : "selected products";
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedDiscounts = filteredData.slice(
@@ -283,8 +318,8 @@ const DiscountsPage = () => {
                 <div className='d-flex gap-3 align-itmes-cenetr'>
                 <p className="text-muted m-0">
                   {discount.discountType === "Percentage"
-                    ? `${discount.discountValue}% off on ${selectedProductText}`
-                    :  `₹${discount.discountValue} off on ${selectedProductText}`}
+                    ? `${discount.discountValue}% off on ${getProductText(discount)}`
+                    :  `₹${discount.discountValue} off on ${getProductText(discount)}`}
                 </p>
                
                 <p className='text-muted m-0'>{discount.minPurchaseRequirement}</p>
@@ -364,10 +399,10 @@ const DiscountsPage = () => {
             <div className='d-flex mt-3'>
             
             <p className="text-muted m-0">
-                  {discount.discountType === "Percentage"
-                    ? `${discount.discountValue}% off on ${discount?.applicableProducts[0]?.productName}`
-                    : `₹${discount.discountValue} off on cotton yarn`}
-              </p>
+              {discount.discountType === "Percentage"
+                ? `${discount.discountValue}% off on ${getProductText(discount)}`
+                : `₹${discount.discountValue} off on ${getProductText(discount)}`}
+            </p>
 
             <span><LuDot  size={25}/></span>
 

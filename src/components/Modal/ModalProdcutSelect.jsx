@@ -1,8 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
-const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate }) => {
+const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate, preSelectedProducts = [] }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // Sync with pre-selected products when modal opens or preSelectedProducts change
+  useEffect(() => {
+    if (show) {
+      if (preSelectedProducts.length > 0) {
+        const preSelectedIds = preSelectedProducts.map(product => 
+          product.productId || product.id
+        );
+        setSelectedProducts(preSelectedIds);
+      } else {
+        setSelectedProducts([]);
+      }
+    }
+  }, [show, preSelectedProducts]);
 
   // Handle individual product selection
   const handleProductSelection = (productId) => {
@@ -22,7 +36,6 @@ const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate }) => {
     }
   };
 
-
   const handleConfirmSelection = () => {
     const selectedProductData = products.filter((product) =>
       selectedProducts.includes(product.productId) 
@@ -30,14 +43,13 @@ const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate }) => {
     onOrderCreate(selectedProductData);
     handleClose();
   };
-  
 
   return (
-    <Modal className="modal" show={show} onHide={handleClose} centered>
+    <Modal className="modal p-0 m-0" show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
         <Modal.Title>Select Products</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className="p-0">
         <Form>
           <Form.Check
             type="checkbox"
@@ -58,12 +70,11 @@ const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate }) => {
           ))}
         </Form>
       </Modal.Body>
-      <Modal.Footer>
-        {/* <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button> */}
+      <Modal.Footer className="m-0">
         <button
-                    className="btn-secondary-custom" onClick={handleConfirmSelection}>
+          className="btn-secondary-custom" 
+          onClick={handleConfirmSelection}
+        >
           Add Selected
         </button>
       </Modal.Footer>

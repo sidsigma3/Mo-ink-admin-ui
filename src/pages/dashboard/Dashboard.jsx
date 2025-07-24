@@ -368,38 +368,43 @@ const {
 
 
       <div className="current-status-ctn row">
-        <h3>Current Status</h3>
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-          <DashboardBox heading={'New Orders To Fulfill'} number={newOrdersToFulfill} />
+          <DashboardBox heading={'Confirmed Orders (Items)'} number={newOrdersToFulfill} />
         </div>
-        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-          <DashboardBox heading={'Orders at Manufacturer'} number={ordersAtManufacturer} />
-        </div>
-        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-          <DashboardBox heading={'Orders Shipped'} number={ordersDispatched} />
-        </div>
-     
 
+         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
+          <DashboardBox
+            heading={'Confirmed Orders (kgs)'}
+            number={`${formatNumber(newOrderReceivedWeight)} Kgs`}
+          />
+        </div>
+
+        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
+        <DashboardBox
+          heading={'Amount Received'}
+          number={`₹ ${formatNumber(paymentReceivableInLacs)} Lacs`}
+        />
+      </div>
+
+        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
+          <DashboardBox 
+            heading={'Amount COD'} 
+            number={`₹ ${formatNumber(totalRevenueInLacs - paymentReceivableInLacs)} Lacs`} 
+          />
+        </div>
+
+        <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
+          <DashboardBox heading={'Order Delivered'} number={ordersAtManufacturer} />
+        </div>
+
+          <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
+            <DashboardBox
+              heading={'Available Inventory'}
+              number={`${formatNumber(totalInventoryLeft)} Kgs`}
+            />
+          </div>
       {/* <div className="current-status-ctn row"> */}
        
-       <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-    <DashboardBox
-      heading={'Payment Receivable'}
-      number={`₹ ${formatNumber(paymentReceivableInLacs)} Lacs`}
-    />
-  </div>
-  <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-    <DashboardBox
-      heading={'New Order Received'}
-      number={`${formatNumber(newOrderReceivedWeight)} Kgs`}
-    />
-  </div>
-  <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-    <DashboardBox
-      heading={'Total Inventory Left'}
-      number={`${formatNumber(totalInventoryLeft)} Kgs`}
-    />
-  </div>
    {/* </div> */}
       
       </div>
