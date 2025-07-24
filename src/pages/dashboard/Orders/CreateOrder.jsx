@@ -950,7 +950,6 @@ const handleCreateOrder = async () => {
   
 
   const handleSendPaymentLink = () => {
-    console.log('hello')
     setShowModal(true);
   };
 
@@ -958,17 +957,19 @@ const handleCreateOrder = async () => {
     setShowModal(false);
   };
 
-  const handleModalConfirm = async (amountToCollect) => {
-    try {
-      const res = await sendCodOrderById(order?.orderId, amountToCollect);
-      alert("Payment link sent successfully!");
-      // Optionally refresh transactions or state here
-    } catch (error) {
-      alert("Failed to send payment link.");
-    } finally {
-      setShowModal(false);
-    }
-  };
+  const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
+  try {
+    const res = await sendCodOrderById(order?.orderId, amount);
+
+    alert("Payment link sent successfully!");
+    // Optionally refresh transactions or state here
+  } catch (error) {
+    alert("Failed to send payment link.");
+  } finally {
+    setShowModal(false);
+  }
+};
+
     
 
     const [discountPercentage, setDiscountPercentage] = useState(0);
