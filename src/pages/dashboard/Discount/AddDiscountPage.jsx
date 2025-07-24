@@ -617,6 +617,7 @@ const handleMaxUsageChange = (field1,field2) => {
               handleClose={() => setShowModalOrder(false)}
               products={finalData}
               onOrderCreate={handleReceiveOrder}
+              preSelectedProducts={productSelect} 
             ></ModalProdcutSelect>
 
             <div className="mt-2">
@@ -633,36 +634,53 @@ const handleMaxUsageChange = (field1,field2) => {
                 </div>
               </div>
             </div>
-
-          <div className="product-select mb-3">
-            <div className="d-flex flex-wrap gap-2">
-              {productSelect.map((product, ix) => (
-                <div
-                  key={ix}
-                  className="d-inline-flex align-items-center"
-                  style={{
-                    backgroundColor: '#6b21a80e',
-                    borderRadius: '16px',
-                    padding: '6px 14px',
-                    fontSize: '0.8rem',
-                    fontWeight: '500',
-                    color: '#6B21A8',
-                    border: '1px solid #6B21A8',
-                    lineHeight: '1.25',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                >
-                  {product.productName}
+              <div className="product-select mb-3">
+                <div className="d-flex flex-wrap gap-2">
+                  {productSelect.map((product, ix) => (
+                    <div
+                      key={ix}
+                      className="d-inline-flex align-items-center"
+                      style={{
+                        backgroundColor: '#6b21a80e',
+                        borderRadius: '16px',
+                        padding: '6px 14px',
+                        fontSize: '0.8rem',
+                        fontWeight: '500',
+                        color: '#6B21A8',
+                        border: '1px solid #6B21A8',
+                        lineHeight: '1.25',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                      }}
+                    >
+                      <span>{product.productName}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteOrder(ix)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#6B21A8',
+                          marginLeft: '8px',
+                          padding: '0',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontSize: '0.9rem'
+                        }}
+                        title="Remove product"
+                      >
+                        <RxCross2 />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            {errors.products && (
-              <p className="text-danger mt-2 mb-0" style={{ fontSize: '0.8125rem' }}>
-                {errors.products}
-              </p>
-            )}
-          </div>
+                {errors.products && (
+                  <p className="text-danger mt-2 mb-0" style={{ fontSize: '0.8125rem' }}>
+                    {errors.products}
+                  </p>
+                )}
+              </div>
           </div>
 
           <div className="min-purchase mt-2">

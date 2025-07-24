@@ -120,28 +120,45 @@ const CustomersPage = () => {
         }
     }, [customers]);
 
-    const getCustomerOrderStats = (customerId) => {
-        const customerOrders = orders.filter(order => order.customer.id === customerId);
+        const getCustomerOrderStats = (customerId) => {
+            const customerOrders = orders.filter(order => order.customer.id === customerId);
 
-        const totalOrders = customerOrders.length;
+            const totalOrders = customerOrders.length;
 
-        const lastOrderDate = totalOrders > 0
-            ? new Date(
-                Math.max(...customerOrders.map(order => new Date(order.createdAt)))
-            ).toLocaleString("en-IN", {
-                timeZone: "Asia/Kolkata",
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
+            let lastOrderDate = "No order";
+            
+            if (totalOrders > 0) {
+                // Find the most recent order by comparing timestamps
+                const mostRecentOrder = customerOrders.reduce((latest, current) => {
+                    const latestDate = new Date(latest.createdAt);
+                    const currentDate = new Date(current.createdAt);
+                    return currentDate > latestDate ? current : latest;
+                });
+
+                // Format the date using the same function as OrderTable
+                lastOrderDate = formatDateToIST(mostRecentOrder.createdAt);
+            }
+
+            return { totalOrders, lastOrderDate };
+        };
+
+        // Add the formatDateToIST function to CustomersPage (same as in OrderTable)
+        const formatDateToIST = (dateStr) => {
+            // Trim microseconds to avoid browser inconsistencies
+            const trimmedDateStr = dateStr.split('.')[0] + 'Z'; // ensures it's treated as UTC
+            const utcDate = new Date(trimmedDateStr);
+            
+            return utcDate.toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
                 hour12: true,
-            })
-            : "No order";
-
-        return { totalOrders, lastOrderDate };
-    };
-
+            });
+        };
+        
     const exportToExcel = () => {
         const showToast = (message, type = "error") => {
             setToasts([{ message, type }]);

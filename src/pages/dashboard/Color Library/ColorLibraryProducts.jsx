@@ -122,12 +122,12 @@ const ColorLibraryProducts = () => {
                   />
                 </div>
                 
-                <div className="card-body p-1 text-center">
-                  <h6 className="fw-bold text-dark mb-2">{item.name}</h6>
-                  <p className="mb-0 text-muted">
-                    {item.colorCount} Color
-                  </p>
-                </div>
+                <div className="card-body py-1 text-center d-flex align-items-center justify-content-between gap-2">
+                <h6 className="fw-medium text-dark mb-0" style={{ fontSize: '14px'}}>{item.name}</h6>
+                <p className="mb-0 fs-7 text-muted"  style={{ fontSize: '12px'}}>
+                  {item.colorCount} Color
+                </p>
+              </div>
               </div>
             </div>
           ))}

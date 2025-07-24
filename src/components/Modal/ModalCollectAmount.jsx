@@ -43,7 +43,7 @@ const ModalCollectAmount = ({ isOpen, onCancel, onConfirm, maxAmount }) => {
         <div className="modal-icon success">
           <span>&#8377;</span>
         </div>
-        <h2 className="modal-title">Collect Partial Payment</h2>
+        <h2 className="modal-title">Collect C.O.D</h2>
         
         {/* Payment Method Selection Tabs */}
         <div className="payment-method-tabs">

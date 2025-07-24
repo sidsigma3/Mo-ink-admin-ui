@@ -397,7 +397,9 @@ useEffect(() => {
                 </div>
 
                 <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
-                <DashboardBox heading={'Order to Deliver'} number={ordersToDeliver}></DashboardBox>
+                <DashboardBox heading={'COD Amount'} 
+                number={`₹ ${formatNumber(totalRevenue - totalReceivedAmount)}`}>
+                </DashboardBox>
                    
                 </div>
         </div>

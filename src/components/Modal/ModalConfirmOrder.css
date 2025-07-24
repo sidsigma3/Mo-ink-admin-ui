@@ -21,6 +21,7 @@
   position: relative;
   text-align: center;
   justify-items: center;
+  
 }
 
 .modal-close {
@@ -109,6 +110,7 @@
   border-radius: 12px;
   padding: 4px;
   border: 1px solid #e2e8f0;
+  align-self: center;
 }
 
 .payment-method-tabs .tab-button {
@@ -171,7 +173,6 @@
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .payment-method-tabs .tab-button {
-    padding: 10px 16px;
     font-size: 13px;
   }
 }
