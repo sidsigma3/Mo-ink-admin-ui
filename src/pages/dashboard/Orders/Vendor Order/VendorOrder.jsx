@@ -5,6 +5,7 @@ import ProductFilter from '../../../../components/Filter/DayFilter/ProductFilter
 import StatusFilter from '../../../../components/Filter/DayFilter/StatusFilter/StatusFilter'
 import { useVendorOrderContext } from '../../../../components/Context/VendorOrderContext'
 import { FiDownload } from "react-icons/fi";
+import { LuDot } from "react-icons/lu";
 import { Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AddBtn from '../../../../components/Buttons/Add/AddBtn'
@@ -436,88 +437,154 @@ if (totalPages > 1) {
 
         </div>
 
-        <div className="table-responsive mt-3 table-ctn">
-        <Table hover>
-          <thead className="thead-dark">
-            <tr>
-            <th>ID</th>
-            <th style={{ textAlign: 'center' }}>PO</th>
-            <th style={{ textAlign: 'center' }}>Date</th>
-            <th style={{ textAlign: 'center' }}>Order For</th>
-            <th style={{ textAlign: 'center' }}>Vendor</th>
-            <th style={{ textAlign: 'center' }}>Weight</th>
-            <th style={{ textAlign: 'center' }}>Amount</th>
-            <th style={{ textAlign: 'center' }}>Status</th>
-            <th style={{ textAlign: 'center' }}>Invoice</th>
-             
-            </tr>
-          </thead>
-          <tbody>
+        {/* Desktop Table */}
+        <div className="d-none d-md-block">
+          <div className="table-responsive mt-3 rounded-2 table-ctn">
+            <Table hover>
+              <thead className="thead-dark">
+                <tr>
+                  <th>ID</th>
+                  <th style={{ textAlign: 'center' }}>PO</th>
+                  <th style={{ textAlign: 'center' }}>Date</th>
+                  <th style={{ textAlign: 'center' }}>Order For</th>
+                  <th style={{ textAlign: 'center' }}>Vendor</th>
+                  <th style={{ textAlign: 'center' }}>Weight</th>
+                  <th style={{ textAlign: 'center' }}>Amount</th>
+                  <th style={{ textAlign: 'center' }}>Status</th>
+                  <th style={{ textAlign: 'center' }}>Invoice</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.length === 0 ? (
+                  <tr>
+                    <td colSpan="9" style={{ textAlign: 'center' }}>
+                      No orders found.
+                    </td>
+                  </tr>
+                ) : (
+                  orders.map((order) => {
+                    const totalWeight = order.vendorOrderVariantResponse.reduce(
+                      (sum, variant) => sum + variant.vendorOrderWeight,
+                      0
+                    );
+
+                    return (
+                      <tr key={order.vendorOrderId} onClick={() => handleRowClick(order.correlationId)} style={{ cursor: 'pointer' }}>
+                        <td style={{ verticalAlign: 'middle'}}>{order.vendorOrderId}</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.correlationId}</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{formatDateToIST(order.orderDate)}</td>
+                        <td style={{ justifyItems: 'center', alignContent:'center'}}>
+                          <div 
+                            style={{
+                              padding: '4px',
+                              border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem', 
+                              backgroundColor:order.vendorType === 'SPINNER' ? '#DBEAFE' : '#FEF3C7',
+                              borderColor:order.vendorType === 'SPINNER' ? '#93C5FD' : '#FCD34D' ,
+                              color : order.vendorType === 'SPINNER' ? '#1E40AF' : '#92400E' ,
+                            }}  
+                          >
+                            {order.vendorType}
+                          </div>    
+                        </td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.vendorName}</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{totalWeight.toFixed(0)} kg</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>₹ {order.totalAmount.toFixed(0)}</td>
+                        <td style={{ justifyItems: 'center', alignContent:'center'}}>
+                          <div className={statusClassMap[order.status]} style={{
+                              padding: '4px',
+                              border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem'}}>
+                            {order.status}
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
+                          <button
+                            className="border-0 btn"
+                            onClick={(e)=>{
+                              e.stopPropagation()
+                              downloadVendorInvoice(order.vendorOrderId)
+                            }}
+                          >
+                            <FiDownload size={20}/>
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="d-block d-md-none mt-3">
           {orders.length === 0 ? (
-            <tr>
-              <td colSpan="8" style={{ textAlign: 'center' }}>
-                No orders found.
-              </td>
-            </tr>
+            <div className="mmobile-empty-state">
+              <p>No orders found</p>
+            </div>
           ) : (
-           orders.map((order) => {
+            orders.map((order) => {
               const totalWeight = order.vendorOrderVariantResponse.reduce(
                 (sum, variant) => sum + variant.vendorOrderWeight,
                 0
               );
 
               return (
-              <tr key={order.vendorOrderId} onClick={() => handleRowClick(order.correlationId)} style={{ cursor: 'pointer' }}>
-                <td style={{ verticalAlign: 'middle'}}>{order.vendorOrderId}</td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.correlationId}</td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{formatDateToIST(order.orderDate)}</td>
-                <td style={{ justifyItems: 'center', alignContent:'center'}}>
-                    <div 
-                    style={{
-                        padding: '4px',
-                        border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem', 
-                        backgroundColor:order.vendorType === 'SPINNER' ? '#DBEAFE' : '#FEF3C7',
-                        borderColor:order.vendorType === 'SPINNER' ? '#93C5FD' : '#FCD34D' ,
-                        color : order.vendorType === 'SPINNER' ? '#1E40AF' : '#92400E' ,
-                    }}  
-                    >
-                    {order.vendorType}
-                </div>    
-                </td>
-                <td  style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.vendorName}</td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{totalWeight.toFixed(2)} kg</td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>{order.totalAmount.toFixed(2)}</td>
-                <td style={{ justifyItems: 'center', alignContent:'center'}}>
-                  <div className={statusClassMap[order.status]}>
-                    {[order.status]}
+                <div 
+                  key={order.vendorOrderId} 
+                  className="ccard rounded-3"
+                  onClick={() => handleRowClick(order.correlationId)}
+                >
+                  {/* Header */}
+                  <div className="ccard-header">
+                    <div className="order-tag-id">
+                    <h3 className='m-0' style={{fontSize: '1rem'}}>#{order.vendorOrderId}</h3>
+                    </div>
+                    <div className="ddates-time">
+                    <h4 className="ddate-time">{formatDateToIST(order.orderDate)}</h4>
+                    </div>
                   </div>
-                    {/* <div style={{
-                        padding: '4px',
-                        border:'1px solid',borderRadius:'0.2rem',textAlign:'center',width:'6rem', 
-                        backgroundColor:order.payment === 'Paid' ? '#D1FAE5' : '#F3F4F6',
-                        borderColor:order.payment === 'Paid' ? '#6EE7B7' : '#D1D5DB' ,
-                        color : order.payment === 'Paid' ? '#41b788' : '#3f3c3c' ,
-                    }}>
-                    {order.status}
-                    </div> */}
 
-                </td>
-                <td  style={{ textAlign: 'center', verticalAlign: 'middle'}}>
-                <button
-                className="border-0 btn"
-                     onClick={(e)=>{
-                       e.stopPropagation()
-                      downloadVendorInvoice(order.vendorOrderId)
-                    }}
-                   >
-                    <FiDownload size={20}/>
-                   </button>
-                </td>
-              </tr>
-            )}))}
-          </tbody>
-            </Table>
-      </div>
+                  {/* Content */}
+                  <div className="ccard-content">
+                    <div className="vvendor-info  d-flex justify-content-between">
+                      <div className="vvendor-name"><p style={{fontSize: '16px', fontWeight: '500'}}>{order.vendorName}</p></div>
+                      <span> <LuDot size={25} /></span>
+                      <div className="">
+                        <span className="wweight">{totalWeight.toFixed(0)} kg</span>
+                        <span> <LuDot size={25} /></span>
+                        <span className="aamount">₹ {order.totalAmount.toFixed(0)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="ccard-footer">
+                    <div className="ttag-container">
+                      <div className="vvendor-type-tag" data-type={order.vendorType}>
+                        {order.vendorType}
+                      </div>
+                    </div>
+                    <div className="sstatus-container">
+                      <div className={`sstatus-tag ${statusClassMap[order.status]}`}>
+                        {order.status}
+                      </div>
+                      <button
+                        className="ddownload-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadVendorInvoice(order.vendorOrderId);
+                        }}
+                      >
+                        <FiDownload size={16}/>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
     <div className="d-flex justify-content-end mt-2 pagination">
       <Pagination className="z-index-n1">{paginationItems}</Pagination>
     </div>

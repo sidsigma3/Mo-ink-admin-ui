@@ -830,18 +830,62 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
 
 // Your existing handleCreateOrder function remains the same
 const handleCreateOrder = async () => {
-  try {
-    if (!selectedCustomer) {
-      alert("No customer selected!");
+   try {
+
+    if (orderDetails.length === 0) {
+      showToast("Add at least one product", "error");
       return;
     }
 
-    if (orderDetails.length === 0) {
-      alert("No items in the order!");
+    const invalidWeightItems = orderDetails.filter(order => !order.color?.weight || order.color.weight <= 0);
+    if (invalidWeightItems.length > 0) {
+      showToast("Order weight must be greater than 0", "error");
+      return;
+    }
+
+    if (!selectedCustomer) {
+      showToast("Please select a customer", "error");
       return;
     }
 
     const homeAddress = selectedCustomer?.addresses?.find(addr => addr.addressType === "HOME");
+    if (!homeAddress) {
+      showToast("Customer must have a HOME address to create an order", "error");
+      return;
+    }
+
+    if (!selectedAddress?.id) {
+      showToast("Please select a shipping address", "error");
+      return;
+    }
+
+     if (!selectedDiscount || selectedDiscount === '' || !selectedDiscountValue) {
+      showToast("Please select a discount", "error");
+      return;
+    }
+
+    if (!selectedPayment || selectedPayment === 'Select Payment Type') {
+      showToast("Please select a payment type", "error");
+      return;
+    }
+
+    const invalidVariants = orderDetails.filter(order => !order.variantId);
+    if (invalidVariants.length > 0) {
+      showToast("Some products are missing variant information", "error");
+      return;
+    }
+
+    if (walletDeduction > walletBalances) {
+      showToast(`Wallet deduction cannot exceed available balance (₹${walletBalances.toFixed(0)})`, "error");
+      return;
+    }
+
+    if (walletDeduction > netPayablePrice) {
+      showToast(`Wallet deduction cannot exceed total payable amount (₹${netPayablePrice.toFixed(0)})`, "error");
+      return;
+    }
+
+
     const isOdisha = homeAddress?.state?.toLowerCase() === "odisha";
 
     // Calculate total weight for proportional handling charges
@@ -2341,35 +2385,48 @@ const handleCancelTransaction = () => {
 
 
                     <tr className="border-bottom">
-                      <td className="fw-medium pt-2 pb-4 ">Wallet</td>
-                      <td className="pb-3 pt-2">{walletBalances.toFixed(0)}</td>
-                      <td style={{ textAlign: "end" }} className="pb-3 text-success pt-2">
-                      <span className=" font-semibold">-</span> ₹ {isViewMode ? (
-                              // Show plain text in view mode
-                              <span>{walletDeduction ? `${walletDeduction.toFixed(0)}` : "0"}</span>
-                          ) : (
-                              // Show input field in edit mode
-                              <input
-                                className="border border-secondary-subtle text-success rounded-1 w-80  text-center ps-2 text-end p-1"
-                                type="number"
-                                placeholder="Enter"
-                                value={walletDeduction ? Math.min(walletDeduction.toFixed(0), Math.min(walletBalances.toFixed(0), netPayablePrice.toFixed(0))) : ""}
-                                onChange={(e) => {
-                                  const val = parseFloat(e.target.value);
-                                  if (!isNaN(val)) {
-                                    handleWalletDeductionChange(val);
-                                  } else {
-                                    handleWalletDeductionChange(""); // Clear input if invalid
-                                  }
-                                }}
-                                min="0"
-                                max={Math.min(walletBalances, netPayablePrice)}
-                                disabled={isViewMode}
-                              />
-
-                          )}
-                      </td>
-                  </tr>
+                        <td className="fw-medium pt-2 pb-4">Wallet</td>
+                        <td className="pb-3 pt-2">{walletBalances.toFixed(0)}</td>
+                        <td style={{ textAlign: "end" }} className="pb-3 text-success pt-2">
+                          <div className="d-flex flex-column align-items-end">
+                            {/* <span className="font-semibold mb-1">-</span> */}
+                            <div className="d-flex align-items-center">
+                              <span className="me-1">- ₹</span>
+                              {isViewMode ? (
+                                // Show plain text in view mode
+                                <span className="text-nowrap">
+                                  {walletDeduction ? `${walletDeduction.toFixed(0)}` : "0"}
+                                </span>
+                              ) : (
+                                // Show input field in edit mode
+                                <input
+                                  className="border border-secondary-subtle text-success rounded-1 text-center text-end p-1"
+                                  style={{ 
+                                    width: "80px",
+                                    minWidth: "60px",
+                                    fontSize: "14px"
+                                  }}
+                                  type="number"
+                                  placeholder="0"
+                                  value={walletDeduction ? Math.min(walletDeduction.toFixed(0), Math.min(walletBalances.toFixed(0), netPayablePrice.toFixed(0))) : ""}
+                                  onChange={(e) => {
+                                    const val = parseFloat(e.target.value);
+                                    if (!isNaN(val)) {
+                                      handleWalletDeductionChange(val);
+                                    } else {
+                                      handleWalletDeductionChange(""); // Clear input if invalid
+                                    }
+                                  }}
+                                  min="0"
+                                  max={Math.min(walletBalances, netPayablePrice)}
+                                  disabled={isViewMode}
+                                />
+                              )}
+                            </div>
+                          
+                          </div>
+                        </td>
+                      </tr>
 
                   
                     <tr className="border-bottom">

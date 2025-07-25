@@ -486,7 +486,12 @@ const Spinners = () => {
                         
                       </div>
 
-                        <p style={{ fontSize: '0.8rem', color: '#93A3AB', fontWeight: 500 }}>Last Order on {customer.lastOrder}</p>
+                        <p style={{ fontSize: '0.8rem', color: '#93A3AB', fontWeight: 500 }}>Last Order on 
+                        <span> {vendorOrdersMap[customer.vendorId]?.length
+                                  ? formatToIST(
+                                      vendorOrdersMap[customer.vendorId].at(-1).orderDate
+                                    )
+                                  : 'No order'}</span> </p>
 
                       </div>
                     ))}
