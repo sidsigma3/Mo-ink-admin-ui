@@ -45,6 +45,46 @@ const ColorLibrary =  ({setDemoData }) => {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [filteredColors, setFilteredColors] = useState([]);
 
+  // Add new color at the TOP
+  const handleAddColor = () => {
+    console.log('🎨 === ADD COLOR BUTTON CLICKED ===');
+    console.log('📊 Current newColors length:', newColors.length);
+    
+    const newColor = {
+      id: `new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      colorName: '',
+      colorCode: '',
+      colorImage: [],
+      status: 'ACTIVE',
+      localPreview0: '',
+      localPreview1: '',
+    };
+    
+    console.log('🆕 Creating new color object:', newColor);
+    
+    // Add new color at the TOP of the array
+    setNewColors(prev => {
+      console.log('📝 Previous newColors:', prev);
+      const updated = [newColor, ...prev]; // New color first, then existing ones
+      console.log('✅ Updated newColors:', updated);
+      console.log('✅ New total length:', updated.length);
+      return updated;
+    });
+    
+    console.log('🔄 handleAddColor completed successfully');
+  };
+
+  // Monitor newColors changes
+  useEffect(() => {
+    console.log('🔄 newColors updated:', newColors);
+  }, [newColors]);
+
+  // Remove new color function
+  const handleRemoveNewColor = (index) => {
+    console.log('🗑️ Removing new color at index:', index);
+    setNewColors(prev => prev.filter((_, i) => i !== index));
+  };
+
  const handleImageUpload = async (e, index, imageIndex) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -73,21 +113,6 @@ const ColorLibrary =  ({setDemoData }) => {
     console.error("Upload failed", err);
   }
 };
-
-const handleAddColor = () => {
-    setNewColors(prev => [
-      ...prev,
-      {
-        id: `new-${Date.now()}`,
-        colorName: '',
-        colorCode: '',
-        colorImage: [],
-        status: 'ACTIVE',
-        localPreview0: '',
-        localPreview1: '',
-      }
-    ]);
-  };
 
  
   const handleChange = () => {
@@ -119,6 +144,10 @@ const handleAddColor = () => {
 
 const handleSaveColors = async () => {
   try {
+    console.log('💾 Saving colors...');
+    console.log('Existing colors:', colors.length);
+    console.log('New colors:', newColors.length);
+
     const updatedColors = [
       ...colors.map((color) => ({
         id: color.id,
@@ -139,8 +168,8 @@ const handleSaveColors = async () => {
     await updateColorsByProductId(productId, updatedColors);
 
     // ✅ Clear new rows and refetch full list
-    setNewColors([]);  // if you were tracking new rows separately
-    await fetchColors();  // reuses your existing logic
+    setNewColors([]);  // Clear new colors array
+    await fetchColors();  // Refresh the data
 
     setToasts(prev => [
       ...prev,
@@ -165,6 +194,7 @@ const handleColorChange = (index, field, value) => {
 };
 
 const handleNewColorChange = (index, field, value) => {
+  console.log(`🎨 Updating new color ${index}, field: ${field}, value:`, value);
   setNewColors(prev => {
     const updated = [...prev];
     updated[index][field] = value;
@@ -175,6 +205,8 @@ const handleNewColorChange = (index, field, value) => {
 const handleNewImageUpload = async (e, index, imageIndex) => {
   const file = e.target.files[0];
   if (!file) return;
+
+  console.log(`📷 Uploading image for new color ${index}, image ${imageIndex}`);
 
   const type = imageIndex === 0 ? 'product-color-cone' : 'product-color-hank';
 
@@ -286,7 +318,7 @@ const importFromExcel = (file, callback) => {
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
     const formatted = jsonData.map((row) => ({
-      id: null,
+      id: `new-${Date.now()}-${Math.random()}`,
       colorName: row.ColorName || '',
       colorCode: row.ColorCode || '',
       colorImage: [row.ConeImageURL || '', row.HankImageURL || ''],
@@ -308,6 +340,7 @@ const handleFileChange = (e) => {
   if (!file) return;
 
   importFromExcel(file, (importedColors) => {
+    console.log('📁 Imported colors:', importedColors);
     setNewColors(importedColors);
     setColors([]);
   });
@@ -395,7 +428,7 @@ const handleFileChange = (e) => {
   }
 
  const showToast = (message, type = "error") => {
-            setToasts([{ message, type }]);
+            setToasts([{ id: Date.now(), message, type }]);
             setTimeout(() => setToasts([]), 3000);
           };
 
@@ -416,12 +449,12 @@ const handleFileChange = (e) => {
                     style={{ display: 'none' }}
                     onChange={handleFileChange}
                   />
-                  <Link to={'/create-order'}>
-                                <AddBtn
-                                    text={"Add color"}
-                                    onClick={handleAddColor}
-                                ></AddBtn>
-                            </Link>
+                  
+                <AddBtn
+                    text={"Add color"}
+                    clickFunction={handleAddColor}
+                />
+                      
               </div>
             
             </div>
@@ -464,6 +497,128 @@ const handleFileChange = (e) => {
           </tr>
         </thead>
         <tbody>
+          {/* New Colors Rows - Render FIRST (at top) */}
+          {newColors.map((item, index) => (
+            <tr key={item.id} style={{ backgroundColor: '#f8f9fa' }}>
+              <td>
+                <input
+                  className="form-control"
+                  placeholder="Enter Color Name"
+                  value={item.colorName}
+                  onChange={(e) => handleNewColorChange(index, 'colorName', e.target.value)}
+                />
+              </td>
+              <td style={{ textAlign: "center" }}>
+                <input
+                  className="form-control text-center"
+                  placeholder="Enter Color Code"
+                  value={item.colorCode}
+                  onChange={(e) => handleNewColorChange(index, 'colorCode', e.target.value)}
+                />
+              </td>
+
+              {/* Cone Image Upload */}
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <label
+                    htmlFor={`new-upload-cone-${index}`}
+                    style={{
+                      cursor: "pointer",
+                      display: "inline-block",
+                      borderRadius: "8px",
+                      border:
+                        item.localPreview0 || item.colorImage?.[0] ? "1px solid #ccc" : "1px dashed gray",
+                      padding: item.localPreview0 || item.colorImage?.[0] ? 0 : "10px",
+                    }}
+                    title="Upload Cone Image"
+                  >
+                    {item.localPreview0 || item.colorImage?.[0] ? (
+                      <img
+                        src={item.localPreview0 || `${backendUrl}${item.colorImage[0]}`}
+                        alt="Cone"
+                        width="40"
+                        height="40"
+                        style={{ borderRadius: "8px", display: "block" }}
+                      />
+                    ) : (
+                      "➕"
+                    )}
+                  </label>
+                  <input
+                    type="file"
+                    id={`new-upload-cone-${index}`}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleNewImageUpload(e, index, 0)}
+                  />
+                </div>
+              </td>
+
+              {/* Hank Image Upload */}
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <label
+                    htmlFor={`new-upload-hank-${index}`}
+                    style={{
+                      cursor: "pointer",
+                      display: "inline-block",
+                      borderRadius: "8px",
+                      border:
+                        item.localPreview1 || item.colorImage?.[1] ? "1px solid #ccc" : "1px dashed gray",
+                      padding: item.localPreview1 || item.colorImage?.[1] ? 0 : "10px",
+                    }}
+                    title="Upload Hank Image"
+                  >
+                    {item.localPreview1 || item.colorImage?.[1] ? (
+                      <img
+                        src={item.localPreview1 || `${backendUrl}${item.colorImage[1]}`}
+                        alt="Hank"
+                        width="40"
+                        height="40"
+                        style={{ borderRadius: "8px", display: "block" }}
+                      />
+                    ) : (
+                      "➕"
+                    )}
+                  </label>
+                  <input
+                    type="file"
+                    id={`new-upload-hank-${index}`}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleNewImageUpload(e, index, 1)}
+                  />
+                </div>
+              </td>
+
+              {/* Status Toggle */}
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={item.status === 'ACTIVE'}
+                    onChange={() =>
+                      handleNewColorChange(index, 'status', item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                    }
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </td>
+
+              {/* Remove Button */}
+              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                <button
+                  className="btn btn-sm text-danger"
+                  title="Remove Color"
+                  onClick={() => handleRemoveNewColor(index)}
+                >
+                  <MdDelete size={18} />
+                </button>
+              </td>
+            </tr>
+          ))}
+
+          {/* Existing Colors - Render SECOND (below new colors) */}
           {paginatedColors.map((item, index) => (
             <tr key={item.id}>
                <td style={{ verticalAlign: "middle" }}>
@@ -597,115 +752,6 @@ const handleFileChange = (e) => {
             </tr>
           ))}
 
-          {newColors.map((item, index) => (
-            <tr key={item.id}>
-              <td>
-                <input
-                  className="form-control"
-                  placeholder="Enter Color Name"
-                  value={item.colorName}
-                  onChange={(e) => handleNewColorChange(index, 'colorName', e.target.value)}
-                />
-              </td>
-              <td style={{ textAlign: "center" }}>
-                <input
-                  className="form-control text-center"
-                  placeholder="Enter Color Code"
-                  value={item.colorCode}
-                  onChange={(e) => handleNewColorChange(index, 'colorCode', e.target.value)}
-                />
-              </td>
-
-              {/* Cone Image Upload */}
-              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <label
-                    htmlFor={`new-upload-cone-${index}`}
-                    style={{
-                      cursor: "pointer",
-                      display: "inline-block",
-                      borderRadius: "8px",
-                      border:
-                        item.localPreview0 || item.colorImage?.[0] ? "1px solid #ccc" : "1px dashed gray",
-                      padding: item.localPreview0 || item.colorImage?.[0] ? 0 : "10px",
-                    }}
-                    title="Upload Cone Image"
-                  >
-                    {item.localPreview0 || item.colorImage?.[0] ? (
-                      <img
-                        src={item.localPreview0 || `${backendUrl}${item.colorImage[0]}`}
-                        alt="Cone"
-                        width="40"
-                        height="40"
-                        style={{ borderRadius: "8px", display: "block" }}
-                      />
-                    ) : (
-                      "➕"
-                    )}
-                  </label>
-                  <input
-                    type="file"
-                    id={`new-upload-cone-${index}`}
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={(e) => handleNewImageUpload(e, index, 0)}
-                  />
-                </div>
-              </td>
-
-              {/* Hank Image Upload */}
-              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <label
-                    htmlFor={`new-upload-hank-${index}`}
-                    style={{
-                      cursor: "pointer",
-                      display: "inline-block",
-                      borderRadius: "8px",
-                      border:
-                        item.localPreview1 || item.colorImage?.[1] ? "1px solid #ccc" : "1px dashed gray",
-                      padding: item.localPreview1 || item.colorImage?.[1] ? 0 : "10px",
-                    }}
-                    title="Upload Hank Image"
-                  >
-                    {item.localPreview1 || item.colorImage?.[1] ? (
-                      <img
-                        src={item.localPreview1 || `${backendUrl}${item.colorImage[1]}`}
-                        alt="Hank"
-                        width="40"
-                        height="40"
-                        style={{ borderRadius: "8px", display: "block" }}
-                      />
-                    ) : (
-                      "➕"
-                    )}
-                  </label>
-                  <input
-                    type="file"
-                    id={`new-upload-hank-${index}`}
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={(e) => handleNewImageUpload(e, index, 1)}
-                  />
-                </div>
-              </td>
-
-              {/* Status Toggle */}
-              <td style={{ textAlign: "center", verticalAlign: "middle" }}>
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={item.status === 'ACTIVE'}
-                    onChange={() =>
-                      handleNewColorChange(index, 'status', item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
-                    }
-                  />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-            </tr>
-          ))}
-
         </tbody>
       </Table>
 
@@ -731,7 +777,140 @@ const handleFileChange = (e) => {
         </div>
 
         <div className='d-block d-md-none'>
-          {/* Existing Colors Cards */}
+          {/* New Colors Cards - Render FIRST (at top) */}
+          {newColors.map((item, index) => (
+            <div key={item.id} className="color-card mb-3 shadow-sm border rounded-3 overflow-hidden bg-white border-primary border-2">
+              {/* Card Header */}
+              <div className="card-header bg-primary bg-opacity-10 px-3 py-2 border-bottom border-primary">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h6 className="mb-0 fw-semibold text-primary">
+                    <span className="badge bg-primary me-2">NEW</span>
+                    {item.colorName || `New Color #${index + 1}`}
+                  </h6>
+                  <div className="d-flex align-items-center header-actions">
+                    {/* Status Toggle */}
+                    <label className="switch mb-0">
+                      <input
+                        type="checkbox"
+                        checked={item.status === 'ACTIVE'}
+                        onChange={() =>
+                          handleNewColorChange(index, 'status', item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                        }
+                      />
+                      <span className="slider round"></span>
+                    </label>
+                    
+                    {/* Remove Button */}
+                    <button
+                      className="btn btn-sm btn-outline-danger p-1"
+                      title="Remove Color"
+                      onClick={() => handleRemoveNewColor(index)}
+                    >
+                      <MdDelete size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="card-body p-3">
+                {/* Color Name and Code Row */}
+                <div className="row g-2 mb-3">
+                  <div className="col-6">
+                    <label className="form-label fw-medium text-muted small">Color Name</label>
+                    <input
+                      className="form-control form-control-sm"
+                      placeholder="Enter color name"
+                      value={item.colorName}
+                      onChange={(e) => handleNewColorChange(index, 'colorName', e.target.value)}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label fw-medium text-muted small">Color Code</label>
+                    <input
+                      className="form-control form-control-sm"
+                      placeholder="Enter color code"
+                      value={item.colorCode}
+                      onChange={(e) => handleNewColorChange(index, 'colorCode', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Images Section */}
+                <div className="mb-3">
+                  <div className="d-flex gap-2">
+                    {/* Cone Image */}
+                    <div className="image-upload-wrapper">
+                      <label className="form-label small text-secondary mb-1">Cone</label>
+                      <label
+                        htmlFor={`new-upload-cone-mobile-${index}`}
+                        className="image-upload-box d-flex align-items-center justify-content-center"
+                      >
+                        {item.localPreview0 || item.colorImage?.[0] ? (
+                          <img
+                            src={item.localPreview0 || `${backendUrl}${item.colorImage[0]}`}
+                            alt="Cone"
+                            className="uploaded-image"
+                          />
+                        ) : (
+                          <div className="upload-placeholder">
+                            <div className="upload-icon">➕</div>
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        type="file"
+                        id={`new-upload-cone-mobile-${index}`}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => handleNewImageUpload(e, index, 0)}
+                      />
+                    </div>
+
+                    {/* Hank Image */}
+                    <div className="image-upload-wrapper">
+                      <label className="form-label small text-secondary mb-1">Hank</label>
+                      <label
+                        htmlFor={`new-upload-hank-mobile-${index}`}
+                        className="image-upload-box d-flex align-items-center justify-content-center"
+                      >
+                        {item.localPreview1 || item.colorImage?.[1] ? (
+                          <img
+                            src={item.localPreview1 || `${backendUrl}${item.colorImage[1]}`}
+                            alt="Hank"
+                            className="uploaded-image"
+                          />
+                        ) : (
+                          <div className="upload-placeholder">
+                            <div className="upload-icon">➕</div>
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        type="file"
+                        id={`new-upload-hank-mobile-${index}`}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => handleNewImageUpload(e, index, 1)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Display */}
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="small fw-medium text-muted">Status</span>
+                  <div className="status-toggle-wrapper">
+                    <span className={`status-label ${item.status === 'ACTIVE' ? 'active' : 'inactive'}`}>
+                      {item.status === 'ACTIVE' ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Existing Colors Cards - Render SECOND (below new colors) */}
           {filteredColors.map((item, index) => (
             <div key={item.id} className="color-card mb-3  border rounded-3 overflow-hidden bg-white">
               {/* Card Header */}
@@ -882,149 +1061,21 @@ const handleFileChange = (e) => {
               </div>
             </div>
           ))}
-
-          {/* New Colors Cards */}
-          {newColors.map((item, index) => (
-            <div key={item.id} className="color-card mb-3 shadow-sm border rounded-3 overflow-hidden bg-white border-primary border-2">
-              {/* Card Header */}
-              <div className="card-header bg-primary bg-opacity-10 px-3 py-2 border-bottom border-primary">
-                <div className="d-flex justify-content-between align-items-center">
-                  <h6 className="mb-0 fw-semibold text-primary">
-                    <span className="badge bg-primary me-2">NEW</span>
-                    {item.colorName || `Color #${colors.length + index + 1}`}
-                  </h6>
-                  <div className="d-flex align-items-center header-actions">
-                    {/* Status Toggle */}
-                    <label className="switch mb-0">
-                      <input
-                        type="checkbox"
-                        checked={item.status === 'ACTIVE'}
-                        onChange={() =>
-                          handleNewColorChange(index, 'status', item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
-                        }
-                      />
-                      <span className="slider round"></span>
-                    </label>
-                    
-                    {/* Remove Button */}
-                    <button
-                      className="btn btn-sm btn-outline-danger p-1"
-                      title="Remove Color"
-                      onClick={() => {
-                        setNewColors(prev => prev.filter((_, i) => i !== index));
-                      }}
-                    >
-                      <MdDelete size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="card-body p-3">
-                {/* Color Name and Code Row */}
-                <div className="row g-2 mb-3">
-                  <div className="col-6">
-                    <label className="form-label fw-medium text-muted small">Color Name</label>
-                    <input
-                      className="form-control form-control-sm"
-                      placeholder="Enter color name"
-                      value={item.colorName}
-                      onChange={(e) => handleNewColorChange(index, 'colorName', e.target.value)}
-                    />
-                  </div>
-                  <div className="col-6">
-                    <label className="form-label fw-medium text-muted small">Color Code</label>
-                    <input
-                      className="form-control form-control-sm"
-                      placeholder="Enter color code"
-                      value={item.colorCode}
-                      onChange={(e) => handleNewColorChange(index, 'colorCode', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Images Section */}
-                <div className="mb-3">
-                  <div className="d-flex gap-2">
-                    {/* Cone Image */}
-                    <div className="image-upload-wrapper">
-                      <label className="form-label small text-secondary mb-1">Cone</label>
-                      <label
-                        htmlFor={`new-upload-cone-mobile-${index}`}
-                        className="image-upload-box d-flex align-items-center justify-content-center"
-                      >
-                        {item.localPreview0 || item.colorImage?.[0] ? (
-                          <img
-                            src={item.localPreview0 || `${backendUrl}${item.colorImage[0]}`}
-                            alt="Cone"
-                            className="uploaded-image"
-                          />
-                        ) : (
-                          <div className="upload-placeholder">
-                            <div className="upload-icon">➕</div>
-                          </div>
-                        )}
-                      </label>
-                      <input
-                        type="file"
-                        id={`new-upload-cone-mobile-${index}`}
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        onChange={(e) => handleNewImageUpload(e, index, 0)}
-                      />
-                    </div>
-
-                    {/* Hank Image */}
-                    <div className="image-upload-wrapper">
-                      <label className="form-label small text-secondary mb-1">Hank</label>
-                      <label
-                        htmlFor={`new-upload-hank-mobile-${index}`}
-                        className="image-upload-box d-flex align-items-center justify-content-center"
-                      >
-                        {item.localPreview1 || item.colorImage?.[1] ? (
-                          <img
-                            src={item.localPreview1 || `${backendUrl}${item.colorImage[1]}`}
-                            alt="Hank"
-                            className="uploaded-image"
-                          />
-                        ) : (
-                          <div className="upload-placeholder">
-                            <div className="upload-icon">➕</div>
-                          </div>
-                        )}
-                      </label>
-                      <input
-                        type="file"
-                        id={`new-upload-hank-mobile-${index}`}
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        onChange={(e) => handleNewImageUpload(e, index, 1)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Status Display */}
-                <div className="d-flex justify-content-between align-items-center">
-                  <span className="small fw-medium text-muted">Status</span>
-                  <div className="status-toggle-wrapper">
-                    <span className={`status-label ${item.status === 'ACTIVE' ? 'active' : 'inactive'}`}>
-                      {item.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
 
-          <button className="btn-primary-custom mt-3" onClick={handleSaveColors}>
-        Save Changes
-      </button>
+        {/* {newColors.length > 0 && (
+          <div className="alert alert-info mt-3">
+            <strong>📋 {newColors.length}</strong> new color{newColors.length !== 1 ? 's' : ''} ready to be saved.
+          </div>
+        )} */}
+
+        <button className="btn-primary-custom mt-3" onClick={handleSaveColors}>
+          Save Changes
+          {/* {newColors.length > 0 && ` (${colors.length + newColors.length} total colors)`} */}
+        </button>
 
        {/* Toast Notification */}
-     <div className="fixed top-4 right-4 z-50 space-y-2">
+       <div className="fixed top-4 right-4 z-50 space-y-2">
                 {toasts.map((toast) => (
                     <Toast
                         key={toast.id}
@@ -1037,7 +1088,7 @@ const handleFileChange = (e) => {
                 ))}
             </div>
 
-                  <div className='d-flex justify-content-end mt-2 pagination'>
+        <div className='d-flex justify-content-end mt-2 pagination'>
           <Pagination>{paginationItems}</Pagination>
         </div>
 

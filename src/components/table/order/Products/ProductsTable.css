@@ -79,6 +79,22 @@
       /* padding: 1rem; */
     }
   
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card {
+  animation: slideInUp 0.3s ease-out;
+}
+
+
     .product-table .product-card {
       background-color: white;
       padding: 1rem;
