@@ -411,7 +411,7 @@ useEffect(() => {
                     onFilterChange={(filter, value) => handleFilterChange(filter, value)} 
                 />
             </div>
-            <div className='col-sm-6 col-md-3 position-relative z-n1'>
+            <div className='col-sm-6 col-md-3'>
                 <OrderFilter status={selectedStatus} onStatusChange={handleStatusChange} />
             </div>
         </div>
