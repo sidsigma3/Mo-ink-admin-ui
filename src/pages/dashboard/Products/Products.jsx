@@ -91,7 +91,7 @@ const Products = () => {
 
                 <Link to={'/add-product'}>
                 <AddBtn  
-                     text={"Add"}
+                     text={"Add Product"}
                 ></AddBtn>
                 </Link>
             </div>

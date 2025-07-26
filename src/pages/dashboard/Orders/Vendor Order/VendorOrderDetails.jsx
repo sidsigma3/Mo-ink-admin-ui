@@ -285,26 +285,27 @@ const getProductNameById = (productId) => {
             </div>
 
             </div>
-            <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
+            <div className="mt-2 overflow-x-auto">
+            <table className="w-100 table" style={{ fontSize: "0.8rem", fontWeight: 500, overflowX: "auto" }}>
             <thead>
               <tr>
-                <th  className="thtable" >Product</th>
-                <th  className="thtable">Size</th>
-                <th  className="thtable">Variant</th>
-                <th  className="thtable">Weight</th>
-                <th  className="thtable">Rate</th>
+                <th style={{ textAlign: 'start', verticalAlign: 'middle' }}  className="thtable" >Product</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">Size</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">Variant</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">Weight</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">Rate</th>
                 {extractStateFromAddress(spinnerOrder?.vendorAddress) === "odisha" ?(
                     <>
-                    <th  className="thtable">CGST</th>
-                    <th  className="thtable">SGST</th>
+                    <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">CGST</th>
+                    <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">SGST</th>
                     </>
                 ):
                 (
-                    <th  className="thtable">IGST</th>
+                    <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">IGST</th>
                 )
                 }
-                <th  className="thtable">Total</th>
-                <th  className="thtable">Status</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">Total</th>
+                <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -329,16 +330,16 @@ const getProductNameById = (productId) => {
             
                 return (
                   <tr key={`spinner-${index}`}>
-                    <td>{getProductNameById(item.productId)}</td>
-                    <td>{item.size}</td>
-                    <td>{item.variantType}</td>
-                    <td>
+                    <td style={{ textAlign: 'start', verticalAlign: 'middle' }}>{getProductNameById(item.productId)}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{item.size}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{item.variantType}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                       {item.vendorOrderWeight}
                     </td>
-                    <td>{rate.toFixed(2)}</td>
-                    <td>{(gst/2).toFixed(1)}</td>
-                    <td>{(gst/2).toFixed(1)}</td>
-                    <td>{totalAmount.toFixed(2)}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{rate.toFixed(2)}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{(gst/2).toFixed(1)}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{(gst/2).toFixed(1)}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{totalAmount.toFixed(2)}</td>
                     <td  style={{ justifyItems: 'center', alignContent:'center'}}  >
                     <select
                         value={item.status}
@@ -441,6 +442,7 @@ const getProductNameById = (productId) => {
               )}
             </tbody>
           </table>
+          </div>
         </div>
 
 
@@ -517,29 +519,30 @@ const getProductNameById = (productId) => {
             </div>
 
             </div>
-            <table className="w-100 mt-2 table" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
+           <div className="mt-2 overflow-x-auto">
+    <table className="w-100 table" style={{ fontSize: "0.8rem", fontWeight: 500, overflowX: "auto" }}>
       <thead>
         <tr>
-          <th  className="thtable">Product</th>
-          <th  className="thtable text-center">Size</th>
-          <th  className="thtable text-center">Variant</th>
-          <th  className="thtable text-center">Color Name</th>
-          <th  className="thtable text-center">Color Code</th>
-          <th  className="thtable text-center">Weight</th>
-          <th  className="thtable text-center">Rate</th>
+          <th style={{ textAlign: 'start', verticalAlign: 'middle' }}  className="thtable">Product</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Size</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Variant</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Color Name</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Color Code</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Weight</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Rate</th>
           {extractStateFromAddress(dyerOrder?.vendorAddress) === "odisha" ?(
               <>
-               <th  className="thtable text-center">CGST</th>
-               <th  className="thtable text-center">SGST</th>
+               <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">CGST</th>
+               <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">SGST</th>
                </>
           ):
           (
-              <th  className="thtable text-center">IGST</th>
+              <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">IGST</th>
           )
           }
          
-          <th  className="thtable text-center">Total</th>
-          <th  className="thtable text-center">Status</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Total</th>
+          <th style={{ textAlign: 'center', verticalAlign: 'middle' }}  className="thtable text-center">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -566,28 +569,28 @@ const getProductNameById = (productId) => {
 
           return (
             <tr key={`dyer-${index}`} >
-              <td className=" text-center">{getProductNameById(item.productId)}</td>
-              <td className=" text-center">{item.size}</td>
-              <td className=" text-center">{item.variantType}</td>
-               <td className=" text-center">{colorHex}</td>
-              <td>
+              <td style={{ textAlign: 'start', verticalAlign: 'middle' }} className="">{getProductNameById(item.productId)}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }} className=" text-center">{item.size}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }} className=" text-center">{item.variantType}</td>
+               <td style={{ textAlign: 'center', verticalAlign: 'middle' }} className=" text-center">{colorHex}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                 <div className="d-flex justify-content-center align-items-center gap-2">
                   {colorName}
                 </div>
               </td>
-              <td  className=" text-center">{item.vendorOrderWeight}</td>
-              <td className=" text-center">{rate.toFixed(2)}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }}  className=" text-center">{item.vendorOrderWeight}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }} className=" text-center">{rate.toFixed(2)}</td>
               {billingState?.toLowerCase() === "odisha"?(
                   <>
-                    <td>{(gst/2).toFixed(1)}</td>
-                    <td>{(gst/2).toFixed(1)}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{(gst/2).toFixed(1)}</td>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{(gst/2).toFixed(1)}</td>
                   </>
               ):(
-                  <td>{gst}</td>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>{gst}</td>
               )
             }
               
-              <td className=" text-center">{totalAmount.toFixed(2)}</td>
+              <td style={{ textAlign: 'center', verticalAlign: 'middle' }} className=" text-center">{totalAmount.toFixed(2)}</td>
               <td  style={{ justifyItems: 'center', alignContent:'center'}}  >
               <select
                 value={item.status}
@@ -674,6 +677,7 @@ const getProductNameById = (productId) => {
         )}
       </tbody>
     </table>
+    </div>
         </div>
         
         

@@ -132,13 +132,13 @@
 .vvendor-type-tag[data-type="SPINNER"] {
   background-color: #dbeafe;
   color: #1e40af;
-  border-color: #93c5fd;
+  border-color: #5d91cb;
 }
 
 .vvendor-type-tag:not([data-type="SPINNER"]) {
   background-color: #fef3c7;
   color: #d97706;
-  border-color: #fde68a;
+  border-color: #FCD34D;
 }
 
 .sstatus-container {
