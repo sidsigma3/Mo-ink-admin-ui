@@ -20,7 +20,6 @@
   box-shadow: 0 20px 80px rgba(0, 0, 0, 0.05);
   position: relative;
   text-align: center;
-  justify-items: center;
   
 }
 
@@ -104,14 +103,15 @@
 /* Payment Method Tabs */
 .payment-method-tabs {
   display: flex;
-  width: 80%;
-  margin-bottom: 24px;
+  width: 80%; 
+  margin: 0 auto 24px; 
   background: #f8fafc;
   border-radius: 12px;
   padding: 4px;
   border: 1px solid #e2e8f0;
   align-items: center;
   justify-content: center;
+  gap: 2px;
 }
 
 .payment-method-tabs .tab-button {
@@ -130,6 +130,9 @@
   user-select: none;
   text-align: center;
   white-space: nowrap;
+  display: flex; /* Add this */
+  align-items: center; /* Add this */
+  justify-content: center; /* Add this */
 }
 
 .payment-method-tabs .tab-button:hover {
