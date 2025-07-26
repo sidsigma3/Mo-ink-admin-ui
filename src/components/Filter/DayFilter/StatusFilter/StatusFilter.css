@@ -21,23 +21,6 @@
     font-size: 0.8rem;
 }
 
-.status .dropdown-menu{
-    width: 4rem ;
-    font-size: 0.8rem;
-    z-index: 9999;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-
-.dropdown button{
-    background-color: white;
-    border-radius: 0.3rem;
-    color: black;
-}
 
 
 

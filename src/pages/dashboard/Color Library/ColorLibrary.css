@@ -183,7 +183,6 @@ input:checked + .slider:before {
   border: 1px solid #e2e8f0;
   
   overflow: hidden;
-  z-index: -1;
   margin-bottom: 1rem;
 }
 

@@ -149,7 +149,6 @@ body{ background-color: #F7F8FA !important;
 }
 
 .dropdown-menu {
-  z-index: 00 !important;  /* Bootstrap default is 1000, we're going lower */
   position: absolute;
   margin-top: 0.125rem;
   border: 1px solid rgba(0, 0, 0, 0.15);
@@ -213,13 +212,13 @@ body{ background-color: #F7F8FA !important;
   
   .main .sidebarWrapper{
     width: 100% !important;
-    height: 15px;
+    height: 32px;
   }
   
   .main .content{
     overflow: auto;
     height: 100%;
-    padding-top: 1.5rem !important;
+    padding-top: 1.9rem !important;
   }
   
   .main .sidebarWrapper .sideBar{

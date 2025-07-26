@@ -22,6 +22,7 @@ import {
   ChevronRight,
   ChevronDown
 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 const SideBar = () => {
     const navigate = useNavigate();
@@ -126,7 +127,7 @@ const SideBar = () => {
 
         <div className='sidebar-menu' >
           {/* Mobile menu */}
-          <ul className="mobile-menu z-40">
+          <ul className="mobile-menu">
             <li className={`menu-item ${selected === 'dashboard' ? 'selected' : ''}`}>
               <Link to={'/dashboard'} className='menu-link'>
                 <button onClick={() => setSelected('dashboard')} className='menu-button'>
@@ -177,7 +178,8 @@ const SideBar = () => {
                 <span className='menu-text'>More</span>
               </button>
             </li>
-
+          {createPortal(
+            <>
             {isMoreMenuOpen && (
                 <div ref={menuRef} className="more-menu-dropdown" style={{ zIndex: 5 }}>
                   <div className="dropdown-content">
@@ -231,6 +233,8 @@ const SideBar = () => {
                   </div>
                 </div>
               )}
+              </>, document.body
+               )}
           </ul>
 
           {/* Desktop menu */}
