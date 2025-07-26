@@ -47,6 +47,7 @@ import BulkAssignPage from './pages/dashboard/Orders/BulkAssign/BulkAssignPage';
 import ColorLibrary from './pages/dashboard/Color Library/ColorLibrary';
 import ColorLibraryProducts from './pages/dashboard/Color Library/ColorLibraryProducts';
 
+
 function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -89,10 +90,12 @@ function App() {
                   <ProtectedRoute>
                     <Header />
                     <div className="main d-flex">
+                    
                       <div className="sidebarWrapper">
                         <SideBar />
                       </div>
-                      <div className="content w-100 p-3">
+                     
+                      <div className="content w-100 p-4">
                         <OrderProvider>
                           <ProductProvider>
                             <DiscountProvider>

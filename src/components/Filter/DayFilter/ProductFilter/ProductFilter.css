@@ -21,32 +21,6 @@
     margin: 0;
 }
 
-.custom-dropdown .dropdown-toggle-custom {
-  background: white;
-  border: 1px solid #dee2e6;
-  height: 38px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.dropdown-menu-custom {
-  z-index: 9999;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.dropdown-item-custom {
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.dropdown-item-custom:hover {
-  background-color: #f8f9fa;
-}
-
 
 
 @media(max-width:768px){
