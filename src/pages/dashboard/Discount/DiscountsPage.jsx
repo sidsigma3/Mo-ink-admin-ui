@@ -263,7 +263,7 @@ const getProductText = (discount) => {
 
   return (
     <div className='discounts'>
-        <div className='top d-flex justify-content-between align-items-center mt-2 mb-4 '>
+        <div className='top d-flex justify-content-between align-items-center mt-3 mb-4 '>
             <h4 className='m-0' style={{fontSize:'1.2rem'}}>Discounts</h4>
 
             <div className='d-flex gap-2'>

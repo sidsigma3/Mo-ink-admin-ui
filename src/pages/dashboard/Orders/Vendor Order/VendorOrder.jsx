@@ -330,7 +330,7 @@ if (totalPages > 1) {
 
   return (
     <div className='vendor-order'>
-         <div className='top d-flex justify-content-between align-items-center  mt-2 mb-4'>
+         <div className='top d-flex justify-content-between align-items-center  mt-3 mb-4'>
             <h3 className='m-0' style={{fontSize:'1.2rem'}}>Vendor Orders</h3>
 
             <div className='btn-ctn d-flex justify-content-center align-items-center gap-2'>

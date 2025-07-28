@@ -520,7 +520,7 @@ const handleMaxUsageChange = (field1,field2) => {
 
   return (
     <div className="add-discount">
-      <div className="top d-flex gap-3  mt-2 mb-4" style={{ cursor: "pointer" }}>
+      <div className="top d-flex gap-3  mt-3 mb-4" style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/discounts")}>
           <IoArrowBackOutline size={25} />
         </span>

@@ -189,7 +189,7 @@ const InventoryDetails = () => {
   return (
     <div className='inventory-wrapper bg p-0'>
       {/* Page Title */}
-      <div className='d-flex justify-content-between align-items-center mt-2 mb-4'>
+      <div className='d-flex justify-content-between align-items-center mt-3 mb-4'>
       <div className="top d-flex gap-3" style={{ cursor: "pointer" }}>
       <span onClick={() => navigate("/inventory")}>
           <IoArrowBackOutline size={25} />

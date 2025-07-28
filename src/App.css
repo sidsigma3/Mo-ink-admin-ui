@@ -163,10 +163,10 @@ body{ background-color: #F7F8FA !important;
 
 .sidebarWrapper{
   width: 17rem;
-  /* height: calc(100vh - 12vh); */
   position: sticky;
   top: 0;
   padding: 0.5rem;
+  background: transparent;
 }
 
 .content{

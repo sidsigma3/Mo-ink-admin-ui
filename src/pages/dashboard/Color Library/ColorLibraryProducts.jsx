@@ -90,7 +90,7 @@ const ColorLibraryProducts = () => {
 
   return (
     <div className='colorlibrary'>
-      <div className='top d-flex justify-content-between mt-2 mb-2'>
+      <div className='top d-flex justify-content-between mt-3 mb-2'>
         <h4 style={{ fontSize: '1.2rem' }}>Color Library</h4>
       </div>
 

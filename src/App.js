@@ -95,7 +95,7 @@ function App() {
                         <SideBar />
                       </div>
                      
-                      <div className="content w-100 p-4">
+                      <div className="content w-100 p-3">
                         <OrderProvider>
                           <ProductProvider>
                             <DiscountProvider>

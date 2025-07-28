@@ -429,22 +429,24 @@ input:checked + .slider:before {
   .text-primary-custom{
     color: #6B21A8;
   }
+
+  
 }
 
 /* Fix for file inputs */
 input[type="file"] {
   position: absolute !important;
   opacity: 0 !important;
-  pointer-events: none !important;
+  /* pointer-events: none !important; */
   z-index: -1 !important;
 }
 
-/* Ensure proper layering */
-.d-flex.justify-content-between.align-items-center {
-  /* position: relative;
-  z-index: 4; */
-}
+  .d-flex.gap-2 * {
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+  }
 
 .gap-2 {
   gap: 0.5rem !important;
 }
+

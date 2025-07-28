@@ -301,16 +301,16 @@ useEffect(() => {
 
   return (
     <div className='order'>
-        <div className='top mt-2 mb-4'>
+        <div className='top mt-3 mb-4'>
             <h3>Orders</h3>
 
             <div className='btn-ctn'>
             <div className="date-filter position-relative">
                      <button
-                      className=" date-btn btn lg-btn fw-medium "
+                      className=" date-btn btn lg-btn fw-medium d-flex align-items-center justify-content-center"
                       onClick={() => setShowPicker(!showPicker)}
                     >
-                      <span className="d-none d-sm-inline">
+                      <span className="d-none d-sm-inline text-center">
                         {startDate && endDate
                           ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
                           : "Select Date"}

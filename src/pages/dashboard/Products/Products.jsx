@@ -78,7 +78,7 @@ const Products = () => {
 
   return (
     <div className='products'>
-    <div className='top d-flex align-items-center justify-content-between mt-2 mb-4 gap-3'> <div>
+    <div className='top d-flex align-items-center justify-content-between mt-3 mb-4 gap-3'> <div>
                 <h3 className='mb-0 ' style={{fontSize:'1.2rem'}}>Products</h3>
             </div>
 

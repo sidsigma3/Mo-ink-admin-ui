@@ -9,9 +9,8 @@ const ImportBtn = ({onClick}) => {
          <span> Import </span><CgImport size={19}/>
     </button>
 
-
-    <button className='import-btn btn sm-btn'>
-    <CgImport size={22}/>
+    <button className='import-btn btn sm-btn' onClick={onClick}>
+        <CgImport size={22}/>
     </button>
     </>
   )
