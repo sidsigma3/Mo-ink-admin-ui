@@ -1,30 +1,53 @@
-.export-btn{
+.export-btn {
     height: 40px;
     padding: 0.2rem 2rem;
     font-size: 0.8rem;
+    font-weight: 400;
     background-color: #ffffff !important;
     border: 2px solid #ffdb63;
     color: #9c7800 !important;
-  }
+    border-radius: 6px; /* Add default border radius */
+    cursor: pointer; /* Ensure cursor shows it's clickable */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Space between text and icon */
+    transition: all 0.2s ease; /* Smooth transitions */
+}
 
-.sm-bttn{
+.export-btn:hover {
+    background-color: #fffbf0 !important;
+    border-color: #f0c648;
+}
+
+.export-btn:active {
+    transform: scale(0.98);
+}
+
+.sm-bttn {
     display: none;
 }
 
+.lg-btn {
+    display: inline-flex;
+}
 
-@media(max-width:768px){
-    .sm-bttn{
-        display: grid;
-        padding: 0.1rem 0.1rem !important;
+@media (max-width: 768px) {
+    .sm-bttn {
+        display: inline-flex !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
         width: 2.2rem !important;
         height: 2.2rem !important;
-        border-radius: 50%;
+        min-height: 2.2rem; /* Prevent height collapse */
+        min-width: 2.2rem; /* Prevent width collapse */
         align-items: center;
-        justify-items: center;
+        justify-content: center;
+        /* Ensure touch target is large enough */
+        touch-action: manipulation;
     }
 
-
-    .lg-btn{
-        display: none;
+    .lg-btn {
+        display: none !important;
     }
 }

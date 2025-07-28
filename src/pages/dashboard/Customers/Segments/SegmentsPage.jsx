@@ -184,7 +184,7 @@ const SegmentsPage = () => {
 
   return (
     <div className='segments-page'>
-           <div className='top d-flex justify-content-between align-items-center mt-2 mb-4 '>
+           <div className='top d-flex justify-content-between align-items-center mt-3 mb-4 '>
            <h3 className='m-0' style={{fontSize:'1.2rem'}}>Segments</h3>
 
             <div className='d-flex gap-2'>

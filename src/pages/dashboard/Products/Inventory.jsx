@@ -573,7 +573,7 @@ const Inventory = () => {
       </div>
 
       {/* Page Title */}
-      <div className='d-flex justify-content-between align-items-center mt-2 mb-4'>
+      <div className='d-flex justify-content-between align-items-center mt-3 mb-4'>
         <h3 className='page-title m-0' style={{fontSize:'1.2rem'}}>Inventory</h3>
         <div className='d-flex gap-2'>
           <ExportBtn onClick={() => exportToExcel(filteredInventory)} />

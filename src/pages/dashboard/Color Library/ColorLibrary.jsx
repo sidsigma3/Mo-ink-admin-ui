@@ -434,7 +434,7 @@ const handleFileChange = (e) => {
 
   return (
     <div className='colorlibrary'>
-      <div className='top d-flex  justify-content-between mb-2 mt-2' style={{cursor:'pointer'}}>
+      <div className='top d-flex  justify-content-between mb-2 mt-3' style={{cursor:'pointer'}}>
                 <div className='top d-flex gap-3 align-items-center'>
                 <span onClick={() => navigate('/colorlibrary-products')}><IoArrowBackOutline size={25}/></span>
                 <h5 className='m-0' style={{fontSize:'1.2rem'}}>Color Details</h5>

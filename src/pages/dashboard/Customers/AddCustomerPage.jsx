@@ -480,7 +480,7 @@ const handleChequePhotoChange = async (e) => {
     <div className='add-customer'>
 
       {state?.index !== undefined ? (
-          <div className='top d-flex  gap-3 align-items-center mt-2 mb-4 '>
+          <div className='top d-flex  gap-3 align-items-center mt-3 mb-4 '>
                     <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
                     <IoArrowBackOutline size={25} />
                 </span>
@@ -488,7 +488,7 @@ const handleChequePhotoChange = async (e) => {
         </div>
           ):
           (
-        <div className='top d-flex gap-3 align-items-center mt-2 mb-4 '>
+        <div className='top d-flex gap-3 align-items-center mt-3 mb-4 '>
           <span onClick={() => navigate("/customers")} style={{ cursor: "pointer" }}>
             <IoArrowBackOutline size={25} />
           </span>

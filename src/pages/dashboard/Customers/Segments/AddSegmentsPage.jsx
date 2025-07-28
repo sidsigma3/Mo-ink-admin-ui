@@ -219,7 +219,7 @@ const AddSegmentsPage = () => {
 
   return (
     <div className='add-segments-page'>
-         <div className='top d-flex gap-3 align-items-center mt-2 mb-4 ' style={{ cursor: "pointer" }}>
+         <div className='top d-flex gap-3 align-items-center mt-3 mb-4 ' style={{ cursor: "pointer" }}>
         <span onClick={() => navigate("/segments")}>
           <IoArrowBackOutline size={25} />
         </span>

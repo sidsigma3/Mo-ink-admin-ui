@@ -166,7 +166,7 @@ const ProfilePage = ({setIsAuthenticated}) => {
   
   return (
     <div className='profile-page'>
-        <div className='d-flex justify-content-between mt-2 mb-4'>
+        <div className='d-flex justify-content-between mt-3 mb-4'>
             <div>
                 <h5>Welcome , {userDetails.firstName} {" "} {userDetails.lastName}</h5>
                 <h6 className='text-primary'>{today}</h6>

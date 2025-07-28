@@ -800,7 +800,7 @@ console.log(sizeColorMap)
   return (
     
     <div className="add-product-ctn">
-        <div className='top d-flex gap-3 align-items-center mt-2 mb-4 ' style={{cursor:"pointer"}}>
+        <div className='top d-flex gap-3 align-items-center mt-3 mb-4 ' style={{cursor:"pointer"}}>
             <span onClick={() => navigate('/products')}><IoArrowBackOutline size={25}/></span>
             <h3 className='m-0' style={{fontSize:'1.2rem'}}>Add Products</h3>
         </div>
@@ -1512,7 +1512,7 @@ console.log(sizeColorMap)
        
     </div>
 
-        <div className="w-100 d-flex justify-content-between align-items-center mt-2 mb-4 ">
+        <div className="w-100 d-flex justify-content-between align-items-center mt-3 mb-4 ">
           {state?.index !== undefined && (
             <DeleteBtn clickFunction={() => setShowDeleteModal(true)} />
           )}

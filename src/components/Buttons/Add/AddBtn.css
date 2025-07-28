@@ -1,36 +1,54 @@
-.add-btn{
+.add-btn {
     height: 40px;
     padding: 0.2rem 2rem;
     font-size: 0.8rem;
     font-weight: 400;
-    background-color: #6B21A8!important;
-    /* border: 2px solid #6B21A8; */
+    background-color: #6B21A8 !important;
+    border: 2px solid #6B21A8;
     color: #ffffff !important;
-    text-decoration: none !important;  
-  }
-
-.lg-add-btn{
-    display: grid;
+    text-decoration: none !important;
+    border-radius: 6px; /* Add default border radius */
+    cursor: pointer; /* Ensure cursor shows it's clickable */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Space between text and icon */
+    transition: all 0.2s ease; /* Smooth transitions */
 }
 
-.sm-add-btn{
+.add-btn:hover {
+    background-color: #491772 !important;
+    border-color: #491772;
+}
+
+.add-btn:active {
+    transform: scale(0.98);
+}
+
+.lg-add-btn {
+    display: inline-flex;
+}
+
+.sm-add-btn {
     display: none !important;
 }
 
-
-
-@media(max-width:768px){
-    .sm-add-btn{
-        display: grid !important;
-        padding: 0.1rem 0.1rem !important;
-        border-radius: 50%;
+@media (max-width: 768px) {
+    .sm-add-btn {
+        display: inline-flex !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
         width: 2.2rem !important;
         height: 2.2rem !important;
+        min-height: 2.2rem; /* Prevent height collapse */
+        min-width: 2.2rem; /* Prevent width collapse */
         align-items: center;
-        justify-items: center;
+        justify-content: center;
+        /* Ensure touch target is large enough */
+        touch-action: manipulation;
     }
 
-    .lg-add-btn{
+    .lg-add-btn {
         display: none !important;
     }
 }

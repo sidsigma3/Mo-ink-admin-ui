@@ -9,8 +9,8 @@ const ExportBtn = ({onClick}) => {
          <span> Export </span><PiExportBold size={18}/>
     </button>
 
-    <button className='export-btn btn sm-bttn  '>
-    <PiExportBold size={20}/>
+    <button className='export-btn btn sm-bttn' onClick={onClick}>
+        <PiExportBold size={20}/>
     </button>
     </>
   )
