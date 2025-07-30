@@ -137,10 +137,18 @@ const ColorLibrary =  ({setDemoData }) => {
       statusMap[color.id] = color.status === 'ACTIVE';
     });
     setColorStatus(statusMap);
+    
+    // ✅ Add this: Apply filter after status is set
+    setTimeout(() => {
+      applyCombinedFilter(searchTerm, selectedStatus);
+    }, 0);
+    
   } catch (error) {
     console.error("Failed to fetch colors:", error);
   }
 };
+
+
 
 const handleSaveColors = async () => {
   try {
@@ -247,45 +255,51 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
   };
 
   const applyCombinedFilter = (searchValue, status) => {
-    const lowercasedSearch = searchValue?.toLowerCase?.() || "";
-    
-    let filtered = [...colors]; // Start with all colors
+  console.log('🔍 Filter Debug:', { searchValue, status, colorsLength: colors.length, colorStatus });
+  
+  const lowercasedSearch = searchValue?.toLowerCase?.() || "";
+  
+  let filtered = [...colors]; // Start with all colors
 
-    // Apply search filter
-    if (lowercasedSearch) {
-      filtered = filtered.filter((item) => {
-        const matchesColorName = item.colorName?.toLowerCase().includes(lowercasedSearch);
-        const matchesColorCode = item.colorCode?.toLowerCase().includes(lowercasedSearch);
-        return matchesColorName || matchesColorCode;
-      });
-    }
+  // Apply search filter
+  if (lowercasedSearch) {
+    filtered = filtered.filter((item) => {
+      const matchesColorName = item.colorName?.toLowerCase().includes(lowercasedSearch);
+      const matchesColorCode = item.colorCode?.toLowerCase().includes(lowercasedSearch);
+      return matchesColorName || matchesColorCode;
+    });
+  }
 
-    // Apply status filter - Fixed logic
-    if (status !== 'All') {
-      filtered = filtered.filter((item) => {
-        // Check both the original status and the current toggle state
-        const currentToggleState = colorStatus[item.id];
-        const itemStatus = currentToggleState ? 'ACTIVE' : 'INACTIVE';
-        
-        // Also check original status from data if toggle state is undefined
-        const originalStatus = item.status === 'ACTIVE';
-        const finalStatus = currentToggleState !== undefined ? currentToggleState : originalStatus;
-        const statusString = finalStatus ? 'ACTIVE' : 'INACTIVE';
-        
-        console.log(`Item ${item.colorName}: toggle=${currentToggleState}, original=${item.status}, final=${statusString}, looking for=${status}`);
-        return statusString === status;
-      });
-    }
+  // Apply status filter - Fixed logic
+  if (status !== 'All') {
+    console.log('🎯 Applying status filter:', status);
+    filtered = filtered.filter((item) => {
+      // Get current switch state (fallback to original status if not toggled yet)
+      const isChecked = colorStatus[item.id] !== undefined 
+        ? colorStatus[item.id] 
+        : item.status === 'ACTIVE';
+      
+      console.log(`Color ${item.colorName}: isChecked=${isChecked}, status=${status}`);
+      
+      if (status === 'ACTIVE') {
+        return isChecked === true;
+      } else if (status === 'INACTIVE') {
+        return isChecked === false;
+      }
+      return true;
+    });
+  }
 
-    console.log("Filtered colors:", filtered);
-    setFilteredColors(filtered);
-  };
+  console.log("Filtered colors:", filtered.length);
+  setFilteredColors(filtered);
+};
 
   // Update filter when colors or colorStatus changes + reset page when filtering
-  useEffect(() => {
+ useEffect(() => {
+  if (colors.length > 0) {
     applyCombinedFilter(searchTerm, selectedStatus);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [colors, colorStatus, searchTerm, selectedStatus]);
+  }
+}, [colorStatus]);
 
   const [toasts, setToasts] = useState([]);
 
@@ -911,7 +925,7 @@ const handleFileChange = (e) => {
           ))}
 
           {/* Existing Colors Cards - Render SECOND (below new colors) */}
-          {filteredColors.map((item, index) => (
+          {paginatedColors.map((item, index) => (
             <div key={item.id} className="color-card mb-3  border rounded-3 overflow-hidden bg-white">
               {/* Card Header */}
               <div className="card-header bg-light px-3 py-2 border-bottom">

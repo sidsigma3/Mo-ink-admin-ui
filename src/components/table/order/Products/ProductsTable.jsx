@@ -221,7 +221,7 @@ for (let i = 1; i <= totalPages; i++) {
                   padding: '0.3rem 0.5rem',
                   backgroundColor: '#EFEFEF',
                   border: '1px solid #B9C0CD',
-                  borderRadius: '0.9rem',
+                  borderRadius: '20rem',
                   justifyContent: 'center',
                   width: '45%',
                   textAlign: 'center'
@@ -298,51 +298,25 @@ for (let i = 1; i <= totalPages; i++) {
     
 
 
-      <div className="product-cards rounded-4">
+       <div className="product-cards rounded-4">
+          {currentRows.map((item, index) => (
+            <div className="product-card" key={`${item.productId}-${item.variantIndex}-${index}`} 
+                 onClick={() => handleRowClick(item.productIndex, item.variantIndex)}>
 
-      {finalData.map((product, index) => (
-          product.groupedVariants.map((item, ix) => (
+              <div className='d-flex justify-content-between'>
+                <h3 className='fs-6 fw-medium'>{item.productName}</h3>
+                <div style={{ justifyItems: 'center', alignContent:'center'}}>
+                  <h3 className='fs-6 fw-medium'>{item.size}</h3>
+                </div>
+              </div>
 
-          <div className="product-card " key={ix} onClick={() => handleRowClick(index,ix)}>
-
-            <div className='d-flex justify-content-between'>
-                 <h3 className='fs-6 fw-medium	'>{product.productName}</h3>
-                 <div style={{ justifyItems: 'center', alignContent:'center'}} >
-                 <h3 className='fs-6 fw-medium	'> {item.size}</h3>
-                 </div>
-            </div>
-
-            <div className='d-flex justify-content-between align-items-center mt-3'>
-            
-            <p><strong></strong> {item.variants.length} Variants</p>
-
-            <span><LuDot  size={25}/></span>
-
-            {/* <div style={{ display: 'flex', alignItems: 'center' }}>
-           
-            <div style={{ display: 'flex' }}>
-                {item.variants.map((color, index) => (
-                <div
-                    key={index}
-                    style={{
-                    width: '35px',
-                    height: '35px',
-                    backgroundColor: color.colorName,
-                    borderRadius: '50%',
-                    marginLeft: index === 0 ? '0' : '-10px',
-                    border: '1px solid #fff',
-                    }}
-                 
-                ></div>
-                ))}
-            </div>
-            </div> */}
-
-            {/* <div className='d-flex justify-content-between mt-2 pe-4'> */}
+              <div className='d-flex justify-content-between align-items-center mt-3'>
+                <p><strong></strong> {item.variants.length} Variants</p>
+                <span><LuDot size={25}/></span>
                 <p>{item.totalWeight} Kgs</p>
-                <span><LuDot  size={25}/></span>
-                 <p> 
-                   <div
+                <span><LuDot size={25}/></span>
+                <p> 
+                  <div
                     style={{
                       padding: '0.2rem 0.2rem',
                       fontSize: '0.8rem',
@@ -352,26 +326,23 @@ for (let i = 1; i <= totalPages; i++) {
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginBottom: '0',
-                      backgroundColor:
-                        product.availableStatus === 'ACTIVE' ? '#d1fae5' : '#F3F4F6',
+                      backgroundColor: item.availableStatus === 'ACTIVE' ? '#d1fae5' : '#F3F4F6',
                       border: '1px solid',
-                      borderColor:
-                        product.availableStatus === 'ACTIVE' ? '#6ee7b7' : '#D1D5DB',
+                      borderColor: item.availableStatus === 'ACTIVE' ? '#6ee7b7' : '#D1D5DB',
                       borderRadius: '0.2rem',
                       textAlign: 'center',
-                      color: product.availableStatus === 'ACTIVE' ? '#065f46' : '#DC2626',
+                      color: item.availableStatus === 'ACTIVE' ? '#065f46' : '#DC2626',
                       fontWeight: '500',
                     }}
                   >
-                    {product.availableStatus}
+                    {item.availableStatus}
                   </div>
-
                 </p>
+              </div>
             </div>
-          </div>
-        ))))}
+          ))}
+        </div>
 
-      </div>
         {/* Toast Notification */}
      <div className="fixed top-4 right-4 z-50 space-y-2">
                 {toasts.map((toast) => (

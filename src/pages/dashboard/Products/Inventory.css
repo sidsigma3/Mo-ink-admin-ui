@@ -598,8 +598,24 @@
   .pagination li .page-link {
     font-size: 0.875rem;
     font-weight: 500;
+     background: #ffffff;
+     border: #6B21A8;
   }
   
+.pagination li.active .page-link,
+.pagination li .page-link.active {
+    background: #6B21A8;
+    color: #ffffff;
+    border: 1px solid #6B21A8;
+}
+
+/* For hover state */
+.pagination li .page-link:hover {
+    background: #EDE9FE;
+    color: #6B21A8;
+}
+
+
   /* Color Dot */
   .color-dot {
     width: 25px;

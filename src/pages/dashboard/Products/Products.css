@@ -7,6 +7,24 @@
     width: 35%;
 }
 
+          .custom-pagination .page-link {
+            color: #6B21A8;
+            border-color: #6B21A8;
+          }
+          .custom-pagination .page-item.active .page-link {
+            background-color: #6B21A8;
+            border-color: #6B21A8;
+          }
+          .custom-pagination .page-link:hover {
+            color: white;
+            background-color: #6B21A8;
+            border-color: #6B21A8;
+          }
+          .custom-pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #fff;
+            border-color: #dee2e6;
+          }
 
 @media(max-width:1024px){
     .products .filter-sec{

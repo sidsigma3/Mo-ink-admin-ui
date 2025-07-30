@@ -295,7 +295,7 @@ const getProductText = (discount) => {
             </div>
         </div>
 
-        <div className='discount-table-ctn rounded-2'>
+        <div className='discount-table-ctn rounded-2' style={{height: '60vh'}}>
           <Table hover>
             <thead>
               <tr>
@@ -363,7 +363,7 @@ const getProductText = (discount) => {
           </Table>
 
           <div className="data-cards">
-        {filteredData.map((discount,index) => (
+        {paginatedDiscounts.map((discount,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between'>

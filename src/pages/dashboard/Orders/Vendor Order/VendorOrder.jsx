@@ -337,7 +337,7 @@ if (totalPages > 1) {
                    <div className='btn-ctn'>
                                           <div className="date-filter position-relative">
                                                <button
-                                               className=" date-btn btn lg-btn fw-medium "
+                                               className=" date-btn btn lg-btn fw-medium d-flex align-items-center justify-content-center "
                                                onClick={() => setShowPicker(!showPicker)}
                                              >
                                                <span className="d-none d-sm-inline">
@@ -439,7 +439,7 @@ if (totalPages > 1) {
 
         {/* Desktop Table */}
         <div className="d-none d-md-block">
-          <div className="table-responsive mt-3 rounded-2 table-ctn">
+          <div className="table-responsive mt-3 rounded-2 table-ctn" style={{height: '60vh'}}>
             <Table hover>
               <thead className="thead-dark">
                 <tr>

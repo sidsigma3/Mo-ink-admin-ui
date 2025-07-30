@@ -22,7 +22,7 @@ const ProductFilter = ({ filterOptions, onFilterChange }) => {
     };
   
     return (
-      <div className="d-flex bg-white p-2 gap-3 border order-id w-100 ps-0" style={{ height: '2.3 rem' }}>
+      <div className="d-flex bg-white p-2 gap-4 border order-id w-100 ps-0" style={{ height: '2.3 rem' }}>
         {/* Dropdown Selection */}
         <div className="d-flex align-items-center justify-content-between border border-right" style={{ width: "39%" }}>
           <Dropdown onSelect={handleSelect} size="sm" className="d-flex align-items-center w-100">
