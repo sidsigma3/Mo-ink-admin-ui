@@ -660,7 +660,7 @@ const Inventory = () => {
       <div className="inventory-container">
         {/* Table View (Visible on large screens) */}
         <div className="table-wrapper">
-          <Table hover className="text-center align-middle mb-0 inventory-table">
+          <Table hover className="text-center align-middle mb-0 inventory-table" style={{height: '60vh'}}>
             <thead className="table-light">
               <tr>
                 <th className="text-start py-3">Product</th>

@@ -258,8 +258,8 @@ const AnalyticsPage = () => {
 
   return (
     <div className='analytics-page '>
-        <div className='top d-flex justify-content-between mt-2'>
-            <h4 style={{fontSize:'1.2rem'}}>Analytics</h4>
+        <div className='top d-flex align-items-center justify-content-between mt-3'>
+            <h4 className='m-0 text-center' style={{fontSize:'1.2rem'}}>Analytics</h4>
             <Filter></Filter>
         </div>
 

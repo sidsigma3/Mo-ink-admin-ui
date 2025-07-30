@@ -303,7 +303,7 @@ const UserPage = () => {
                 </Table>
 
                 <div className="data-cards rounded-4">
-                    {filteredData.map((user,index) => (
+                    {currentPageData.map((user,index) => (
                       <div className="data-card" key={index}>
 
                         <div className='d-flex justify-content-between align-items-center' onClick={() => handleRowClick(index)}>

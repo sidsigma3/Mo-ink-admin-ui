@@ -167,17 +167,36 @@ const SegmentsPage = () => {
 
       const paginationItems = [];
 
-      for (let page = 1; page <= totalPages; page++) {
-        paginationItems.push(
-          <Pagination.Item
-            key={page}
-            active={page === currentPage}
-            onClick={() => setCurrentPage(page)}
-          >
-            {page}
-          </Pagination.Item>
-        );
-      }
+      if (totalPages >= 1) {
+              paginationItems.push(
+                  <Pagination.Prev
+                      key="prev"
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                  />
+              );
+      
+              for (let number = 1; number <= totalPages; number++) {
+                  paginationItems.push(
+                      <Pagination.Item
+                          key={number}
+                          active={number === currentPage}
+                          onClick={() => setCurrentPage(number)}
+                      >
+                          {number}
+                      </Pagination.Item>
+                  );
+              }
+      
+              paginationItems.push(
+                  <Pagination.Next
+                      key="next"
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                  />
+              );
+          }
+      
         
 
 
@@ -301,7 +320,7 @@ const SegmentsPage = () => {
 
 
             <div className="data-cards rounded-4">
-        {filteredData.map((seg,index) => (
+        {currentPageData.map((seg,index) => (
           <div className="data-card" key={index} onClick={() => handleRowClick(index)}>
 
             <div className='d-flex justify-content-between align-items-center'>

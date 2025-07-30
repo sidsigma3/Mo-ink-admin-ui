@@ -399,7 +399,7 @@ const CustomersPage = () => {
                 </Table>
 
                 <div className="data-cards rounded-4">
-             {filteredData.map((customer,index) => {
+             {paginatedCustomers.map((customer,index) => {
                 const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
               return(
               <div className="data-card" key={index} onClick={() => handleRowClick(index)}>

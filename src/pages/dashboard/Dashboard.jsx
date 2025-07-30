@@ -292,7 +292,7 @@ const {
                         <div className='btn-ctn'>
                          <div className="date-filter position-relative">
                               <button
-                              className=" date-btn btn lg-btn fw-medium "
+                              className=" date-btn btn lg-btn fw-medium d-flex align-items-center justify-content-center "
                               onClick={() => setShowPicker(!showPicker)}
                             >
                               <span className="d-none d-sm-inline">
