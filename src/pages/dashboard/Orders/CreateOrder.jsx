@@ -962,7 +962,7 @@ const handleCreateOrder = async () => {
         transactionId: "TXN" + Date.now(),
         paidAmount: Number(onlineAmt.toFixed(0)),
         pendingAmount: Number(codAmt.toFixed(0)),
-        paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PAID",
+        paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTILLY_PAID",
         totalDiscount: Number(grandTotals.totalDiscount.toFixed(0)),
         totalSgst: Number(isOdisha ? grandTotals.sgst.toFixed(0) : "0.00"),
         totalCgst: Number(isOdisha ? grandTotals.cgst.toFixed(0) : "0.00"),
@@ -1541,7 +1541,7 @@ const handleCancelTransaction = () => {
 
   return (
     <div className='create-order'>
-        <div className='top d-flex gap-3 mb-4 mt-3' style={{cursor:'pointer'}}>
+        <div className='top d-flex gap-3 mb-4 mt-2' style={{cursor:'pointer'}}>
             <span onClick={() => navigate('/orders')}><IoArrowBackOutline size={25}/></span>
            { Object.keys(order).length === 0 ? (
             <h3 className='m-0' style={{fontSize:'1.2rem'}}>Create Order</h3>
@@ -1765,7 +1765,7 @@ const handleCancelTransaction = () => {
                                                       </td>
                                                       <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                                                         <span className="fw-medium" style={{ fontSize: '0.8rem', color: 'black' }}>
-                                                          {discountPercent.toFixed(2)}%
+                                                          {combinedDiscountPercent.toFixed(2)}%
                                                         </span>
                                                       </td>
                                                      
@@ -2295,11 +2295,11 @@ const handleCancelTransaction = () => {
 
                      <td>
                       <div>
-                        <p>{(grandTotals.baseTotal > 0
+                        <p >{(grandTotals.baseTotal > 0
                         ? (grandTotals.totalDiscount / grandTotals.baseTotal) * 100
                         : 0).toFixed(2)}%</p>
-                        <p>{discountPercentage}%</p>
-                        <p className="text-gray-400">
+                        <p className='text-black-50 my-2'>{discountPercentage}%</p>
+                        <p className="text-black-50">
                           {selectedDiscountData?.discountType === 'Percentage'
                             ? `${selectedDiscountData?.discountValue}%`
                             : `₹${selectedDiscountData?.discountValue || 0}`}
@@ -2308,16 +2308,18 @@ const handleCancelTransaction = () => {
                     </td>
 
 
-                      <td>
-                        <div>
+                      <td className='d-flex justify-content-end'>
+                        <div className='mt-2'>
                           <p className='text-end text-success'>
                             <span className="mr-1 font-semibold">-</span> ₹{grandTotals.totalDiscount.toFixed(0)}
                           </p>
                           <p className="text-gray-400 text-end">
-                            ₹{grandTotals.totalPaymentTypeDiscount.toFixed(0)}
+                            {/* ₹{grandTotals.totalPaymentTypeDiscount.toFixed(0)} */}
+                            {}
                           </p>
                           <p className="text-gray-400 text-end">
-                            ₹{grandTotals.totalCouponTypeDiscount.toFixed(0)}
+                            {/* ₹{grandTotals.totalCouponTypeDiscount.toFixed(0)} */}
+                            {}
                           </p>
                         </div>
                       </td>

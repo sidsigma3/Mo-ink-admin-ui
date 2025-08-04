@@ -361,7 +361,7 @@ const {
 
       <div className="bg-white graph-ctn shadow-sm p-3">
         <h5 style={{fontSize:'1.2rem'}}>Product Sold (Kgs)</h5>
-       <h5 className="mb-3" style={{fontSize:'1rem'}}> <span className="text-success me-1">+3.4%</span>from last period</h5>
+       <h5 className="mb-3" style={{fontSize:'1rem'}}></h5>
       <ProductSoldGraph productData={productSoldByCategory} />
 
       </div>
@@ -369,32 +369,32 @@ const {
 
       <div className="current-status-ctn row">
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-          <DashboardBox heading={'Confirmed Orders (Items)'} number={newOrdersToFulfill} />
+          <DashboardBox heading={'New Orders (Items)'} number={newOrdersToFulfill} />
         </div>
 
          <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
           <DashboardBox
-            heading={'Confirmed Orders (kgs)'}
+            heading={'New Orders (kgs)'}
             number={`${formatNumber(newOrderReceivedWeight)} Kgs`}
           />
         </div>
 
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
         <DashboardBox
-          heading={'Amount Received'}
+          heading={'Pending Amount'}
           number={`₹ ${formatNumber(paymentReceivableInLacs)} Lacs`}
         />
       </div>
 
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
           <DashboardBox 
-            heading={'Amount COD'} 
-            number={`₹ ${formatNumber(totalRevenueInLacs - paymentReceivableInLacs)} Lacs`} 
+            heading={'Received Amount'} 
+            number={`₹ ${(totalRevenueInLacs - paymentReceivableInLacs).toFixed(2)} Lacs`} 
           />
         </div>
 
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-          <DashboardBox heading={'Order Delivered'} number={ordersAtManufacturer} />
+          <DashboardBox heading={'Order Delivered'} number={ordersDispatched} />
         </div>
 
           <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
