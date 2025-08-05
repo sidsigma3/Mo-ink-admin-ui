@@ -12,7 +12,7 @@ import { enIN } from "date-fns/locale";
 import DatePicker from "react-datepicker";
 import { getAllInventory } from "../../services/InventoryService";
 import { getAllProduct } from "../../services/ProductService";
-import { FiCalendar } from "react-icons/fi";
+import { FiCalendar, FiX } from 'react-icons/fi';
 // import BottomNav from "../../components/SideBar/BottomNav";
 import { fetchDashboardAnalytics } from "../../services/analyticsService";
 
@@ -290,55 +290,111 @@ const {
                         {/* <Filter></Filter> */}
 
                         <div className='btn-ctn'>
-                         <div className="date-filter position-relative">
-                              <button
-                              className=" date-btn btn lg-btn fw-medium d-flex align-items-center justify-content-center "
-                              onClick={() => setShowPicker(!showPicker)}
-                            >
-                              <span className="d-none d-sm-inline">
-                                {startDate && endDate
-                                  ? `${format(startDate, "dd MMM yyyy")} - ${format(endDate, "dd MMM yyyy")}`
-                                  : "Select Date"}
-                              </span>
-                                </button>
-        
-                                <button className="date-btn btn sm-bttn"
-                                onClick={() => setShowPicker(!showPicker)}>
-                              <FiCalendar className=" " size={20} />
-                            </button>
-                          {startDate && endDate && (
-                            <button
-                              className="ms-2 btn btn-sm btn-outline-secondary"
-                              onClick={() => {
-                                setStartDate(null);
-                                setEndDate(null);
-                                // No need to call fetch here — useEffect will handle it!
-                              }}
-                            >
-                              Clear
-                            </button>
-                          )}
-
-
-
-                        {showPicker && (
-                          <div ref={datePickerRef} style={{ zIndex: 1000, position: "absolute", right: "0" }}>
-                            <DatePicker
-                              selected={startDate}
-                              onChange={(dates) => {
-                                const [start, end] = dates;
-                                setStartDate(start);
-                                setEndDate(end);
-                              }}
-                              startDate={startDate}
-                              endDate={endDate}
-                              selectsRange
-                              inline
-                              dateFormat="dd MMM yyyy"
-                            />
-                          </div>
+                  <div className="date-filter d-flex position-relative align-items-center">
+                      {/* Main date button - desktop */}
+                      <button
+                        className="date-btn btn lg-btn fw-medium d-flex align-items-center justify-content-center position-relative"
+                        onClick={() => setShowPicker(!showPicker)}
+                      >
+                        <span className="d-none d-sm-inline">
+                          {startDate && endDate
+                            ? `${format(startDate, "dd MMM yy")} - ${format(endDate, "dd MMM yy")}`
+                            : "Select Date"}
+                        </span>
+                        
+                        {/* Clear button integrated into main button - desktop */}
+                        {startDate && endDate && (
+                          <button
+                            className="btn-clear position-absolute d-none d-sm-flex align-items-center justify-content-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setStartDate(null);
+                              setEndDate(null);
+                            }}
+                            style={{
+                              right: '8px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: 'none',
+                              backgroundColor: '#ef44441f',
+                              color: '#ef4444',
+                              fontSize: '12px',
+                              zIndex: 1
+                            }}
+                            title="Clear dates"
+                          >
+                            <FiX size={12} />
+                          </button>
                         )}
-                      </div>
+                      </button>
+
+                      {/* Mobile date button with calendar icon */}
+                      <button 
+                        className="date-btn btn sm-bttn position-relative"
+                        onClick={() => setShowPicker(!showPicker)}
+                      >
+                        <FiCalendar size={20} />
+                        
+                        {/* Clear icon on top-right for mobile */}
+                        {startDate && endDate && (
+                          <button
+                            className="position-absolute d-sm-none d-flex align-items-center justify-content-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setStartDate(null);
+                              setEndDate(null);
+                            }}
+                            style={{
+                              top: '-6px',
+                              right: '-6px',
+                              width: '18px',
+                              height: '18px',
+                              borderRadius: '50%',
+                              border: '1px solid white',
+                              backgroundColor: '#dc3545',
+                              color: 'white',
+                              fontSize: '10px',
+                              zIndex: 2,
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                            }}
+                            title="Clear dates"
+                          >
+                            <FiX size={10} />
+                          </button>
+                        )}
+                      </button>
+
+                      {/* Date picker dropdown */}
+                      {showPicker && (
+                        <div 
+                          ref={datePickerRef} 
+                          style={{ 
+                            zIndex: 1000, 
+                            position: "absolute", 
+                            right: "0",
+                            top: "100%",
+                            marginTop: "4px"
+                          }}
+                        >
+                          <DatePicker
+                            selected={startDate}
+                            onChange={(dates) => {
+                              const [start, end] = dates;
+                              setStartDate(start);
+                              setEndDate(end);
+                            }}
+                            startDate={startDate}
+                            endDate={endDate}
+                            selectsRange
+                            inline
+                            dateFormat="dd MMM yyyy"
+                          />
+                        </div>
+                      )}
+                    </div>
                       </div>
 
 
@@ -369,7 +425,7 @@ const {
 
       <div className="current-status-ctn row">
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
-          <DashboardBox heading={'New Orders (Items)'} number={newOrdersToFulfill} />
+          <DashboardBox heading={'New Orders'} number={newOrdersToFulfill} />
         </div>
 
          <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
