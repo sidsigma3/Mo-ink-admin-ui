@@ -45,11 +45,9 @@ const ColorLibrary =  ({setDemoData }) => {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [filteredColors, setFilteredColors] = useState([]);
 
-  // Add new color at the TOP
+ 
   const handleAddColor = () => {
-    console.log('🎨 === ADD COLOR BUTTON CLICKED ===');
-    console.log('📊 Current newColors length:', newColors.length);
-    
+ 
     const newColor = {
       id: `new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       colorName: '',
@@ -60,18 +58,15 @@ const ColorLibrary =  ({setDemoData }) => {
       localPreview1: '',
     };
     
-    console.log('🆕 Creating new color object:', newColor);
-    
-    // Add new color at the TOP of the array
+ 
+  
     setNewColors(prev => {
       console.log('📝 Previous newColors:', prev);
-      const updated = [newColor, ...prev]; // New color first, then existing ones
-      console.log('✅ Updated newColors:', updated);
-      console.log('✅ New total length:', updated.length);
+      const updated = [newColor, ...prev]; 
       return updated;
     });
     
-    console.log('🔄 handleAddColor completed successfully');
+ 
   };
 
   // Monitor newColors changes
@@ -81,7 +76,6 @@ const ColorLibrary =  ({setDemoData }) => {
 
   // Remove new color function
   const handleRemoveNewColor = (index) => {
-    console.log('🗑️ Removing new color at index:', index);
     setNewColors(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -139,9 +133,10 @@ const ColorLibrary =  ({setDemoData }) => {
     setColorStatus(statusMap);
     
     // ✅ Add this: Apply filter after status is set
-    setTimeout(() => {
-      applyCombinedFilter(searchTerm, selectedStatus);
-    }, 0);
+    // setTimeout(() => {
+    //   applyCombinedFilter(searchTerm, selectedStatus);
+    //   console.log('achha')
+    // }, 0);
     
   } catch (error) {
     console.error("Failed to fetch colors:", error);
@@ -152,10 +147,6 @@ const ColorLibrary =  ({setDemoData }) => {
 
 const handleSaveColors = async () => {
   try {
-    console.log('💾 Saving colors...');
-    console.log('Existing colors:', colors.length);
-    console.log('New colors:', newColors.length);
-
     const updatedColors = [
       ...colors.map((color) => ({
         id: color.id,
@@ -255,7 +246,7 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
   };
 
   const applyCombinedFilter = (searchValue, status) => {
-  console.log('🔍 Filter Debug:', { searchValue, status, colorsLength: colors.length, colorStatus });
+ 
   
   const lowercasedSearch = searchValue?.toLowerCase?.() || "";
   
@@ -272,7 +263,7 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
 
   // Apply status filter - Fixed logic
   if (status !== 'All') {
-    console.log('🎯 Applying status filter:', status);
+  
     filtered = filtered.filter((item) => {
       // Get current switch state (fallback to original status if not toggled yet)
       const isChecked = colorStatus[item.id] !== undefined 
@@ -290,7 +281,7 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
     });
   }
 
-  console.log("Filtered colors:", filtered.length);
+
   setFilteredColors(filtered);
 };
 
@@ -366,6 +357,7 @@ const handleFileChange = (e) => {
     currentPage * itemsPerPage
   );
 
+
   // Fixed pagination with proper ellipsis logic
   const paginationItems = [];
 
@@ -440,6 +432,7 @@ const handleFileChange = (e) => {
       />
     );
   }
+
 
  const showToast = (message, type = "error") => {
             setToasts([{ id: Date.now(), message, type }]);

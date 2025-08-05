@@ -254,12 +254,13 @@ const {
   totalCustomers,
   totalOrders,
   totalRevenueInLacs,
+  paymentReceivedInLacs,
   totalWeightSold,
   productSoldByCategory,
   newOrdersToFulfill,
   ordersAtManufacturer,
   ordersDispatched,
-  paymentReceivableInLacs,
+  paymentPendingInLacs,
   newOrderReceivedWeight,
   totalInventoryLeft,
 } = analytics;
@@ -408,10 +409,10 @@ const {
                           <DashboardBox heading={'Total Order'} number={totalOrders} />
                         </div>
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
-                          <DashboardBox heading={'Total Revenue (Lacs)'} number={`₹ ${formatNumber(totalRevenueInLacs)}`} />
+                          <DashboardBox heading={'Total Revenue (Lacs)'} number={`₹ ${totalRevenueInLacs}`} />
                         </div>
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
-                          <DashboardBox heading={'Total Weight Sold'} number={`${formatNumber(totalWeightSold)} Kgs`} />
+                          <DashboardBox heading={'Total Weight Sold'} number={`${totalWeightSold} Kgs`} />
                         </div>
                     </div>
 
@@ -438,14 +439,14 @@ const {
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
         <DashboardBox
           heading={'Pending Amount'}
-          number={`₹ ${formatNumber(paymentReceivableInLacs)} Lacs`}
+          number={`₹ ${paymentPendingInLacs} Lacs`}
         />
       </div>
 
         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
           <DashboardBox 
             heading={'Received Amount'} 
-            number={`₹ ${(totalRevenueInLacs - paymentReceivableInLacs).toFixed(2)} Lacs`} 
+            number={`₹ ${(paymentReceivedInLacs).toFixed(2)} Lacs`} 
           />
         </div>
 
@@ -456,7 +457,7 @@ const {
           <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
             <DashboardBox
               heading={'Available Inventory'}
-              number={`${formatNumber(totalInventoryLeft)} Kgs`}
+              number={`${totalInventoryLeft} Kgs`}
             />
           </div>
       {/* <div className="current-status-ctn row"> */}
