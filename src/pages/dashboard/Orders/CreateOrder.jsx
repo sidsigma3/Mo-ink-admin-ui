@@ -962,7 +962,7 @@ const handleCreateOrder = async () => {
         transactionId: "TXN" + Date.now(),
         paidAmount: Number(onlineAmt.toFixed(0)),
         pendingAmount: Number(codAmt.toFixed(0)),
-        paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTILLY_PAID",
+        paymentStatus: onlinePercentage === 0 ? "UNPAID" : "PARTIALLY_PAID",
         totalDiscount: Number(grandTotals.totalDiscount.toFixed(0)),
         totalSgst: Number(isOdisha ? grandTotals.sgst.toFixed(0) : "0.00"),
         totalCgst: Number(isOdisha ? grandTotals.cgst.toFixed(0) : "0.00"),
