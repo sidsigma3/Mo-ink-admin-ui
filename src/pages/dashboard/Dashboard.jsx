@@ -270,7 +270,7 @@ const {
   const formatNumber = (num) => {
    
     if (num >= 100000) {
-        return (num / 100000).toFixed(2) + " L"; 
+        return (num / 100000).toFixed(2) + " Lacs"; 
     }
         return num; 
 };
@@ -409,7 +409,7 @@ const {
                           <DashboardBox heading={'Total Order'} number={totalOrders} />
                         </div>
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
-                          <DashboardBox heading={'Total Revenue (Lacs)'} number={`₹ ${totalRevenueInLacs}`} />
+                          <DashboardBox heading={'Total Revenue (Lacs)'} number={`₹ ${formatNumber(totalRevenueInLacs)}`} />
                         </div>
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
                           <DashboardBox heading={'Total Weight Sold'} number={`${totalWeightSold} Kgs`} />
@@ -432,7 +432,7 @@ const {
          <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
           <DashboardBox
             heading={'New Orders (kgs)'}
-            number={`${formatNumber(newOrderReceivedWeight)} Kgs`}
+            number={`${newOrderReceivedWeight} Kgs`}
           />
         </div>
 
