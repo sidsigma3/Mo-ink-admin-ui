@@ -260,3 +260,26 @@ export const sendCodOrderById = async (orderId, amountToCollect) => {
   }
 };
 
+export const collectCodOfflineById = async (orderId, amountToCollect, remarks) => {
+  try {
+    const response = await axios.post(
+      `${URL}/payment/cod/offline-collection/${orderId}`,
+      {}, // Empty body
+      {
+        params: {
+          amountToCollect,
+          remarks,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error collecting offline COD for order ID ${orderId}:`, error);
+    throw error;
+  }
+};
+
+
+
+
+

@@ -21,7 +21,7 @@ import { getAllCustomer , getWalletTransactions} from '../../../services/Custome
 import { getAllOrders , updateOrderVariantStatuses , updateOrderVariants} from '../../../services/OrderService';
 import { Segment } from 'react';
 import { getAllDiscount } from '../../../services/DiscountService';
-import { createOrder, getCodOrderById , sendCodOrderById} from '../../../services/OrderService';
+import { createOrder, getCodOrderById , sendCodOrderById, collectCodOfflineById} from '../../../services/OrderService';
 import emailjs from 'emailjs-com';
 import ReactWhatsapp from 'react-whatsapp';
 import html2pdf from 'html2pdf.js';
@@ -246,7 +246,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
                 const formattedTransactions = codTransactions.map((tx) => ({
                   transactionId: tx.razorpayReferenceId,
                   date: tx.paidAt,
-                  payType: 'Online Payment Link',
+                  payType: tx.razorpayOrderId ? 'Online Payment Link' : 'Cash',
                   amountCollected: tx.amountPaid,
                   remaining: tx.remainingAmount
                 }));
@@ -999,18 +999,27 @@ const handleCreateOrder = async () => {
     setShowModal(false);
   };
 
-  const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
+const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
   try {
-    const res = await sendCodOrderById(order?.orderId, amount);
-
-    alert("Payment link sent successfully!");
-    // Optionally refresh transactions or state here
+    if (paymentMethod === 'manual_entry') {
+      await collectCodOfflineById(order?.orderId, amount, remark);
+      alert("Cash payment recorded successfully!");
+    } else if (paymentMethod === 'payment_link') {
+      await sendCodOrderById(order?.orderId, amount);
+      alert("Payment link sent successfully!");
+    }
+    fetchCodTransactions(order?.orderId)
   } catch (error) {
-    alert("Failed to send payment link.");
+    alert(
+      paymentMethod === 'manual_entry'
+        ? "Failed to record cash payment."
+        : "Failed to send payment link."
+    );
   } finally {
     setShowModal(false);
   }
 };
+
 
     
 
