@@ -1888,7 +1888,7 @@ const handleCancelTransaction = () => {
 
                                     
                                             {isViewMode && (
-                                              <td>
+                                              <td style={{ justifyItems: 'center', alignContent:'center'}} >
                                                 <div className='d-flex flex-column gap-3'>
                                                   {order.status === "RETURN_REQUESTED" && (
                                                    <div className="d-flex align-items-center justify-content-between position-relative">

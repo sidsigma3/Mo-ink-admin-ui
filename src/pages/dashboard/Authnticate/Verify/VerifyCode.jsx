@@ -87,11 +87,11 @@ const [username, setUsername] = useState("");
           Verify
         </button>
 
-        <div className="text-center small fs-6 fw-normal text-white-50 my-3">Or login with</div>
+        {/* <div className="text-center small fs-6 fw-normal text-white-50 my-3">Or login with</div>
 
         <div className="d-flex justify-content-center gap-2 gap-lg-3">
         <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
-        </div>
+        </div> */}
       </form>
     </div>
     </div>

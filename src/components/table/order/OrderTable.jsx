@@ -628,6 +628,8 @@ const handleRowClick = (order) => {
               </select>
             </div>
 
+            
+
 
               {/* <div className="manufacturer">
                 {order.manufacturer ? (
