@@ -14,7 +14,6 @@
   border: 3px solid #ffffff  !important;
   color: #0b1127 !important;
   align-items: start;
-  height: 52vh;
 
 }
 
@@ -88,7 +87,7 @@
   width: 60%;
 }
 
-
+/* 
 @media (max-width: 1540px) {
 .login-card {
     height: 68vh;    }
@@ -101,5 +100,5 @@
 
 @media (max-width: 768px) {
 .login-card {
-    height: 58vh;    }
-  }
+    height: auto;    }
+  } */

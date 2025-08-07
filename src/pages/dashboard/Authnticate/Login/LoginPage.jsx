@@ -145,11 +145,11 @@ const LoginPage = ({ togglePage ,isLogin, setAuthStatus }) => {
             Login
           </button>
 
-          <div className="text-center small fs-7 fw-normal text-white-50 my-3">Or login with</div>
+          {/* <div className="text-center small fs-7 fw-normal text-white-50 my-3">Or login with</div>
 
           <div className="d-flex justify-content-center gap-2 gap-lg-3">
           <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
-          </div>
+          </div> */}
         </form>
       </div>
                   <div className="fixed top-4 right-4 z-50 space-y-2">
