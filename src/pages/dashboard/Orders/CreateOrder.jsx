@@ -2210,7 +2210,7 @@ const handleCancelTransaction = () => {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu className="w-75">
-                        <Dropdown.Item eventKey={"100%"}>
+                        {/* <Dropdown.Item eventKey={"100%"}>
                           <div className="p-2 border-bottom">
                             <h6 className="text-md font-normal">
                               <span className="text-primary">100%</span> Online Payment
@@ -2227,7 +2227,7 @@ const handleCancelTransaction = () => {
                             </h6>
                             <h6>0.50% discount will be applied.</h6>
                           </div>
-                        </Dropdown.Item>
+                        </Dropdown.Item> */}
 
                         {/* <Dropdown.Item eventKey={"30%"}>
                           <div className="p-2 border-bottom">
