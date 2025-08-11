@@ -433,8 +433,8 @@ input:checked + .slider:before {
   
 }
 
-/* Fix for file inputs */
-input[type="file"] {
+/* Fix for file inputs */ 
+.colorlibrary input[type="file"] {
   position: absolute !important;
   opacity: 0 !important;
   /* pointer-events: none !important; */
