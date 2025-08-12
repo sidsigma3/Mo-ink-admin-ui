@@ -924,8 +924,7 @@ const handleCreateOrder = async () => {
         };
       });
 
-    console.log(orderVariants);
-
+   
     const totalQuantity = orderVariants.reduce((sum, item) => sum + item.orderWeight, 0);
     const totalAmount = Number(calculateTotalAmount());
 
@@ -2091,6 +2090,14 @@ const handleCancelTransaction = () => {
                           <h4>Customer</h4>
                           <p>{selectedCustomer.customerName}</p>
                         </div>
+                      </div>
+
+                      <div className="flex-grow-1">
+                         <div className='mb-2'>
+                          <h4>Company</h4>
+                          <p>{selectedCustomer.company}</p>
+                        </div>
+
                       </div>
 
                       {/* Contact Info */}
