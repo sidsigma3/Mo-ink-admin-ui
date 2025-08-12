@@ -32,6 +32,54 @@ const yarnData = [
     colors: "4 Color",
     image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn4.jpg?updatedAt=1749718954196",
   },
+  {
+    name: "Lenzing Micro Modal",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn1.png?updatedAt=1754928796191",
+  },
+  {
+    name: "Viscose",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn7.jpg?updatedAt=1749718954502",
+  },
+  {
+    name: "Tencel",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn6.jpg?updatedAt=1749718954437",
+  },
+  {
+    name: "Ecovero",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn8.png?updatedAt=1754927536082",
+  },
+  {
+    name: "Birla Micro Modal",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn8%20(3).png?updatedAt=1754927535975",
+  },
+  {
+    name: "Livaeco",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn8%20(2).png?updatedAt=1754927535634",
+  },
+  {
+    name: "Flax Varieties",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn7%20%20.png?updatedAt=1754927543913",
+  },
+   {
+    name: "Excel-Linen",
+    sku: "2 SKU",
+    colors: "4 Color",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn8.png?updatedAt=1754927906052",
+  },
 ];
 
 // Create image map for easy lookup
@@ -98,7 +146,7 @@ const ColorLibraryProducts = () => {
         <div className="row g-3 justify-content-center">
           {products.map((item, index) => (
 
-            <div className="col-6 col-lg-2 m-0" key={index}
+            <div className="col-6 col-lg-2 mt-0 mb-3" key={index}
             style={{cursor:'pointer'}}
              onClick={() =>{
                       navigate("/colorlibrary", {
@@ -122,9 +170,9 @@ const ColorLibraryProducts = () => {
                   />
                 </div>
                 
-                <div className="card-body py-1 text-center d-flex align-items-center justify-content-between gap-2">
-                <h6 className="fw-medium text-dark mb-0" style={{ fontSize: '14px'}}>{item.name}</h6>
-                <p className="mb-0 fs-7 text-muted"  style={{ fontSize: '12px'}}>
+                <div className="card-body py-1  d-flex align-items-center justify-content-between gap-2">
+                <h6 className="fw-medium text-dark mb-0 text-start " style={{ fontSize: '14px'}}>{item.name}</h6>
+                <p className="mb-0 fs-7 text-muted text-center"  style={{ fontSize: '12px'}}>
                   {item.colorCount} Color
                 </p>
               </div>

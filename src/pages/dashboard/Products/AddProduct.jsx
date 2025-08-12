@@ -119,10 +119,17 @@ const AddProduct = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [status, setStatus] = useState(product?.availableStatus || "Active"); 
 
-  const showToast = (message, type = "error") => {
-    setToasts([{ message, type }]);
-    setTimeout(() => setToasts([]), 3000);
-      };
+ const showToast = (message, type = "error") => {
+  const newToast = { 
+    id: Date.now() + Math.random(), // Unique ID
+    message, 
+    type 
+  };
+  setToasts(prev => [...prev, newToast]);
+  setTimeout(() => {
+    setToasts(prev => prev.filter(t => t.id !== newToast.id));
+  }, 3000);
+};
  
  
 
@@ -144,6 +151,8 @@ const [formData, setFormData] = useState({
   media: product?.productImage?.[0] || null,
   mediaHank: hankImage,
   mediaCone: coneImage,
+  mediaHankLoading: false, 
+  mediaConeLoading: false,
 });
 
 console.log(product);
@@ -170,153 +179,190 @@ const handleMediaChange = async (e, type) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  try {
-    const res = await uploadProductImage(file, `product-${type}`); // type: hank or cone
-    const uploadedUrl = res.data;
+  // Validate file size (2MB = 2 * 1024 * 1024 bytes)
+  const maxSize = 2 * 1024 * 1024; // 2MB
+  if (file.size > maxSize) {
+    showToast('Image file size must be less than 2MB.', 'error');
+    // Clear the input
+    e.target.value = '';
+    return;
+  }
 
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!allowedTypes.includes(file.type)) {
+    showToast('Please upload a valid image file (JPEG, PNG, WebP).', 'error');
+    e.target.value = '';
+    return;
+  }
+
+  try {
+    // Show loading state
     setFormData(prev => ({
       ...prev,
-      [`media${type.charAt(0).toUpperCase() + type.slice(1)}`]: uploadedUrl, // mediaHank or mediaCone
+      [`media${type.charAt(0).toUpperCase() + type.slice(1)}Loading`]: true
     }));
+
+    const res = await uploadProductImage(file, `product-${type}`);
+    const uploadedUrl = res.data;
+
+    // Update the correct field based on type
+    const fieldName = type === 'hank' ? 'mediaHank' : 'mediaCone';
+    
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: uploadedUrl,
+      [`media${type.charAt(0).toUpperCase() + type.slice(1)}Loading`]: false
+    }));
+
+    showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} image uploaded successfully!`, 'success');
+    
   } catch (error) {
-    showToast('Image upload failed due to image file size.', 'error');
+    console.error('Upload error:', error);
+    setFormData(prev => ({
+      ...prev,
+      [`media${type.charAt(0).toUpperCase() + type.slice(1)}Loading`]: false
+    }));
+    showToast('Image upload failed. Please try again.', 'error');
+    // Clear the input on error
+    e.target.value = '';
   }
 };
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    setErrors({}); // Reset errors before validation
+  setErrors({}); // Reset errors before validation
 
-    // Validation checks
-    let validationErrors = {};
+  // Validation checks
+  let validationErrors = {};
 
-    if (!formData.productName.trim()) validationErrors.productName = "Product name is required.";
-    // if (!formData.description.trim()) validationErrors.description = "Description is required.";
-    // if (!formData.pricePerKg || formData.pricePerKg <= 0) validationErrors.pricePerKg = "Valid price per Kg is required.";
-    // if (!formData.costPerItem || formData.costPerItem <= 0) validationErrors.costPerItem = "Valid cost per item is required.";
-    // if (!formData.compareAtPrice || formData.compareAtPrice <= 0) validationErrors.compareAtPrice = "Valid Compare at price is required.";
-    // if (!formData.media) validationErrors.media = "Please upload a product image or media.";
-    if (!formData.gst || formData.gst < 0) validationErrors.gst = "Valid GST value is required.";
-    if (variants.length < 2) validationErrors.variants = "At least (Size & Color) variant is required.";
-    if (sizeColorMap.length < 2) validationErrors.sizeColorMap = "Size and color combination is required.";
+  if (!formData.productName.trim()) validationErrors.productName = "Product name is required.";
+  if (!formData.gst || formData.gst < 0) validationErrors.gst = "Valid GST value is required.";
+  if (variants.length < 2) validationErrors.variants = "At least (Size & Color) variant is required.";
+  if (sizeColorMap.length === 0) validationErrors.sizeColorMap = "Size and color combination is required.";
 
-    let hasInvalidPricing = false;
-      sizeColorMap.forEach(({ size, colors }) => {
-        colors.forEach(color => {
-          (color.variants || []).forEach(variant => {
-            const price = Number(variant.price);
-            const markup = Number(variant.markupPricePerKg);
-            if (!price || price <= 0 || !markup || markup <= 0) {
-              hasInvalidPricing = true;
-            }
-          });
-        });
-      });
+  // Check if at least one image is uploaded
+  if (!formData.mediaHank && !formData.mediaCone) {
+    validationErrors.media = "Please upload at least one product image (Hank or Cone).";
+  }
 
-      if (hasInvalidPricing) {
-        validationErrors.sizeColorMap = "Each size-color variant must have a valid Price and Markup Price.";
-      }
-
-    // Stop submission if there are errors
-    if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        return;
-    }
-
-  
-    
-    const plainTextDescription = formData.description.replace(/<\/?[^>]+(>|$)/g, "");
-
-    // Create variants with calculated prices and availability
-    const newVariants = sizeColorMap.flatMap(({ size, colors, coneDescription, hankDescription }) =>
-      colors.flatMap((color) =>
-        (color.variants || []).map((variant) => ({
-          size,
-          color: {
-            colorName: color.color,
-            colorCode: color.hex,
-            status: "ACTIVE",
-          },
-          variantType: variant.variantType.toUpperCase(),
-          availableWeight: Number(variant.available),
-          pricePerKg: Number(variant.price),
-          markupPricePerKg: Number(variant.markupPricePerKg || 0),
-          availableStatus: variant.availableStatus || "ACTIVE",
-          variantDescription:
-            variant.variantType.toUpperCase() === "CONE"
-              ? coneDescription || ""
-              : hankDescription || "",
-        }))
-      )
-    );
-
-
-    const averagePrice = sizeColorMap.reduce(
-        (acc, { colors }) => {
-            const total = colors.reduce((sum, color) => sum + Number(color.price), 0);
-            return acc + total;
-        },
-        0
-    ) / sizeColorMap.reduce((count, { colors }) => count + colors.length, 0);
-
-    const formattedData = {
-        title: formData.productName,
-        description: plainTextDescription,
-        media: [formData.mediaCone,formData.mediaHank],
-        availableStatus: status.toUpperCase(),
-        gstOnProduct: Number(formData.gst),
-        variants: newVariants, // All variants are sent
-        deletedVariantIds: [], // No deleted variants are tracked now
-    };
-
-    console.log(formattedData)
-
-    try {
-        if (state?.index !== undefined) {
-            const productId = product.productId;
-            const originalGrouped = product.groupedVariants || [];
-
-            const changedVariants = [];
-
-            // Loop through newVariants and check for changes
-            newVariants.forEach((newVar) => {
-                const matchSizeGroup = originalGrouped.find(g => g.size === newVar.size);
-                const matchColor = matchSizeGroup?.variants.find(
-                    old =>
-                        old.colorName === newVar.color.colorName &&
-                        old.hexCode.toLowerCase() === newVar.color.colorCode.toLowerCase() &&
-                        old.variantType === newVar.variantType
-                );
-
-                if (!matchColor ||
-                    matchColor.available !== newVar.availableWeight ||
-                    matchColor.pricePerKg !== newVar.pricePerKg ||
-                    matchColor.markupPricePerKg !== newVar.markupPricePerKg ||
-                    matchColor.hexCode !== newVar.color.hexCode
-                ) {
-                    changedVariants.push(newVar); // Track only changed variants
-                }
-            });
-
-            // Send all variants, but mark only the changed ones in formattedData
-            formattedData.variants = newVariants; // All variants, including changed and unchanged
-
-            // Do not track deleted variants
-            // formattedData.deletedVariantIds = deletedIds;  // No longer needed
-
-            await updateProduct(productId, formattedData);
-        } else {
-            // If it's a new product, just add the new variants
-            formattedData.variants = newVariants;
-            await addProduct(formattedData);
+  let hasInvalidPricing = false;
+  sizeColorMap.forEach(({ size, colors }) => {
+    colors.forEach(color => {
+      (color.variants || []).forEach(variant => {
+        const price = Number(variant.price);
+        const markup = Number(variant.markupPricePerKg);
+        if (!price || price <= 0 || !markup || markup <= 0) {
+          hasInvalidPricing = true;
         }
+      });
+    });
+  });
 
-        navigate('/products');
-    } catch (error) {
-        console.error('Error submitting product:', error);
+  if (hasInvalidPricing) {
+    validationErrors.sizeColorMap = "Each size-color variant must have a valid Price and Markup Price.";
+  }
+
+  // Stop submission if there are errors
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    showToast('Please fix the validation errors before submitting.', 'error');
+    return;
+  }
+
+  const plainTextDescription = formData.description ? formData.description.replace(/<\/?[^>]+(>|$)/g, "") : "";
+
+  // Create variants with calculated prices and availability
+  const newVariants = sizeColorMap.flatMap(({ size, colors, coneDescription, hankDescription }) =>
+    colors.flatMap((color) =>
+      (color.variants || []).map((variant) => ({
+        size,
+        color: {
+          colorName: color.color,
+          colorCode: color.hex,
+          status: "ACTIVE",
+        },
+        variantType: variant.variantType.toUpperCase(),
+        availableWeight: Number(variant.available),
+        pricePerKg: Number(variant.price),
+        markupPricePerKg: Number(variant.markupPricePerKg || 0),
+        availableStatus: variant.availableStatus || "ACTIVE",
+        variantDescription:
+          variant.variantType.toUpperCase() === "CONE"
+            ? coneDescription || ""
+            : hankDescription || "",
+      }))
+    )
+  );
+
+  // Create media array - only include uploaded images
+  const mediaArray = [];
+  if (formData.mediaCone) mediaArray.push(formData.mediaCone);
+  if (formData.mediaHank) mediaArray.push(formData.mediaHank);
+
+  const formattedData = {
+    title: formData.productName,
+    description: plainTextDescription,
+    media: mediaArray, // Use array of uploaded images
+    availableStatus: status.toUpperCase(),
+    gstOnProduct: Number(formData.gst),
+    variants: newVariants,
+    deletedVariantIds: [],
+  };
+
+  console.log('Submitting data:', formattedData);
+
+  try {
+    if (state?.index !== undefined) {
+      const productId = product.productId;
+      console.log('Updating product with ID:', productId);
+      await updateProduct(productId, formattedData);
+      showToast("Product updated successfully!", "success");
+    } else {
+      console.log('Adding new product');
+      await addProduct(formattedData);
+      showToast("Product added successfully!", "success");
     }
+
+    // Redirect after successful submission
+    setTimeout(() => {
+      navigate('/products');
+    }, 1500);
+  } catch (error) {
+    console.error('Error submitting product:', error);
+    
+    // More detailed error handling
+    let errorMessage = 'Failed to save product. Please try again.';
+    if (error.response) {
+      // Server responded with error status
+      console.error('Server error:', error.response.data);
+      errorMessage = error.response.data?.message || errorMessage;
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('Network error:', error.request);
+      errorMessage = 'Network error. Please check your connection.';
+    }
+    
+    showToast(errorMessage, 'error');
+  }
+};
+
+// Optional: Add function to remove uploaded images
+const handleMediaRemove = (type) => {
+  const fieldName = type === 'hank' ? 'mediaHank' : 'mediaCone';
+  setFormData(prev => ({
+    ...prev,
+    [fieldName]: null
+  }));
+  
+  // Clear the file input
+  const inputId = `${type}-upload`;
+  const input = document.getElementById(inputId);
+  if (input) input.value = '';
+  
+  showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} image removed.`, 'info');
 };
 
 
@@ -847,87 +893,147 @@ console.log(sizeColorMap)
           </div> */}
          
       <div className="">
-  <div className=" row g-4">
-    {/* Hank Image Upload */}
-    <div className="col-md-6">
-      <div className="media-upload-card p-4 h-100">
-        <label className="upload-label mb-3"  style={{fontSize:'1rem'}}>Hank Image</label>
-        <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
-          <input
-            type="file"
-            id="hank-upload"
-            accept="image/*"
-            onChange={(e) => handleMediaChange(e, 'hank')}
-            className="d-none"
-          />
-          <label 
-            htmlFor="hank-upload" 
-            className="upload-button btn-secondary-custom rounded-pill px-4 py-2 mb-2"
-          >
-            <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
-          </label>
-          <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
-          
-          {formData.mediaHank && (
-            <div className="preview-container mt-4 text-center">
-              <img 
-                src={`${backendUrl}${formData.mediaHank}`} 
-                alt="Hank Preview" 
-                className="img-thumbnail rounded" 
-                style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
-              />
+<div className="row g-4">
+  {/* Hank Image Upload */}
+  <div className="col-md-6">
+    <div className="media-upload-card p-4 h-100">
+      <label className="upload-label mb-3" style={{fontSize:'1rem'}}>
+        Hank Image <span className="text-muted">(Max 2MB)</span>
+      </label>
+      <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+        <input
+          type="file"
+          id="hank-upload"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          onChange={(e) => handleMediaChange(e, 'hank')}
+          className="d-none"
+          disabled={formData.mediaHankLoading}
+        />
+        
+        {!formData.mediaHank ? (
+          <>
+            <label 
+              htmlFor="hank-upload" 
+              className={`upload-button btn-secondary-custom rounded-pill px-4 py-2 mb-2 ${
+                formData.mediaHankLoading ? 'disabled' : ''
+              }`}
+              style={{ 
+                cursor: formData.mediaHankLoading ? 'not-allowed' : 'pointer',
+                opacity: formData.mediaHankLoading ? 0.6 : 1
+              }}
+            >
+              {formData.mediaHankLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-cloud-arrow-up me-2"></i>Choose Hank Image
+                </>
+              )}
+            </label>
+            <p className="upload-hint text-muted mb-0">JPEG, PNG, WebP (Max 2MB)</p>
+          </>
+        ) : (
+          <div className="preview-container text-center">
+            <img 
+              src={`${backendUrl}${formData.mediaHank}`} 
+              alt="Hank Preview" 
+              className="img-thumbnail rounded mb-2" 
+              style={{ maxWidth: '150px', maxHeight: '150px', objectFit: 'contain' }}
+            />
+            <div className="d-flex gap-2 justify-content-center">
+              <label 
+                htmlFor="hank-upload" 
+                className="btn btn-sm btn-outline-primary"
+              >
+                Change Image
+              </label>
               {/* <button 
-                className="btn btn-sm btn-outline-danger mt-2"
+                className="btn btn-sm btn-outline-danger"
                 onClick={() => handleMediaRemove('hank')}
+                type="button"
               >
                 Remove
               </button> */}
             </div>
-          )}
-        </div>
-      </div>
-    </div>
-
-    {/* Cone Image Upload */}
-    <div className="col-md-6">
-      <div className="media-upload-card p-4 h-100">
-        <label className="upload-label mb-3"  style={{fontSize:'1rem'}}>Cone Image</label>
-        <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
-          <input
-            type="file"
-            id="cone-upload"
-            accept="image/*"
-            onChange={(e) => handleMediaChange(e, 'cone')}
-            className="d-none"
-          />
-          <label 
-            htmlFor="cone-upload" 
-            className="upload-button btn-secondary-custom rounded-pill px-4 py-2 mb-2"
-          >
-            <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
-          </label>
-          <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
-          
-          {formData.mediaCone && (
-            <div className="preview-container mt-4 text-center">
-              <img 
-                src={`${backendUrl}${formData.mediaCone}`} 
-                alt="Cone Preview" 
-                className="img-thumbnail rounded" 
-                style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain' }}
-              />
-              {/* <button 
-                className="btn btn-sm btn-outline-danger mt-2"
-                onClick={() => handleMediaRemove('cone')}
-              >
-                Remove
-              </button> */}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   </div>
+
+  {/* Cone Image Upload */}
+  <div className="col-md-6">
+    <div className="media-upload-card p-4 h-100">
+      <label className="upload-label mb-3" style={{fontSize:'1rem'}}>
+        Cone Image <span className="text-muted">(Max 2MB)</span>
+      </label>
+      <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+        <input
+          type="file"
+          id="cone-upload"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          onChange={(e) => handleMediaChange(e, 'cone')}
+          className="d-none"
+          disabled={formData.mediaConeLoading}
+        />
+        
+        {!formData.mediaCone ? (
+          <>
+            <label 
+              htmlFor="cone-upload" 
+              className={`upload-button btn-secondary-custom rounded-pill px-4 py-2 mb-2 ${
+                formData.mediaConeLoading ? 'disabled' : ''
+              }`}
+              style={{ 
+                cursor: formData.mediaConeLoading ? 'not-allowed' : 'pointer',
+                opacity: formData.mediaConeLoading ? 0.6 : 1
+              }}
+            >
+              {formData.mediaConeLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-cloud-arrow-up me-2"></i>Choose Cone Image
+                </>
+              )}
+            </label>
+            <p className="upload-hint text-muted mb-0">JPEG, PNG, WebP (Max 2MB)</p>
+          </>
+        ) : (
+          <div className="preview-container text-center">
+            <img 
+              src={`${backendUrl}${formData.mediaCone}`} 
+              alt="Cone Preview" 
+              className="img-thumbnail rounded mb-2" 
+              style={{ maxWidth: '150px', maxHeight: '150px', objectFit: 'contain' }}
+            />
+            <div className="d-flex gap-2 justify-content-center">
+              <label 
+                htmlFor="cone-upload" 
+                className="btn btn-sm btn-outline-primary"
+              >
+                Change Image
+              </label>
+              {/* <button 
+                className="btn btn-sm btn-outline-danger"
+                onClick={() => handleMediaRemove('cone')}
+                type="button"
+              >
+                Remove
+              </button> */}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
         </div>
