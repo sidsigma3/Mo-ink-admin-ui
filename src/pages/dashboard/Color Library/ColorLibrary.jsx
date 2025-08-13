@@ -61,7 +61,6 @@ const ColorLibrary =  ({setDemoData }) => {
  
   
     setNewColors(prev => {
-      console.log('📝 Previous newColors:', prev);
       const updated = [newColor, ...prev]; 
       return updated;
     });
@@ -69,10 +68,6 @@ const ColorLibrary =  ({setDemoData }) => {
  
   };
 
-  // Monitor newColors changes
-  useEffect(() => {
-    console.log('🔄 newColors updated:', newColors);
-  }, [newColors]);
 
   // Remove new color function
   const handleRemoveNewColor = (index) => {
@@ -104,6 +99,7 @@ const ColorLibrary =  ({setDemoData }) => {
       return updated;
     });
   } catch (err) {
+    showToast('Upload Failed','erorr')
     console.error("Upload failed", err);
   }
 };
@@ -193,7 +189,6 @@ const handleColorChange = (index, field, value) => {
 };
 
 const handleNewColorChange = (index, field, value) => {
-  console.log(`🎨 Updating new color ${index}, field: ${field}, value:`, value);
   setNewColors(prev => {
     const updated = [...prev];
     updated[index][field] = value;
@@ -205,7 +200,6 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  console.log(`📷 Uploading image for new color ${index}, image ${imageIndex}`);
 
   const type = imageIndex === 0 ? 'product-color-cone' : 'product-color-hank';
 
@@ -234,25 +228,22 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
 
   // Fixed filter functions
   const handleFilterChange = (filter, value) => {
-    console.log("Filter changed:", filter, value);
+   
     setSearchTerm(value);
     applyCombinedFilter(value, selectedStatus);
   };
 
   const handleStatusChange = (status) => {
-    console.log("Status filter changed to:", status);
+   
     setSelectedStatus(status);
     applyCombinedFilter(searchTerm, status);
   };
 
   const applyCombinedFilter = (searchValue, status) => {
- 
-  
   const lowercasedSearch = searchValue?.toLowerCase?.() || "";
-  
-  let filtered = [...colors]; // Start with all colors
+  let filtered = [...colors];
 
-  // Apply search filter
+  // Search filter
   if (lowercasedSearch) {
     filtered = filtered.filter((item) => {
       const matchesColorName = item.colorName?.toLowerCase().includes(lowercasedSearch);
@@ -261,36 +252,30 @@ const handleNewImageUpload = async (e, index, imageIndex) => {
     });
   }
 
-  // Apply status filter - Fixed logic
+  // Status filter
   if (status !== 'All') {
-  
     filtered = filtered.filter((item) => {
-      // Get current switch state (fallback to original status if not toggled yet)
       const isChecked = colorStatus[item.id] !== undefined 
         ? colorStatus[item.id] 
         : item.status === 'ACTIVE';
       
-      console.log(`Color ${item.colorName}: isChecked=${isChecked}, status=${status}`);
-      
-      if (status === 'ACTIVE') {
-        return isChecked === true;
-      } else if (status === 'INACTIVE') {
-        return isChecked === false;
-      }
+      if (status === 'ACTIVE') return isChecked === true;
+      if (status === 'INACTIVE') return isChecked === false;
       return true;
     });
   }
 
-
   setFilteredColors(filtered);
+  setCurrentPage(1); 
 };
 
-  // Update filter when colors or colorStatus changes + reset page when filtering
- useEffect(() => {
+
+useEffect(() => {
   if (colors.length > 0) {
     applyCombinedFilter(searchTerm, selectedStatus);
   }
-}, [colorStatus]);
+}, [colors, searchTerm, selectedStatus, colorStatus]);
+
 
   const [toasts, setToasts] = useState([]);
 
@@ -345,7 +330,6 @@ const handleFileChange = (e) => {
   if (!file) return;
 
   importFromExcel(file, (importedColors) => {
-    console.log('📁 Imported colors:', importedColors);
     setNewColors(importedColors);
     setColors([]);
   });
