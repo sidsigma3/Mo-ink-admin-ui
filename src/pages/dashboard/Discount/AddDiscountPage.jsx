@@ -747,7 +747,7 @@ const handleMaxUsageChange = (field1,field2) => {
                  checked={selectedOptionCustomer === "specific-segment"}
                  onChange={() => handleSelectionCustomer("specific-segment")}
                 ></input>
-                <label style={{fontSize:'1rem'}}>Specific customer sagements</label>
+                <label style={{fontSize:'1rem'}}>Specific customer segments</label>
                 </div>
 
                 <ModalCustomerList
