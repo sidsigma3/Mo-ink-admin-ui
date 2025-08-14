@@ -2171,7 +2171,7 @@ const handleCancelTransaction = () => {
                     </p>
                   </Dropdown.Toggle>
 
-                  <Dropdown.Menu className="w-75">
+                  <Dropdown.Menu className="w-100">
                     {filteredDiscounts.map((item, index) => (
                       <Dropdown.Item key={index} eventKey={item.discountCode}>
                         <div>
@@ -2216,7 +2216,7 @@ const handleCancelTransaction = () => {
                         </p>
                       </Dropdown.Toggle>
 
-                      <Dropdown.Menu className="w-75">
+                      <Dropdown.Menu className="w-100">
                         {/* <Dropdown.Item eventKey={"100%"}>
                           <div className="p-2 border-bottom">
                             <h6 className="text-md font-normal">
@@ -2257,7 +2257,7 @@ const handleCancelTransaction = () => {
                         </Dropdown.Item> */}
 
                         <Dropdown.Item eventKey={"0%"}>
-                          <div className="p-2 border-bottom">
+                          <div className="border-bottom">
                             <h6 className="text-md font-normal">
                               <span className="text-primary">0%</span> Online +{" "}
                               <span className="text-primary">100%</span> COD

@@ -49,7 +49,7 @@ const ModalProdcutSelect = ({ show, handleClose, products, onOrderCreate, preSel
       <Modal.Header closeButton>
         <Modal.Title>Select Products</Modal.Title>
       </Modal.Header>
-      <Modal.Body className="p-0">
+      <Modal.Body className="md-p-2">
         <Form>
           <Form.Check
             type="checkbox"
