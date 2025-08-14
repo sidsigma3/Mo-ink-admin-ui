@@ -618,7 +618,7 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
       
     };
 
-   const calculateGrandTotals = (
+ const calculateGrandTotals = (
   orderDetails = [],
   paymentDiscount = 0,
   couponDiscount = 0,
@@ -633,7 +633,7 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
   let totalWeight = 0;
   let totalBaseTotal = 0;
 
-
+  // Pre-calculate totals for min requirement checks
   for (const order of orderDetails) {
     if (!order || order.status === 'CANCELLED') continue;
     const weight = parseFloat(order.color.weight) || 0;
@@ -646,7 +646,7 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
   let globalDiscountAllowed = true;
 
   if (minReq.includes("Minimum purchase amount")) {
-    const amountMatch = minReq.match(/\₹\s?(\d+)/);
+    const amountMatch = minReq.match(/₹\)?\s*:\s*(\d+)/);
     const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
     globalDiscountAllowed = totalBaseTotal >= minAmount;
   } else if (minReq.includes("Minimum quantity required")) {
@@ -654,7 +654,6 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
     const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
     globalDiscountAllowed = totalWeight >= minQty;
   }
-
 
   for (const order of orderDetails) {
     if (!order || order.status === 'CANCELLED') continue;
@@ -668,28 +667,30 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
       (product) => product.id === order.productId
     );
 
-    // 🔥 Apply coupon discount based on type
-   // Parse and check min purchase requirement
-      const minReq = selectedDiscountData.minPurchaseRequirement || "";
-      let discountAllowed = true;
+    // Parse and check min purchase requirement for this discount
+    const minReq = selectedDiscountData.minPurchaseRequirement || "";
+    let discountAllowed = true;
 
-      if (minReq.includes("Minimum purchase amount")) {
-        const amountMatch = minReq.match(/\₹\s?(\d+)/);
-        const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
-        discountAllowed = totalBaseTotal >= minAmount;
-      } else if (minReq.includes("Minimum quantity required")) {
-        const qtyMatch = minReq.match(/(\d+)/);
-        const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
-        discountAllowed = totalWeight >= minQty;
+    if (minReq.includes("Minimum purchase amount")) {
+      const amountMatch = minReq.match(/₹\)?\s*:\s*(\d+)/);
+      const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
+      discountAllowed = totalBaseTotal >= minAmount;
+    } else if (minReq.includes("Minimum quantity required")) {
+      const qtyMatch = minReq.match(/(\d+)/);
+      const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
+      discountAllowed = totalWeight >= minQty;
+    }
+
+    // ✅ FixedAmount applies proportionally to item value
+    let couponDiscountAmount = 0;
+    if (isCouponApplicable && discountAllowed) {
+      if (selectedDiscountData.discountType === "FixedAmount") {
+        couponDiscountAmount =
+          (Number(selectedDiscountData.discountValue) * (rawTotal / (totalBaseTotal || 1)));
+      } else {
+        couponDiscountAmount = (rawTotal * couponDiscount) / 100;
       }
-
-// Then apply discount only if applicable and allowed
-    const couponDiscountAmount = isCouponApplicable && discountAllowed
-      ? selectedDiscountData.discountType === "FixedAmount"
-        ? Number(selectedDiscountData.discountValue)
-        : (rawTotal * couponDiscount) / 100
-      : 0;
-
+    }
 
     const subtotalAfterCoupon = rawTotal - couponDiscountAmount;
 
@@ -1064,7 +1065,7 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
     const netPayable = (totalAfterDiscount - walletDeduction).toFixed(2);
     
     
-   const calculatePriceBreakdown = (
+  const calculatePriceBreakdown = (
   variant,
   selectedDiscount = 0,
   paymentDiscount = 0,
@@ -1080,6 +1081,16 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
       discountPercent: 0,
       combinedDiscountPercent: 0,
     };
+  }
+  let totalWeight = 0;
+  let totalBaseTotal = 0;
+
+  for (const order of orderDetails) {
+    if (!order || order.status === 'CANCELLED') continue;
+    const weight = parseFloat(order.color.weight) || 0;
+    const price = order.price || 0;
+    totalBaseTotal += weight * price;
+    totalWeight += weight;
   }
 
   const weight = parseFloat(variant.weight) || 0;
@@ -1102,13 +1113,13 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
     // ✅ Check minimum requirement
     const minReq = selectedDiscountData.minPurchaseRequirement || "";
     if (minReq.includes("Minimum purchase amount")) {
-      const amountMatch = minReq.match(/\₹\s?(\d+)/);
+      const amountMatch = minReq.match(/₹\)?\s*:\s*(\d+)/);
       const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
-      discountAllowed = baseTotal >= minAmount;
+      discountAllowed = totalBaseTotal >= minAmount;
     } else if (minReq.includes("Minimum quantity required")) {
       const qtyMatch = minReq.match(/(\d+)/);
       const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
-      discountAllowed = weight >= minQty;
+      discountAllowed = totalWeight >= minQty;
     }
 
     if (isApplicable && discountAllowed) {
@@ -1116,7 +1127,9 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
         productDiscountPercent = Number(selectedDiscount);
         productDiscountAmount = baseTotal * (productDiscountPercent / 100);
       } else if (selectedDiscountData.discountType === "FixedAmount") {
-        productDiscountAmount = Number(selectedDiscountData.discountValue);
+        // 🔹 Proportional fixed amount discount based on total order value
+        productDiscountAmount =
+          (Number(selectedDiscountData.discountValue) * (baseTotal / (totalBaseTotal || 1)));
         productDiscountPercent = (productDiscountAmount / baseTotal) * 100;
       }
     }
@@ -1205,7 +1218,17 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
     const colorWeight = item.color?.weight || 0; // Assuming color weight is a property of color object
     
     return acc + colorWeight;
+    
   }, 0);
+
+  const totalBaseTotal = orderDetails.reduce((acc, item) => {
+  // Assuming you have price and weight to calculate amount
+  const colorWeight = item.color?.weight || 0; 
+  const pricePerKg = item.price || 0; // Or item.color?.price if stored inside color
+  
+  return acc + (colorWeight * pricePerKg);
+}, 0);
+
   
   const grandTotals = calculateGrandTotals(
     orderDetails,
@@ -1235,6 +1258,34 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
 
   const currentCustomerId = selectedCustomer?.customerId;
 
+
+
+
+const isDiscountEligible = (discount, totalBaseTotal, totalWeight) => {
+  if (!discount) return false;
+
+  // Check status
+  const isActive = discount.discountStatus?.toUpperCase().trim() === "ACTIVE";
+  if (!isActive) return false;
+
+  // Check min purchase requirement
+  const minReq = discount.minPurchaseRequirement || "";
+  let discountAllowed = true;
+
+  if (minReq.includes("Minimum purchase amount")) {
+    const amountMatch = minReq.match(/(\d+)/);
+    const minAmount = amountMatch ? Number(amountMatch[1]) : 0;
+    discountAllowed = totalBaseTotal >= minAmount;
+  } else if (minReq.includes("Minimum quantity required")) {
+    const qtyMatch = minReq.match(/(\d+)/);
+    const minQty = qtyMatch ? Number(qtyMatch[1]) : 0;
+    discountAllowed = totalWeight >= minQty;
+  }
+
+  return discountAllowed;
+};
+
+
 const filteredDiscounts = discountData.filter((discount) => {
   const isActive = discount.discountStatus?.toUpperCase().trim() === "ACTIVE";
 
@@ -1245,6 +1296,17 @@ const filteredDiscounts = discountData.filter((discount) => {
 
   return isActive && !!matchedCustomer;
 });
+
+useEffect(() => {
+  if (selectedDiscountData && !isDiscountEligible(selectedDiscountData, totalBaseTotal, totalWeight)) {
+    showToast(`"${selectedDiscountData.discountCode}" has been removed as eligibility is no longer met`,'erorr');
+    setSelectedDiscountedData();
+    setSelectedDiscount('');
+    setSelectedDiscountValue(null);
+    setSelectedDiscountId('');
+  }
+}, [totalBaseTotal, totalWeight]);
+
 
 const handleDeleteColor = (productId, size, colorName, variantType) => {
   const updatedOrderDetails = orderDetails.filter(
@@ -2151,43 +2213,60 @@ const handleCancelTransaction = () => {
                   </p>
                 </div>
               ) : (
-                <Dropdown
-                  onSelect={handleSelectDiscount}
-                  size="sm"
-                  className="status mt-2"
-                >
-                  <Dropdown.Toggle
-                    variant="light"
-                    id="dropdown-basic"
-                    className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
-                  >
-                    <p className="m-0 text-primary">
-                     {selectedDiscountData?.discountType === 'Percentage'
-                      ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
-                      : selectedDiscountData?.discountType === 'FixedAmount'
-                      ? `${selectedDiscount} - ₹${selectedDiscountValue}`
-                      : "Select Discount"}
+               <Dropdown
+  onSelect={(discountCode) => {
+    const selectedItem = filteredDiscounts.find(item => item.discountCode === discountCode);
+    // Only allow selection if discount is eligible
+    if (selectedItem && isDiscountEligible(selectedItem, totalBaseTotal, totalWeight)) {
+      handleSelectDiscount(discountCode);
+    }
+  }}
+  size="sm"
+  className="status mt-2"
+>
+  <Dropdown.Toggle
+    variant="light"
+    id="dropdown-basic"
+    className="d-flex align-items-center justify-content-between gap-2 w-100 border rounded"
+  >
+    <p className="m-0 text-primary">
+      {selectedDiscountData?.discountType === 'Percentage'
+        ? `${selectedDiscount} - ${selectedDiscountValue}% Off`
+        : selectedDiscountData?.discountType === 'FixedAmount'
+        ? `${selectedDiscount} - ₹${selectedDiscountValue}`
+        : "Select Discount"}
+    </p>
+  </Dropdown.Toggle>
 
-                    </p>
-                  </Dropdown.Toggle>
+  <Dropdown.Menu className="w-100">
+    {filteredDiscounts.map((item, index) => {
+      const eligible = isDiscountEligible(item, totalBaseTotal, totalWeight);
+      return (
+        <Dropdown.Item
+          key={index}
+          eventKey={item.discountCode}
+          disabled={!eligible} // 🔹 make uneligible discounts unclickable
+          style={{ opacity: eligible ? 1 : 0.5, cursor: eligible ? 'pointer' : 'not-allowed' }}
+          className='bg-white border-0'
+        >
+          <div>
+            <strong>{item.discountCode}</strong>
+            <br />
+            <small>{item.minPurchaseRequirement}</small>
+            <br />
+            <small>
+              {item.discountValue}
+              {item.discountType === "Percentage" && ' %'}
+              {" "}off on{" "}
+              {item.applicableProducts[0]?.productName || "this product"}
+            </small>
+          </div>
+        </Dropdown.Item>
+      );
+    })}
+  </Dropdown.Menu>
+</Dropdown>
 
-                  <Dropdown.Menu className="w-100">
-                    {filteredDiscounts.map((item, index) => (
-                      <Dropdown.Item key={index} eventKey={item.discountCode}>
-                        <div>
-                          <strong>{item.discountCode}</strong>
-                          <br />
-                          <small>
-                            {item.discountValue}
-                             {item.discountType==="Percentage" && (' %')}
-                              {" "}off on{" "}
-                            {item.applicableProducts[0]?.productName || "this product"}
-                          </small>
-                        </div>
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown>
               )}
             </div>
           </div>
