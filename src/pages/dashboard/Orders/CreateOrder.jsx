@@ -1611,8 +1611,8 @@ const handleCancelTransaction = () => {
 
   return (
     <div className='create-order'>
-        <div className='top d-flex gap-3 mb-4 mt-2' style={{cursor:'pointer'}}>
-            <span onClick={() => navigate('/orders')}><IoArrowBackOutline size={25}/></span>
+        <div className='top d-flex gap-3 mb-4 mt-3' style={{cursor:'pointer'}}>
+            <span onClick={() => navigate('/order')}><IoArrowBackOutline size={25}/></span>
            { Object.keys(order).length === 0 ? (
             <h3 className='m-0' style={{fontSize:'1.2rem'}}>Create Order</h3>
 
