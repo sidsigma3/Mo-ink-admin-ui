@@ -409,6 +409,25 @@ const handleRowClick = (order) => {
               </td>
 
               <td style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
+                <span
+                  className={
+                    order.payment.paymentStatus === "FULLY_PAID"
+                      ? "green"
+                      : order.payment.paymentStatus === "PARTIALLY_PAID"
+                      ? "purple"
+                      : "yellow"
+                  }
+                >
+                  {order.payment.paymentStatus === "FULLY_PAID" 
+                    ? "Paid" 
+                    : order.payment.paymentStatus === "PARTIALLY_PAID" 
+                    ? "Partially Paid" 
+                    : "Unpaid"
+                  }
+                </span>
+              </td>
+
+              {/* <td style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
                 <select
                   className={
                     order.payment.paymentStatus === "FULLY_PAID"
@@ -458,7 +477,7 @@ const handleRowClick = (order) => {
                     );
                   })}
                 </select>
-              </td>
+              </td> */}
 
               <td   style={{ justifyItems: 'center', alignContent:'center'}}  onClick={(e) => e.stopPropagation()}>
 
@@ -573,59 +592,22 @@ const handleRowClick = (order) => {
               </div>
 
               <div className="dropdown-wrappers" onClick={(e) => e.stopPropagation()}>
-              <select
-                className={
-                  order.payment.paymentStatus === "FULLY_PAID"
-                    ? "green"
-                    : order.payment.paymentStatus === "PARTIALLY_PAID"
-                    ? "purple"
-                    : "yellow"
-                }
-                style={{ 
-                        textTransform: 'capitalize',
-                        textAlign: 'center',
-                        fontWeight: '500',
-                      }}
-                value={order.payment.paymentStatus}
-                onChange={(e) => {
-                  const newStatus = e.target.value;
-
-                  const showToast = (message, type = "error") => {
-                    setToasts([{ message, type }]);
-                    setTimeout(() => setToasts([]), 3000);
-                  };
-                  
-                  if (order.status !== "SHIPPED") {
-                    showToast("Payment status can only be changed after order has been shipped", "error");
-                    return;
+              <span
+                  className={
+                    order.payment.paymentStatus === "FULLY_PAID"
+                      ? "green"
+                      : order.payment.paymentStatus === "PARTIALLY_PAID"
+                      ? "purple"
+                      : "yellow"
                   }
-
-                  setModalData({
-                    isOpen: true,
-                    type: 'payment',
-                    status: newStatus,
-                    orderId: order.orderId,
-                  });
-                }}
-              >
-                {[
-                  { label: "Unpaid", value: "UNPAID" },
-                  { label: "Partially Paid", value: "PARTIALLY_PAID" },
-                  { label: "Paid", value: "FULLY_PAID" },
-                ].map(({ label, value }) => {
-                  const current = order.payment.paymentStatus;
-
-                  const isDisabled =
-                    (current === "PARTIALLY_PAID" && value === "UNPAID") ||
-                    (current === "FULLY_PAID" && (value === "UNPAID" || value === "PARTIALLY_PAID"));
-
-                  return (
-                    <option key={value} value={value} disabled={isDisabled}>
-                      {label}
-                    </option>
-                  );
-                })}
-              </select>
+                >
+                  {order.payment.paymentStatus === "FULLY_PAID" 
+                    ? "Paid" 
+                    : order.payment.paymentStatus === "PARTIALLY_PAID" 
+                    ? "Partially Paid" 
+                    : "Unpaid"
+                  }
+                </span>
             </div>
 
             
