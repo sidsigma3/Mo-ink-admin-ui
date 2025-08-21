@@ -1612,7 +1612,7 @@ const handleCancelTransaction = () => {
   return (
     <div className='create-order'>
         <div className='top d-flex gap-3 mb-4 mt-3' style={{cursor:'pointer'}}>
-            <span onClick={() => navigate('/order')}><IoArrowBackOutline size={25}/></span>
+            <span onClick={() => navigate('/orders')}><IoArrowBackOutline size={25}/></span>
            { Object.keys(order).length === 0 ? (
             <h3 className='m-0' style={{fontSize:'1.2rem'}}>Create Order</h3>
 
@@ -2468,7 +2468,7 @@ const handleCancelTransaction = () => {
                       <td></td>
                       {/* <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td> */}
                       {/* <td className="text-end">₹{calculateGrandTotal(orderDetails).toFixed(2)-((calculateGrandTotal(orderDetails) * (discountPercentage + (Number(selectedDiscountValue) || 0))) / 100)+49}</td> */}
-                      <td className='text-end pt-2 pb-4'>₹49</td>
+                      <td className='text-end pt-2 pb-4'>₹0</td>
                     </tr>
                   
                     <tr>
