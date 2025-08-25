@@ -557,53 +557,94 @@ const handleChequePhotoChange = async (e) => {
                 </div>
                   
 
-                  <div className='col-12 my-4'>
-               <div className="media-upload-card p-4 h-100">
-                  <label className="upload-label mb-3" style={{ fontSize: '1rem' }}>
-                    Aadhaar Card Photo
-                  </label>
+                  <div className="row">
+  {/* Front Side */}
+  <div className="col-12 col-md-6 my-4">
+    <div className="media-upload-card p-4 h-100">
+      <label className="upload-label mb-3" style={{ fontSize: "1rem" }}>
+        Aadhaar Card Front
+      </label>
 
-                  <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
-                    <input
-                      type="file"
-                      id="cheque-upload"
-                      accept="image/*"
-                      onChange={handleChequePhotoChange}
-                      className="d-none"
-                    />
-                    <label
-                      htmlFor="cheque-upload"
-                      className="upload-button btn btn-outline-custom  rounded-pill px-4 py-2 mb-2"
-                    >
-                      <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
-                    </label>
-                    <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+      <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+        <input
+          type="file"
+          id="cheque-front-upload"
+          accept="image/*"
+          onChange={(e) => handleChequePhotoChange(e, 0)}
+          className="d-none"
+        />
+        <label
+          htmlFor="cheque-front-upload"
+          className="upload-button btn btn-outline-custom rounded-pill px-4 py-2 mb-2"
+        >
+          <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+        </label>
+        <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
 
-                    {formData.chequePhoto && (
-                      <div className="preview-container mt-4 text-center">
-                        <img
-                          src={`${backendUrl}${formData.chequePhoto}`}
-                          alt="Cheque Preview"
-                          className="img-thumbnail rounded"
-                          style={{ 
-                            maxWidth: '100px', 
-                            maxHeight: '100px', 
-                            objectFit: 'contain',
-                            cursor: 'pointer'
-                          }}
-                          onClick={handleImageClick}
-                        />
-                        {/* <button
-                          className="btn btn-sm btn-outline-secondary mt-2"
-                          onClick={handleDownloadChequePhoto}
-                        >
-                          <i className="bi bi-download me-1"></i>Download
-                        </button> */}
-                      </div>
-                    )}
-                  </div>
-                          </div>
-                          </div>
+        {formData.chequePhotos?.[0] && (
+          <div className="preview-container mt-4 text-center">
+            <img
+              src={`${backendUrl}${formData.chequePhotos[0]}`}
+              alt="Front Preview"
+              className="img-thumbnail rounded"
+              style={{
+                maxWidth: "100px",
+                maxHeight: "100px",
+                objectFit: "contain",
+                cursor: "pointer",
+              }}
+              onClick={handleImageClick}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* Back Side */}
+  <div className="col-12 col-md-6 my-4">
+    <div className="media-upload-card p-4 h-100">
+      <label className="upload-label mb-3" style={{ fontSize: "1rem" }}>
+        Aadhaar Card Back
+      </label>
+
+      <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+        <input
+          type="file"
+          id="cheque-back-upload"
+          accept="image/*"
+          onChange={(e) => handleChequePhotoChange(e, 1)}
+          className="d-none"
+        />
+        <label
+          htmlFor="cheque-back-upload"
+          className="upload-button btn btn-outline-custom rounded-pill px-4 py-2 mb-2"
+        >
+          <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+        </label>
+        <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+
+        {formData.chequePhotos?.[1] && (
+          <div className="preview-container mt-4 text-center">
+            <img
+              src={`${backendUrl}${formData.chequePhotos[1]}`}
+              alt="Back Preview"
+              className="img-thumbnail rounded"
+              style={{
+                maxWidth: "100px",
+                maxHeight: "100px",
+                objectFit: "contain",
+                cursor: "pointer",
+              }}
+              onClick={handleImageClick}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
 
                           {/* Preview Modal */}
                           {showPreview && (

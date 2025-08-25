@@ -856,10 +856,10 @@ const handleCreateOrder = async () => {
       return;
     }
 
-     if (!selectedDiscount || selectedDiscount === '' || !selectedDiscountValue) {
-      showToast("Please select a discount", "error");
-      return;
-    }
+    //  if (!selectedDiscount || selectedDiscount === '' || !selectedDiscountValue) {
+    //   showToast("Please select a discount", "error");
+    //   return;
+    // }
 
     if (!selectedPayment || selectedPayment === 'Select Payment Type') {
       showToast("Please select a payment type", "error");
@@ -1239,7 +1239,7 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
   
   
   const handlingCharges = calculateShippingCost(orderDetails, selectedCustomer);
-  const platformFee = 49;
+  const platformFee = 0;
 
   const netPayablePrice =
     grandTotals.baseTotal - grandTotals.totalDiscount +
