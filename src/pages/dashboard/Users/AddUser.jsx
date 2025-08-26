@@ -30,9 +30,8 @@ const AddUser = () => {
     const [userToDelete, setUserToDelete] = useState(null);
     const [showPreview, setShowPreview] = useState(false);
     const fileInputRef = useRef(null);
-
-
-
+    const [currentIndex, setCurrentIndex] = useState(0);
+   
     const isViewMode = !!state
 
     const master = JSON.parse(localStorage.getItem('userData'))
@@ -55,17 +54,20 @@ const AddUser = () => {
         phone: customer?.phoneNumber || "",
         email: customer?.email || "",
         company: customer?.company || "",
-        adharNumber: customer?.aadhaarNumber || "",
-        chequePhoto: customer?.aadhaarDocumentUploadLink || "",
+        adharNumber: customer?.aadhaar?.aadhaarNumber || "",
+        aadhaarPhotos: [
+            customer?.aadhaar?.aadhaarDocumentUploadLinkFront || "",
+            customer?.aadhaar?.aadhaarDocumentUploadLinkBack || ""
+        ],
         address: customer?.userAddress || "",
         apartment: customer?.street || "",
         country: customer?.country || "",
         state: customer?.state || "",
         city: customer?.city || "",
         pinCode: customer?.zipcode || "",
-        status:customer?.userStatus.toLowerCase() || "ACTIVE",
-        role:customer?.role || 'SALES',
-      });
+        status: customer?.userStatus?.toLowerCase() || "ACTIVE",
+        role: customer?.role || "SALES",
+    });
     
 
     const handleChange = (e) => {
@@ -125,20 +127,28 @@ const AddUser = () => {
 
         
     
-        const newUser = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            whatsappNumber: formData.whatsapp,
-            aadhaarNumber:formData.adharNumber,
-            phoneNumber: formData.phone,
-            userAddress: formData.address, // Fixed duplicate key issue
-            userStatus: formData.status.toUpperCase(),
-            zipcode: formData.pinCode,
-            street: formData.apartment,
-            aadhaarDocumentUploadLink:formData.chequePhoto,
-            ...formData,
+       const newUser = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        whatsappNumber: formData.whatsapp,
+        phoneNumber: formData.phone,
+        userAddress: formData.address,
+        userStatus: formData.status.toUpperCase(),
+        zipcode: formData.pinCode,
+        street: formData.apartment,
+        role: formData.role,
+        company: formData.company,
+        country: formData.country,
+        state: formData.state,
+        city: formData.city,
+        aadhaar: {
+            aadhaarNumber: formData.adharNumber,
+            aadhaarDocumentUploadLinkFront: formData.aadhaarPhotos?.[0] || "",
+            aadhaarDocumentUploadLinkBack: formData.aadhaarPhotos?.[1] || ""
+        }
         };
+
     
         try {
             if (state?.index !== undefined) {
@@ -177,7 +187,7 @@ const AddUser = () => {
         setShowDeleteModal(true);
         };
 
-        const confirmDelete = async () => {
+    const confirmDelete = async () => {
         try {
             await deleteUser(userToDelete);
             showToast("User deleted successfully!", "success");
@@ -190,48 +200,49 @@ const AddUser = () => {
         }
         };
 
+        console.log(formData)
 
+        const handleAadhaarPhotoChange = async (e, index) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-const handleChangePhoto = () => {
-  console.log('Change photo button clicked!'); // Debug log
-  
-  // Trigger the hidden file input
-  if (fileInputRef.current) {
-    fileInputRef.current.click();
-  } else {
-    console.error('File input ref not found');
-    // addToast('Unable to open file selector', 'error');
-  }
-};
-
-
-       const handleDownloadChequePhoto = () => {
-          if (!formData.chequePhoto) {
-            console.error("No cheque photo URL provided");
-            return;
-          }
-
-          const url = `${backendUrl}${formData.chequePhoto}`;
-          window.open(url, '_blank');
+            try {
+                const uploadedUrl = await uploadProductImage(file, "user"); 
+                console.log(uploadedUrl)
+                setFormData((prev) => {
+                const updated = [...prev.aadhaarPhotos];
+                updated[index] = uploadedUrl.data; 
+                return { ...prev, aadhaarPhotos: updated };
+                });
+            } catch (error) {
+                console.error("Error uploading Aadhaar photo:", error);
+                showToast("Upload failed, please try again.", "error");
+            }
         };
 
 
 
+      const handleDownloadAadhaarPhoto = (index) => {
+        if (!formData.aadhaarPhotos?.[index]) return;
+        const url = `${backendUrl}${formData.aadhaarPhotos[index]}`;
+        window.open(url, "_blank");
+        };
 
-         const handleCopyImageLink = async () => {
-    try {
-      const imageUrl = `${backendUrl}${formData.chequePhoto}`;
-      await navigator.clipboard.writeText(imageUrl);
-      alert('Image link copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy link:', err);
-      alert('Failed to copy link');
-    }
-  };
+    const handleCopyAadhaarLink = async (index) => {
+        try {
+            const imageUrl = `${backendUrl}${formData.aadhaarPhotos[index]}`;
+            await navigator.clipboard.writeText(imageUrl);
+            alert("Image link copied to clipboard!");
+        } catch (err) {
+            console.error("Failed to copy link:", err);
+            alert("Failed to copy link");
+        }
+        };
 
-  const handleImageClick = () => {
-    setShowPreview(true);
-  };
+const handleImageClick = (index) => {
+  setCurrentIndex(index);
+  setShowPreview(true);
+};
 
   const handleClosePreview = () => {
     setShowPreview(false);
@@ -392,370 +403,197 @@ const handleChangePhoto = () => {
                 {formErrors.company && <div className="invalid-feedback d-block">{formErrors.company}</div>}
             </div>
 
-        <div className='col-12 my-4'>
-               <div className="media-upload-card p-4 h-100">
-                  <label className="upload-label mb-3" style={{ fontSize: '1rem' }}>
-                    Aadhaar Card Photo
-                  </label>
+       <div className="row">
+            {/* Aadhaar Front */}
+            <div className="col-6 my-4">
+                <div className="media-upload-card p-4 h-100">
+                <label className="upload-label mb-3" style={{ fontSize: "1rem" }}>
+                    Aadhaar Front
+                </label>
 
-                  <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+                <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
                     <input
-                      type="file"
-                      id="cheque-upload"
-                      accept="image/*"
-                      onChange={handleChangePhoto}
-                      className="d-none"
+                    type="file"
+                    id="aadhaar-front-upload"
+                    accept="image/*"
+                    onChange={(e) => handleAadhaarPhotoChange(e, 0)}
+                    className="d-none"
                     />
                     <label
-                      htmlFor="cheque-upload"
-                      className="upload-button btn btn-outline-custom  rounded-pill px-4 py-2 mb-2"
+                    htmlFor="aadhaar-front-upload"
+                    className="upload-button btn btn-outline-custom rounded-pill px-4 py-2 mb-2"
                     >
-                      <i className="bi bi-cloud-arrow-up me-2"></i>Choose File
+                    <i className="bi bi-cloud-arrow-up me-2"></i>Choose Front
                     </label>
                     <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
 
-                    {formData.chequePhoto && (
-                      <div className="preview-container mt-4 text-center">
+                    {formData.aadhaarPhotos?.[0] && (
+                    <div className="preview-container mt-4 text-center">
                         <img
-                          src={`${backendUrl}${formData.chequePhoto}`}
-                          alt="Cheque Preview"
-                          className="img-thumbnail rounded"
-                          style={{ 
-                            maxWidth: '100px', 
-                            maxHeight: '100px', 
-                            objectFit: 'contain',
-                            cursor: 'pointer'
-                          }}
-                          onClick={handleImageClick}
+                        src={`${backendUrl}${formData.aadhaarPhotos[0]}`}
+                        alt="Aadhaar Front"
+                        className="img-thumbnail rounded"
+                        style={{
+                            maxWidth: "100px",
+                            maxHeight: "100px",
+                            objectFit: "contain",
+                            cursor: "pointer",
+                        }}
+                        onClick={()=>handleImageClick(0)}
                         />
-                        {/* <button
-                          className="btn btn-sm btn-outline-secondary mt-2"
-                          onClick={handleDownloadChequePhoto}
-                        >
-                          <i className="bi bi-download me-1"></i>Download
-                        </button> */}
-                      </div>
+                    </div>
                     )}
-                  </div>
-                          </div>
-                          </div>
+                </div>
+                </div>
+            </div>
+
+            {/* Aadhaar Back */}
+            <div className="col-6 my-4">
+                <div className="media-upload-card p-4 h-100">
+                <label className="upload-label mb-3" style={{ fontSize: "1rem" }}>
+                    Aadhaar Back
+                </label>
+
+                <div className="upload-area d-flex flex-column justify-content-center align-items-center p-4">
+                    <input
+                    type="file"
+                    id="aadhaar-back-upload"
+                    accept="image/*"
+                    onChange={(e) => handleAadhaarPhotoChange(e, 1)}
+                    className="d-none"
+                    />
+                    <label
+                    htmlFor="aadhaar-back-upload"
+                    className="upload-button btn btn-outline-custom rounded-pill px-4 py-2 mb-2"
+                    >
+                    <i className="bi bi-cloud-arrow-up me-2"></i>Choose Back
+                    </label>
+                    <p className="upload-hint text-muted mb-0">JPEG, PNG (Max 2MB)</p>
+
+                    {formData.aadhaarPhotos?.[1] && (
+                    <div className="preview-container mt-4 text-center">
+                        <img
+                        src={`${backendUrl}${formData.aadhaarPhotos[1]}`}
+                        alt="Aadhaar Back"
+                        className="img-thumbnail rounded"
+                        style={{
+                            maxWidth: "100px",
+                            maxHeight: "100px",
+                            objectFit: "contain",
+                            cursor: "pointer",
+                        }}
+                        onClick={()=>handleImageClick(1)}
+                        />
+                    </div>
+                    )}
+                </div>
+                </div>
+            </div>
+            </div>
+
 
                           {/* Preview Modal */}
-                          {showPreview && (
-                        <div 
-                            className="modal fade m-0 p-0 show d-block" 
-                            style={{ 
-                            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                            backdropFilter: 'blur(4px)',
-                            zIndex: 2000
-                            }}
-                            onClick={handleClosePreview}
-                        >
-                            <div 
-                            className="modal-dialog modal-xl d-flex align-items-center justify-content-center p-3"
-                            style={{ 
-                                maxWidth: '100vw', 
-                                height: '100vh',
-                                margin: 0
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                            >
-                            <div 
-                                className="position-relative w-100 h-100 d-flex align-items-center justify-content-center"
-                                style={{ maxWidth: '95vw', maxHeight: '95vh' }}
-                            >
-                                {/* Main Image Container */}
-                                <div className="position-relative">
-                                <img
-                                    src={`${backendUrl}${formData.chequePhoto}`}
-                                    alt="Aadhaar Card Preview"
-                                    className="img-fluid rounded-3 shadow-lg"
-                                    style={{ 
-                                    maxWidth: '100%',
-                                    maxHeight: '85vh',
-                                    objectFit: 'contain',
-                                    backgroundColor: 'white',
-                                    border: '2px solid rgba(255, 255, 255, 0.1)',
-                                    cursor: 'default'
-                                    }}
-                                    draggable={false}
-                                    onContextMenu={(e) => e.preventDefault()}
-                                    onLoad={() => console.log('Image loaded successfully')}
-                                    // onError={() => addToast('Failed to load image', 'error')}
-                                />
-                                </div>
+                        {showPreview && (
+  <div
+    className="modal fade m-0 p-0 show d-block"
+    style={{
+      backgroundColor: "rgba(0, 0, 0, 0.85)",
+      backdropFilter: "blur(4px)",
+      zIndex: 2000,
+    }}
+    onClick={handleClosePreview}
+  >
+    <div
+      className="modal-dialog modal-xl d-flex align-items-center justify-content-center p-3"
+      style={{ maxWidth: "100vw", height: "100vh", margin: 0 }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="position-relative w-100 h-100 d-flex align-items-center justify-content-center"
+        style={{ maxWidth: "95vw", maxHeight: "95vh" }}
+      >
+        {/* Main Image */}
+        <img
+          src={`${backendUrl}${formData.aadhaarPhotos?.[currentIndex]}`}
+          alt="Aadhaar Preview"
+          className="img-fluid rounded-3 shadow-lg"
+          style={{
+            maxWidth: "100%",
+            maxHeight: "85vh",
+            objectFit: "contain",
+            backgroundColor: "white",
+            border: "2px solid rgba(255, 255, 255, 0.1)",
+          }}
+          onLoad={() => console.log("Image loaded successfully")}
+          onError={() => console.error("Failed to load Aadhaar image")}
+          draggable={false}
+          onContextMenu={(e) => e.preventDefault()}
+        />
 
-                                {/* Desktop Action Buttons - Top Right */}
-                                <div 
-                                className="d-none d-lg-flex flex-column gap-3" 
-                                style={{ 
-                                    position: 'absolute', 
-                                    top: '20px', 
-                                    right: '20px', 
-                                    zIndex: 1070,
-                                    pointerEvents: 'auto'
-                                }}
-                                >
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDownloadChequePhoto();
-                                    }}
-                                    title="Save to Local Storage"
-                                    style={{ 
-                                    width: '48px', 
-                                    height: '48px',
-                                    backgroundColor: '#6B21A8',
-                                    color: 'white',
-                                    transition: 'all 0.2s ease-in-out',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                    onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#7C3AED';
-                                    e.currentTarget.style.transform = 'scale(1.05)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#6B21A8';
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    }}
-                                >
-                                    <Download size={20} />
-                                </button>
-                                
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCopyImageLink();
-                                    }}
-                                    title="Copy Image Link"
-                                    style={{ 
-                                    width: '48px', 
-                                    height: '48px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                    color: '#6B21A8',
-                                    transition: 'all 0.2s ease-in-out',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                    onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.transform = 'scale(1.05)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    }}
-                                >
-                                    <Link size={20} />
-                                </button>
+        {/* Action Buttons */}
+        <div
+          className="d-flex gap-2 position-absolute"
+          style={{
+            top: "20px",
+            right: "20px",
+            zIndex: 1070,
+          }}
+        >
+          {/* Download */}
+          <button
+            type="button"
+            className="btn btn-sm btn-dark rounded-circle"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDownloadAadhaarPhoto(currentIndex);
+            }}
+          >
+            <Download size={16} />
+          </button>
 
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleChangePhoto();
-                                    }}
-                                    title="Change Photo"
-                                    style={{ 
-                                    width: '48px', 
-                                    height: '48px',
-                                    backgroundColor: 'rgba(34, 197, 94, 0.9)',
-                                    color: 'white',
-                                    transition: 'all 0.2s ease-in-out',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                    onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#22c55e';
-                                    e.currentTarget.style.transform = 'scale(1.05)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.9)';
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    }}
-                                >
-                                    <Camera size={20} />
-                                </button>
-                                
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-lg border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleClosePreview();
-                                    }}
-                                    title="Close Preview"
-                                    style={{ 
-                                    width: '48px', 
-                                    height: '48px',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                    color: 'white',
-                                    transition: 'all 0.2s ease-in-out',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                    onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-                                    e.currentTarget.style.transform = 'scale(1.05)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    }}
-                                >
-                                    <X size={20} />
-                                </button>
-                                </div>
+          {/* Copy link */}
+          <button
+            type="button"
+            className="btn btn-sm btn-light rounded-circle"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCopyAadhaarLink(currentIndex);
+            }}
+          >
+            <Link size={16} />
+          </button>
 
-                                {/* Mobile/Tablet Action Buttons - Bottom Center */}
-                                <div 
-                                className="d-flex d-lg-none gap-2 justify-content-center position-absolute"
-                                style={{ 
-                                    bottom: '20px',
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    zIndex: 1070,
-                                    padding: '12px 16px',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                    borderRadius: '50px',
-                                    backdropFilter: 'blur(10px)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    pointerEvents: 'auto'
-                                }}
-                                >
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDownloadChequePhoto();
-                                    }}
-                                    title="Save to Storage"
-                                    style={{ 
-                                    width: '40px', 
-                                    height: '40px',
-                                    backgroundColor: '#6B21A8',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                >
-                                    <Download size={16} />
-                                </button>
-                                
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCopyImageLink();
-                                    }}
-                                    title="Copy Link"
-                                    style={{ 
-                                    width: '40px', 
-                                    height: '40px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                    color: '#6B21A8',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                >
-                                    <Link size={16} />
-                                </button>
+          {/* Change photo */}
+          <button
+            type="button"
+            className="btn btn-sm btn-success rounded-circle"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Camera size={16} />
+          </button>
 
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleChangePhoto();
-                                    }}
-                                    title="Change Photo"
-                                    style={{ 
-                                    width: '40px', 
-                                    height: '40px',
-                                    backgroundColor: 'rgba(34, 197, 94, 0.9)',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                >
-                                    <Camera size={16} />
-                                </button>
-                                
-                                <button
-                                    type="button"
-                                    className="btn d-flex align-items-center justify-content-center rounded-circle shadow-sm border-0"
-                                    onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleClosePreview();
-                                    }}
-                                    title="Close"
-                                    style={{ 
-                                    width: '40px', 
-                                    height: '40px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    zIndex: 1070
-                                    }}
-                                >
-                                    <X size={16} />
-                                </button>
-                                </div>
+          {/* Close */}
+          <button
+            type="button"
+            className="btn btn-sm btn-danger rounded-circle"
+            onClick={handleClosePreview}
+          >
+            <X size={16} />
+          </button>
+        </div>
 
-                                {/* ESC Key Hint - Top Left */}
-                                <div 
-                                className="d-none d-md-block position-absolute text-white-50 small"
-                                style={{ 
-                                    top: '20px', 
-                                    left: '20px',
-                                    fontFamily: 'monospace',
-                                    userSelect: 'none',
-                                    fontSize: '12px',
-                                    fontWeight: '400'
-                                }}
-                                >
-                                Press ESC to close
-                                </div>
-
-                                {/* Loading indicator for image */}
-                                {!formData.chequePhoto && (
-                                <div 
-                                    className="position-absolute d-flex align-items-center justify-content-center"
-                                    style={{
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    color: 'white',
-                                    fontSize: '16px'
-                                    }}
-                                >
-                                    <div className="spinner-border text-light me-2" role="status" style={{ width: '20px', height: '20px' }}>
-                                    <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                    Loading image...
-                                </div>
-                                )}
-
-                                {/* Hidden file input for photo change */}
-                                <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleChangePhoto}
-                                accept="image/*"
-                                style={{ display: 'none' }}
-                                />
-                            </div>
-                            </div>
-                        </div>
-                        )}
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={(e) => handleAadhaarPhotoChange(e, currentIndex)}
+        />
+      </div>
+    </div>
+  </div>
+)}
 
 
 
@@ -840,13 +678,16 @@ const handleChangePhoto = () => {
         </div>
 
         <div className='right'>
+           {(isMaster || !targetIsMaster) && (
             <div className='bg-white p-3 rounded'>
                 <h5 className='mb-3'>Status</h5>
-
-                <StatusInput status={formData.status} 
-                  onStatusChange={handleStatusChange}
-                ></StatusInput>
+                <StatusInput 
+                status={formData.status} 
+                onStatusChange={handleStatusChange}
+                />
             </div>
+            )}
+
 
       {!(targetIsMaster ) && (
         <div className='bg-white p-3 rounded mt-2'>
