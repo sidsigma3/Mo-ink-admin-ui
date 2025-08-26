@@ -60,13 +60,13 @@ const yarnData = [
     name: "Birla Micro Modal",
     sku: "2 SKU",
     colors: "4 Color",
-    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn8%20(3).png?updatedAt=1754927535975",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn23.png?updatedAt=1756185220782",
   },
   {
     name: "Livaeco",
     sku: "2 SKU",
     colors: "4 Color",
-    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn8%20(2).png?updatedAt=1754927535634",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarns.png?updatedAt=1754933780605",
   },
   {
     name: "Flax Varieties",
@@ -78,7 +78,7 @@ const yarnData = [
     name: "Excel-Linen",
     sku: "2 SKU",
     colors: "4 Color",
-    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn8.png?updatedAt=1754927906052",
+    image: "https://ik.imagekit.io/mediadata/Mo%20Ink%20n%20Dyes/Yarn22.png?updatedAt=1756185220923",
   },
 ];
 
