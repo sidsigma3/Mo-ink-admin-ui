@@ -58,9 +58,10 @@ const CustomersPage = () => {
         }
     }, [customers, selectedFilter, searchTerm, selectedStatus]);
 
-    const handleRowClick = (index) => {
+    const handleRowClick = (customerId) => {
+        console.log(customerId)
         // Find the original index in customers array
-        const originalIndex = customers.findIndex(customer => customer === filteredData[index]);
+        const originalIndex = customers.findIndex(customer => customer.customerId === customerId);
         navigate('/add-customer', { state: { index: originalIndex, customers} });
     };
 
@@ -364,7 +365,7 @@ const CustomersPage = () => {
                   const { totalOrders, lastOrderDate } = getCustomerOrderStats(customer.customerId);
 
                   return (
-                    <tr key={index} style={{ cursor: "pointer" }} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(index)}>
+                    <tr key={index} style={{ cursor: "pointer" }} onClick={(e) => !e.target.closest('.dropdown') && handleRowClick(customer.customerId)}>
                       <td style={{ verticalAlign: 'middle'}}>{customer.customerId}</td>
                       <td style={{ verticalAlign: 'middle'}} >{customer.customerName}</td>
                       <td style={{ verticalAlign: 'middle'}} >{customer.email}</td>
