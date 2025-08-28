@@ -181,7 +181,7 @@ const CreateOrder = forwardRef(({ orderData }, ref) => {
     const [productData,setProductData] = useState([])
 
     const [selectedType,setSelectedType] = useState()
-    
+ 
      useEffect(() => {
             const fetchData = async () => {
               try {
@@ -2549,17 +2549,11 @@ const handleCancelTransaction = () => {
                     </tr>
 
 
-                    <tr>
-                      <td className="fw-medium pb-3 pt-2">Balance Due</td>
-                      <td className="pb-3 pt-2">{codPercentage}%</td>
-
-                      {isViewMode === true ? (
-                          <td className="text-end pb-3 pt-2">₹{order?.payment.pendingAmount.toFixed(0)-order?.payment.totalAdjustedAmount.toFixed(0)}</td>
-                        ):(
-                          <td className="text-end pb-3 pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td>
-                        )
-                      }
-                     
+                    <tr> 
+                      <td className="fw-medium pb-3 pt-2">Balance Due</td> 
+                      <td className="pb-3 pt-2">{codPercentage}%</td> 
+                      {isViewMode === true ? ( <td className="text-end pb-3 pt-2">₹{order?.payment.pendingAmount.toFixed(0)-order?.payment.totalAdjustedAmount.toFixed(0)}</td>
+                       ):( <td className="text-end pb-3 pt-2">₹{((toPay * codPercentage) / 100).toFixed(0)}</td> ) } 
                     </tr>
 
                       {order?.payment?.cancelRefundAmount > 0 &&(
