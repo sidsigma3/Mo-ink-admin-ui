@@ -412,7 +412,7 @@ const {
                           <DashboardBox heading={'Total Revenue (Lacs)'} number={`₹ ${formatNumber(totalRevenueInLacs)}`} />
                         </div>
                         <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4 col-xl">
-                          <DashboardBox heading={'Total Weight Sold'} number={`${totalWeightSold} Kgs`} />
+                          <DashboardBox heading={'Total Weight Sold'} number={`${totalWeightSold.toFixed(2)} Kgs`} />
                         </div>
                     </div>
 
@@ -432,7 +432,7 @@ const {
          <div className="dashboardBox-ctn col-6 col-md-4 col-lg-4">
           <DashboardBox
             heading={'New Orders (kgs)'}
-            number={`${newOrderReceivedWeight} Kgs`}
+            number={`${newOrderReceivedWeight.toFixed(2)} Kgs`}
           />
         </div>
 

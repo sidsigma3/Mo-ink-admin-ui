@@ -2187,8 +2187,9 @@ const handleCancelTransaction = () => {
                           <p className="text-gray-600 whitespace-pre-line">{order.shippingAddress}</p>
                         ) : (
                           <>
+                            <p>{selectedAddress?.customerAddress}</p>
                             <p>{selectedAddress?.street}</p>
-                            <p>{selectedAddress?.city}, {selectedAddress?.state} - {selectedAddress?.zipCode}</p>
+                            <p>{selectedAddress?.city}, {selectedAddress?.state} - {selectedAddress?.zipcode}</p>
                           </>
                         )}
                       </div>
