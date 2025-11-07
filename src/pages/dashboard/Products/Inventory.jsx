@@ -586,7 +586,7 @@ const Inventory = () => {
           <DashboardBox heading={'Total SKU'} number={dashboardStats.totalSKU} />
         </div>
         <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
-          <DashboardBox heading={'Total Customer Order'} number={`${dashboardStats.totalCustomerOrder} Kgs`} />
+          <DashboardBox heading={'Total Customer Order'} number={`${dashboardStats.totalCustomerOrder?.toFixed(2)} Kgs`} />
         </div>
         <div className="dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl">
           <DashboardBox heading={'Stock Remaining'} number={`${dashboardStats.stockRemaining} Kgs`} />
