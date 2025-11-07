@@ -450,7 +450,7 @@ useEffect(() => {
                 </div>
 
                 <div className='dashboardBox-ctn col-6 col-md-6 col-lg-6 col-xl'>
-                <DashboardBox heading={'Total Order Weight'} number={totalOrderWeight + " Kg"}></DashboardBox>
+                <DashboardBox heading={'Total Order Weight'} number={totalOrderWeight.toFixed(2) + " Kg"}></DashboardBox>
                    
                 </div>
 
