@@ -3,35 +3,39 @@ import { useNavigate } from "react-router-dom";
 import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
 import "./TotalSales.css";
 
-const TotalSales = () => {
+const TotalSales = ({ data }) => {
   const navigate = useNavigate();
+
+  const months = data?.monthlySales?.map(m => m.month) || ["Jan", "Feb", "Mar", "Apr", "May"];
+  const values = data?.monthlySales?.map(m => m.value) || [30, 50, 40, 70, 60];
+  const total = data?.totalSales || 0;
 
   const createGradient = (ctx, chartArea) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, chartArea.bottom);
-    gradient.addColorStop(0, "rgba(5, 97, 252, 0.8)");
-    gradient.addColorStop(1, "rgba(5, 97, 252, 0)");
+    gradient.addColorStop(0, "rgba(107, 33, 168, 0.8)");
+    gradient.addColorStop(1, "rgba(107, 33, 168, 0)");
     return gradient;
   };
 
   const lineChartData = {
-    labels: ["January", "February", "March", "April", "May"],
+    labels: months,
     datasets: [
       {
         label: "",
-        data: [30, 50, 40, 70, 60],
-        borderColor: "#0561FC",
+        data: values,
+        borderColor: "#6B21A8",
         backgroundColor: (ctx) => {
           const { chart } = ctx;
           const { ctx: canvasCtx, chartArea } = chart;
-          if (!chartArea) return "rgba(5, 97, 252, 0.2)";
+          if (!chartArea) return "rgba(107, 33, 168, 0.2)";
           return createGradient(canvasCtx, chartArea);
         },
         fill: true,
         tension: 0.4,
         pointBackgroundColor: "#fff",
-        pointBorderColor: "#0561FC",
+        pointBorderColor: "#6B21A8",
         pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: "#0561FC",
+        pointHoverBorderColor: "#6B21A8",
       },
     ],
   };
@@ -50,13 +54,7 @@ const TotalSales = () => {
   };
 
   const tableHeaders = ["Month", "Sales"];
-  const tableRows = [
-    ["January", 30],
-    ["February", 50],
-    ["March", 40],
-    ["April", 70],
-    ["May", 60],
-  ];
+  const tableRows = months.map((m, i) => [m, values[i]]);
 
   const handleClick = () => {
     navigate("/graph-details", {
@@ -73,15 +71,13 @@ const TotalSales = () => {
 
   return (
     <div className="total-sales-card p-3" onClick={handleClick}>
-      {/* <h4>Total Sales</h4>
-      <h3>₹1,04,804.00</h3> */}
       <div className="total-sales-graph">
         <GraphComponent
           type="line"
           data={lineChartData}
           options={chartOptions}
           text={"Total Sales"}
-          number={"₹1,04,804.00"}
+          number={`₹${total.toLocaleString('en-IN')}`}
         />
       </div>
     </div>

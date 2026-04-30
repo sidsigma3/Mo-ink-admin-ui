@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Filter from '../../../components/Filter/DayFilter/Filter'
-import GraphComponent from '../../../components/Analylitcs/Graph/Graph Cards/GraphComponent';
 import SalesMap from '../../../components/Analylitcs/Graph/Map/SalesMap';
 import TotalSales from './Graphs/TotalSales';
 import TotalOrders from './Graphs/TotalOrders';
@@ -12,249 +11,27 @@ import OnlineStoreConversionRate from './Graphs/OnlineStoreConversionRate';
 import OnlineStoreSession from './Graphs/OnlineStoreSession';
 import SessionByDevice from './Graphs/SessionByDevice';
 import TopCustomers from './Graphs/TopCustomers';
+import { getAnalytics } from '../../../services/analyticsService';
 
 const AnalyticsPage = () => {
-    const customersData = [
-        { name: "Customer A", sales: 5000 },
-        { name: "Customer B", sales: 4000 },
-        { name: "Customer C", sales: 3000 },
-        { name: "Customer D", sales: 2500 },
-        { name: "Customer E", sales: 2000 },
-        { name: "Customer F", sales: 1500 },
-      ];
+    const [analyticsData, setAnalyticsData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-      const createGradient = (ctx, chartArea) => {
-        const gradient = ctx.createLinearGradient(0, 0, 0, chartArea.bottom);
-        gradient.addColorStop(0, "#6B21A8"); // Start with solid blue
-        gradient.addColorStop(1, "rgba(5, 97, 252, 0)"); // Fade to transparent
-        return gradient;
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const res = await getAnalytics();
+          if (res && res.data) {
+            setAnalyticsData(res.data);
+          }
+        } catch (error) {
+          console.error('Error fetching analytics:', error);
+        } finally {
+          setLoading(false);
+        }
       };
-        
-
-      const lineChartData = {
-        labels: ["January", "February", "March", "April", "May"],
-        datasets: [
-          {
-            label: "Sales",
-            data: [30, 50, 40, 70, 60], // Your dataset values
-            borderColor: "#6B21A8", // Line color
-            backgroundColor: (ctx) => {
-              const { chart } = ctx;
-              const { ctx: canvasCtx, chartArea } = chart;
-              if (!chartArea) {
-                return "rgba(5, 97, 252, 0.2)"; // Placeholder before the chart is rendered
-              }
-              return createGradient(canvasCtx, chartArea);
-            },
-            fill: true, // Enables area fill
-            tension: 0.4, // Curve the line
-            pointBackgroundColor: "#fff", // Point background color
-            pointBorderColor: "#6B21A8", // Point border color
-            pointHoverBackgroundColor: "#fff", // Point hover fill color
-            pointHoverBorderColor: "#6B21A8", // Point hover border color
-          },
-        ],
-      };
-      
-    
-      const barChartData = {
-        labels: ["2020", "2021", "2022"],
-        datasets: [
-          {
-            label: "Revenue",
-            barThickness: 25,
-            borderRadius:7,
-            data: [3000, 4000, 5000],
-            backgroundColor: [ // Dynamically set color based on max value
-              Math.max(...[3000, 4000, 5000]) === 3000 ? "#6B21A8" : "#CDCDCD", // Blue if max
-              Math.max(...[3000, 4000, 5000]) === 4000 ? "#6B21A8" : "#CDCDCD", // Blue if max
-              Math.max(...[3000, 4000, 5000]) === 5000 ? "#6B21A8" : "#CDCDCD", // Blue if max
-            ],
-          },
-        ],
-       
-      };
-      
-    
-      const doughnutChartData = {
-        labels: ["Red", "Blue", "Yellow"],
-        datasets: [
-          {
-            data: [300, 50, 100],
-            backgroundColor: [
-              "#6B21A8", // Main color
-              "#6b21a8b4", // A darker shade of #6B21A8
-              "#6b21a869", // A lighter shade of #6B21A8
-            ],
-          },
-        ],
-      };
-    
-      const chartOptions = {
-        responsive: true,
-        maintainAspectRatio	:false,
-        scales: {
-            x: {
-              grid: { display: true },
-            },
-            y: {
-              grid: { display: true },
-              beginAtZero: true,
-            },
-          },
-        plugins: {
-          legend: { position: "top" },
-          title: { display: true, text: "Chart" },
-        },
-      };
-
-
-      const horizontalBarChartData = {
-        labels: ["2020", "2021", "2022"],
-        datasets: [
-          {
-            label: "Revenue",
-            data: [3000, 4000, 5000],
-            barThickness: 25,
-            borderRadius:7,
-            backgroundColor: [
-              "#6B21A8",
-            ],
-            barThickness: 30,  // Set fixed bar width
-          },
-        ],
-      };
-      
-      const horizontalBarChartOptions = {
-        responsive: true,
-        maintainAspectRatio:false,
-        indexAxis: "y",  // Make the bar chart horizontal
-        plugins: {
-          legend: {
-            position: "top",
-          },
-          title: {
-            display: true,
-            text: "Revenue Over Years",
-          },
-        },
-        scales: {
-          x: {
-            beginAtZero: true, // Start the x-axis at 0
-          },
-          y: {
-            beginAtZero: true, // Start the y-axis at 0
-          },
-        },
-      };
-
-
-      const sortedCustomers = customersData.sort((a, b) => b.sales - a.sales);
-
-      const chartDataTopCustomer = {
-        labels: sortedCustomers.map(customer => customer.name),
-        datasets: [
-          {
-            label: "Customer Sales",
-            data: sortedCustomers.map(customer => customer.sales),
-            backgroundColor: sortedCustomers.map((_, index) => {
-              // Adjust opacity for each customer based on their rank
-              const opacity = 0.2 + (0.8 * (index + 1)) / sortedCustomers.length;
-              return `rgba(5, 97, 252, ${opacity})`; // Faded blue color for lower ranked customers
-            }),
-            borderColor: "#6B21A8", // Solid blue for borders
-            borderWidth: 1,
-            barThickness: 25,
-            borderRadius:7,
-          },
-        ],
-      };
-    
-      // Chart options
-      const chartOptionsTopCustomer = {
-        indexAxis: "y", // To make the bars horizontal
-        maintainAspectRatio:false,
-        responsive: true,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const customerName = context.label;
-                const sales = context.raw;
-                return `${customerName}: $${sales.toLocaleString()}`; // Show customer name and sales in the tooltip
-              },
-            },
-          },
-        },
-        scales: {
-          x: {
-            title: {
-              display: false,
-              text: "Sales",
-            },
-          },
-          y: {
-            title: {
-              display: false,
-              text: "Customers",
-            },
-          },
-        },
-      };
-
-      const topSellingColorsData = [
-        { color: "#FF5733", sales: 150 }, // Red
-        { color: "#33FF57", sales: 120 }, // Green
-        { color: "#3357FF", sales: 100 }, // Blue
-        { color: "#F3FF33", sales: 80 },  // Yellow
-        { color: "#FF33A6", sales: 60 },  // Pink
-      ];
-
-      const chartDataTopColor = {
-        labels: topSellingColorsData.map((item) => item.color), // Color names as labels
-        datasets: [
-          {
-            label: "Sales",
-            data: topSellingColorsData.map((item) => item.sales), // Sales topSellingColorsData for each color
-            backgroundColor: topSellingColorsData.map((item) => item.color), // Using color for bars
-            borderColor: "#FFFFFF", // Optional: white border for each bar
-            borderWidth: 1,
-            barThickness: 25,
-            borderRadius:7,
-          },
-        ],
-      };
-    
-      // Chart options
-      const chartOptionsTopColor = {
-        indexAxis:"y",
-        maintainAspectRatio	:false,
-        responsive: true,
-        scales: {
-          x: {
-            beginAtZero: true,
-            grid: {
-              display: false, // Hide gridlines for a cleaner look
-            },
-          },
-          y: {
-            grid: {
-              display: false, // Hide y-axis gridlines
-            },
-          },
-        },
-        plugins: {
-          legend: {
-            display: false, // Hide legend (if not needed)
-          },
-          tooltip: {
-            callbacks: {
-              label: (tooltipItem) => `${tooltipItem.raw} Sales`, // Custom tooltip label
-            },
-          },
-        },
-      };
-    
+      fetchData();
+    }, []);
 
   return (
     <div className='analytics-page '>
@@ -263,54 +40,39 @@ const AnalyticsPage = () => {
             <Filter></Filter>
         </div>
 
+        {loading ? (
+          <div className="d-flex justify-content-center align-items-center" style={{ height: '50vh' }}>
+            <div className="spinner-border" style={{ color: '#6B21A8' }} role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : (
         <div >
     
       <div className="row g-3 mt-2">
-        {/* <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
-          <GraphComponent type="line" data={lineChartData} options={chartOptions} />
-        </div>
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
-          <GraphComponent type="bar" data={barChartData} options={chartOptions} />
-        </div>
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
-          <GraphComponent type="bar" data={horizontalBarChartData} options={horizontalBarChartOptions} />
-        </div>
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
-          <GraphComponent type="doughnut" data={doughnutChartData} options={chartOptions} />
-        </div>
-
-       
-
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
-          <GraphComponent type="bar" data={chartDataTopCustomer} options={chartOptionsTopCustomer} />
-        </div>
-
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-6 mt-3">
-          <GraphComponent type="bar" data={chartDataTopColor} options={chartOptionsTopColor} />
-        </div> */}
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
-          <TotalSales/>
+          <TotalSales data={analyticsData}/>
         </div>
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
-          <TotalOrders></TotalOrders>
+          <TotalOrders data={analyticsData}/>
         </div>
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
-           <AvgOrder></AvgOrder>
+           <AvgOrder data={analyticsData}/>
         </div>
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
-           <TopProducts></TopProducts>
+           <TopProducts data={analyticsData}/>
         </div>
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
-           <TopSellingCounter></TopSellingCounter>
+           <TopSellingCounter data={analyticsData}/>
         </div>
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3">
-           <TopSellingColor></TopSellingColor>
+           <TopSellingColor data={analyticsData}/>
         </div>
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
@@ -330,13 +92,13 @@ const AnalyticsPage = () => {
         </div>
 
         <div className="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 mt-3 position-relative z-n1">
-          <TopCustomers></TopCustomers>
+          <TopCustomers data={analyticsData}/>
         </div>
-
 
         
       </div>
     </div>
+        )}
 
 
 

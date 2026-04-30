@@ -12,8 +12,8 @@ const OnlineStoreSession = () => {
       {
         label: "Store Session",
         data: [30000, 50000, 40000, 70000, 60000],
-        borderColor: "#0561FC",
-        backgroundColor: "rgba(5, 97, 252, 0.2)",
+        borderColor: "#6B21A8",
+        backgroundColor: "rgba(107, 33, 168, 0.2)",
         fill: true,
         tension: 0.4,
       },

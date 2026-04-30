@@ -3,19 +3,39 @@ import { useNavigate } from "react-router-dom";
 import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
 import './AvgOrder.css';
 
-const AvgOrder = () => {
+const AvgOrder = ({ data }) => {
   const navigate = useNavigate();
 
+  const months = data?.monthlySales?.map(m => m.month) || ["Jan", "Feb", "Mar", "Apr", "May"];
+  const orderValues = data?.monthlyOrders?.map(m => m.value) || [1, 1, 1, 1, 1];
+  const salesValues = data?.monthlySales?.map(m => m.value) || [30000, 50000, 40000, 70000, 60000];
+  const avgValues = months.map((_, i) => orderValues[i] > 0 ? Math.round(salesValues[i] / orderValues[i]) : 0);
+  const avgTotal = data?.avgOrderValue || 0;
+
+  const createGradient = (ctx, chartArea) => {
+    const gradient = ctx.createLinearGradient(0, 0, 0, chartArea.bottom);
+    gradient.addColorStop(0, "rgba(107, 33, 168, 0.6)");
+    gradient.addColorStop(1, "rgba(107, 33, 168, 0)");
+    return gradient;
+  };
+
   const lineChartData = {
-    labels: ["January", "February", "March", "April", "May"],
+    labels: months,
     datasets: [
       {
         label: "Avg Order",
-        data: [30000, 50000, 40000, 70000, 60000],
-        borderColor: "#0561FC",
-        backgroundColor: "rgba(5, 97, 252, 0.2)",
+        data: avgValues,
+        borderColor: "#6B21A8",
+        backgroundColor: (ctx) => {
+          const { chart } = ctx;
+          const { ctx: canvasCtx, chartArea } = chart;
+          if (!chartArea) return "rgba(107, 33, 168, 0.2)";
+          return createGradient(canvasCtx, chartArea);
+        },
         fill: true,
         tension: 0.4,
+        pointBackgroundColor: "#fff",
+        pointBorderColor: "#6B21A8",
       },
     ],
   };
@@ -33,14 +53,8 @@ const AvgOrder = () => {
     },
   };
 
-  const tableHeaders = ["Month", "Sales"];
-  const tableRows = [
-    ["January", 30],
-    ["February", 50],
-    ["March", 40],
-    ["April", 70],
-    ["May", 60],
-  ];
+  const tableHeaders = ["Month", "Avg Value"];
+  const tableRows = months.map((m, i) => [m, `₹${avgValues[i].toLocaleString('en-IN')}`]);
 
   const handleClick = () => {
     navigate("/graph-details", {
@@ -57,15 +71,13 @@ const AvgOrder = () => {
 
   return (
     <div className="avg-order-card " onClick={handleClick}>
-      {/* <h4>Average Order Value</h4>
-      <h3>₹16,213.00</h3> */}
       <div className="avg-order-graph">
         <GraphComponent
           type="line"
           data={lineChartData}
           options={chartOptions}
           text="Average Order Value"
-          number="₹51,580"
+          number={`₹${Math.round(avgTotal).toLocaleString('en-IN')}`}
         />
       </div>
     </div>

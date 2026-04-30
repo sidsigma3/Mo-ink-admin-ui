@@ -3,31 +3,24 @@ import { useNavigate } from "react-router-dom";
 import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
 import "./TopCustomers.css";
 
-const TopCustomers = () => {
+const TopCustomers = ({ data }) => {
   const navigate = useNavigate();
 
-  const customersData = [
-    { name: "Customer A", sales: 5000 },
-    { name: "Customer B", sales: 4000 },
-    { name: "Customer C", sales: 3000 },
-    { name: "Customer D", sales: 2500 },
-    { name: "Customer E", sales: 2000 },
-    { name: "Customer F", sales: 1500 },
-  ];
-
-  const sortedCustomers = customersData.sort((a, b) => b.sales - a.sales);
+  const customers = data?.topCustomers || [];
+  const labels = customers.length > 0 ? customers.map(c => c.customerName) : ["Customer A", "Customer B", "Customer C"];
+  const values = customers.length > 0 ? customers.map(c => c.totalPurchase) : [5000, 4000, 3000];
 
   const chartDataTopCustomer = {
-    labels: sortedCustomers.map((customer) => customer.name),
+    labels,
     datasets: [
       {
-        label: "Customer Purchase",
-        data: sortedCustomers.map((customer) => customer.sales),
-        backgroundColor: sortedCustomers.map((_, index) => {
-          const opacity = 0.2 + (0.8 * (index + 1)) / sortedCustomers.length;
-          return `rgba(5, 97, 252, ${opacity})`; // Faded blue color for lower ranked customers
+        label: "Purchase Amount",
+        data: values,
+        backgroundColor: labels.map((_, index) => {
+          const opacity = 0.3 + (0.7 * (labels.length - index)) / labels.length;
+          return `rgba(107, 33, 168, ${opacity})`;
         }),
-        borderColor: "rgba(5, 97, 252, 1)", // Solid blue for borders
+        borderColor: "#6B21A8",
         borderWidth: 1,
         barThickness: 25,
         borderRadius: 7,
@@ -36,7 +29,7 @@ const TopCustomers = () => {
   };
 
   const chartOptionsTopCustomer = {
-    indexAxis: "y", // To make the bars horizontal
+    indexAxis: "y",
     maintainAspectRatio: false,
     responsive: true,
     plugins: {
@@ -44,27 +37,20 @@ const TopCustomers = () => {
       tooltip: {
         callbacks: {
           label: (context) => {
-            const customerName = context.label;
             const sales = context.raw;
-            return `${customerName}: $${sales.toLocaleString()}`; // Show customer name and sales in the tooltip
+            return `₹${sales.toLocaleString('en-IN')}`;
           },
         },
       },
     },
     scales: {
-      x: {
-        grid: { display: false },
-        title: { display: false },
-      },
-      y: {
-        grid: { display: false },
-        title: { display: false },
-      },
+      x: { grid: { display: false }, title: { display: false } },
+      y: { grid: { display: false }, title: { display: false } },
     },
   };
 
-  const tableHeaders = ["Customer", "Sales"];
-  const tableRows = sortedCustomers.map((customer) => [customer.name, customer.sales]);
+  const tableHeaders = ["Customer", "Purchase (₹)"];
+  const tableRows = labels.map((l, i) => [l, `₹${values[i].toLocaleString('en-IN')}`]);
 
   const handleClick = () => {
     navigate("/graph-details", {
@@ -81,8 +67,6 @@ const TopCustomers = () => {
 
   return (
     <div className="top-customers-card p-3" onClick={handleClick}>
-      {/* <h4>Top Customers</h4>
-      <h3>Customer A</h3> */}
       <div className="top-customers-graph">
         <GraphComponent
           type="bar"
@@ -95,6 +79,4 @@ const TopCustomers = () => {
   );
 };
 
-
 export default TopCustomers;
-

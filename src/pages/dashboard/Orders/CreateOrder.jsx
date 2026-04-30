@@ -11,12 +11,12 @@ import ModalCustomer from '../../../components/Modal/ModalCustomer';
 import { RxCross2 } from "react-icons/rx";
 import { GoPencil } from "react-icons/go";
 import { Button } from 'react-bootstrap';
-import { IoAddCircleOutline } from "react-icons/io5";
+import { IoAddCircleOutline, IoSaveOutline } from "react-icons/io5";
 import ModalAssign from '../../../components/Modal/ModalAssign';
 import ModalInvoice from '../../../components/Modal/ModalInvoice';
 import { updateOrder } from "../../../services/OrderService";
 import { useCustomerContext } from '../../../components/Context/CustomerContext';
-import { getAllProduct } from '../../../services/ProductService';
+import { getAllProduct, updateProduct } from '../../../services/ProductService';
 import { getAllCustomer , getWalletTransactions} from '../../../services/CustomerService';
 import { getAllOrders , updateOrderVariantStatuses , updateOrderVariants} from '../../../services/OrderService';
 import { Segment } from 'react';
@@ -409,6 +409,77 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
       };
       
 
+      const handlePriceChange = (orderIndex, newPrice) => {
+        const updatedPrice = newPrice !== "" ? parseFloat(parseFloat(newPrice).toFixed(2)) : "";
+        const updatedOrderDetails = [...orderDetails];
+      
+        updatedOrderDetails[orderIndex] = {
+          ...updatedOrderDetails[orderIndex],
+          price: updatedPrice,
+          priceChanged: true,
+        };
+      
+        setOrderDetails(updatedOrderDetails);
+      };
+      
+
+      const handleSaveMasterPrice = async (orderItem) => {
+        try {
+          // Find the RAW product data from backend state
+          const rawProduct = productData.find(p => p.id === orderItem.productId);
+          if (!rawProduct) {
+            console.error("Product not found in productData:", orderItem.productId, productData);
+            throw new Error("Original product data not found");
+          }
+
+          // Map variants to the format expected by the API (VariantDTO)
+          // We use the raw variants from the backend to preserve all hidden fields (ids, color details, etc.)
+          const updatedVariants = rawProduct.variants.map(v => {
+            if (v.id === orderItem.variantId) {
+              return { 
+                ...v, 
+                pricePerKg: Number(orderItem.price),
+                // Map nested color object if needed, though ...v should handle it
+                availableStatus: v.availableStatus || "ACTIVE"
+              };
+            }
+            return { 
+              ...v, 
+              availableStatus: v.availableStatus || "ACTIVE"
+            };
+          });
+
+          // Construct the exact DTO expected by ProductRequestDTO (title, description, media, etc.)
+          const productRequestDTO = {
+            title: rawProduct.productName,
+            description: rawProduct.productDescription,
+            media: rawProduct.productImage,
+            availableStatus: rawProduct.availableStatus || "ACTIVE",
+            gstOnProduct: rawProduct.gstOnProduct || 0,
+            variants: updatedVariants,
+            deletedVariantIds: []
+          };
+
+          console.log("Sending update to master catalog:", productRequestDTO);
+
+          await updateProduct(rawProduct.id, productRequestDTO);
+          
+          // Refresh local products state to keep UI in sync
+          await refreshAllProducts();
+          
+          alert("Product price updated in master catalog!");
+          
+          setOrderDetails(prev => prev.map(item => 
+            item.variantId === orderItem.variantId ? { ...item, priceChanged: false } : item
+          ));
+
+        } catch (error) {
+          console.error("Error updating master price:", error);
+          const errorMsg = error.response?.data?.message || error.message;
+          alert(`Failed to update master price: ${errorMsg}`);
+        }
+      };
+
       const variantToProductMap = {};
           finalData.forEach((p) => {
           p.groupedVariants?.forEach((gv) => {
@@ -454,6 +525,11 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
             const variantDetails = matchingColor.variants.find(v => v.variantType.toLowerCase() === variantType.toLowerCase());
             if (!variantDetails) return;
     
+            // Calculate historical unit price from stored total and weight
+            const storedTotal = variant.orderVariantTotalAmount || 0;
+            const weightVal = parseFloat(orderWeight) || 0;
+            const calculatedPrice = weightVal > 0 ? parseFloat((storedTotal / weightVal).toFixed(2)) : (variantDetails.price || 0);
+
             flatDetails.push({
                 productId: product.productId,
                 productName: product.productName,
@@ -463,13 +539,13 @@ const handleReceiveOrder = (newItems, action = 'CREATE_NEW') => {
                     name: color.colorName,
                     hex: color.colorCode,
                     colorImage:color.colorImage,
-                    weight: parseFloat(orderWeight) || 0,
+                    weight: weightVal,
                 },
                 variantType,
-                price: variantDetails.price || 0,
+                price: calculatedPrice,
                 available: variantDetails.available || 0,
                 costPerKg: matchingColor.costPerItemPerKg || 0,
-                markupPricePerKg: variantDetails.markupPricePerKg || 0,
+                markupPricePerKg: variantDetails.markupPricePerKg || 0, // Fallback to current markup as it's not stored separately
                 gstOnProduct: product.gstOnProduct || 0,
                 productImage: product.productImage || ["null"],
                 variantId: orderVariantId,
@@ -1681,6 +1757,7 @@ const handleCancelTransaction = () => {
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '100px', width: '10%' }} className='fw-medium'>Name</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '5%' }} className='fw-medium'>Type</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '100px', width: '10%' }} className='fw-medium'>Weight (Kgs)</th>
+      <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '100px', width: '10%' }} className='fw-medium'>Price/Kg</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>Cost</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '90px', width: '9%' }} className='fw-medium'>Discount</th>
       <th style={{ textAlign: 'center', verticalAlign: 'middle', minWidth: '80px', width: '8%' }} className='fw-medium'>CGST</th>
@@ -1796,7 +1873,33 @@ const handleCancelTransaction = () => {
                                           />
 
                                           </div>
-                                        </td>
+                                          </td>
+                                          <td style={{ width: '12rem', verticalAlign: 'middle' }}>
+                                           <div className="d-flex align-items-center justify-content-center">
+                                             <div style={{ width: '80px' }}>
+                                               <input
+                                                 type="number"
+                                                 style={{ border: '1px solid', width: '100%', fontSize: '0.85rem', textAlign: 'center' }}
+                                                 placeholder="Price"
+                                                 className="rounded border-secondary-subtle ps-1 py-1"
+                                                 value={order.price !== undefined && order.price !== "" ? Number(order.price).toFixed(2) : ""}
+                                                 onChange={(e) => handlePriceChange(index, e.target.value)}
+                                                 disabled={["SHIPPED", "CANCELLED", "DELIVERED", "RETURNED", "RETURN_REJECTED", "RETURN_REQUESTED"].includes(order.status)}
+                                               />
+                                             </div>
+                                             <div style={{ width: '32px', display: 'flex', justifyContent: 'center', marginLeft: '4px' }}>
+                                               {!isViewMode && order.priceChanged && (
+                                                  <button 
+                                                    className="btn btn-sm btn-outline-success p-0 border-0 shadow-none"
+                                                    onClick={() => handleSaveMasterPrice(order)}
+                                                    title="Save this price to Product Catalog"
+                                                  >
+                                                    <IoSaveOutline size={18} />
+                                                  </button>
+                                               )}
+                                             </div>
+                                           </div>
+                                         </td>
 
 
 

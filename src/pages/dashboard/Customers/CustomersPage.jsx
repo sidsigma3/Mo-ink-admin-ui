@@ -330,7 +330,7 @@ const CustomersPage = () => {
             <div className='order-filter-cttn d-flex gap-2 mb-2 mt-3 '>
                 <div className='col-sm-6 col-md-9'>
                     <ProductFilter 
-                        filterOptions={["City", "Customer"]} 
+                        filterOptions={["Customer", "City"]} 
                         onFilterChange={handleFilterChange}
                         searchTerm={searchTerm}
                     />
@@ -352,6 +352,7 @@ const CustomersPage = () => {
                             <th style={{ verticalAlign: 'middle'}}>#ID</th>
                             <th style={{ verticalAlign: 'middle'}} >Name</th>
                             <th style={{ verticalAlign: 'middle'}} >Email</th>
+                            <th style={{ verticalAlign: 'middle'}} >Number</th>
                             <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Location</th>
                             <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Wallet</th>
                             <th style={{ textAlign: 'center', verticalAlign: 'middle'}} >Orders</th>
@@ -369,6 +370,7 @@ const CustomersPage = () => {
                       <td style={{ verticalAlign: 'middle'}}>{customer.customerId}</td>
                       <td style={{ verticalAlign: 'middle'}} >{customer.customerName}</td>
                       <td style={{ verticalAlign: 'middle'}} >{customer.email}</td>
+                      <td style={{ verticalAlign: 'middle'}} >{customer.phoneNumber}</td>
                       <td style={{ textAlign: 'center', verticalAlign: 'middle'}} >{customer.addresses[0]?.city || ""}</td>
                       <td  className="wallet-balance-cell" style={{ color: "#3CAA82", textAlign: 'center', verticalAlign: 'middle' }}>
                         {walletBalances[customer.customerId] !== undefined ? (walletBalances[customer.customerId]).toFixed(0) : "Loading..."}

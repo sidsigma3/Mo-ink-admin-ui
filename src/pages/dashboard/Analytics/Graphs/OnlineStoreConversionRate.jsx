@@ -7,6 +7,7 @@ const OnlineStoreConversionRate = () => {
   const navigate = useNavigate();
 
   const rawData = [20, 30, 50, 45];
+  const maxVal = Math.max(...rawData);
 
   const barChartData = {
     labels: ["Jan", "Feb", "Mar", "Apr"],
@@ -17,7 +18,7 @@ const OnlineStoreConversionRate = () => {
         borderRadius: 7,
         data: rawData,
         backgroundColor: rawData.map((val) =>
-          val === Math.max(...rawData) ? "#0561FC" : "#CDCDCD"
+          val === maxVal ? "#6B21A8" : "#CDCDCD"
         ),
       },
     ],
@@ -27,13 +28,8 @@ const OnlineStoreConversionRate = () => {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      x: {
-        grid: { display: false },
-      },
-      y: {
-        grid: { display: false },
-        beginAtZero: true,
-      },
+      x: { grid: { display: false } },
+      y: { grid: { display: false }, beginAtZero: true },
     },
     plugins: {
       legend: { display: false },
@@ -47,7 +43,6 @@ const OnlineStoreConversionRate = () => {
     ["February", "50%"],
     ["March", "40%"],
     ["April", "70%"],
-    ["May", "60%"],
   ];
 
   const handleClick = () => {
@@ -65,7 +60,6 @@ const OnlineStoreConversionRate = () => {
 
   return (
     <div className="conversion-rate-card p-3" onClick={handleClick}>
-      {/* <h4>Online Conversion Rate</h4> */}
       <div className="conversion-rate-graph">
         <GraphComponent
           type="bar"
@@ -79,6 +73,4 @@ const OnlineStoreConversionRate = () => {
   );
 };
 
-
 export default OnlineStoreConversionRate;
-

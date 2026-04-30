@@ -3,21 +3,22 @@ import { useNavigate } from "react-router-dom";
 import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
 import "./TopSellingCounter.css";
 
-const TopSellingCounter = () => {
+const TopSellingCounter = ({ data }) => {
   const navigate = useNavigate();
 
-  const data = [90, 70, 60, 55, 30];
-  const labels = ["2/92", "2/120", "2/72", "2/16", "2/80"];
+  const counters = data?.topCounters || [];
+  const labels = counters.length > 0 ? counters.map(c => c.name) : ["2/92", "2/120", "2/72", "2/16", "2/80"];
+  const values = counters.length > 0 ? counters.map(c => c.value) : [90, 70, 60, 55, 30];
 
   const horizontalBarChartData = {
     labels,
     datasets: [
       {
-        label: "Sales",
-        data,
+        label: "Weight (kg)",
+        data: values,
         barThickness: 25,
         borderRadius: 7,
-        backgroundColor: "#0561FC",
+        backgroundColor: "#6B21A8",
       },
     ],
   };
@@ -36,14 +37,8 @@ const TopSellingCounter = () => {
     },
   };
 
-  const tableHeaders = ["Counter", "Sales"];
-  const tableRows = [
-    ["2/16", 30],
-    ["2/120", 50],
-    ["2/92", 40],
-    ["2/72", 70],
-    ["2/90", 60],
-  ];
+  const tableHeaders = ["Counter", "Weight (kg)"];
+  const tableRows = labels.map((l, i) => [l, values[i]]);
 
   const handleClick = () => {
     navigate("/graph-details", {
@@ -60,8 +55,6 @@ const TopSellingCounter = () => {
 
   return (
     <div className="top-selling-card p-3" onClick={handleClick}>
-      {/* <h4>Top Selling Counter</h4>
-      <h3>Counter 2/92</h3> */}
       <div className="top-selling-graph">
         <GraphComponent
           type="bar"
@@ -74,6 +67,4 @@ const TopSellingCounter = () => {
   );
 };
 
-
 export default TopSellingCounter;
-
