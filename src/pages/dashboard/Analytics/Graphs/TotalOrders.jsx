@@ -3,22 +3,24 @@ import { useNavigate } from "react-router-dom";
 import GraphComponent from "../../../../components/Analylitcs/Graph/Graph Cards/GraphComponent";
 import "./TotalOrders.css";
 
-const TotalOrders = () => {
+const TotalOrders = ({ data }) => {
   const navigate = useNavigate();
 
-  const orders = [3000, 4000, 5000, 4500];
-  const maxOrder = Math.max(...orders);
+  const months = data?.monthlyOrders?.map(m => m.month) || ["Jan", "Feb", "Mar", "Apr"];
+  const values = data?.monthlyOrders?.map(m => m.value) || [3, 4, 5, 4];
+  const total = data?.totalOrders || 0;
+  const maxOrder = Math.max(...values);
 
   const barChartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr"],
+    labels: months,
     datasets: [
       {
         label: "Orders",
         barThickness: 25,
         borderRadius: 7,
-        data: orders,
-        backgroundColor: orders.map((val) =>
-          val === maxOrder ? "#0561FC" : "#CDCDCD"
+        data: values,
+        backgroundColor: values.map((val) =>
+          val === maxOrder ? "#6B21A8" : "#CDCDCD"
         ),
       },
     ],
@@ -38,13 +40,7 @@ const TotalOrders = () => {
   };
 
   const tableHeaders = ["Month", "Orders"];
-  const tableRows = [
-    ["January", 30],
-    ["February", 50],
-    ["March", 40],
-    ["April", 70],
-    ["May", 60],
-  ];
+  const tableRows = months.map((m, i) => [m, values[i]]);
 
   const handleClick = () => {
     navigate("/graph-details", {
@@ -61,21 +57,17 @@ const TotalOrders = () => {
 
   return (
     <div className="total-orders-card p-3" onClick={handleClick}>
-      {/* <h4>Total Orders</h4>
-      <h3>50 Orders</h3> */}
       <div className="total-orders-graph">
         <GraphComponent
           type="bar"
           data={barChartData}
           options={chartOptions}
           text={"Total Orders"}
-          number={"50 Orders"}
+          number={`${total} Orders`}
         />
       </div>
     </div>
   );
 };
 
-
 export default TotalOrders;
-

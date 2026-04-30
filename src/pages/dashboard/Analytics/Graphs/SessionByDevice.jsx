@@ -12,40 +12,30 @@ const SessionByDevice = () => {
       {
         data: [300, 50, 100, 250],
         backgroundColor: [
-          "#0561FC", // Main color
-          "#0350D2", // A darker shade of #0561FC
-          "#3A73FF", // A lighter shade of #0561FC
-          "#7A9FFF", // Another variation
+          "#6B21A8",
+          "#8B3EC8",
+          "#A855F7",
+          "#C084FC",
         ],
       },
     ],
   };
 
-  // Calculate the total visitors
   const totalVisitors = doughnutChartData.datasets[0].data.reduce(
     (acc, value) => acc + value,
     0
   );
 
-  // Custom plugin to display total visitors in the center
   const centerTextPlugin = {
     id: "centerText",
     beforeDraw(chart) {
-      const {
-        width,
-        height,
-        ctx
-      } = chart;
+      const { width, height, ctx } = chart;
       ctx.save();
       ctx.font = "bold 20px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "#0561FC";
-      ctx.fillText(
-        `${totalVisitors} Visitors`,
-        width / 2,
-        height / 2
-      );
+      ctx.fillStyle = "#6B21A8";
+      ctx.fillText(`${totalVisitors} Visitors`, width / 2, height / 2);
     },
   };
 
@@ -55,13 +45,21 @@ const SessionByDevice = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: { position: "bottom" },
-      title: { display: false, text: "Session By Device Type" },
+      title: { display: false },
     },
     scales: {
-      x: { display: false }, // Hide x-axis
-      y: { display: false }, // Hide y-axis
+      x: { display: false },
+      y: { display: false },
     },
   };
+
+  const tableHeaders = ["Device", "Session"];
+  const tableRows = [
+    ["Mobile", 300],
+    ["Desktop", 50],
+    ["Tablet", 100],
+    ["Others", 250],
+  ];
 
   const handleClick = () => {
     navigate("/graph-details", {
@@ -76,23 +74,14 @@ const SessionByDevice = () => {
     });
   };
 
-  const tableHeaders = ["Device", "Session"];
-  const tableRows = [
-    ["Mobile", 300],
-    ["Desktop", 50],
-    ["Tablet", 100],
-    ["Others", 250],
-  ];
-
   return (
     <div className="session-device-card  p-3" onClick={handleClick}>
-      {/* <h4>Session by Device Type</h4> */}
       <div className="session-device-graph">
         <GraphComponent
           type="doughnut"
           data={doughnutChartData}
           options={chartOptions}
-          plugins={[centerTextPlugin]} // Pass the plugin here
+          plugins={[centerTextPlugin]}
           text={"Session by device type"}
         />
       </div>
