@@ -38,6 +38,9 @@ import { RiFilePaper2Line } from 'react-icons/ri';
 import ModalSendInvoice from '../../../components/Modal/ModalSendInvoice';
 import Toast from "../../../components/Toast/Toast";
 import ModalCollectAmount from '../../../components/Modal/ModalCollectAmount';
+import { updateHandlingRate, resolveRatePerKg, HANDLING_RATE_EDITOR_ROLES } from '../../../services/SettingsService';
+import useHandlingRate from '../../../utils/useHandlingRate';
+import ModalHandlingCharges from '../../../components/Modal/ModalHandlingCharges';
 
 
 const backendUrl = process.env.REACT_APP_IMAGE_URL
@@ -1252,6 +1255,25 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
     order?.address || {}
   );
 
+  // Handling rates shared by every app. Only MASTER and ADMIN users may change them;
+  // the backend enforces the same rule.
+  const [handlingRateConfig, setHandlingRateConfig] = useHandlingRate();
+  const [showHandlingChargesModal, setShowHandlingChargesModal] = useState(false);
+  const canEditHandlingRate = HANDLING_RATE_EDITOR_ROLES.includes(user?.role);
+
+  const handleSaveHandlingRate = async ({ inStateRatePerKg, outOfStateRatePerKg }) => {
+    const response = await updateHandlingRate({
+      inStateRatePerKg,
+      outOfStateRatePerKg,
+      homeState: handlingRateConfig.homeState,
+      updatedByUserId: user?.userId ?? null,
+    });
+
+    setHandlingRateConfig(response?.data || { ...handlingRateConfig, inStateRatePerKg, outOfStateRatePerKg });
+    setShowHandlingChargesModal(false);
+    showToast("Handling charges updated", "success");
+  };
+
 
   const handleSelectAddress = (addressType) => {
     const newSelectedAddress = selectedCustomer.addresses.find(
@@ -1262,29 +1284,33 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
     }
   };
 
-  const calculateShippingCost = (orderDetails, selectedCustomer) => {
-    let state = "";
-  
-    if (isViewMode) {
-      const parts = order.shippingAddress?.split(",") || [];
-      if (parts.length >= 3) {
-        state = parts[parts.length - 3]?.trim().toLowerCase(); // e.g., "Odisha"
-      }
-    } else {
-      state = selectedAddress?.state?.toLowerCase();
-    }
-  
-    if (!state) return 0;
-  
-    const ratePerKg = state === "odisha" ? 3 : 5;
-  
-    const totalWeight = orderDetails.reduce((acc, item) => {
-      if (item.status === 'CANCELLED') return acc;
-      return acc + (Number(item.color?.weight) || 0);
-    }, 0);
-  
-    return Number((totalWeight * ratePerKg).toFixed(2));
+  // Addresses are stored by the backend as
+  // "customerAddress, street, city, state, PIN: <zip>, country" with null fields
+  // dropped, so anchor the state on "PIN:" instead of counting back from the end —
+  // counting lands on the city whenever country is missing.
+  const getStateFromAddressText = (addressText) => {
+    if (!addressText) return "";
+    const beforePin = String(addressText).split("PIN:")[0];
+    const parts = beforePin.split(",").map((part) => part.trim()).filter(Boolean);
+    return (parts[parts.length - 1] || "").toLowerCase();
   };
+
+  // Shipping state decides which configured rate applies.
+  const shippingState = isViewMode
+    ? getStateFromAddressText(order.shippingAddress)
+    : (selectedAddress?.state || "").toLowerCase();
+
+  // Rupees per kg in force for this order's shipping state.
+  const effectiveHandlingRatePerKg = resolveRatePerKg(shippingState, handlingRateConfig);
+
+  // Cancelled lines are not handled, so they are not charged for.
+  const handlingChargeableWeight = orderDetails.reduce((acc, item) => {
+    if (item.status === 'CANCELLED') return acc;
+    return acc + (Number(item.color?.weight) || 0);
+  }, 0);
+
+  const calculateShippingCost = () =>
+    Number((handlingChargeableWeight * effectiveHandlingRatePerKg).toFixed(2));
   
   
 
@@ -1314,7 +1340,7 @@ const handleModalConfirm = async ({ amount, paymentMethod, remark }) => {
   );
   
   
-  const handlingCharges = calculateShippingCost(orderDetails, selectedCustomer);
+  const handlingCharges = calculateShippingCost();
   const platformFee = 0;
 
   const netPayablePrice =
@@ -1491,10 +1517,9 @@ const handleOrderChange = async () => {
 
     const discount = (baseAmount * combinedDiscountPercent) / 100;
 
-    // Handling Charges
-    const shippingState = getStateFromBillingAddress(order.shippingAddress);
-    const ratePerKg = shippingState?.toLowerCase() === "odisha" ? 3 : 5;
-    const handling = orderWeight * ratePerKg;
+    // Handling Charges — same rate the summary panel is showing, so a weight edit
+    // never recomputes against a different rate than the operator saw.
+    const handling = orderWeight * effectiveHandlingRatePerKg;
 
     const taxableAmount = baseAmount - discount;
 
@@ -1546,9 +1571,9 @@ const handleOrderChange = async () => {
 
 
 
-const billingAddress = order?.billingAddress 
+const billingAddress = order?.billingAddress
 ? getStateFromBillingAddress(order.billingAddress)
-: selectedCustomer?.addresses?.find((addr) => addr.addressType === "HOME").state.toLowerCase();
+: (selectedCustomer?.addresses?.find((addr) => addr.addressType === "HOME")?.state || "").toLowerCase();
 
 const isOdisha = billingAddress === "odisha";
 
@@ -2222,7 +2247,7 @@ const handleCancelTransaction = () => {
                                 {selectedAddress.addressType || "Select Address"}
                               </Dropdown.Toggle>
                               <Dropdown.Menu>
-                                {selectedCustomer.addresses.map((address, index) => (
+                                {selectedCustomer.addresses?.map((address, index) => (
                                   <Dropdown.Item key={index} eventKey={address.addressType}>
                                     {address.addressType}
                                   </Dropdown.Item>
@@ -2281,7 +2306,7 @@ const handleCancelTransaction = () => {
                               <p className="text-gray-600 whitespace-pre-line">{order.billingAddress}</p>
                           </div>
                         )}
-                    
+
 
                       {/* Shipping Address */}
                       <div className="flex-grow-1">
@@ -2561,9 +2586,23 @@ const handleCancelTransaction = () => {
                    
                     <tr>
                       <td className=" fw-medium pt-2">Handling Charges</td>
-                      <td></td>
-                      {/* <td className="text-end">₹{((calculateGrandTotal(orderDetails) * 5) / 100).toFixed(2)}</td> */}
-                      <td className="text-end">₹{calculateShippingCost(orderDetails, selectedCustomer)}</td>
+                      <td className="pt-2">
+                        <span className="d-inline-flex align-items-center gap-1 text-black-50" style={{ fontSize: "13px" }}>
+                          ₹{effectiveHandlingRatePerKg}/kg
+                          {!isViewMode && canEditHandlingRate && (
+                            <button
+                              type="button"
+                              title="Edit handling charges"
+                              aria-label="Edit handling charges"
+                              className="handling-edit-btn"
+                              onClick={() => setShowHandlingChargesModal(true)}
+                            >
+                              <GoPencil size={13} />
+                            </button>
+                          )}
+                        </span>
+                      </td>
+                      <td className="text-end">₹{handlingCharges.toFixed(0)}</td>
                     </tr>
 
 
@@ -2686,6 +2725,13 @@ const handleCancelTransaction = () => {
                         show={showModalInvoice}
                         handleClose={()=>SetShowModalInvoice(false)}
                     ></ModalInvoice>
+
+                    <ModalHandlingCharges
+                        isOpen={showHandlingChargesModal}
+                        onCancel={() => setShowHandlingChargesModal(false)}
+                        onSave={handleSaveHandlingRate}
+                        handlingRate={handlingRateConfig}
+                    />
 
                     {/* <ReactWhatsapp number={selectedCustomer.whatsappNumber} message={"hdshuihuih"}>
                         <button className="whatsapp-btn">Send on WhatsApp</button>

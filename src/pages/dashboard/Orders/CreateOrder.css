@@ -11,6 +11,31 @@
     /* font-weight: 500; */
 }
 
+/* ---------- Handling charges edit affordance ---------- */
+
+.create-order .handling-edit-btn {
+    background: transparent;
+    border: none;
+    padding: 0.25rem;
+    line-height: 1;
+    color: #6B21A8;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.create-order .handling-edit-btn:hover {
+    background-color: #F3E8FF;
+}
+
+.create-order .handling-edit-btn:focus-visible {
+    outline: 2px solid #6B21A8;
+    outline-offset: 1px;
+}
+
 
 
 
