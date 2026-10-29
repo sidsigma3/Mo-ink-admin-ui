@@ -446,7 +446,7 @@ if (totalPages > 1) {
 
                 {/* <ImportBtn></ImportBtn> */}
 
-                <Link to={'/BulkAssignPage'}>
+                <Link to={'/BulkAssignPage'} className='text-decoration-none'>
                                     <AddBtn
                                         text={"Order to vendor"}
                                     ></AddBtn>

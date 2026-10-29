@@ -176,7 +176,7 @@ const UserPage = () => {
 
                 {(userData.role === "MASTER") && (
                     <div className='d-flex gap-2'>
-                      <Link to={'/add-user'}>
+                      <Link to={'/add-user'} className='text-decoration-none'>
                         <AddBtn text={"Add User"} />
                       </Link>
                     </div>

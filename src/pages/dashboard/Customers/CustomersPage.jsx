@@ -321,7 +321,7 @@ const CustomersPage = () => {
                 <div className='d-flex gap-2'>
                     <ExportBtn onClick={exportToExcel}></ExportBtn>
 
-                    <Link to={'/add-customer'}>
+                    <Link to={'/add-customer'} className='text-decoration-none'>
                     <AddBtn text={"Add New"}></AddBtn>
                     </Link>
                 </div>

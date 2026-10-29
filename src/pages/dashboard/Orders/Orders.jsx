@@ -415,7 +415,7 @@ useEffect(() => {
 
                 <ExportBtn onClick={() => orderTableRef.current?.exportOrders()}></ExportBtn>
                 
-                <Link to={'/create-order'}>
+                <Link to={'/create-order'} className='text-decoration-none'>
                     <AddBtn
                         text={"Create Order"}
                     ></AddBtn>

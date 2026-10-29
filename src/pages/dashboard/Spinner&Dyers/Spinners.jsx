@@ -331,7 +331,7 @@ const Spinners = () => {
                       </Modal.Footer>
                     </Modal>
 
-                    <Link to={'/add-spinner-and-dyers'}>
+                    <Link to={'/add-spinner-and-dyers'} className='text-decoration-none'>
                     <AddBtn text={"Add New"}></AddBtn>
                     </Link>
                 </div>

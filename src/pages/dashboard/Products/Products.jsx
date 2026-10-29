@@ -89,7 +89,7 @@ const Products = () => {
 
                 {/* <ImportBtn></ImportBtn> */}
 
-                <Link to={'/add-product'}>
+                <Link to={'/add-product'} className='text-decoration-none'>
                 <AddBtn  
                      text={"Add Product"}
                 ></AddBtn>

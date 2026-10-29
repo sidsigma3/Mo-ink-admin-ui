@@ -211,7 +211,7 @@ const SegmentsPage = () => {
 
                
 
-                <Link to={'/add-segments'}>
+                <Link to={'/add-segments'} className='text-decoration-none'>
                 <AddBtn text={"Add New"}></AddBtn>
                 </Link>
             </div>

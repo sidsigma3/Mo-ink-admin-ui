@@ -269,7 +269,7 @@ const getProductText = (discount) => {
             <div className='d-flex gap-2'>
                 <ExportBtn onClick={() => exportToExcel(filteredData)}></ExportBtn>
 
-                <Link to={'/add-discount'}>
+                <Link to={'/add-discount'} className='text-decoration-none'>
                 <AddBtn text={"Add Discount"}></AddBtn>
                 </Link>
             </div>
